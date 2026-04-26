@@ -1,29 +1,24 @@
 {
-  "actualizado": "2026-04-26T02:53:20.124Z",
+  "actualizado": "2026-04-26T03:04:41.750Z",
   "jugadores": [
     {
       "id": "pau-gasol",
       "nombre": "Pau Gasol",
-      "draft": true,
-      "draft_anio": 2001,
-      "draft_pick": 3,
-      "draft_equipo": "ATL",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 1226,
       "partidos_titular": 1150,
       "min_total": 41001,
-      "min_g": 33.4,
+      "min_g": 33.44290375203915,
       "pts_total": 20894,
-      "pts_g": 17,
+      "pts_g": 17.042414355628058,
       "rbd_total": 11305,
-      "rbd_g": 9.2,
+      "rbd_g": 9.221044045676999,
       "ast_total": 3925,
-      "ast_g": 3.2,
+      "ast_g": 3.201468189233279,
       "stl_total": 606,
-      "stl_g": 0.5,
+      "stl_g": 0.49429037520391517,
       "blk_total": 1941,
-      "blk_g": 1.6,
+      "blk_g": 1.5831973898858076,
       "tres_total": 179,
       "tres_g": 0.1,
       "tov_total": 2638,
@@ -31,131 +26,13 @@
       "fg_pct": 0.507343124165554,
       "tres_pct": 0.3683127572016461,
       "ft_pct": 0.753446363492315,
-      "equipos_nba": "MEM, LAL, CHI, SAS",
+      "rank": 1,
+      "draft": false,
+      "draft_anio": 2001,
+      "draft_pick": 3,
+      "draft_equipo": "ATL",
       "ganancias": 220990766,
-      "premios": [
-        {
-          "tipo": "ROY",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2002,
-          "team": "MEM"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2003,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2006,
-          "team": "MEM"
-        },
-        {
-          "tipo": "POM",
-          "detalle": "",
-          "year": 2009,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2009,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2009,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2010,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2010,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2010,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2011,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2011,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2011,
-          "team": "LAL"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2016,
-          "team": "CHI"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "MEM, LAL, CHI, SAS",
       "temporadas_data": [
         {
           "year": 2019,
@@ -480,32 +357,149 @@
           "ft_pct": null
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 1
+      "premios": [
+        {
+          "tipo": "ROY",
+          "detalle": "ROY",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2002,
+          "team": "MEM"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2003,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2006,
+          "team": "MEM"
+        },
+        {
+          "tipo": "POM",
+          "detalle": "POM",
+          "year": 2009,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2009,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2009,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2010,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2010,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2010,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2011,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2011,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2011,
+          "team": "LAL"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2016,
+          "team": "CHI"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "marc-gasol",
       "nombre": "Marc Gasol",
-      "draft": true,
-      "draft_anio": 2007,
-      "draft_pick": 48,
-      "draft_equipo": "LAL",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 891,
       "partidos_titular": 866,
       "min_total": 28719,
-      "min_g": 32.2,
+      "min_g": 32.23232323232323,
       "pts_total": 12514,
-      "pts_g": 14,
+      "pts_g": 14.044893378226712,
       "rbd_total": 6604,
-      "rbd_g": 7.4,
+      "rbd_g": 7.411896745230078,
       "ast_total": 2996,
-      "ast_g": 3.4,
+      "ast_g": 3.3625140291806956,
       "stl_total": 792,
-      "stl_g": 0.9,
+      "stl_g": 0.8888888888888888,
       "blk_total": 1254,
-      "blk_g": 1.4,
+      "blk_g": 1.4074074074074074,
       "tres_total": 431,
       "tres_g": 0.5,
       "tov_total": 1755,
@@ -513,77 +507,13 @@
       "fg_pct": 0.48090890226188004,
       "tres_pct": 0.36006683375104426,
       "ft_pct": 0.776,
-      "equipos_nba": "MEM, TOR, LAL",
+      "rank": 2,
+      "draft": false,
+      "draft_anio": 2007,
+      "draft_pick": 48,
+      "draft_equipo": "LAL",
       "ganancias": 181665456,
-      "premios": [
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2009,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2009,
-          "team": "MEM"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2010,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2012,
-          "team": "MEM"
-        },
-        {
-          "tipo": "DPOY",
-          "detalle": "",
-          "year": 2013,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2013,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Defense",
-          "detalle": "",
-          "year": 2013,
-          "team": "MEM"
-        },
-        {
-          "tipo": "MVP",
-          "detalle": "",
-          "year": 2015,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2015,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All NBA",
-          "detalle": "",
-          "year": 2015,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2017,
-          "team": "MEM"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "MEM, TOR, LAL",
       "temporadas_data": [
         {
           "year": 2019,
@@ -796,32 +726,95 @@
           "ft_pct": 0.7333333333333333
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 2
+      "premios": [
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2009,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2009,
+          "team": "MEM"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2010,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2012,
+          "team": "MEM"
+        },
+        {
+          "tipo": "DPOY",
+          "detalle": "DPOY",
+          "year": 2013,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2013,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Defense",
+          "detalle": "All Defense",
+          "year": 2013,
+          "team": "MEM"
+        },
+        {
+          "tipo": "MVP",
+          "detalle": "MVP",
+          "year": 2015,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2015,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All NBA",
+          "detalle": "All NBA",
+          "year": 2015,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2017,
+          "team": "MEM"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "nikola-mirotic",
       "nombre": "Nikola Mirotic",
-      "draft": true,
-      "draft_anio": 2011,
-      "draft_pick": 23,
-      "draft_equipo": "HOU",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 319,
       "partidos_titular": 95,
       "min_total": 7718,
-      "min_g": 24.2,
+      "min_g": 24.19435736677116,
       "pts_total": 3910,
-      "pts_g": 12.3,
+      "pts_g": 12.25705329153605,
       "rbd_total": 1894,
-      "rbd_g": 5.9,
+      "rbd_g": 5.93730407523511,
       "ast_total": 407,
-      "ast_g": 1.3,
+      "ast_g": 1.2758620689655173,
       "stl_total": 240,
-      "stl_g": 0.8,
+      "stl_g": 0.7523510971786834,
       "blk_total": 228,
-      "blk_g": 0.7,
+      "blk_g": 0.7147335423197492,
       "tres_total": 614,
       "tres_g": 1.9,
       "tov_total": 381,
@@ -829,41 +822,13 @@
       "fg_pct": 0.42250324254215305,
       "tres_pct": 0.35864485981308414,
       "ft_pct": 0.8079625292740047,
-      "equipos_nba": "",
+      "rank": 3,
+      "draft": false,
+      "draft_anio": 2011,
+      "draft_pick": 23,
+      "draft_equipo": "HOU",
       "ganancias": 41631175,
-      "premios": [
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2015,
-          "team": "CHI"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2016,
-          "team": "CHI"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2019,
@@ -992,32 +957,59 @@
           "ft_pct": 0.8028169014084507
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 3
+      "premios": [
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2015,
+          "team": "CHI"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2016,
+          "team": "CHI"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "serge-ibaka",
       "nombre": "Serge Ibaka",
-      "draft": true,
-      "draft_anio": 2008,
-      "draft_pick": 24,
-      "draft_equipo": "SEA",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 919,
       "partidos_titular": 697,
       "min_total": 25126,
-      "min_g": 27.3,
+      "min_g": 27.340587595212188,
       "pts_total": 11028,
       "pts_g": 12,
       "rbd_total": 6513,
-      "rbd_g": 7.1,
+      "rbd_g": 7.087051142546246,
       "ast_total": 749,
-      "ast_g": 0.8,
+      "ast_g": 0.8150163220892275,
       "stl_total": 373,
-      "stl_g": 0.4,
+      "stl_g": 0.4058759521218716,
       "blk_total": 1759,
-      "blk_g": 1.9,
+      "blk_g": 1.9140369967355821,
       "tres_total": 614,
       "tres_g": 0.7,
       "tov_total": 1187,
@@ -1025,23 +1017,13 @@
       "fg_pct": 0.5131224764468372,
       "tres_pct": 0.35927442949093036,
       "ft_pct": 0.7573397243858598,
-      "equipos_nba": "OKC, ORL",
+      "rank": 4,
+      "draft": false,
+      "draft_anio": 2008,
+      "draft_pick": 24,
+      "draft_equipo": "SEA",
       "ganancias": 141250191,
-      "premios": [
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2011,
-          "team": "OKC"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2011,
-          "team": "OKC"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "OKC, ORL",
       "temporadas_data": [
         {
           "year": 2023,
@@ -1296,32 +1278,41 @@
           "ft_pct": 0.75
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 4
+      "premios": [
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2011,
+          "team": "OKC"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2011,
+          "team": "OKC"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "juan-carlos-navarro",
       "nombre": "Juan Carlos Navarro",
-      "draft": true,
-      "draft_anio": 2002,
-      "draft_pick": 40,
-      "draft_equipo": "WAS",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 82,
       "partidos_titular": 30,
       "min_total": 2117,
-      "min_g": 25.8,
+      "min_g": 25.817073170731707,
       "pts_total": 896,
-      "pts_g": 10.9,
+      "pts_g": 10.926829268292684,
       "rbd_total": 210,
-      "rbd_g": 2.6,
+      "rbd_g": 2.5609756097560976,
       "ast_total": 177,
-      "ast_g": 2.2,
+      "ast_g": 2.158536585365854,
       "stl_total": 48,
-      "stl_g": 0.6,
+      "stl_g": 0.5853658536585366,
       "blk_total": 1,
-      "blk_g": 0,
+      "blk_g": 0.012195121951219513,
       "tres_total": 156,
       "tres_g": 1.9,
       "tov_total": 134,
@@ -1329,23 +1320,13 @@
       "fg_pct": 0.402088772845953,
       "tres_pct": 0.3611111111111111,
       "ft_pct": 0.8493150684931506,
-      "equipos_nba": "",
+      "rank": 5,
+      "draft": false,
+      "draft_anio": 2002,
+      "draft_pick": 40,
+      "draft_equipo": "WAS",
       "ganancias": 538090,
-      "premios": [
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2008,
-          "team": "MEM"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2008,
-          "team": "MEM"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2008,
@@ -1362,32 +1343,41 @@
           "ft_pct": 0.8493150684931506
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 5
+      "premios": [
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2008,
+          "team": "MEM"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2008,
+          "team": "MEM"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "ricky-rubio",
       "nombre": "Ricky Rubio",
-      "draft": true,
-      "draft_anio": 2009,
-      "draft_pick": 5,
-      "draft_equipo": "MIN",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 698,
       "partidos_titular": 603,
       "min_total": 20694,
-      "min_g": 29.6,
+      "min_g": 29.64756446991404,
       "pts_total": 7570,
-      "pts_g": 10.8,
+      "pts_g": 10.845272206303726,
       "rbd_total": 2830,
-      "rbd_g": 4.1,
+      "rbd_g": 4.054441260744985,
       "ast_total": 5160,
-      "ast_g": 7.4,
+      "ast_g": 7.392550143266476,
       "stl_total": 1226,
-      "stl_g": 1.8,
+      "stl_g": 1.7564469914040115,
       "blk_total": 94,
-      "blk_g": 0.1,
+      "blk_g": 0.1346704871060172,
       "tres_total": 637,
       "tres_g": 0.9,
       "tov_total": 1768,
@@ -1395,35 +1385,13 @@
       "fg_pct": 0.387806411062225,
       "tres_pct": 0.32351447435246317,
       "ft_pct": 0.8426160337552743,
-      "equipos_nba": "",
+      "rank": 6,
+      "draft": false,
+      "draft_anio": 2009,
+      "draft_pick": 5,
+      "draft_equipo": "MIN",
       "ganancias": 131001894,
-      "premios": [
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2012,
-          "team": "MIN"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2012,
-          "team": "MIN"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2012,
-          "team": "MIN"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2013,
-          "team": "MIN"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2015,
@@ -1594,32 +1562,53 @@
           "ft_pct": 0.8021201413427562
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 6
+      "premios": [
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2012,
+          "team": "MIN"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2012,
+          "team": "MIN"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2012,
+          "team": "MIN"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2013,
+          "team": "MIN"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "santi-aldama",
       "nombre": "Santi Aldama",
-      "draft": true,
-      "draft_anio": 2021,
-      "draft_pick": 30,
-      "draft_equipo": "UTA",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 278,
       "partidos_titular": 82,
       "min_total": 6518,
-      "min_g": 23.4,
+      "min_g": 23.446043165467625,
       "pts_total": 2895,
-      "pts_g": 10.4,
+      "pts_g": 10.413669064748202,
       "rbd_total": 1513,
-      "rbd_g": 5.4,
+      "rbd_g": 5.442446043165468,
       "ast_total": 570,
-      "ast_g": 2.1,
+      "ast_g": 2.050359712230216,
       "stl_total": 183,
-      "stl_g": 0.7,
+      "stl_g": 0.658273381294964,
       "blk_total": 172,
-      "blk_g": 0.6,
+      "blk_g": 0.6187050359712231,
       "tres_total": 396,
       "tres_g": 1.4,
       "tov_total": 271,
@@ -1627,10 +1616,13 @@
       "fg_pct": 0.46317581949765857,
       "tres_pct": 0.34615384615384615,
       "ft_pct": 0.6857749469214437,
-      "equipos_nba": "MEM",
+      "rank": 7,
+      "draft": false,
+      "draft_anio": 2021,
+      "draft_pick": 30,
+      "draft_equipo": "UTA",
       "ganancias": 62743371,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "MEM",
       "temporadas_data": [
         {
           "year": 2022,
@@ -1675,32 +1667,28 @@
           "ft_pct": 0.7272727272727273
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 7
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "rudy-fernandez",
       "nombre": "Rudy Fernández",
-      "draft": true,
-      "draft_anio": 2007,
-      "draft_pick": 24,
-      "draft_equipo": "PHX",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 249,
       "partidos_titular": 10,
       "min_total": 5965,
-      "min_g": 24,
+      "min_g": 23.955823293172692,
       "pts_total": 2254,
-      "pts_g": 9.1,
+      "pts_g": 9.052208835341366,
       "rbd_total": 608,
-      "rbd_g": 2.4,
+      "rbd_g": 2.4417670682730925,
       "ast_total": 554,
-      "ast_g": 2.2,
+      "ast_g": 2.2248995983935744,
       "stl_total": 249,
       "stl_g": 1,
       "blk_total": 40,
-      "blk_g": 0.2,
+      "blk_g": 0.1606425702811245,
       "tres_total": 413,
       "tres_g": 1.7,
       "tov_total": 286,
@@ -1708,29 +1696,13 @@
       "fg_pct": 0.39935240151106316,
       "tres_pct": 0.36006974716652135,
       "ft_pct": 0.8395348837209302,
-      "equipos_nba": "",
+      "rank": 8,
+      "draft": false,
+      "draft_anio": 2007,
+      "draft_pick": 24,
+      "draft_equipo": "PHX",
       "ganancias": 5676523,
-      "premios": [
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2009,
-          "team": "POR"
-        },
-        {
-          "tipo": "All Star",
-          "detalle": "",
-          "year": 2009,
-          "team": "POR"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2009,
-          "team": "POR"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2012,
@@ -1789,32 +1761,47 @@
           "ft_pct": 0.8391608391608392
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 8
+      "premios": [
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2009,
+          "team": "POR"
+        },
+        {
+          "tipo": "All Star",
+          "detalle": "All Star",
+          "year": 2009,
+          "team": "POR"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2009,
+          "team": "POR"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "jose-m-calderon",
       "nombre": "José M. Calderón",
-      "draft": true,
-      "draft_anio": null,
-      "draft_pick": null,
-      "draft_equipo": null,
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 895,
       "partidos_titular": 591,
       "min_total": 23643,
-      "min_g": 26.4,
+      "min_g": 26.416759776536313,
       "pts_total": 7921,
-      "pts_g": 8.9,
+      "pts_g": 8.850279329608938,
       "rbd_total": 2148,
       "rbd_g": 2.4,
       "ast_total": 5148,
-      "ast_g": 5.8,
+      "ast_g": 5.75195530726257,
       "stl_total": 716,
       "stl_g": 0.8,
       "blk_total": 71,
-      "blk_g": 0.1,
+      "blk_g": 0.07932960893854749,
       "tres_total": 920,
       "tres_g": 1,
       "tov_total": 1339,
@@ -1822,10 +1809,13 @@
       "fg_pct": 0.4717391304347826,
       "tres_pct": 0.40707964601769914,
       "ft_pct": 0.8726415094339622,
-      "equipos_nba": "",
+      "rank": 9,
+      "draft": false,
+      "draft_anio": null,
+      "draft_pick": null,
+      "draft_equipo": null,
       "ganancias": 84201469,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2017,
@@ -2080,32 +2070,28 @@
           "ft_pct": 0.9083333333333333
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 9
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "jorge-garbajosa",
       "nombre": "Jorge Garbajosa",
-      "draft": true,
-      "draft_anio": null,
-      "draft_pick": null,
-      "draft_equipo": null,
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 74,
       "partidos_titular": 60,
       "min_total": 1983,
-      "min_g": 26.8,
+      "min_g": 26.7972972972973,
       "pts_total": 589,
-      "pts_g": 8,
+      "pts_g": 7.95945945945946,
       "rbd_total": 345,
-      "rbd_g": 4.7,
+      "rbd_g": 4.662162162162162,
       "ast_total": 128,
-      "ast_g": 1.7,
+      "ast_g": 1.7297297297297298,
       "stl_total": 81,
-      "stl_g": 1.1,
+      "stl_g": 1.0945945945945945,
       "blk_total": 15,
-      "blk_g": 0.2,
+      "blk_g": 0.20270270270270271,
       "tres_total": 72,
       "tres_g": 1,
       "tov_total": 65,
@@ -2113,29 +2099,13 @@
       "fg_pct": 0.4151624548736462,
       "tres_pct": 0.3444976076555024,
       "ft_pct": 0.7307692307692307,
-      "equipos_nba": "",
+      "rank": 10,
+      "draft": false,
+      "draft_anio": null,
+      "draft_pick": null,
+      "draft_equipo": null,
       "ganancias": 12120000,
-      "premios": [
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2007,
-          "team": "TOR"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2007,
-          "team": "TOR"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2007,
-          "team": "TOR"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2008,
@@ -2166,32 +2136,47 @@
           "ft_pct": 0.7307692307692307
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 10
+      "premios": [
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2007,
+          "team": "TOR"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2007,
+          "team": "TOR"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2007,
+          "team": "TOR"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "willy-hernangomez",
       "nombre": "Willy Hernangómez",
-      "draft": true,
-      "draft_anio": 2015,
-      "draft_pick": 35,
-      "draft_equipo": "PHI",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 344,
       "partidos_titular": 48,
       "min_total": 5149,
-      "min_g": 15,
+      "min_g": 14.968023255813954,
       "pts_total": 2524,
-      "pts_g": 7.3,
+      "pts_g": 7.337209302325581,
       "rbd_total": 1982,
-      "rbd_g": 5.8,
+      "rbd_g": 5.761627906976744,
       "ast_total": 364,
-      "ast_g": 1.1,
+      "ast_g": 1.058139534883721,
       "stl_total": 145,
-      "stl_g": 0.4,
+      "stl_g": 0.42151162790697677,
       "blk_total": 134,
-      "blk_g": 0.4,
+      "blk_g": 0.38953488372093026,
       "tres_total": 37,
       "tres_g": 0.1,
       "tov_total": 347,
@@ -2199,29 +2184,13 @@
       "fg_pct": 0.5331143951833607,
       "tres_pct": 0.30578512396694213,
       "ft_pct": 0.7129629629629629,
-      "equipos_nba": "",
+      "rank": 11,
+      "draft": false,
+      "draft_anio": 2015,
+      "draft_pick": 35,
+      "draft_equipo": "PHI",
       "ganancias": 12435586,
-      "premios": [
-        {
-          "tipo": "ROM",
-          "detalle": "",
-          "year": 2017,
-          "team": "NYK"
-        },
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2017,
-          "team": "NYK"
-        },
-        {
-          "tipo": "All Rookie",
-          "detalle": "",
-          "year": 2017,
-          "team": "NYK"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2018,
@@ -2350,32 +2319,47 @@
           "ft_pct": 0.728
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 11
+      "premios": [
+        {
+          "tipo": "ROM",
+          "detalle": "ROM",
+          "year": 2017,
+          "team": "NYK"
+        },
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2017,
+          "team": "NYK"
+        },
+        {
+          "tipo": "All Rookie",
+          "detalle": "All Rookie",
+          "year": 2017,
+          "team": "NYK"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "raul-lopez",
       "nombre": "Raül Lopez",
-      "draft": true,
-      "draft_anio": 2001,
-      "draft_pick": 24,
-      "draft_equipo": "UTA",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 113,
       "partidos_titular": 26,
       "min_total": 2135,
-      "min_g": 18.9,
+      "min_g": 18.893805309734514,
       "pts_total": 733,
-      "pts_g": 6.5,
+      "pts_g": 6.486725663716814,
       "rbd_total": 194,
-      "rbd_g": 1.7,
+      "rbd_g": 1.7168141592920354,
       "ast_total": 428,
-      "ast_g": 3.8,
+      "ast_g": 3.7876106194690267,
       "stl_total": 84,
-      "stl_g": 0.7,
+      "stl_g": 0.7433628318584071,
       "blk_total": 5,
-      "blk_g": 0,
+      "blk_g": 0.04424778761061947,
       "tres_total": 45,
       "tres_g": 0.4,
       "tov_total": 221,
@@ -2383,10 +2367,13 @@
       "fg_pct": 0.4294478527607362,
       "tres_pct": 0.34615384615384615,
       "ft_pct": 0.8533333333333334,
-      "equipos_nba": "",
+      "rank": 12,
+      "draft": false,
+      "draft_anio": 2001,
+      "draft_pick": 24,
+      "draft_equipo": "UTA",
       "ganancias": 3941313,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2005,
@@ -2417,32 +2404,28 @@
           "ft_pct": 0.8632478632478633
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 12
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "alex-abrines",
       "nombre": "Alex Abrines",
-      "draft": true,
-      "draft_anio": 2013,
-      "draft_pick": 32,
-      "draft_equipo": "OKC",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 174,
       "partidos_titular": 16,
       "min_total": 2777,
-      "min_g": 16,
+      "min_g": 15.959770114942529,
       "pts_total": 924,
-      "pts_g": 5.3,
+      "pts_g": 5.310344827586207,
       "rbd_total": 248,
-      "rbd_g": 1.4,
+      "rbd_g": 1.4252873563218391,
       "ast_total": 88,
-      "ast_g": 0.5,
+      "ast_g": 0.5057471264367817,
       "stl_total": 92,
-      "stl_g": 0.5,
+      "stl_g": 0.5287356321839081,
       "blk_total": 22,
-      "blk_g": 0.1,
+      "blk_g": 0.12643678160919541,
       "tres_total": 219,
       "tres_g": 1.3,
       "tov_total": 72,
@@ -2450,17 +2433,13 @@
       "fg_pct": 0.3865652724968314,
       "tres_pct": 0.3680672268907563,
       "ft_pct": 0.8796296296296297,
-      "equipos_nba": "",
+      "rank": 13,
+      "draft": false,
+      "draft_anio": 2013,
+      "draft_pick": 32,
+      "draft_equipo": "OKC",
       "ganancias": 15294947,
-      "premios": [
-        {
-          "tipo": "Rising Stars",
-          "detalle": "",
-          "year": 2017,
-          "team": "OKC"
-        }
-      ],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2019,
@@ -2505,32 +2484,35 @@
           "ft_pct": 0.8478260869565217
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 13
+      "premios": [
+        {
+          "tipo": "Rising Stars",
+          "detalle": "Rising Stars",
+          "year": 2017,
+          "team": "OKC"
+        }
+      ],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "juancho-hernangomez",
       "nombre": "Juancho Hernangómez",
-      "draft": true,
-      "draft_anio": 2016,
-      "draft_pick": 15,
-      "draft_equipo": "DEN",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 339,
       "partidos_titular": 76,
       "min_total": 5269,
-      "min_g": 15.5,
+      "min_g": 15.542772861356932,
       "pts_total": 1711,
-      "pts_g": 5,
+      "pts_g": 5.047197640117994,
       "rbd_total": 1131,
-      "rbd_g": 3.3,
+      "rbd_g": 3.336283185840708,
       "ast_total": 216,
-      "ast_g": 0.6,
+      "ast_g": 0.6371681415929203,
       "stl_total": 131,
-      "stl_g": 0.4,
+      "stl_g": 0.3864306784660767,
       "blk_total": 71,
-      "blk_g": 0.2,
+      "blk_g": 0.20943952802359883,
       "tres_total": 266,
       "tres_g": 0.8,
       "tov_total": 167,
@@ -2538,10 +2520,13 @@
       "fg_pct": 0.4278462654097172,
       "tres_pct": 0.34234234234234234,
       "ft_pct": 0.6760204081632653,
-      "equipos_nba": "",
+      "rank": 14,
+      "draft": false,
+      "draft_anio": 2016,
+      "draft_pick": 15,
+      "draft_equipo": "DEN",
       "ganancias": 24938681,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2022,
@@ -2726,32 +2711,28 @@
           "ft_pct": null
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 14
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "sergio-rodriguez",
       "nombre": "Sergio Rodríguez",
-      "draft": true,
-      "draft_anio": 2006,
-      "draft_pick": 27,
-      "draft_equipo": "PHX",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 353,
       "partidos_titular": 52,
       "min_total": 5281,
-      "min_g": 15,
+      "min_g": 14.960339943342776,
       "pts_total": 1747,
-      "pts_g": 4.9,
+      "pts_g": 4.949008498583569,
       "rbd_total": 525,
-      "rbd_g": 1.5,
+      "rbd_g": 1.4872521246458923,
       "ast_total": 1183,
-      "ast_g": 3.4,
+      "ast_g": 3.3512747875354107,
       "stl_total": 212,
-      "stl_g": 0.6,
+      "stl_g": 0.6005665722379604,
       "blk_total": 13,
-      "blk_g": 0,
+      "blk_g": 0.036827195467422094,
       "tres_total": 202,
       "tres_g": 0.6,
       "tov_total": 481,
@@ -2759,10 +2740,13 @@
       "fg_pct": 0.4094488188976378,
       "tres_pct": 0.33666666666666667,
       "ft_pct": 0.7394636015325671,
-      "equipos_nba": "",
+      "rank": 15,
+      "draft": false,
+      "draft_anio": 2006,
+      "draft_pick": 27,
+      "draft_equipo": "PHX",
       "ganancias": 11469835,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2010,
@@ -2863,32 +2847,28 @@
           "ft_pct": 0.7922077922077922
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 15
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "hugo-gonzalez",
       "nombre": "Hugo González",
-      "draft": true,
-      "draft_anio": null,
-      "draft_pick": null,
-      "draft_equipo": null,
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 63,
       "partidos_titular": 3,
       "min_total": 970,
-      "min_g": 15.4,
+      "min_g": 15.396825396825397,
       "pts_total": 258,
-      "pts_g": 4.1,
+      "pts_g": 4.095238095238095,
       "rbd_total": 218,
-      "rbd_g": 3.5,
+      "rbd_g": 3.4603174603174605,
       "ast_total": 37,
-      "ast_g": 0.6,
+      "ast_g": 0.5873015873015873,
       "stl_total": 38,
-      "stl_g": 0.6,
+      "stl_g": 0.6031746031746031,
       "blk_total": 20,
-      "blk_g": 0.3,
+      "blk_g": 0.31746031746031744,
       "tres_total": 35,
       "tres_g": 0.6,
       "tov_total": 34,
@@ -2896,35 +2876,34 @@
       "fg_pct": 0.47297297297297297,
       "tres_pct": 0.33653846153846156,
       "ft_pct": 0.5,
-      "equipos_nba": "",
+      "rank": 16,
+      "draft": false,
+      "draft_anio": null,
+      "draft_pick": null,
+      "draft_equipo": null,
       "ganancias": 14289145,
+      "equipos_nba": "",
+      "temporadas_data": [],
       "premios": [],
       "records": [],
-      "temporadas_data": [],
-      "playoffs_temporadas": [],
-      "rank": 16
+      "playoffs_temporadas": []
     },
     {
       "id": "victor-claver",
       "nombre": "Víctor Claver",
-      "draft": true,
-      "draft_anio": 2009,
-      "draft_pick": 22,
-      "draft_equipo": "POR",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 80,
       "partidos_titular": 16,
       "min_total": 1072,
       "min_g": 13.4,
       "pts_total": 258,
-      "pts_g": 3.2,
+      "pts_g": 3.225,
       "rbd_total": 178,
-      "rbd_g": 2.2,
+      "rbd_g": 2.225,
       "ast_total": 56,
       "ast_g": 0.7,
       "stl_total": 30,
-      "stl_g": 0.4,
+      "stl_g": 0.375,
       "blk_total": 16,
       "blk_g": 0.2,
       "tres_total": 34,
@@ -2934,10 +2913,13 @@
       "fg_pct": 0.398406374501992,
       "tres_pct": 0.29310344827586204,
       "ft_pct": 0.5853658536585366,
-      "equipos_nba": "",
+      "rank": 17,
+      "draft": false,
+      "draft_anio": 2009,
+      "draft_pick": 22,
+      "draft_equipo": "POR",
       "ganancias": 4000000,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2015,
@@ -2982,32 +2964,28 @@
           "ft_pct": 0.4666666666666667
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 17
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "usman-garuba",
       "nombre": "Usman Garuba",
-      "draft": true,
-      "draft_anio": 2021,
-      "draft_pick": 23,
-      "draft_equipo": "HOU",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 99,
       "partidos_titular": 3,
       "min_total": 1209,
-      "min_g": 12.2,
+      "min_g": 12.212121212121213,
       "pts_total": 225,
-      "pts_g": 2.3,
+      "pts_g": 2.272727272727273,
       "rbd_total": 390,
-      "rbd_g": 3.9,
+      "rbd_g": 3.9393939393939394,
       "ast_total": 81,
-      "ast_g": 0.8,
+      "ast_g": 0.8181818181818182,
       "stl_total": 54,
-      "stl_g": 0.5,
+      "stl_g": 0.5454545454545454,
       "blk_total": 40,
-      "blk_g": 0.4,
+      "blk_g": 0.40404040404040403,
       "tres_total": 29,
       "tres_g": 0.3,
       "tov_total": 53,
@@ -3015,10 +2993,13 @@
       "fg_pct": 0.4751131221719457,
       "tres_pct": 0.3670886075949367,
       "ft_pct": 0.6170212765957447,
-      "equipos_nba": "",
+      "rank": 18,
+      "draft": false,
+      "draft_anio": 2021,
+      "draft_pick": 23,
+      "draft_equipo": "HOU",
       "ganancias": 7424488,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 2024,
@@ -3077,43 +3058,42 @@
           "ft_pct": null
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 18
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "fernando-martin",
       "nombre": "Fernando Martín",
-      "draft": true,
-      "draft_anio": 1985,
-      "draft_pick": 38,
-      "draft_equipo": "BRK",
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 24,
       "partidos_titular": 0,
       "min_total": 146,
-      "min_g": 6.1,
+      "min_g": 6.083333333333333,
       "pts_total": 22,
-      "pts_g": 0.9,
+      "pts_g": 0.9166666666666666,
       "rbd_total": 28,
-      "rbd_g": 1.2,
+      "rbd_g": 1.1666666666666667,
       "ast_total": 9,
-      "ast_g": 0.4,
+      "ast_g": 0.375,
       "stl_total": 7,
-      "stl_g": 0.3,
+      "stl_g": 0.2916666666666667,
       "blk_total": 1,
-      "blk_g": 0,
+      "blk_g": 0.041666666666666664,
       "tres_total": 0,
       "tres_g": 0,
       "tov_total": 20,
       "pf_total": 24,
       "fg_pct": 0.2903225806451613,
-      "tres_pct": null,
+      "tres_pct": 0,
       "ft_pct": 0.36363636363636365,
-      "equipos_nba": "",
+      "rank": 19,
+      "draft": false,
+      "draft_anio": 1985,
+      "draft_pick": 38,
+      "draft_equipo": "BRK",
       "ganancias": 145000,
-      "premios": [],
-      "records": [],
+      "equipos_nba": "",
       "temporadas_data": [
         {
           "year": 1987,
@@ -3130,18 +3110,14 @@
           "ft_pct": 0.36363636363636365
         }
       ],
-      "playoffs_temporadas": [],
-      "rank": 19
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": []
     },
     {
       "id": "27-oct-2022",
       "nombre": "(27 oct 2022)",
-      "draft": true,
-      "draft_anio": null,
-      "draft_pick": null,
-      "draft_equipo": null,
-      "nacimiento": null,
-      "temporadas": 0,
+      "temporadas": null,
       "partidos": 0,
       "partidos_titular": 0,
       "min_total": 0,
@@ -3163,13 +3139,17 @@
       "fg_pct": null,
       "tres_pct": null,
       "ft_pct": null,
-      "equipos_nba": "",
+      "rank": 20,
+      "draft": false,
+      "draft_anio": null,
+      "draft_pick": null,
+      "draft_equipo": null,
       "ganancias": 0,
+      "equipos_nba": "",
+      "temporadas_data": [],
       "premios": [],
       "records": [],
-      "temporadas_data": [],
-      "playoffs_temporadas": [],
-      "rank": 20
+      "playoffs_temporadas": []
     }
   ]
 }
