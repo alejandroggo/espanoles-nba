@@ -95,6 +95,39 @@ const MODES = {
       <td class="${sc==='po_ast_total'?'highlight':''}">${fmt(j.po_ast_total)}</td>
       <td>${fmtPct(j.po_fg_pct)}</td><td>${fmt(j.po_seasons)}</td>`,
   },
+  season_highs: {
+    defaultSort: 'sh_pts_g',
+    chips: [
+      {label:'PPG', col:'sh_pts_g'}, {label:'RPG', col:'sh_rbd_g'}, {label:'APG', col:'sh_ast_g'},
+      {label:'MIN', col:'sh_min_g'},
+    ],
+    head: [
+      {label:'PPG', col:'sh_pts_g'}, {label:'RPG', col:'sh_rbd_g'}, {label:'APG', col:'sh_ast_g'},
+      {label:'FG%', col:'sh_fg_pct'}, {label:'3P%', col:'sh_tres_pct'}, {label:'FT%', col:'sh_ft_pct'},
+      {label:'SPG', col:'sh_stl_g'}, {label:'BPG', col:'sh_blk_g'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='sh_pts_g'?'highlight':''}">${fmtDec(j.sh_pts_g)}</td>
+      <td class="${sc==='sh_rbd_g'?'highlight':''}">${fmtDec(j.sh_rbd_g)}</td>
+      <td class="${sc==='sh_ast_g'?'highlight':''}">${fmtDec(j.sh_ast_g)}</td>
+      <td>${fmtPct(j.sh_fg_pct)}</td><td>${fmtPct(j.sh_tres_pct)}</td><td>${fmtPct(j.sh_ft_pct)}</td>
+      <td>${fmtDec(j.sh_stl_g)}</td><td>${fmtDec(j.sh_blk_g)}</td>`,
+  },
+  playoffs_sh: {
+    defaultSort: 'po_sh_pts_g',
+    chips: [
+      {label:'PPG', col:'po_sh_pts_g'}, {label:'RPG', col:'po_sh_rbd_g'}, {label:'APG', col:'po_sh_ast_g'},
+    ],
+    head: [
+      {label:'PPG', col:'po_sh_pts_g'}, {label:'RPG', col:'po_sh_rbd_g'}, {label:'APG', col:'po_sh_ast_g'},
+      {label:'FG%', col:'po_sh_fg_pct'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='po_sh_pts_g'?'highlight':''}">${fmtDec(j.po_sh_pts_g)}</td>
+      <td class="${sc==='po_sh_rbd_g'?'highlight':''}">${fmtDec(j.po_sh_rbd_g)}</td>
+      <td class="${sc==='po_sh_ast_g'?'highlight':''}">${fmtDec(j.po_sh_ast_g)}</td>
+      <td>${fmtPct(j.po_sh_fg_pct)}</td>`,
+  },
 };
 
 // ══════════════════════════════════════════════
@@ -206,6 +239,7 @@ window.addEventListener('hashchange', handleHash);
 function handleHash() {
   const hash = location.hash.slice(1);
   if (hash && DATA) {
+    if (hash === 'transacciones') { renderTransacciones(); showView('transacciones'); return; }
     const j = DATA.jugadores.find(x => x.id === hash);
     if (j) { showJugador(j); return; }
   }
@@ -221,6 +255,35 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   window.scrollTo(0, 0);
+}
+
+function showTransacciones() {
+  history.pushState('', '', location.pathname + '#transacciones');
+  renderTransacciones();
+  showView('transacciones');
+}
+
+function renderTransacciones() {
+  const all = [];
+  DATA.jugadores.forEach(j => {
+    (j.transacciones || []).forEach(t => all.push({ ...t, jugador: j.nombre, jugador_id: j.id }));
+  });
+  all.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+  const tbody = document.getElementById('trans-body');
+  if (!all.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-cell">Sin transacciones registradas</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = all.map(t => `
+    <tr class="trans-row" onclick="location.hash='${t.jugador_id}'">
+      <td>${t.fecha || '—'}</td>
+      <td class="nombre">${t.jugador}</td>
+      <td><span class="trans-tipo trans-${(t.tipo||'').toLowerCase().replace(/\s+/g,'-')}">${t.tipo || '—'}</span></td>
+      <td>${t.de || '—'}</td>
+      <td>${t.a || '—'}</td>
+      <td class="trans-detalle">${t.detalle || '—'}</td>
+    </tr>`).join('');
 }
 
 // ══════════════════════════════════════════════
@@ -253,6 +316,28 @@ function renderHeroKpis() {
 // ══════════════════════════════════════════════
 // TABLA RANKING
 // ══════════════════════════════════════════════
+function enrichSeasonHighs(jugadores) {
+  jugadores.forEach(j => {
+    const mx = (arr, fn) => { const vals = arr.map(fn).filter(v => v != null); return vals.length ? Math.max(...vals) : null; };
+    const seas = (j.temporadas_data || []).filter(s => s.g > 0);
+    j.sh_pts_g    = mx(seas, s => s.pts_g);
+    j.sh_rbd_g    = mx(seas, s => s.rbd_g);
+    j.sh_ast_g    = mx(seas, s => s.ast_g);
+    j.sh_fg_pct   = mx(seas, s => s.fg_pct);
+    j.sh_tres_pct = mx(seas, s => s.tres_pct);
+    j.sh_ft_pct   = mx(seas, s => s.ft_pct);
+    j.sh_stl_g    = mx(seas, s => s.stl_g);
+    j.sh_blk_g    = mx(seas, s => s.blk_g);
+    j.sh_min_g    = mx(seas, s => s.min_g);
+
+    const po = (j.playoffs_temporadas || []).filter(s => s.g > 0);
+    j.po_sh_pts_g  = mx(po, s => s.pts_g);
+    j.po_sh_rbd_g  = mx(po, s => s.rbd_g);
+    j.po_sh_ast_g  = mx(po, s => s.ast_g);
+    j.po_sh_fg_pct = mx(po, s => s.fg_pct);
+  });
+}
+
 function enrichPlayoffStats(jugadores) {
   jugadores.forEach(j => {
     const po = j.playoffs_temporadas || [];
@@ -287,11 +372,11 @@ function renderTabla() {
   const mode = MODES[viewMode];
   let jugadores = [...DATA.jugadores];
 
-  const isPlayoff = viewMode === 'playoffs_pg' || viewMode === 'playoffs_totals';
-  if (isPlayoff) {
-    enrichPlayoffStats(jugadores);
-    jugadores = jugadores.filter(j => j.po_g > 0);
-  }
+  const PLAYOFF_MODES = ['playoffs_pg', 'playoffs_totals', 'playoffs_sh'];
+  const isPlayoff = PLAYOFF_MODES.includes(viewMode);
+  if (isPlayoff) enrichPlayoffStats(jugadores);
+  if (['season_highs', 'playoffs_sh'].includes(viewMode)) enrichSeasonHighs(jugadores);
+  if (isPlayoff) jugadores = jugadores.filter(j => j.po_g > 0);
 
   if (searchTerm) {
     const q = searchTerm.toLowerCase();
@@ -385,6 +470,7 @@ function showJugador(j) {
 function buildFicha(j) {
   const premiosCount = (j.premios||[]).length;
   const poSeasons = (j.playoffs_temporadas||[]).length;
+  const transCount = (j.transacciones||[]).length;
 
   return `
     <div class="ficha-header">
@@ -432,6 +518,7 @@ function buildFicha(j) {
       <button class="tab-btn" onclick="openTab(this,'tab-playoffs')">Playoffs ${poSeasons>0?`(${poSeasons})`:''}</button>
       <button class="tab-btn" onclick="openTab(this,'tab-premios')">Premios ${premiosCount>0?`(${premiosCount})`:''}</button>
       <button class="tab-btn" onclick="openTab(this,'tab-records')">Récords</button>
+      <button class="tab-btn" onclick="openTab(this,'tab-trans')">Transacciones${transCount>0?` (${transCount})`:''}</button>
     </div>
 
     <div id="tab-carrera" class="tab-panel">
@@ -448,6 +535,9 @@ function buildFicha(j) {
     </div>
     <div id="tab-records" class="tab-panel">
       ${buildTabRecords(j)}
+    </div>
+    <div id="tab-trans" class="tab-panel">
+      ${buildTabTransacciones(j)}
     </div>
   `;
 }
@@ -576,6 +666,30 @@ function buildTabPremios(j) {
       <div class="premio-meta">${p.year} · ${p.team}</div>
     </div>
   `).join('')}</div>`;
+}
+
+// ── TAB TRANSACCIONES ────────────────────────
+function buildTabTransacciones(j) {
+  const trans = [...(j.transacciones || [])].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  if (!trans.length) return '<p class="empty-msg">Sin transacciones registradas</p>';
+
+  return `<div style="overflow-x:auto">
+    <table class="tab-table">
+      <thead><tr>
+        <th>Fecha</th><th>Tipo</th><th>De</th><th>A</th><th>Detalle</th>
+      </tr></thead>
+      <tbody>
+        ${trans.map(t => `
+          <tr>
+            <td>${t.fecha || '—'}</td>
+            <td><span class="trans-tipo trans-${(t.tipo||'').toLowerCase().replace(/\s+/g,'-')}">${t.tipo || '—'}</span></td>
+            <td>${t.de || '—'}</td>
+            <td>${t.a || '—'}</td>
+            <td class="trans-detalle">${t.detalle || '—'}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
 }
 
 // ── TAB RÉCORDS ──────────────────────────────
