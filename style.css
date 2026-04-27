@@ -288,6 +288,15 @@ td.dorado { color: var(--dorado); font-weight: 600; }
 td.draft-badge {
   text-align: left;
 }
+.player-thumb {
+  width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: top center;
+  vertical-align: middle; margin-right: 0.45rem;
+  border: 1px solid var(--border2); background: var(--surface2);
+}
+.player-photo {
+  width: 90px; flex-shrink: 0; object-fit: cover; object-position: top;
+  border: 1px solid var(--border);
+}
 .badge {
   display: inline-block;
   font-family: var(--mono);
@@ -348,13 +357,14 @@ tr.separator-row td {
 
 /* ficha cabecera */
 .ficha-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
   padding: 2rem 0 2rem;
   border-bottom: 1px solid var(--border);
 }
+.ficha-header > div:first-of-type { flex: 1; }
+.ficha-kpis { margin-left: auto; }
 .ficha-nombre {
   font-family: var(--display);
   font-size: clamp(2.5rem, 5vw, 4.5rem);
