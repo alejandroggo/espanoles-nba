@@ -44,37 +44,20 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="search-input" placeholder="Buscar jugador…" oninput="filterTabla()">
     </div>
-    <div class="sort-chips" id="sort-chips">
-      <button class="chip active" data-col="pts_g" onclick="setSortChip(this,'pts_g')">PPG</button>
-      <button class="chip" data-col="rbd_g" onclick="setSortChip(this,'rbd_g')">RPG</button>
-      <button class="chip" data-col="ast_g" onclick="setSortChip(this,'ast_g')">APG</button>
-      <button class="chip" data-col="partidos" onclick="setSortChip(this,'partidos')">Partidos</button>
-      <button class="chip" data-col="ganancias" onclick="setSortChip(this,'ganancias')">$</button>
-      <button class="chip" data-col="temporadas" onclick="setSortChip(this,'temporadas')">Temporadas</button>
+    <div class="mode-chips">
+      <button class="mode-chip active" data-mode="per_game"        onclick="setViewMode('per_game')">Por partido</button>
+      <button class="mode-chip"        data-mode="totals"          onclick="setViewMode('totals')">Totales</button>
+      <button class="mode-chip"        data-mode="playoffs_pg"     onclick="setViewMode('playoffs_pg')">Playoffs PG</button>
+      <button class="mode-chip"        data-mode="playoffs_totals" onclick="setViewMode('playoffs_totals')">Playoffs Tot.</button>
     </div>
+    <div class="controles-sep"></div>
+    <div id="sort-chips" class="sort-chips"></div>
     <span class="results-count" id="results-count"></span>
   </div>
 
   <div class="tabla-wrap">
     <table id="ranking-table">
-      <thead>
-        <tr>
-          <th onclick="sortTable('rank')" data-col="rank">#</th>
-          <th onclick="sortTable('nombre')" data-col="nombre">Jugador</th>
-          <th onclick="sortTable('draft')" data-col="draft">Draft</th>
-          <th onclick="sortTable('partidos')" data-col="partidos">PJ</th>
-          <th onclick="sortTable('pts_g')" data-col="pts_g">PPG</th>
-          <th onclick="sortTable('rbd_g')" data-col="rbd_g">RPG</th>
-          <th onclick="sortTable('ast_g')" data-col="ast_g">APG</th>
-          <th onclick="sortTable('fg_pct')" data-col="fg_pct">FG%</th>
-          <th onclick="sortTable('tres_pct')" data-col="tres_pct">3P%</th>
-          <th onclick="sortTable('ft_pct')" data-col="ft_pct">FT%</th>
-          <th onclick="sortTable('blk_g')" data-col="blk_g">BPG</th>
-          <th onclick="sortTable('stl_g')" data-col="stl_g">SPG</th>
-          <th onclick="sortTable('temporadas')" data-col="temporadas">SEAS</th>
-          <th onclick="sortTable('ganancias')" data-col="ganancias">$</th>
-        </tr>
-      </thead>
+      <thead id="ranking-thead"></thead>
       <tbody id="ranking-body"></tbody>
     </table>
   </div>

@@ -15,9 +15,93 @@ const STAT_LABELS = {
 };
 
 // ══════════════════════════════════════════════
+// MODOS DE VISTA
+// ══════════════════════════════════════════════
+const MODES = {
+  per_game: {
+    defaultSort: 'pts_g',
+    chips: [
+      {label:'PPG', col:'pts_g'}, {label:'RPG', col:'rbd_g'}, {label:'APG', col:'ast_g'},
+      {label:'Partidos', col:'partidos'}, {label:'$', col:'ganancias'}, {label:'Seas', col:'temporadas'},
+    ],
+    head: [
+      {label:'PJ', col:'partidos'}, {label:'PPG', col:'pts_g'}, {label:'RPG', col:'rbd_g'},
+      {label:'APG', col:'ast_g'}, {label:'FG%', col:'fg_pct'}, {label:'3P%', col:'tres_pct'},
+      {label:'FT%', col:'ft_pct'}, {label:'BPG', col:'blk_g'}, {label:'SPG', col:'stl_g'},
+      {label:'SEAS', col:'temporadas'}, {label:'$', col:'ganancias'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
+      <td class="${sc==='pts_g'?'highlight':''}">${fmtDec(j.pts_g)}</td>
+      <td class="${sc==='rbd_g'?'highlight':''}">${fmtDec(j.rbd_g)}</td>
+      <td class="${sc==='ast_g'?'highlight':''}">${fmtDec(j.ast_g)}</td>
+      <td>${fmtPct(j.fg_pct)}</td><td>${fmtPct(j.tres_pct)}</td><td>${fmtPct(j.ft_pct)}</td>
+      <td>${fmtDec(j.blk_g)}</td><td>${fmtDec(j.stl_g)}</td>
+      <td class="${sc==='temporadas'?'highlight':''}">${fmt(j.temporadas)}</td>
+      <td class="${sc==='ganancias'?'dorado':''}">${fmtMoney(j.ganancias)}</td>`,
+  },
+  totals: {
+    defaultSort: 'pts_total',
+    chips: [
+      {label:'PTS', col:'pts_total'}, {label:'RBD', col:'rbd_total'}, {label:'AST', col:'ast_total'},
+      {label:'Partidos', col:'partidos'}, {label:'$', col:'ganancias'},
+    ],
+    head: [
+      {label:'PJ', col:'partidos'}, {label:'PTS', col:'pts_total'}, {label:'RBD', col:'rbd_total'},
+      {label:'AST', col:'ast_total'}, {label:'STL', col:'stl_total'}, {label:'BLK', col:'blk_total'},
+      {label:'3PM', col:'tres_total'}, {label:'MIN', col:'min_total'}, {label:'TOV', col:'tov_total'},
+      {label:'$', col:'ganancias'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
+      <td class="${sc==='pts_total'?'highlight':''}">${fmt(j.pts_total)}</td>
+      <td class="${sc==='rbd_total'?'highlight':''}">${fmt(j.rbd_total)}</td>
+      <td class="${sc==='ast_total'?'highlight':''}">${fmt(j.ast_total)}</td>
+      <td>${fmt(j.stl_total)}</td><td>${fmt(j.blk_total)}</td>
+      <td>${fmt(j.tres_total)}</td><td>${fmt(j.min_total)}</td><td>${fmt(j.tov_total)}</td>
+      <td class="${sc==='ganancias'?'dorado':''}">${fmtMoney(j.ganancias)}</td>`,
+  },
+  playoffs_pg: {
+    defaultSort: 'po_g',
+    chips: [
+      {label:'PPG', col:'po_pts_g'}, {label:'RPG', col:'po_rbd_g'}, {label:'APG', col:'po_ast_g'},
+      {label:'PJ-PO', col:'po_g'},
+    ],
+    head: [
+      {label:'PJ-PO', col:'po_g'}, {label:'PPG', col:'po_pts_g'}, {label:'RPG', col:'po_rbd_g'},
+      {label:'APG', col:'po_ast_g'}, {label:'FG%', col:'po_fg_pct'}, {label:'SEAS-PO', col:'po_seasons'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='po_g'?'highlight':''}">${fmt(j.po_g)}</td>
+      <td class="${sc==='po_pts_g'?'highlight':''}">${fmtDec(j.po_pts_g)}</td>
+      <td class="${sc==='po_rbd_g'?'highlight':''}">${fmtDec(j.po_rbd_g)}</td>
+      <td class="${sc==='po_ast_g'?'highlight':''}">${fmtDec(j.po_ast_g)}</td>
+      <td>${fmtPct(j.po_fg_pct)}</td><td>${fmt(j.po_seasons)}</td>`,
+  },
+  playoffs_totals: {
+    defaultSort: 'po_g',
+    chips: [
+      {label:'PTS', col:'po_pts_total'}, {label:'RBD', col:'po_rbd_total'}, {label:'AST', col:'po_ast_total'},
+      {label:'PJ-PO', col:'po_g'},
+    ],
+    head: [
+      {label:'PJ-PO', col:'po_g'}, {label:'PTS', col:'po_pts_total'}, {label:'RBD', col:'po_rbd_total'},
+      {label:'AST', col:'po_ast_total'}, {label:'FG%', col:'po_fg_pct'}, {label:'SEAS-PO', col:'po_seasons'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='po_g'?'highlight':''}">${fmt(j.po_g)}</td>
+      <td class="${sc==='po_pts_total'?'highlight':''}">${fmt(j.po_pts_total)}</td>
+      <td class="${sc==='po_rbd_total'?'highlight':''}">${fmt(j.po_rbd_total)}</td>
+      <td class="${sc==='po_ast_total'?'highlight':''}">${fmt(j.po_ast_total)}</td>
+      <td>${fmtPct(j.po_fg_pct)}</td><td>${fmt(j.po_seasons)}</td>`,
+  },
+};
+
+// ══════════════════════════════════════════════
 // ESTADO
 // ══════════════════════════════════════════════
 let DATA = null;
+let viewMode = 'per_game';
 let sortCol = 'pts_g';
 let sortAsc = false;
 let searchTerm = '';
@@ -169,64 +253,83 @@ function renderHeroKpis() {
 // ══════════════════════════════════════════════
 // TABLA RANKING
 // ══════════════════════════════════════════════
+function enrichPlayoffStats(jugadores) {
+  jugadores.forEach(j => {
+    const po = j.playoffs_temporadas || [];
+    j.po_seasons = po.length;
+    j.po_g = po.reduce((s, t) => s + (t.g || 0), 0);
+    if (j.po_g > 0) {
+      j.po_pts_g    = po.reduce((s, t) => s + (t.pts_g || 0) * (t.g || 0), 0) / j.po_g;
+      j.po_rbd_g    = po.reduce((s, t) => s + (t.rbd_g || 0) * (t.g || 0), 0) / j.po_g;
+      j.po_ast_g    = po.reduce((s, t) => s + (t.ast_g || 0) * (t.g || 0), 0) / j.po_g;
+      j.po_fg_pct   = po.reduce((s, t) => s + (t.fg_pct || 0) * (t.g || 0), 0) / j.po_g;
+      j.po_pts_total = Math.round(po.reduce((s, t) => s + (t.pts_g || 0) * (t.g || 0), 0));
+      j.po_rbd_total = Math.round(po.reduce((s, t) => s + (t.rbd_g || 0) * (t.g || 0), 0));
+      j.po_ast_total = Math.round(po.reduce((s, t) => s + (t.ast_g || 0) * (t.g || 0), 0));
+    } else {
+      j.po_pts_g = null; j.po_rbd_g = null; j.po_ast_g = null; j.po_fg_pct = null;
+      j.po_pts_total = null; j.po_rbd_total = null; j.po_ast_total = null;
+    }
+  });
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  sortCol = MODES[mode].defaultSort;
+  sortAsc = false;
+  document.querySelectorAll('.mode-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderTabla();
+}
+
 function renderTabla() {
+  const mode = MODES[viewMode];
   let jugadores = [...DATA.jugadores];
 
-  // filtro búsqueda
+  const isPlayoff = viewMode === 'playoffs_pg' || viewMode === 'playoffs_totals';
+  if (isPlayoff) {
+    enrichPlayoffStats(jugadores);
+    jugadores = jugadores.filter(j => j.po_g > 0);
+  }
+
   if (searchTerm) {
     const q = searchTerm.toLowerCase();
     jugadores = jugadores.filter(j => j.nombre.toLowerCase().includes(q));
   }
 
-  // ordenar
-  jugadores.sort((a,b) => {
+  jugadores.sort((a, b) => {
     const va = a[sortCol] ?? (sortAsc ? Infinity : -Infinity);
     const vb = b[sortCol] ?? (sortAsc ? Infinity : -Infinity);
     if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
     return sortAsc ? va - vb : vb - va;
   });
 
-  // actualizar cabecera activa
-  document.querySelectorAll('thead th').forEach(th => {
-    th.classList.remove('sorted','asc');
-    if (th.dataset.col === sortCol) {
-      th.classList.add('sorted');
-      if (sortAsc) th.classList.add('asc');
-    }
-  });
+  // thead dinámico
+  document.getElementById('ranking-thead').innerHTML = `<tr>
+    <th></th><th>Jugador</th><th></th>
+    ${mode.head.map(h => `<th data-col="${h.col}" onclick="sortTable('${h.col}')" class="${sortCol===h.col?'sorted'+(sortAsc?' asc':''):''}">${h.label}</th>`).join('')}
+  </tr>`;
 
-  // sincronizar chips: estado activo y flecha de dirección
-  document.querySelectorAll('.chip[data-col]').forEach(c => {
-    const isActive = c.dataset.col === sortCol;
-    c.classList.toggle('active', isActive);
-    const label = c.dataset.label || (c.dataset.label = c.textContent.trim());
-    c.textContent = isActive ? label + (sortAsc ? ' ↑' : ' ↓') : label;
-  });
+  // chips dinámicos
+  document.getElementById('sort-chips').innerHTML = mode.chips.map(c => {
+    const active = sortCol === c.col;
+    return `<button class="chip${active?' active':''}" data-col="${c.col}" data-label="${c.label}" onclick="setSortChip('${c.col}')">${c.label}${active?(sortAsc?' ↑':' ↓'):''}</button>`;
+  }).join('');
 
   document.getElementById('results-count').textContent =
-    jugadores.length + ' jugador' + (jugadores.length!==1?'es':'');
+    jugadores.length + ' jugador' + (jugadores.length !== 1 ? 'es' : '');
 
-  const tbody = document.getElementById('ranking-body');
-  tbody.innerHTML = jugadores.map((j, i) => `
-    <tr onclick="openJugador('${j.id}')" style="animation-delay:${i*0.02}s">
-      <td class="rank">${i+1}</td>
+  document.getElementById('ranking-body').innerHTML = jugadores.map((j, i) => `
+    <tr onclick="openJugador('${j.id}')" style="animation-delay:${i * 0.02}s">
+      <td class="rank">${i + 1}</td>
       <td class="nombre">${j.nombre}</td>
       <td class="draft-badge">
         ${j.draft
-          ? `<span class="badge badge-draft">${j.draft_anio||'Draft'}${j.draft_pick ? ` #${j.draft_pick}` : ''}</span>`
+          ? `<span class="badge badge-draft">${j.draft_anio || 'Draft'}${j.draft_pick ? ` #${j.draft_pick}` : ''}</span>`
           : `<span class="badge badge-undraft">Undrafted</span>`}
       </td>
-      <td class="${sortCol==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
-      <td class="${sortCol==='pts_g'?'highlight':''}">${fmtDec(j.pts_g)}</td>
-      <td class="${sortCol==='rbd_g'?'highlight':''}">${fmtDec(j.rbd_g)}</td>
-      <td class="${sortCol==='ast_g'?'highlight':''}">${fmtDec(j.ast_g)}</td>
-      <td>${fmtPct(j.fg_pct)}</td>
-      <td>${fmtPct(j.tres_pct)}</td>
-      <td>${fmtPct(j.ft_pct)}</td>
-      <td>${fmtDec(j.blk_g)}</td>
-      <td>${fmtDec(j.stl_g)}</td>
-      <td class="${sortCol==='temporadas'?'highlight':''}">${fmt(j.temporadas)}</td>
-      <td class="${sortCol==='ganancias'?'dorado':''}">${fmtMoney(j.ganancias)}</td>
+      ${mode.cells(j, sortCol)}
     </tr>
   `).join('');
 }
@@ -237,7 +340,7 @@ function sortTable(col) {
   renderTabla();
 }
 
-function setSortChip(el, col) {
+function setSortChip(col) {
   if (sortCol === col) sortAsc = !sortAsc;
   else { sortCol = col; sortAsc = false; }
   renderTabla();

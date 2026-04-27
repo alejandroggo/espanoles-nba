@@ -188,6 +188,27 @@ body {
 .chip:hover { border-color: var(--texto-dim); color: var(--texto); }
 .chip.active { border-color: var(--rojo); color: var(--texto); background: rgba(200,16,46,0.12); }
 
+.mode-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.mode-chip {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--texto-dim);
+  cursor: pointer; transition: all 0.15s;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.mode-chip:hover { border-color: var(--texto-dim); color: var(--texto); }
+.mode-chip.active { border-color: var(--rojo); background: var(--rojo); color: #fff; }
+
+.controles-sep {
+  width: 1px; height: 18px;
+  background: var(--border2);
+  flex-shrink: 0;
+  align-self: center;
+}
+
 .results-count {
   margin-left: auto;
   font-family: var(--mono);
