@@ -148,7 +148,7 @@ function renderTabla() {
       <td class="draft-badge">
         ${j.draft
           ? `<span class="badge badge-draft">${j.draft_anio||'Draft'}</span>`
-          : `<span class="badge badge-undraft">No draft</span>`}
+          : `<span class="badge badge-undraft">Undrafted</span>`}
       </td>
       <td class="${sortCol==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
       <td class="${sortCol==='pts_g'?'highlight':''}">${fmtDec(j.pts_g)}</td>
@@ -209,7 +209,7 @@ function buildFicha(j) {
           <em>${j.nombre.split(' ').slice(1).join(' ')}</em>
         </h2>
         <div class="ficha-meta">
-          ${j.draft ? `<span class="meta-pill">Draft ${j.draft_anio} · Pick #${j.draft_pick||'?'} · ${j.draft_equipo||''}</span>` : '<span class="meta-pill">No drafteado</span>'}
+          ${j.draft ? `<span class="meta-pill">Draft ${j.draft_anio} · Pick #${j.draft_pick||'?'} · ${j.draft_equipo||''}</span>` : '<span class="meta-pill">Undrafted</span>'}
           ${j.nacimiento ? `<span class="meta-pill">Nacido en ${j.nacimiento}</span>` : ''}
           <span class="meta-pill">${j.temporadas||0} temporadas</span>
         </div>
