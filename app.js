@@ -3,6 +3,16 @@
 // ══════════════════════════════════════════════
 const LOCAL_URL = './data.json';
 const CDN_URL = 'https://cdn.jsdelivr.net/gh/alejandroggo/espanoles-nba@main/data.json';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRcnveDICJslZxp9dr116TsvDjcoDdf7LOgIwjKinRd5FixvhRnc-mQ4XfKgXASkxaiI8z4BStm6yD/pub?gid=705791197&single=true&output=csv';
+
+const STAT_LABELS = {
+  PTS: 'Puntos',  RBD: 'Rebotes',  AST: 'Asistencias',
+  STL: 'Robos',   BLK: 'Tapones',  MIN: 'Minutos',
+  FGM: 'Canastas de campo', FGA: 'Intentos de campo',
+  '3PM': 'Triples', '3PA': 'Intentos de triple',
+  FTM: 'Tiros libres', FTA: 'Intentos de tiro libre',
+  TOV: 'Pérdidas', PF: 'Faltas'
+};
 
 // ══════════════════════════════════════════════
 // ESTADO
@@ -30,10 +40,66 @@ async function init() {
       DATA = FALLBACK_DATA;
     }
   }
+
+  // fusionar game highs del sheet (fallo silencioso si no hay acceso)
+  try {
+    const res = await fetch(SHEET_URL);
+    if (res.ok) {
+      const csv = await res.text();
+      mergeGameHighs(parseGameHighsCsv(csv));
+    }
+  } catch(e) {}
+
   hideLoader();
   renderHeroKpis();
   renderTabla();
   handleHash();
+}
+
+// ── GAME HIGHS DESDE GOOGLE SHEET ────────────
+function parseGameHighsCsv(csv) {
+  // separa líneas y celdas (respeta campos entrecomillados)
+  const rows = csv.split('\n').map(line => {
+    const cells = [];
+    let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cells.push(cur.trim());
+    return cells;
+  });
+
+  // fila 1 (índice 0) vacía/título, fila 2 (índice 1) cabeceras desde col C (índice 2)
+  // C=JUGADOR, D=MIN, E=PTS, F=RBD, G=AST, H=STL, I=BLK, J=FGM, K=FGA,
+  // L=3PM, M=3PA, N=FTM, O=FTA, P=TOV, Q=PF
+  const COLS = ['MIN','PTS','RBD','AST','STL','BLK','FGM','FGA','3PM','3PA','FTM','FTA','TOV','PF'];
+
+  const result = {};
+  for (let i = 2; i < rows.length; i++) {
+    const row = rows[i];
+    const nombre = row[2];
+    if (!nombre) continue;
+    const records = [];
+    COLS.forEach((stat, idx) => {
+      const raw = row[3 + idx];
+      if (raw && raw !== '' && raw !== '—' && raw !== '-') {
+        records.push({ categoria: STAT_LABELS[stat] || stat, valor: isNaN(raw) ? raw : Number(raw) });
+      }
+    });
+    result[nombre] = records;
+  }
+  return result;
+}
+
+function mergeGameHighs(highs) {
+  if (!highs) return;
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  DATA.jugadores.forEach(j => {
+    const match = Object.keys(highs).find(k => norm(k) === norm(j.nombre));
+    if (match) j.records = highs[match];
+  });
 }
 
 function hideLoader() {
