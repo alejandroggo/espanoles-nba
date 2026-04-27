@@ -213,7 +213,7 @@ function renderTabla() {
       <td class="nombre">${j.nombre}</td>
       <td class="draft-badge">
         ${j.draft
-          ? `<span class="badge badge-draft">${j.draft_anio||'Draft'}</span>`
+          ? `<span class="badge badge-draft">${j.draft_anio||'Draft'}${j.draft_pick ? ` #${j.draft_pick}` : ''}</span>`
           : `<span class="badge badge-undraft">Undrafted</span>`}
       </td>
       <td class="${sortCol==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
