@@ -22,6 +22,7 @@
   <div class="header-inner">
     <div class="logo" onclick="goHome()">ESPAÑOLES <span>EN LA</span> NBA</div>
     <div class="header-right">
+      <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
       <span class="last-update" id="last-update"></span>
     </div>
   </div>
@@ -46,9 +47,12 @@
     </div>
     <div class="mode-chips">
       <button class="mode-chip active" data-mode="per_game"        onclick="setViewMode('per_game')">Por partido</button>
+      <button class="mode-chip"        data-mode="season_highs"    onclick="setViewMode('season_highs')">Mejor temp.</button>
       <button class="mode-chip"        data-mode="totals"          onclick="setViewMode('totals')">Totales</button>
-      <button class="mode-chip"        data-mode="playoffs_pg"     onclick="setViewMode('playoffs_pg')">Playoffs PG</button>
-      <button class="mode-chip"        data-mode="playoffs_totals" onclick="setViewMode('playoffs_totals')">Playoffs Tot.</button>
+      <span class="mode-chips-sep"></span>
+      <button class="mode-chip"        data-mode="playoffs_pg"     onclick="setViewMode('playoffs_pg')">PO PG</button>
+      <button class="mode-chip"        data-mode="playoffs_sh"     onclick="setViewMode('playoffs_sh')">PO Mejor</button>
+      <button class="mode-chip"        data-mode="playoffs_totals" onclick="setViewMode('playoffs_totals')">PO Tot.</button>
     </div>
     <div class="controles-sep"></div>
     <div id="sort-chips" class="sort-chips"></div>
@@ -59,6 +63,27 @@
     <table id="ranking-table">
       <thead id="ranking-thead"></thead>
       <tbody id="ranking-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- VISTA TRANSACCIONES -->
+<div id="view-transacciones" class="view">
+  <div class="trans-header">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      Volver al ranking
+    </button>
+    <h2 class="trans-title">Todas las transacciones</h2>
+  </div>
+  <div class="tabla-wrap">
+    <table id="trans-table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Jugador</th><th>Tipo</th><th>De</th><th>A</th><th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody id="trans-body"></tbody>
     </table>
   </div>
 </div>

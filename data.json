@@ -212,7 +212,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "gasolpa01"
     },
     {
       "id": "serge-ibaka",
@@ -324,7 +325,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "ibakase01"
     },
     {
       "id": "jose-m-calderon",
@@ -393,7 +395,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "caldejo01"
     },
     {
       "id": "marc-gasol",
@@ -530,7 +533,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "gasolma01"
     },
     {
       "id": "ricky-rubio",
@@ -638,7 +642,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "rubiori01"
     },
     {
       "id": "santi-aldama",
@@ -693,7 +698,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "aldamsa01"
     },
     {
       "id": "nikola-mirotic",
@@ -800,7 +806,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "mirotni01"
     },
     {
       "id": "juancho-hernangomez",
@@ -855,7 +862,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "hernaju01"
     },
     {
       "id": "rudy-fernandez",
@@ -929,7 +937,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "fernaru01"
     },
     {
       "id": "sergio-rodriguez",
@@ -991,7 +1000,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "rodrse01"
     },
     {
       "id": "willy-hernangomez",
@@ -1072,7 +1082,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "hernawi01"
     },
     {
       "id": "alex-abrines",
@@ -1134,7 +1145,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "abrinal01"
     },
     {
       "id": "raul-lopez",
@@ -1181,7 +1193,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "lopezra01"
     },
     {
       "id": "usman-garuba",
@@ -1228,7 +1241,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "garubus01"
     },
     {
       "id": "juan-carlos-navarro",
@@ -1303,7 +1317,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "navarjua01"
     },
     {
       "id": "victor-claver",
@@ -1350,7 +1365,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "clavevi01"
     },
     {
       "id": "jorge-garbajosa",
@@ -1431,7 +1447,8 @@
         }
       ],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "garbajo01"
     },
     {
       "id": "hugo-gonzalez",
@@ -1478,7 +1495,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "gonzahu02"
     },
     {
       "id": "fernando-martin",
@@ -1525,7 +1543,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": "martife01"
     },
     {
       "id": "jose-a-montero",
@@ -1564,7 +1583,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "roberto-duenas",
@@ -1603,7 +1623,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "albert-miralles",
@@ -1642,7 +1663,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "fran-vazquez",
@@ -1681,7 +1703,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "sergio-llull",
@@ -1720,7 +1743,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "dani-diez",
@@ -1759,7 +1783,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     },
     {
       "id": "juan-nunez",
@@ -1798,7 +1823,8 @@
       "premios": [],
       "records": [],
       "temporadas_data": [],
-      "playoffs_temporadas": []
+      "playoffs_temporadas": [],
+      "bref_id": null
     }
   ]
 }

@@ -188,7 +188,15 @@ body {
 .chip:hover { border-color: var(--texto-dim); color: var(--texto); }
 .chip.active { border-color: var(--rojo); color: var(--texto); background: rgba(200,16,46,0.12); }
 
-.mode-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.nav-btn {
+  font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.3rem 0.7rem; border: 1px solid var(--border2); background: transparent;
+  color: var(--texto-dim); cursor: pointer; transition: all 0.15s;
+}
+.nav-btn:hover { border-color: var(--texto-dim); color: var(--texto); }
+
+.mode-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+.mode-chips-sep { width: 1px; height: 16px; background: var(--border2); margin: 0 0.15rem; }
 .mode-chip {
   font-family: var(--mono);
   font-size: 0.65rem;
@@ -280,6 +288,15 @@ td.dorado { color: var(--dorado); font-weight: 600; }
 td.draft-badge {
   text-align: left;
 }
+.player-thumb {
+  width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: top center;
+  vertical-align: middle; margin-right: 0.45rem;
+  border: 1px solid var(--border2); background: var(--surface2);
+}
+.player-photo {
+  width: 90px; flex-shrink: 0; object-fit: cover; object-position: top;
+  border: 1px solid var(--border);
+}
 .badge {
   display: inline-block;
   font-family: var(--mono);
@@ -290,6 +307,37 @@ td.draft-badge {
 }
 .badge-draft { background: rgba(245,197,24,0.12); color: var(--dorado); border: 1px solid rgba(245,197,24,0.3); }
 .badge-undraft { background: var(--surface2); color: var(--texto-dimmer); border: 1px solid var(--border); }
+.draft-info { display: flex; align-items: center; gap: 0.35rem; }
+.draft-pick-num { font-family: var(--mono); font-size: 0.58rem; color: var(--texto-dim); }
+.debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); margin-top: 0.2rem; }
+/* ── TRANSACCIONES ───────────────────────────── */
+.trans-header { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 0.5rem; display: flex; align-items: center; gap: 1.5rem; }
+.trans-title { font-family: var(--display); font-size: 1.6rem; letter-spacing: 0.06em; }
+#trans-table { width: 100%; }
+#trans-table th { font-size: 0.6rem; }
+.trans-row { cursor: pointer; }
+.trans-detalle { font-size: 0.72rem; color: var(--texto-dim); max-width: 28rem; }
+.trans-tipo {
+  display: inline-block; font-family: var(--mono); font-size: 0.56rem;
+  padding: 0.12rem 0.4rem; text-transform: uppercase; letter-spacing: 0.06em;
+  border: 1px solid var(--border2); color: var(--texto-dim);
+}
+.trans-draft   { color: var(--dorado); border-color: rgba(245,197,24,0.4); background: rgba(245,197,24,0.08); }
+.trans-trade   { color: #e05a5a; border-color: rgba(224,90,90,0.4); background: rgba(224,90,90,0.08); }
+.trans-sign,
+.trans-ext     { color: #6dbb8a; border-color: rgba(109,187,138,0.4); background: rgba(109,187,138,0.08); }
+.trans-waive,
+.trans-buyout  { color: var(--texto-dimmer); }
+.empty-cell    { text-align: center; color: var(--texto-dimmer); font-family: var(--mono); font-size: 0.7rem; padding: 2rem; }
+
+tr.separator-row td {
+  font-family: var(--mono); font-size: 0.6rem; color: var(--texto-dimmer);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.5rem 1.2rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  pointer-events: none;
+}
 
 /* ── VISTA JUGADOR ───────────────────────────── */
 #view-jugador {
@@ -309,13 +357,14 @@ td.draft-badge {
 
 /* ficha cabecera */
 .ficha-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
   padding: 2rem 0 2rem;
   border-bottom: 1px solid var(--border);
 }
+.ficha-header > div:first-of-type { flex: 1; }
+.ficha-kpis { margin-left: auto; }
 .ficha-nombre {
   font-family: var(--display);
   font-size: clamp(2.5rem, 5vw, 4.5rem);
