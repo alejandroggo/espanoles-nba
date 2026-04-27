@@ -544,12 +544,12 @@ tbody tr { animation: fadeIn 0.2s ease both; }
       <input type="text" id="search-input" placeholder="Buscar jugador…" oninput="filterTabla()">
     </div>
     <div class="sort-chips" id="sort-chips">
-      <button class="chip active" onclick="setSortChip(this,'pts_g')">PPG</button>
-      <button class="chip" onclick="setSortChip(this,'rbd_g')">RPG</button>
-      <button class="chip" onclick="setSortChip(this,'ast_g')">APG</button>
-      <button class="chip" onclick="setSortChip(this,'partidos')">Partidos</button>
-      <button class="chip" onclick="setSortChip(this,'ganancias')">$</button>
-      <button class="chip" onclick="setSortChip(this,'temporadas')">Temporadas</button>
+      <button class="chip active" data-col="pts_g" onclick="setSortChip(this,'pts_g')">PPG</button>
+      <button class="chip" data-col="rbd_g" onclick="setSortChip(this,'rbd_g')">RPG</button>
+      <button class="chip" data-col="ast_g" onclick="setSortChip(this,'ast_g')">APG</button>
+      <button class="chip" data-col="partidos" onclick="setSortChip(this,'partidos')">Partidos</button>
+      <button class="chip" data-col="ganancias" onclick="setSortChip(this,'ganancias')">$</button>
+      <button class="chip" data-col="temporadas" onclick="setSortChip(this,'temporadas')">Temporadas</button>
     </div>
     <span class="results-count" id="results-count"></span>
   </div>
@@ -710,6 +710,11 @@ function renderTabla() {
       th.classList.add('sorted');
       if (sortAsc) th.classList.add('asc');
     }
+  });
+
+  // sincronizar chips con la columna activa
+  document.querySelectorAll('.chip[data-col]').forEach(c => {
+    c.classList.toggle('active', c.dataset.col === sortCol);
   });
 
   document.getElementById('results-count').textContent =
@@ -876,7 +881,7 @@ function buildTabCarrera(j) {
         <tr><td>Faltas</td><td>${fmt(j.pf_total)}</td><td>—</td></tr>
       </tbody>
       <tfoot>
-        <tr><td>Partidos jugados (titular)</td><td>${fmt(j.partidos)}</td><td>(${fmt(j.partidos_titular)})</td></tr>
+        <tr><td>Partidos jugados (titular)</td><td>${fmt(j.partidos)}</td><td>${j.partidos_titular != null ? `(${fmt(j.partidos_titular)})` : '—'}</td></tr>
       </tfoot>
     </table>
     ${j.equipos_nba ? `<p style="margin-top:1rem;font-family:var(--mono);font-size:0.65rem;color:var(--texto-dim);">EQUIPOS: ${j.equipos_nba}</p>` : ''}
@@ -1024,7 +1029,7 @@ const FALLBACK_DATA = {
     { id:'victor-claver', nombre:'Víctor Claver', draft:true, draft_anio:2009, draft_pick:22, draft_equipo:'POR', temporadas:3, partidos:80, partidos_titular:16, pts_g:3.2, rbd_g:2.2, ast_g:0.7, stl_g:0.4, blk_g:0.2, fg_pct:0.398, tres_pct:0.293, ft_pct:0.585, ganancias:4000000, equipos_nba:'POR', pts_total:258, rbd_total:178, ast_total:56, stl_total:30, blk_total:16, min_total:1072, min_g:13.4, tov_total:58, pf_total:103, tres_total:34, tres_g:0.4, premios:[], records:[], temporadas_data:[], playoffs_temporadas:[] },
     { id:'raul-lopez', nombre:'Raül Lopez', draft:true, draft_anio:2001, draft_pick:24, draft_equipo:'UTA', temporadas:2, partidos:113, partidos_titular:26, pts_g:6.5, rbd_g:1.7, ast_g:3.8, stl_g:0.7, blk_g:0.0, fg_pct:0.429, tres_pct:0.346, ft_pct:0.853, ganancias:3941313, equipos_nba:'UTA', pts_total:733, rbd_total:194, ast_total:428, stl_total:84, blk_total:5, min_total:2135, min_g:18.9, tov_total:221, pf_total:278, tres_total:45, tres_g:0.4, premios:[], records:[], temporadas_data:[], playoffs_temporadas:[] },
     { id:'juan-carlos-navarro', nombre:'Juan Carlos Navarro', draft:true, draft_anio:2002, draft_pick:40, draft_equipo:'WAS', temporadas:1, partidos:82, partidos_titular:30, pts_g:10.9, rbd_g:2.6, ast_g:2.2, stl_g:0.6, blk_g:0.0, fg_pct:0.402, tres_pct:0.361, ft_pct:0.849, ganancias:538090, equipos_nba:'MEM', pts_total:896, rbd_total:210, ast_total:177, stl_total:48, blk_total:1, min_total:2117, min_g:25.8, tov_total:134, pf_total:94, tres_total:156, tres_g:1.9, premios:[{tipo:'All Rookie',detalle:'All Rookie 2nd Team',year:2008,team:'MEM'}], records:[{categoria:'Triples',valor:8,team:'MEM',rival:'NOL',fecha:'16 nov 2007'}], temporadas_data:[], playoffs_temporadas:[] },
-    { id:'fernando-martin', nombre:'Fernando Martín', draft:true, draft_anio:1985, draft_pick:38, draft_equipo:'BRK', temporadas:1, partidos:24, partidos_titular:0, pts_g:0.9, rbd_g:1.2, ast_g:0.4, stl_g:0.3, blk_g:0.0, fg_pct:0.290, tres_pct:0.0, ft_pct:0.364, ganancias:145000, equipos_nba:'POR', pts_total:22, rbd_total:28, ast_total:9, stl_total:7, blk_total:1, min_total:146, min_g:6.1, tov_total:20, pf_total:24, tres_total:0, tres_g:0.0, premios:[], records:[], temporadas_data:[], playoffs_temporadas:[] }
+    { id:'fernando-martin', nombre:'Fernando Martín', draft:true, draft_anio:1985, draft_pick:38, draft_equipo:'BRK', temporadas:1, partidos:24, partidos_titular:0, pts_g:0.9, rbd_g:1.2, ast_g:0.4, stl_g:0.3, blk_g:0.0, fg_pct:0.290, tres_pct:null, ft_pct:0.364, ganancias:145000, equipos_nba:'POR', pts_total:22, rbd_total:28, ast_total:9, stl_total:7, blk_total:1, min_total:146, min_g:6.1, tov_total:20, pf_total:24, tres_total:0, tres_g:0.0, premios:[], records:[], temporadas_data:[], playoffs_temporadas:[] }
   ]
 };
 
