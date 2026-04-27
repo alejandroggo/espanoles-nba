@@ -320,18 +320,34 @@ function renderTabla() {
   document.getElementById('results-count').textContent =
     jugadores.length + ' jugador' + (jugadores.length !== 1 ? 'es' : '');
 
-  document.getElementById('ranking-body').innerHTML = jugadores.map((j, i) => `
+  const colCount = 3 + mode.head.length;
+
+  const renderRow = (j, i) => `
     <tr onclick="openJugador('${j.id}')" style="animation-delay:${i * 0.02}s">
       <td class="rank">${i + 1}</td>
       <td class="nombre">${j.nombre}</td>
       <td class="draft-badge">
-        ${j.draft
-          ? `<span class="badge badge-draft">${j.draft_anio || 'Draft'}${j.draft_pick ? ` #${j.draft_pick}` : ''}</span>`
-          : `<span class="badge badge-undraft">Undrafted</span>`}
+        ${j.draft ? `
+          <div class="draft-info">
+            <span class="badge badge-draft">${j.draft_anio || 'Draft'}</span>
+            ${j.draft_pick ? `<span class="draft-pick-num">#${j.draft_pick}</span>` : ''}
+          </div>
+          ${j.primer_partido ? `<div class="debut-fecha">${j.primer_partido.fecha}</div>` : ''}
+        ` : `<span class="badge badge-undraft">Undrafted</span>`}
       </td>
       ${mode.cells(j, sortCol)}
-    </tr>
-  `).join('');
+    </tr>`;
+
+  const debuted     = jugadores.filter(j => (j.partidos || 0) > 0);
+  const neverDebuted = jugadores.filter(j => (j.partidos || 0) === 0);
+
+  let html = debuted.map(renderRow).join('');
+  if (neverDebuted.length > 0) {
+    html += `<tr class="separator-row"><td colspan="${colCount}">Sin debut en la NBA</td></tr>`;
+    html += neverDebuted.map((j, i) => renderRow(j, debuted.length + i)).join('');
+  }
+
+  document.getElementById('ranking-body').innerHTML = html;
 }
 
 function sortTable(col) {

@@ -290,6 +290,17 @@ td.draft-badge {
 }
 .badge-draft { background: rgba(245,197,24,0.12); color: var(--dorado); border: 1px solid rgba(245,197,24,0.3); }
 .badge-undraft { background: var(--surface2); color: var(--texto-dimmer); border: 1px solid var(--border); }
+.draft-info { display: flex; align-items: center; gap: 0.35rem; }
+.draft-pick-num { font-family: var(--mono); font-size: 0.58rem; color: var(--texto-dim); }
+.debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); margin-top: 0.2rem; }
+tr.separator-row td {
+  font-family: var(--mono); font-size: 0.6rem; color: var(--texto-dimmer);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.5rem 1.2rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  pointer-events: none;
+}
 
 /* ── VISTA JUGADOR ───────────────────────────── */
 #view-jugador {
