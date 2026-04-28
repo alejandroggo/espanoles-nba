@@ -1037,7 +1037,7 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "rodrse01",
+      "bref_id": "rodrise01",
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
@@ -1246,7 +1246,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2682-1-5cf97c30a9311.jpg"
     },
     {
       "id": "usman-garuba",
@@ -1378,7 +1379,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2595-1-5ccc7dce13641.jpg"
     },
     {
       "id": "victor-claver",
@@ -1516,7 +1518,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/1005-1-5ccc1e530f1a1.jpg"
     },
     {
       "id": "hugo-gonzalez",
@@ -1564,7 +1567,7 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "gonzahu02",
+      "bref_id": "gonzahu01",
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
@@ -1620,7 +1623,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/60573-1-5ec77db91fc38.jpg"
     },
     {
       "id": "jose-a-montero",
