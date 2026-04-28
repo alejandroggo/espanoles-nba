@@ -311,14 +311,12 @@ td.draft-badge {
 .draft-pick-num { font-family: var(--mono); font-size: 0.58rem; color: var(--texto-dim); }
 .debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); margin-top: 0.2rem; }
 /* ── TRAYECTORIA ─────────────────────────────── */
-.trayectoria-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 0.5rem; }
-.tray-bloque { min-width: 160px; }
-.tray-bloque--full { width: 100%; }
-.tray-label { font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-dimmer); margin-bottom: 0.4rem; }
-.tray-valor { font-size: 0.9rem; color: var(--texto); }
-.tray-lista { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.tray-equipo { font-family: var(--mono); font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid var(--border2); color: var(--texto-dim); }
-.tray-equipo em { color: var(--texto-dimmer); font-style: normal; }
+.trayectoria-row { display: flex; gap: 0; border: 1px solid var(--border); }
+.tray-col { flex: 1; padding: 1rem 1.2rem; border-right: 1px solid var(--border); }
+.tray-col:last-child { border-right: none; }
+.tray-col--empty .tray-valor { color: var(--texto-dimmer); }
+.tray-label { font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-dimmer); margin-bottom: 0.5rem; }
+.tray-valor { font-size: 0.85rem; color: var(--texto); }
 
 /* ── SUMMER LEAGUE ───────────────────────────── */
 .sl-filter {

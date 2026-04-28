@@ -725,24 +725,17 @@ function buildTabTrayectoria(j) {
   const hasData = j.cantera || j.pre_nba || (j.post_nba && j.post_nba.length);
   if (!hasData) return '<p class="empty-msg">Sin datos de trayectoria</p>';
 
-  return `<div class="trayectoria-grid">
-    ${j.cantera ? `
-      <div class="tray-bloque">
-        <div class="tray-label">Cantera</div>
-        <div class="tray-valor">${j.cantera}</div>
-      </div>` : ''}
-    ${j.pre_nba ? `
-      <div class="tray-bloque">
-        <div class="tray-label">Antes de la NBA</div>
-        <div class="tray-valor">${j.pre_nba}</div>
-      </div>` : ''}
-    ${j.post_nba && j.post_nba.length ? `
-      <div class="tray-bloque tray-bloque--full">
-        <div class="tray-label">Después de la NBA</div>
-        <div class="tray-lista">
-          ${j.post_nba.map(e => `<span class="tray-equipo">${e.equipo || e}${e.year ? ` <em>${e.year}</em>` : ''}</span>`).join('')}
-        </div>
-      </div>` : ''}
+  const post = (j.post_nba || []).slice(0, 3);
+  const tray = (label, val) => val
+    ? `<div class="tray-col"><div class="tray-label">${label}</div><div class="tray-valor">${val}</div></div>`
+    : `<div class="tray-col tray-col--empty"><div class="tray-label">${label}</div><div class="tray-valor">—</div></div>`;
+
+  return `<div class="trayectoria-row">
+    ${tray('Cantera', j.cantera)}
+    ${tray('Pre-NBA', j.pre_nba)}
+    ${tray('Post-NBA 1', post[0] ? (post[0].equipo || post[0]) : null)}
+    ${tray('Post-NBA 2', post[1] ? (post[1].equipo || post[1]) : null)}
+    ${tray('Post-NBA 3', post[2] ? (post[2].equipo || post[2]) : null)}
   </div>`;
 }
 
