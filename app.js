@@ -5,7 +5,7 @@ const LOCAL_URL = './data.json';
 const CDN_URL = 'https://cdn.jsdelivr.net/gh/alejandroggo/espanoles-nba@main/data.json';
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRcnveDICJslZxp9dr116TsvDjcoDdf7LOgIwjKinRd5FixvhRnc-mQ4XfKgXASkxaiI8z4BStm6yD/pub?gid=705791197&single=true&output=csv';
 // Rellena con el gid de la pestaña premios cuando esté lista:
-const PREMIOS_SHEET_URL = '';
+const PREMIOS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRcnveDICJslZxp9dr116TsvDjcoDdf7LOgIwjKinRd5FixvhRnc-mQ4XfKgXASkxaiI8z4BStm6yD/pub?gid=580852671&single=true&output=csv';
 
 const STAT_LABELS = {
   PTS: 'Puntos',  RBD: 'Rebotes',  AST: 'Asistencias',
@@ -175,7 +175,7 @@ async function init() {
       const res = await fetch(PREMIOS_SHEET_URL);
       if (res.ok) {
         const csv = await res.text();
-        mergePremiosFromSheet(parseGameHighsCsv(csv));
+        mergePremiosFromSheet(parsePremiosCsv(csv));
       }
     } catch(e) {}
   }
@@ -342,8 +342,57 @@ function renderPremios() {
     </tr>`).join('');
 }
 
+function parsePremiosCsv(csv) {
+  const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  const rows = csv.split('\n').map(line => {
+    const cells = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cells.push(cur.trim()); return cells;
+  }).filter(r => r.some(c => c));
+
+  // buscar fila de cabeceras (la que contenga "jugador" o "player")
+  let hi = -1, cols = {};
+  for (let i = 0; i < Math.min(rows.length, 5); i++) {
+    const r = rows[i].map(norm);
+    const jIdx = r.findIndex(c => c.includes('jugador') || c.includes('player'));
+    if (jIdx >= 0) {
+      hi = i; cols.jugador = jIdx;
+      cols.year   = r.findIndex(c => c.includes('ano') || c.includes('year') || c.includes('temporada'));
+      cols.tipo   = r.findIndex(c => c.includes('tipo') || c.includes('premio') || c.includes('award'));
+      cols.detalle= r.findIndex(c => c.includes('detalle') || c.includes('descripcion') || c.includes('detail'));
+      cols.team   = r.findIndex(c => c.includes('equipo') || c.includes('team'));
+      break;
+    }
+  }
+  if (hi < 0) return null;
+
+  const result = {};
+  for (let i = hi + 1; i < rows.length; i++) {
+    const r = rows[i];
+    const nombre = cols.jugador >= 0 ? r[cols.jugador] : '';
+    if (!nombre) continue;
+    if (!result[nombre]) result[nombre] = [];
+    result[nombre].push({
+      tipo:   cols.tipo    >= 0 ? r[cols.tipo]                              : '',
+      detalle:cols.detalle >= 0 ? r[cols.detalle]                           : '',
+      year:   cols.year    >= 0 ? (isNaN(r[cols.year]) ? r[cols.year] : Number(r[cols.year])) : '',
+      team:   cols.team    >= 0 ? r[cols.team]                              : '',
+    });
+  }
+  return result;
+}
+
 function mergePremiosFromSheet(parsed) {
-  // placeholder: se implementará cuando el usuario comparta el GID y la estructura del sheet
+  if (!parsed) return;
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  DATA.jugadores.forEach(j => {
+    const match = Object.keys(parsed).find(k => norm(k) === norm(j.nombre));
+    if (match) j.premios = parsed[match].filter(p => p.tipo);
+  });
 }
 
 function renderSummerLeague() {
