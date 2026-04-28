@@ -213,7 +213,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "gasolpa01"
+      "bref_id": "gasolpa01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "serge-ibaka",
@@ -326,7 +330,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "ibakase01"
+      "bref_id": "ibakase01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "jose-m-calderon",
@@ -396,7 +404,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "caldejo01"
+      "bref_id": "caldejo01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "marc-gasol",
@@ -534,7 +546,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "gasolma01"
+      "bref_id": "gasolma01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "ricky-rubio",
@@ -643,7 +659,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "rubiori01"
+      "bref_id": "rubiori01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "santi-aldama",
@@ -699,7 +719,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "aldamsa01"
+      "bref_id": "aldamsa01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "nikola-mirotic",
@@ -807,7 +831,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "mirotni01"
+      "bref_id": "mirotni01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "juancho-hernangomez",
@@ -863,7 +891,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "hernaju01"
+      "bref_id": "hernaju01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "rudy-fernandez",
@@ -938,7 +970,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "fernaru01"
+      "bref_id": "fernaru01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "sergio-rodriguez",
@@ -1001,7 +1037,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "rodrse01"
+      "bref_id": "rodrise01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "willy-hernangomez",
@@ -1083,7 +1123,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "hernawi01"
+      "bref_id": "hernawi01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "alex-abrines",
@@ -1146,7 +1190,11 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "abrinal01"
+      "bref_id": "abrinal01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "raul-lopez",
@@ -1194,7 +1242,12 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "lopezra01"
+      "bref_id": "lopezra01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2682-1-5cf97c30a9311.jpg"
     },
     {
       "id": "usman-garuba",
@@ -1242,7 +1295,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "garubus01"
+      "bref_id": "garubus01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "juan-carlos-navarro",
@@ -1318,7 +1375,12 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "navarjua01"
+      "bref_id": "navarjua01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2595-1-5ccc7dce13641.jpg"
     },
     {
       "id": "victor-claver",
@@ -1366,7 +1428,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "clavevi01"
+      "bref_id": "clavevi01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "jorge-garbajosa",
@@ -1448,7 +1514,12 @@
       ],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "garbajo01"
+      "bref_id": "garbajo01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/1005-1-5ccc1e530f1a1.jpg"
     },
     {
       "id": "hugo-gonzalez",
@@ -1496,7 +1567,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "gonzahu02"
+      "bref_id": "gonzahu01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "fernando-martin",
@@ -1544,7 +1619,12 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": "martife01"
+      "bref_id": "martife01",
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": [],
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/60573-1-5ec77db91fc38.jpg"
     },
     {
       "id": "jose-a-montero",
@@ -1584,7 +1664,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "roberto-duenas",
@@ -1624,7 +1708,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "albert-miralles",
@@ -1664,7 +1752,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "fran-vazquez",
@@ -1704,7 +1796,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "sergio-llull",
@@ -1744,7 +1840,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "dani-diez",
@@ -1784,7 +1884,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     },
     {
       "id": "juan-nunez",
@@ -1824,7 +1928,11 @@
       "records": [],
       "temporadas_data": [],
       "playoffs_temporadas": [],
-      "bref_id": null
+      "bref_id": null,
+      "cantera": null,
+      "pre_nba": null,
+      "post_nba": [],
+      "summer_league": []
     }
   ]
 }
