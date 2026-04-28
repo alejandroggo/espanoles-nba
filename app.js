@@ -4,6 +4,8 @@
 const LOCAL_URL = './data.json';
 const CDN_URL = 'https://cdn.jsdelivr.net/gh/alejandroggo/espanoles-nba@main/data.json';
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRcnveDICJslZxp9dr116TsvDjcoDdf7LOgIwjKinRd5FixvhRnc-mQ4XfKgXASkxaiI8z4BStm6yD/pub?gid=705791197&single=true&output=csv';
+// Rellena con el gid de la pestaña premios cuando esté lista:
+const PREMIOS_SHEET_URL = '';
 
 const STAT_LABELS = {
   PTS: 'Puntos',  RBD: 'Rebotes',  AST: 'Asistencias',
@@ -167,6 +169,17 @@ async function init() {
     }
   } catch(e) {}
 
+  // fusionar premios desde sheet si está configurado
+  if (PREMIOS_SHEET_URL) {
+    try {
+      const res = await fetch(PREMIOS_SHEET_URL);
+      if (res.ok) {
+        const csv = await res.text();
+        mergePremiosFromSheet(parseGameHighsCsv(csv));
+      }
+    } catch(e) {}
+  }
+
   hideLoader();
   renderHeroKpis();
   renderTabla();
@@ -241,6 +254,7 @@ function handleHash() {
   if (hash && DATA) {
     if (hash === 'transacciones') { renderTransacciones(); showView('transacciones'); return; }
     if (hash === 'summer-league') { renderSummerLeague(); showView('summer-league'); return; }
+    if (hash === 'premios') { renderPremios(); showView('premios'); return; }
     const j = DATA.jugadores.find(x => x.id === hash);
     if (j) { showJugador(j); return; }
   }
@@ -268,6 +282,68 @@ function showSummerLeague() {
   history.pushState('', '', location.pathname + '#summer-league');
   renderSummerLeague();
   showView('summer-league');
+}
+
+function showPremios() {
+  history.pushState('', '', location.pathname + '#premios');
+  renderPremios();
+  showView('premios');
+}
+
+const ORDEN_PREMIOS = ['ROY','MVP','DPOY','All NBA','All Star','All Rookie','All Defense','Rising Stars','POM','ROM'];
+
+function renderPremios() {
+  const all = [];
+  DATA.jugadores.forEach(j => {
+    (j.premios || []).forEach(p => all.push({ ...p, jugador: j.nombre, jugador_id: j.id }));
+  });
+  all.sort((a, b) => {
+    if (b.year !== a.year) return b.year - a.year;
+    const ia = ORDEN_PREMIOS.indexOf(a.tipo), ib = ORDEN_PREMIOS.indexOf(b.tipo);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+
+  // poblar filtros si es la primera vez
+  const tipoEl = document.getElementById('premios-tipo-filter');
+  const yearEl = document.getElementById('premios-year-filter');
+  if (tipoEl && !tipoEl.dataset.built) {
+    const tipos = [...new Set(all.map(p => p.tipo))].sort((a, b) => {
+      const ia = ORDEN_PREMIOS.indexOf(a), ib = ORDEN_PREMIOS.indexOf(b);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    tipos.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; tipoEl.appendChild(o); });
+    tipoEl.dataset.built = '1';
+    tipoEl.onchange = renderPremios;
+  }
+  if (yearEl && !yearEl.dataset.built) {
+    const years = [...new Set(all.map(p => p.year))].sort((a, b) => b - a);
+    years.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; yearEl.appendChild(o); });
+    yearEl.dataset.built = '1';
+    yearEl.onchange = renderPremios;
+  }
+
+  const tipo = tipoEl ? tipoEl.value : '';
+  const year = yearEl ? yearEl.value : '';
+  const rows = all.filter(p => (!tipo || p.tipo === tipo) && (!year || String(p.year) === year));
+
+  const BIG = ['ROY','MVP','DPOY','All NBA'];
+  const tbody = document.getElementById('premios-body');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-cell">Sin premios</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(p => `
+    <tr class="trans-row" onclick="location.hash='${p.jugador_id}'">
+      <td>${p.year}</td>
+      <td class="nombre">${p.jugador}</td>
+      <td><span class="premio-badge${BIG.includes(p.tipo) ? ' premio-badge--big' : ''}">${p.tipo}</span></td>
+      <td>${p.detalle || p.tipo}</td>
+      <td>${p.team || '—'}</td>
+    </tr>`).join('');
+}
+
+function mergePremiosFromSheet(parsed) {
+  // placeholder: se implementará cuando el usuario comparta el GID y la estructura del sheet
 }
 
 function renderSummerLeague() {
