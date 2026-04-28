@@ -22,6 +22,7 @@
   <div class="header-inner">
     <div class="logo" onclick="goHome()">ESPAÑOLES <span>EN LA</span> NBA</div>
     <div class="header-right">
+      <button class="nav-btn" onclick="showSummerLeague()">Summer League</button>
       <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
       <span class="last-update" id="last-update"></span>
     </div>
@@ -63,6 +64,28 @@
     <table id="ranking-table">
       <thead id="ranking-thead"></thead>
       <tbody id="ranking-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- VISTA SUMMER LEAGUE -->
+<div id="view-summer-league" class="view">
+  <div class="trans-header">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      Volver al ranking
+    </button>
+    <h2 class="trans-title">Summer League</h2>
+    <select id="sl-year-filter" class="sl-filter">
+      <option value="">Todos los años</option>
+    </select>
+  </div>
+  <div class="tabla-wrap">
+    <table id="sl-table">
+      <thead>
+        <tr><th>Año</th><th>Jugador</th><th>Equipo</th></tr>
+      </thead>
+      <tbody id="sl-body"></tbody>
     </table>
   </div>
 </div>

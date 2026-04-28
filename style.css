@@ -310,6 +310,22 @@ td.draft-badge {
 .draft-info { display: flex; align-items: center; gap: 0.35rem; }
 .draft-pick-num { font-family: var(--mono); font-size: 0.58rem; color: var(--texto-dim); }
 .debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); margin-top: 0.2rem; }
+/* ── TRAYECTORIA ─────────────────────────────── */
+.trayectoria-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 0.5rem; }
+.tray-bloque { min-width: 160px; }
+.tray-bloque--full { width: 100%; }
+.tray-label { font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-dimmer); margin-bottom: 0.4rem; }
+.tray-valor { font-size: 0.9rem; color: var(--texto); }
+.tray-lista { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tray-equipo { font-family: var(--mono); font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid var(--border2); color: var(--texto-dim); }
+.tray-equipo em { color: var(--texto-dimmer); font-style: normal; }
+
+/* ── SUMMER LEAGUE ───────────────────────────── */
+.sl-filter {
+  font-family: var(--mono); font-size: 0.62rem; background: var(--surface); color: var(--texto);
+  border: 1px solid var(--border2); padding: 0.25rem 0.5rem; cursor: pointer; margin-left: auto;
+}
+
 /* ── TRANSACCIONES ───────────────────────────── */
 .trans-header { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 0.5rem; display: flex; align-items: center; gap: 1.5rem; }
 .trans-title { font-family: var(--display); font-size: 1.6rem; letter-spacing: 0.06em; }
