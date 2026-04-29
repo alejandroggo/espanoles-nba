@@ -217,7 +217,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "27 jun 2001"
     },
     {
       "id": "serge-ibaka",
@@ -334,7 +335,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "26 jun 2008"
     },
     {
       "id": "jose-m-calderon",
@@ -408,7 +410,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": null
     },
     {
       "id": "marc-gasol",
@@ -550,7 +553,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "28 jun 2007"
     },
     {
       "id": "ricky-rubio",
@@ -663,7 +667,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2009"
     },
     {
       "id": "santi-aldama",
@@ -723,7 +728,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "29 jul 2021"
     },
     {
       "id": "nikola-mirotic",
@@ -835,7 +841,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "23 jun 2011"
     },
     {
       "id": "juancho-hernangomez",
@@ -895,7 +902,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "23 jun 2016"
     },
     {
       "id": "rudy-fernandez",
@@ -974,7 +982,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "28 jun 2007"
     },
     {
       "id": "sergio-rodriguez",
@@ -1041,7 +1050,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "28 jun 2006"
     },
     {
       "id": "willy-hernangomez",
@@ -1127,7 +1137,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2015"
     },
     {
       "id": "alex-abrines",
@@ -1194,7 +1205,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "27 jun 2013"
     },
     {
       "id": "raul-lopez",
@@ -1247,7 +1259,8 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2682-1-5cf97c30a9311.jpg"
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2682-1-5cf97c30a9311.jpg",
+      "draft_fecha": "27 jun 2001"
     },
     {
       "id": "usman-garuba",
@@ -1299,7 +1312,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "29 jul 2021"
     },
     {
       "id": "juan-carlos-navarro",
@@ -1380,7 +1394,8 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2595-1-5ccc7dce13641.jpg"
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2595-1-5ccc7dce13641.jpg",
+      "draft_fecha": "26 jun 2002"
     },
     {
       "id": "victor-claver",
@@ -1432,7 +1447,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2009"
     },
     {
       "id": "jorge-garbajosa",
@@ -1519,7 +1535,8 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/1005-1-5ccc1e530f1a1.jpg"
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/1005-1-5ccc1e530f1a1.jpg",
+      "draft_fecha": null
     },
     {
       "id": "hugo-gonzalez",
@@ -1571,7 +1588,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2025"
     },
     {
       "id": "fernando-martin",
@@ -1624,7 +1642,8 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/60573-1-5ec77db91fc38.jpg"
+      "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/60573-1-5ec77db91fc38.jpg",
+      "draft_fecha": "18 jun 1985"
     },
     {
       "id": "jose-a-montero",
@@ -1668,7 +1687,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "22 jun 1987"
     },
     {
       "id": "roberto-duenas",
@@ -1712,7 +1732,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 1997"
     },
     {
       "id": "albert-miralles",
@@ -1756,7 +1777,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "24 jun 2004"
     },
     {
       "id": "fran-vazquez",
@@ -1800,7 +1822,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "28 jun 2005"
     },
     {
       "id": "sergio-llull",
@@ -1844,7 +1867,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2009"
     },
     {
       "id": "dani-diez",
@@ -1888,7 +1912,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "25 jun 2015"
     },
     {
       "id": "juan-nunez",
@@ -1932,7 +1957,8 @@
       "cantera": null,
       "pre_nba": null,
       "post_nba": [],
-      "summer_league": []
+      "summer_league": [],
+      "draft_fecha": "26 jun 2024"
     }
   ]
 }

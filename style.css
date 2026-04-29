@@ -309,7 +309,8 @@ td.draft-badge {
 .badge-undraft { background: var(--surface2); color: var(--texto-dimmer); border: 1px solid var(--border); }
 .draft-info { display: flex; align-items: center; gap: 0.35rem; }
 .draft-pick-num { font-family: var(--mono); font-size: 0.58rem; color: var(--texto-dim); }
-.debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); margin-top: 0.2rem; }
+.debut-fecha { font-family: var(--mono); font-size: 0.55rem; color: var(--texto-dimmer); }
+.debut-fecha--debut { margin-top: 0.15rem; }
 /* ── TRAYECTORIA ─────────────────────────────── */
 .trayectoria-row { display: flex; gap: 0; border: 1px solid var(--border); }
 .tray-col { flex: 1; padding: 1rem 1.2rem; border-right: 1px solid var(--border); }
