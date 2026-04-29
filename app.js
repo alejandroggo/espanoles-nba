@@ -176,9 +176,9 @@ async function init() {
   // fusionar desde sheets (fallos silenciosos)
   await Promise.allSettled([
     fetch(PREMIOS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergePremiosFromSheet(parsePremiosCsv(csv))).catch(()=>{}),
-    fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', fecha:'fecha|date', tipo:'tipo|type', de:'de|origen|from', a:'^a$|destino|to', detalle:'detalle|descripcion'}))).catch(()=>{}),
-    fetch(SL_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeSummerLeagueFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'ano|year|temporada', equipo:'equipo|team'}))).catch(()=>{}),
-    fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'temporada|year|ano', team:'equipo|team', g:'pj|^g$|partidos', min_g:'min', pts_g:'pts|ppg', rbd_g:'rbd|rpg|reb', ast_g:'ast|apg', stl_g:'stl|spg|rob', blk_g:'blk|bpg|tap', fg_pct:'fg%|fg_pct|tiro campo', tres_pct:'3p%|tres_pct|triple', ft_pct:'ft%|ft_pct|tiro libre'}))).catch(()=>{}),
+    fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', fecha:'fecha|date', tipo:'tipo|type', de:'^de$|origen|from', a:'^a$|destino|to', detalle:'detalle|descripcion|notas'}))).catch(()=>{}),
+    fetch(SL_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeSummerLeagueFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'^ano$|^year$|^temporada$', equipo:'equipo|team'}))).catch(()=>{}),
+    fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'temporada|^ano$|^year$', team:'^equipo$|^team$', g:'^pj$|^gp$|^g$', min_g:'^min$|^mpg$|minutos', pts_g:'^pts$|^ppg$|puntos', rbd_g:'^rbd$|^reb$|^trb$|^rpg$|rebotes', ast_g:'^ast$|^apg$|asistencias', stl_g:'^stl$|^rob$|^spg$|robos', blk_g:'^blk$|^tap$|^bpg$|tapones', fg_pct:'fg%|tc%|tiro campo', tres_pct:'3p%|t3%|triple', ft_pct:'ft%|tl%|tiro libre'}))).catch(()=>{}),
     fetch(TRAYECTORIA_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTrayectoriaFromSheet(csv)).catch(()=>{}),
   ]);
 
@@ -379,10 +379,13 @@ function parseSheetCsv(csv, fieldMap) {
 
   const result = {};
   const normName = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  let lastNombre = '';
   for (let i = hi + 1; i < rows.length; i++) {
     const r = rows[i];
-    const nombre = cols.jugador >= 0 ? r[cols.jugador] : '';
+    const rawNombre = cols.jugador >= 0 ? r[cols.jugador] : '';
+    const nombre = rawNombre || lastNombre;
     if (!nombre) continue;
+    if (rawNombre) lastNombre = rawNombre;
     const entry = {};
     for (const [key, idx] of Object.entries(cols)) {
       if (key === 'jugador') continue;
