@@ -9,6 +9,7 @@ const PREMIOS_SHEET_URL     = BASE_SHEET + '580852671';
 const TRANS_SHEET_URL       = BASE_SHEET + '1484756964';
 const SL_SHEET_URL          = BASE_SHEET + '161265150';
 const TEMPORADAS_SHEET_URL  = BASE_SHEET + '107120245';
+const TRAYECTORIA_SHEET_URL = BASE_SHEET + '1400531043';
 
 const STAT_LABELS = {
   PTS: 'Puntos',  RBD: 'Rebotes',  AST: 'Asistencias',
@@ -178,6 +179,7 @@ async function init() {
     fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', fecha:'fecha|date', tipo:'tipo|type', de:'de|origen|from', a:'^a$|destino|to', detalle:'detalle|descripcion'}))).catch(()=>{}),
     fetch(SL_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeSummerLeagueFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'ano|year|temporada', equipo:'equipo|team'}))).catch(()=>{}),
     fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'temporada|year|ano', team:'equipo|team', g:'pj|^g$|partidos', min_g:'min', pts_g:'pts|ppg', rbd_g:'rbd|rpg|reb', ast_g:'ast|apg', stl_g:'stl|spg|rob', blk_g:'blk|bpg|tap', fg_pct:'fg%|fg_pct|tiro campo', tres_pct:'3p%|tres_pct|triple', ft_pct:'ft%|ft_pct|tiro libre'}))).catch(()=>{}),
+    fetch(TRAYECTORIA_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTrayectoriaFromSheet(csv)).catch(()=>{}),
   ]);
 
   hideLoader();
@@ -417,6 +419,46 @@ function mergeTemporadasFromSheet(parsed) {
   DATA.jugadores.forEach(j => {
     const match = Object.keys(parsed).find(k => norm(k) === norm(j.nombre));
     if (match) j.temporadas_data = parsed[match].filter(s => s.year);
+  });
+}
+
+function mergeTrayectoriaFromSheet(csv) {
+  const normH = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  const norm  = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const rows  = csv.split('\n').map(line => {
+    const cells = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cells.push(cur.trim()); return cells;
+  }).filter(r => r.some(c => c));
+
+  let hi = -1;
+  for (let i = 0; i < Math.min(rows.length, 5); i++) {
+    if (rows[i].map(normH).some(c => c.includes('jugador') || c.includes('player'))) { hi = i; break; }
+  }
+  if (hi < 0) return;
+
+  const headers = rows[hi].map(normH);
+  const col = (...pats) => { for (const p of pats) { const i = headers.findIndex(h => h.includes(p)); if (i>=0) return i; } return -1; };
+
+  const jugadorIdx  = col('jugador','player');
+  const canteraIdx  = col('cantera','formacion','academy');
+  const preNbaIdx   = col('pre','antes','before');
+  // todas las columnas que contengan "post" — puede haber varias
+  const postIdxs = headers.reduce((acc, h, i) => { if (h.includes('post')) acc.push(i); return acc; }, []);
+
+  rows.slice(hi + 1).forEach(r => {
+    const nombre = jugadorIdx >= 0 ? r[jugadorIdx] : '';
+    if (!nombre) return;
+    const j = DATA.jugadores.find(x => norm(x.nombre) === norm(nombre));
+    if (!j) return;
+    if (canteraIdx >= 0 && r[canteraIdx]) j.cantera  = r[canteraIdx];
+    if (preNbaIdx  >= 0 && r[preNbaIdx])  j.pre_nba  = r[preNbaIdx];
+    const post = postIdxs.map(i => r[i]).filter(v => v && v.trim());
+    if (post.length) j.post_nba = post.map(equipo => ({ equipo }));
   });
 }
 
