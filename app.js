@@ -140,6 +140,7 @@ const MODES = {
 // ESTADO
 // ══════════════════════════════════════════════
 let DATA = null;
+let SL_ALL = null;
 let viewMode = 'per_game';
 let sortCol = 'pts_g';
 let sortAsc = false;
@@ -410,10 +411,16 @@ function mergeTransaccionesFromSheet(parsed) {
 function mergeSummerLeagueFromSheet(parsed) {
   if (!parsed) return;
   const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
-  DATA.jugadores.forEach(j => {
-    const match = Object.keys(parsed).find(k => norm(k) === norm(j.nombre));
-    if (match) j.summer_league = parsed[match].filter(s => s.year || s.equipo);
-  });
+
+  // guardar TODAS las entradas del sheet (incluye jugadores no en data.json)
+  SL_ALL = [];
+  for (const [nombre, entries] of Object.entries(parsed)) {
+    const j = DATA.jugadores.find(x => norm(x.nombre) === norm(nombre));
+    entries.filter(s => s.year || s.equipo).forEach(s => {
+      SL_ALL.push({ ...s, jugador: nombre, jugador_id: j ? j.id : null });
+    });
+    if (j) j.summer_league = entries.filter(s => s.year || s.equipo);
+  }
 }
 
 function mergeTemporadasFromSheet(parsed) {
@@ -519,11 +526,10 @@ function mergePremiosFromSheet(parsed) {
 }
 
 function renderSummerLeague() {
-  const all = [];
-  DATA.jugadores.forEach(j => {
-    (j.summer_league || []).forEach(s => all.push({ ...s, jugador: j.nombre, jugador_id: j.id }));
-  });
-  all.sort((a, b) => b.year - a.year || a.jugador.localeCompare(b.jugador));
+  const all = SL_ALL
+    ? [...SL_ALL]
+    : DATA.jugadores.flatMap(j => (j.summer_league || []).map(s => ({ ...s, jugador: j.nombre, jugador_id: j.id })));
+  all.sort((a, b) => (b.year||0) - (a.year||0) || a.jugador.localeCompare(b.jugador));
 
   // años disponibles para filtro
   const years = [...new Set(all.map(s => s.year))].sort((a, b) => b - a);
@@ -547,8 +553,8 @@ function renderSummerLeague() {
     return;
   }
   tbody.innerHTML = rows.map(s => `
-    <tr class="trans-row" onclick="location.hash='${s.jugador_id}'">
-      <td>${s.year}</td>
+    <tr ${s.jugador_id ? `class="trans-row" onclick="location.hash='${s.jugador_id}'"` : ''}>
+      <td>${s.year || '—'}</td>
       <td class="nombre">${s.jugador}</td>
       <td>${s.equipo || '—'}</td>
     </tr>`).join('');
