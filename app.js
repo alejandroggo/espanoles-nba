@@ -470,7 +470,8 @@ function parseSheetCsv(csv, fieldMap) {
     for (const [key, idx] of Object.entries(cols)) {
       if (key === 'jugador') continue;
       const raw = idx >= 0 ? r[idx] : null;
-      entry[key] = (raw !== null && raw !== '') ? (isNaN(raw) ? raw : Number(raw)) : null;
+      const isDateField = key === 'fecha';
+      entry[key] = (raw !== null && raw !== '') ? (!isDateField && !isNaN(raw) ? Number(raw) : raw) : null;
     }
     if (!result[nombre]) result[nombre] = [];
     result[nombre].push(entry);
