@@ -28,13 +28,12 @@ const MODES = {
     defaultSort: 'pts_g',
     chips: [
       {label:'PPG', col:'pts_g'}, {label:'RPG', col:'rbd_g'}, {label:'APG', col:'ast_g'},
-      {label:'Partidos', col:'partidos'}, {label:'$', col:'ganancias'}, {label:'Seas', col:'temporadas'},
+      {label:'Partidos', col:'partidos'},
     ],
     head: [
       {label:'PJ', col:'partidos'}, {label:'PPG', col:'pts_g'}, {label:'RPG', col:'rbd_g'},
       {label:'APG', col:'ast_g'}, {label:'FG%', col:'fg_pct'}, {label:'3P%', col:'tres_pct'},
       {label:'FT%', col:'ft_pct'}, {label:'BPG', col:'blk_g'}, {label:'SPG', col:'stl_g'},
-      {label:'SEAS', col:'temporadas'}, {label:'$', col:'ganancias'},
     ],
     cells: (j, sc) => `
       <td class="${sc==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
@@ -42,21 +41,18 @@ const MODES = {
       <td class="${sc==='rbd_g'?'highlight':''}">${fmtDec(j.rbd_g)}</td>
       <td class="${sc==='ast_g'?'highlight':''}">${fmtDec(j.ast_g)}</td>
       <td>${fmtPct(j.fg_pct)}</td><td>${fmtPct(j.tres_pct)}</td><td>${fmtPct(j.ft_pct)}</td>
-      <td>${fmtDec(j.blk_g)}</td><td>${fmtDec(j.stl_g)}</td>
-      <td class="${sc==='temporadas'?'highlight':''}">${fmt(j.temporadas)}</td>
-      <td class="${sc==='ganancias'?'dorado':''}">${fmtMoney(j.ganancias)}</td>`,
+      <td>${fmtDec(j.blk_g)}</td><td>${fmtDec(j.stl_g)}</td>`,
   },
   totals: {
     defaultSort: 'pts_total',
     chips: [
       {label:'PTS', col:'pts_total'}, {label:'RBD', col:'rbd_total'}, {label:'AST', col:'ast_total'},
-      {label:'Partidos', col:'partidos'}, {label:'$', col:'ganancias'},
+      {label:'Partidos', col:'partidos'},
     ],
     head: [
       {label:'PJ', col:'partidos'}, {label:'PTS', col:'pts_total'}, {label:'RBD', col:'rbd_total'},
       {label:'AST', col:'ast_total'}, {label:'STL', col:'stl_total'}, {label:'BLK', col:'blk_total'},
       {label:'3PM', col:'tres_total'}, {label:'MIN', col:'min_total'}, {label:'TOV', col:'tov_total'},
-      {label:'$', col:'ganancias'},
     ],
     cells: (j, sc) => `
       <td class="${sc==='partidos'?'highlight':''}">${fmt(j.partidos)}</td>
@@ -64,8 +60,28 @@ const MODES = {
       <td class="${sc==='rbd_total'?'highlight':''}">${fmt(j.rbd_total)}</td>
       <td class="${sc==='ast_total'?'highlight':''}">${fmt(j.ast_total)}</td>
       <td>${fmt(j.stl_total)}</td><td>${fmt(j.blk_total)}</td>
-      <td>${fmt(j.tres_total)}</td><td>${fmt(j.min_total)}</td><td>${fmt(j.tov_total)}</td>
-      <td class="${sc==='ganancias'?'dorado':''}">${fmtMoney(j.ganancias)}</td>`,
+      <td>${fmt(j.tres_total)}</td><td>${fmt(j.min_total)}</td><td>${fmt(j.tov_total)}</td>`,
+  },
+  bio: {
+    defaultSort: 'ganancias',
+    chips: [
+      {label:'$', col:'ganancias'}, {label:'Temporadas', col:'temporadas'},
+      {label:'Pick', col:'draft_pick'}, {label:'Año draft', col:'draft_anio'},
+      {label:'Equipos', col:'num_equipos'},
+    ],
+    head: [
+      {label:'Pick', col:'draft_pick'}, {label:'Año draft', col:'draft_anio'},
+      {label:'Temporadas', col:'temporadas'}, {label:'Ganado', col:'ganancias'},
+      {label:'Equipos', col:'num_equipos'},
+    ],
+    cells: (j, sc) => `
+      <td class="${sc==='draft_pick'?'highlight':''}">${j.draft ? (j.draft_pick ? '#'+j.draft_pick : '—') : 'Undrafted'}</td>
+      <td class="${sc==='draft_anio'?'highlight':''}">${j.draft_anio || '—'}</td>
+      <td class="${sc==='temporadas'?'highlight':''}">${fmt(j.temporadas)}</td>
+      <td class="${sc==='ganancias'?'highlight dorado':''}">${fmtMoney(j.ganancias)}</td>
+      <td class="${sc==='num_equipos'?'highlight':''} equipos-cell">
+        ${j.num_equipos || '—'}${j.equipos_nba ? `<span class="equipos-list">${j.equipos_nba}</span>` : ''}
+      </td>`,
   },
   playoffs_pg: {
     defaultSort: 'po_g',
@@ -774,6 +790,9 @@ function renderTabla() {
   if (isPlayoff) enrichPlayoffStats(jugadores);
   if (['season_highs', 'playoffs_sh'].includes(viewMode)) enrichSeasonHighs(jugadores);
   if (isPlayoff) jugadores = jugadores.filter(j => j.po_g > 0);
+  if (viewMode === 'bio') jugadores.forEach(j => {
+    j.num_equipos = j.equipos_nba ? j.equipos_nba.split(',').map(s => s.trim()).filter(Boolean).length : 0;
+  });
 
   if (searchTerm) {
     const q = searchTerm.toLowerCase();
