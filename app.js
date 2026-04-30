@@ -179,7 +179,30 @@ async function init() {
     fetch(PREMIOS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergePremiosFromSheet(parsePremiosCsv(csv))).catch(()=>{}),
     fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', fecha:'fecha|date', tipo:'tipo|type', de:'^de$|origen|from', a:'^a$|destino|to', detalle:'detalle|descripcion|notas'}))).catch(()=>{}),
     fetch(SL_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeSummerLeagueFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'^ano$|^year$|^temporada$', equipo:'equipo|team'}))).catch(()=>{}),
-    fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'temporada|^ano$|^year$', team:'^equipo$|^team$', g:'^pj$|^gp$|^g$', min_g:'^min$|^mpg$|minutos', pts_g:'^pts$|^ppg$|puntos', rbd_g:'^rbd$|^reb$|^trb$|^rpg$|rebotes', ast_g:'^ast$|^apg$|asistencias', stl_g:'^stl$|^rob$|^spg$|robos', blk_g:'^blk$|^tap$|^bpg$|tapones', fg_pct:'fg%|tc%|tiro campo', tres_pct:'3p%|t3%|triple', ft_pct:'ft%|tl%|tiro libre'}))).catch(()=>{}),
+    fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {
+      jugador:   'jugador|player',
+      year:      '^year$|temporada|^ano$',
+      team:      '^team$|^equipo$',
+      age:       '^age$|^edad$',
+      g:         '^g$|^pj$|^gp$',
+      gs:        '^gs$',
+      min_total: '^min$',
+      min_g:     '^m/g$|^mpg$|^min/g$',
+      pts_total: '^pts$',
+      pts_g:     '^pts/g$|^ppg$',
+      rbd_total: '^rbd$|^reb$|^trb$',
+      rbd_g:     '^rbd/g$|^rpg$|^reb/g$',
+      ast_total: '^ast$',
+      ast_g:     '^ast/g$|^apg$',
+      stl_total: '^stl$',
+      stl_g:     '^stl/g$|^spg$',
+      blk_total: '^blk$|^tap$',
+      blk_g:     '^blk/g$|^bpg$|^tap/g$',
+      fg_pct:    '^fg%$|^tc%$',
+      tres_pct:  '^3p%$|^t3%$',
+      ft_pct:    '^ft%$|^tl%$',
+      tov:       '^tov$|^to$',
+    }))).catch(()=>{}),
     fetch(TRAYECTORIA_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTrayectoriaFromSheet(csv)).catch(()=>{}),
   ]);
 
@@ -936,16 +959,18 @@ function buildTabTemporadas(j) {
     <div style="overflow-x:auto">
     <table class="tab-table">
       <thead><tr>
-        <th>Temporada</th><th>Equipo</th><th>PJ</th><th>MIN</th>
+        <th>Temporada</th><th>Equipo</th><th>Edad</th><th>PJ</th><th>GS</th><th>MIN/G</th>
         <th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th>
-        <th>FG%</th><th>3P%</th><th>FT%</th>
+        <th>FG%</th><th>3P%</th><th>FT%</th><th>TOV</th>
       </tr></thead>
       <tbody>
         ${seas.map(s => `
           <tr>
             <td>${s.year||'—'}</td>
             <td>${s.team||'—'}</td>
+            <td>${fmt(s.age)}</td>
             <td>${fmt(s.g)}</td>
+            <td>${fmt(s.gs)}</td>
             <td>${fmtDec(s.min_g)}</td>
             <td>${fmtDec(s.pts_g)}</td>
             <td>${fmtDec(s.rbd_g)}</td>
@@ -955,6 +980,7 @@ function buildTabTemporadas(j) {
             <td>${fmtPct(s.fg_pct)}</td>
             <td>${fmtPct(s.tres_pct)}</td>
             <td>${fmtPct(s.ft_pct)}</td>
+            <td>${fmt(s.tov)}</td>
           </tr>
         `).join('')}
       </tbody>
