@@ -188,7 +188,7 @@ async function fetchSheetData() {
     fetch(PREMIOS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergePremiosFromSheet(parsePremiosCsv(csv))).catch(()=>{}),
     fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {
       jugador: 'jugador|player',
-      fecha:   '^fecha$|^date$',
+      fecha:   '~^fecha$|~^date$',
       tipo:    '^transaccion$|^tipo$|^type$',
       de:      '^equipo$|^equipo 1$|^de$|origen|from',
       a:       '^equipo 2$|^a$|destino|to',
@@ -428,8 +428,12 @@ function parseSheetCsv(csv, fieldMap) {
   const headers = rows[hi].map(normH);
   const colFor = patterns => {
     for (const pat of patterns.split('|')) {
-      const re = new RegExp(pat.trim());
-      const i = headers.findIndex(h => re.test(h));
+      const raw = pat.trim();
+      const last = raw.startsWith('~');
+      const re = new RegExp(last ? raw.slice(1) : raw);
+      let i = -1;
+      if (last) { for (let k = headers.length - 1; k >= 0; k--) { if (re.test(headers[k])) { i = k; break; } } }
+      else i = headers.findIndex(h => re.test(h));
       if (i >= 0) return i;
     }
     return -1;
