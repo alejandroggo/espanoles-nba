@@ -960,38 +960,57 @@ function buildTabTemporadas(j) {
   const seas = j.temporadas_data;
   if (!seas || !seas.length) return '<p class="empty-msg">Sin datos de temporada</p>';
 
+  const yearNum = s => parseInt((String(s.year||'')).match(/\d{4}/)?.[0] || '0');
+  const sorted = [...seas].sort((a, b) => yearNum(a) - yearNum(b));
+
+  const rowsPG = sorted.map(s => `<tr>
+    <td>${s.year||'—'}</td><td>${s.team||'—'}</td><td>${fmt(s.age)}</td>
+    <td>${fmt(s.g)}</td><td>${fmt(s.gs)}</td><td>${fmtDec(s.min_g)}</td>
+    <td>${fmtDec(s.pts_g)}</td><td>${fmtDec(s.rbd_g)}</td><td>${fmtDec(s.ast_g)}</td>
+    <td>${fmtDec(s.stl_g)}</td><td>${fmtDec(s.blk_g)}</td>
+    <td>${fmtPct(s.fg_pct)}</td><td>${fmtPct(s.tres_pct)}</td><td>${fmtPct(s.ft_pct)}</td>
+    <td>${fmt(s.tov)}</td>
+  </tr>`).join('');
+
+  const rowsTot = sorted.map(s => `<tr>
+    <td>${s.year||'—'}</td><td>${s.team||'—'}</td><td>${fmt(s.age)}</td>
+    <td>${fmt(s.g)}</td><td>${fmt(s.gs)}</td><td>${fmt(s.min_total)}</td>
+    <td>${fmt(s.pts_total)}</td><td>${fmt(s.rbd_total)}</td><td>${fmt(s.ast_total)}</td>
+    <td>${fmt(s.stl_total)}</td><td>${fmt(s.blk_total)}</td>
+    <td>${fmtPct(s.fg_pct)}</td><td>${fmtPct(s.tres_pct)}</td><td>${fmtPct(s.ft_pct)}</td>
+    <td>${fmt(s.tov)}</td>
+  </tr>`).join('');
+
   return `
-    <div style="overflow-x:auto">
-    <table class="tab-table">
-      <thead><tr>
-        <th>Temporada</th><th>Equipo</th><th>Edad</th><th>PJ</th><th>GS</th><th>MIN/G</th>
-        <th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th>
-        <th>FG%</th><th>3P%</th><th>FT%</th><th>TOV</th>
-      </tr></thead>
-      <tbody>
-        ${seas.map(s => `
-          <tr>
-            <td>${s.year||'—'}</td>
-            <td>${s.team||'—'}</td>
-            <td>${fmt(s.age)}</td>
-            <td>${fmt(s.g)}</td>
-            <td>${fmt(s.gs)}</td>
-            <td>${fmtDec(s.min_g)}</td>
-            <td>${fmtDec(s.pts_g)}</td>
-            <td>${fmtDec(s.rbd_g)}</td>
-            <td>${fmtDec(s.ast_g)}</td>
-            <td>${fmtDec(s.stl_g)}</td>
-            <td>${fmtDec(s.blk_g)}</td>
-            <td>${fmtPct(s.fg_pct)}</td>
-            <td>${fmtPct(s.tres_pct)}</td>
-            <td>${fmtPct(s.ft_pct)}</td>
-            <td>${fmt(s.tov)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="tab-subtabs">
+      <button class="tab-sub active" onclick="toggleTemporadas(this,'pg')">Por partido</button>
+      <button class="tab-sub" onclick="toggleTemporadas(this,'tot')">Totales</button>
     </div>
-  `;
+    <div style="overflow-x:auto">
+      <table class="tab-table" id="temps-pg">
+        <thead><tr>
+          <th>Temporada</th><th>Equipo</th><th>Edad</th><th>PJ</th><th>GS</th><th>MIN/G</th>
+          <th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th>
+          <th>FG%</th><th>3P%</th><th>FT%</th><th>TOV</th>
+        </tr></thead>
+        <tbody>${rowsPG}</tbody>
+      </table>
+      <table class="tab-table" id="temps-tot" style="display:none">
+        <thead><tr>
+          <th>Temporada</th><th>Equipo</th><th>Edad</th><th>PJ</th><th>GS</th><th>MIN</th>
+          <th>PTS</th><th>RBD</th><th>AST</th><th>STL</th><th>BLK</th>
+          <th>FG%</th><th>3P%</th><th>FT%</th><th>TOV</th>
+        </tr></thead>
+        <tbody>${rowsTot}</tbody>
+      </table>
+    </div>`;
+}
+
+function toggleTemporadas(btn, mode) {
+  btn.closest('.tab-panel').querySelectorAll('.tab-sub').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('temps-pg').style.display  = mode === 'pg'  ? '' : 'none';
+  document.getElementById('temps-tot').style.display = mode === 'tot' ? '' : 'none';
 }
 
 // ── TAB PLAYOFFS ────────────────────────────
