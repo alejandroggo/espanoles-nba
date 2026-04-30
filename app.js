@@ -733,15 +733,30 @@ function enrichSeasonHighs(jugadores) {
   jugadores.forEach(j => {
     const mx = (arr, fn) => { const vals = arr.map(fn).filter(v => v != null); return vals.length ? Math.max(...vals) : null; };
     const seas = (j.temporadas_data || []).filter(s => s.g > 0);
-    j.sh_pts_g    = mx(seas, s => s.pts_g);
-    j.sh_rbd_g    = mx(seas, s => s.rbd_g);
-    j.sh_ast_g    = mx(seas, s => s.ast_g);
-    j.sh_fg_pct   = mx(seas, s => s.fg_pct);
-    j.sh_tres_pct = mx(seas, s => s.tres_pct);
-    j.sh_ft_pct   = mx(seas, s => s.ft_pct);
-    j.sh_stl_g    = mx(seas, s => s.stl_g);
-    j.sh_blk_g    = mx(seas, s => s.blk_g);
-    j.sh_min_g    = mx(seas, s => s.min_g);
+
+    if (seas.length) {
+      // datos temporada a temporada del sheet → máximo real de cada categoría
+      j.sh_pts_g    = mx(seas, s => s.pts_g);
+      j.sh_rbd_g    = mx(seas, s => s.rbd_g);
+      j.sh_ast_g    = mx(seas, s => s.ast_g);
+      j.sh_fg_pct   = mx(seas, s => s.fg_pct);
+      j.sh_tres_pct = mx(seas, s => s.tres_pct);
+      j.sh_ft_pct   = mx(seas, s => s.ft_pct);
+      j.sh_stl_g    = mx(seas, s => s.stl_g);
+      j.sh_blk_g    = mx(seas, s => s.blk_g);
+      j.sh_min_g    = mx(seas, s => s.min_g);
+    } else {
+      // fallback a medias de carrera si el sheet no ha cargado aún
+      j.sh_pts_g    = j.pts_g;
+      j.sh_rbd_g    = j.rbd_g;
+      j.sh_ast_g    = j.ast_g;
+      j.sh_fg_pct   = j.fg_pct;
+      j.sh_tres_pct = j.tres_pct;
+      j.sh_ft_pct   = j.ft_pct;
+      j.sh_stl_g    = j.stl_g;
+      j.sh_blk_g    = j.blk_g;
+      j.sh_min_g    = j.min_g;
+    }
 
     const po = (j.playoffs_temporadas || []).filter(s => s.g > 0);
     j.po_sh_pts_g  = mx(po, s => s.pts_g);
