@@ -330,8 +330,12 @@ td.draft-badge {
 /* ── SUMMER LEAGUE ───────────────────────────── */
 .sl-filter {
   font-family: var(--mono); font-size: 0.62rem; background: var(--surface); color: var(--texto);
-  border: 1px solid var(--border2); padding: 0.25rem 0.5rem; cursor: pointer; margin-left: auto;
+  border: 1px solid var(--border2); padding: 0.25rem 0.5rem; cursor: pointer;
 }
+.sl-filter:first-of-type { margin-left: auto; }
+.sl-search { cursor: text; min-width: 10rem; }
+.pos-badge { font-family: var(--mono); font-size: 0.52rem; color: var(--texto-dimmer); text-transform: uppercase; letter-spacing: 0.06em; vertical-align: middle; margin-left: 0.3rem; }
+.meta-pill--pos { color: var(--acento); border-color: color-mix(in srgb, var(--acento) 30%, transparent); }
 
 /* ── TRANSACCIONES ───────────────────────────── */
 .trans-header { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 0.5rem; display: flex; align-items: center; gap: 1.5rem; }

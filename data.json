@@ -218,7 +218,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "27 jun 2001"
+      "draft_fecha": "27 jun 2001",
+      "posicion": "Pívot",
+      "nacimiento_fecha": "6 jul 1980"
     },
     {
       "id": "serge-ibaka",
@@ -336,7 +338,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "26 jun 2008"
+      "draft_fecha": "26 jun 2008",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "18 sep 1989"
     },
     {
       "id": "jose-m-calderon",
@@ -411,7 +415,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": null
+      "draft_fecha": null,
+      "posicion": "Base",
+      "nacimiento_fecha": "28 sep 1981"
     },
     {
       "id": "marc-gasol",
@@ -554,7 +560,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "28 jun 2007"
+      "draft_fecha": "28 jun 2007",
+      "posicion": "Pívot",
+      "nacimiento_fecha": "29 ene 1985"
     },
     {
       "id": "ricky-rubio",
@@ -668,7 +676,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2009"
+      "draft_fecha": "25 jun 2009",
+      "posicion": "Base",
+      "nacimiento_fecha": "21 oct 1990"
     },
     {
       "id": "santi-aldama",
@@ -729,7 +739,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "29 jul 2021"
+      "draft_fecha": "29 jul 2021",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "23 may 2001"
     },
     {
       "id": "nikola-mirotic",
@@ -842,7 +854,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "23 jun 2011"
+      "draft_fecha": "23 jun 2011",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "5 nov 1991"
     },
     {
       "id": "juancho-hernangomez",
@@ -903,7 +917,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "23 jun 2016"
+      "draft_fecha": "23 jun 2016",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "28 sep 1995"
     },
     {
       "id": "rudy-fernandez",
@@ -983,7 +999,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "28 jun 2007"
+      "draft_fecha": "28 jun 2007",
+      "posicion": "Escolta",
+      "nacimiento_fecha": "4 abr 1985"
     },
     {
       "id": "sergio-rodriguez",
@@ -1051,7 +1069,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "28 jun 2006"
+      "draft_fecha": "28 jun 2006",
+      "posicion": "Base",
+      "nacimiento_fecha": "12 dic 1986"
     },
     {
       "id": "willy-hernangomez",
@@ -1138,7 +1158,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2015"
+      "draft_fecha": "25 jun 2015",
+      "posicion": "Pívot",
+      "nacimiento_fecha": "28 may 1994"
     },
     {
       "id": "alex-abrines",
@@ -1206,7 +1228,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "27 jun 2013"
+      "draft_fecha": "27 jun 2013",
+      "posicion": "Escolta",
+      "nacimiento_fecha": "1 ago 1993"
     },
     {
       "id": "raul-lopez",
@@ -1260,7 +1284,9 @@
       "post_nba": [],
       "summer_league": [],
       "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2682-1-5cf97c30a9311.jpg",
-      "draft_fecha": "27 jun 2001"
+      "draft_fecha": "27 jun 2001",
+      "posicion": "Base",
+      "nacimiento_fecha": "13 abr 1980"
     },
     {
       "id": "usman-garuba",
@@ -1313,7 +1339,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "29 jul 2021"
+      "draft_fecha": "29 jul 2021",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "29 oct 2002"
     },
     {
       "id": "juan-carlos-navarro",
@@ -1395,7 +1423,9 @@
       "post_nba": [],
       "summer_league": [],
       "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/2595-1-5ccc7dce13641.jpg",
-      "draft_fecha": "26 jun 2002"
+      "draft_fecha": "26 jun 2002",
+      "posicion": "Escolta",
+      "nacimiento_fecha": "13 jun 1980"
     },
     {
       "id": "victor-claver",
@@ -1448,7 +1478,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2009"
+      "draft_fecha": "25 jun 2009",
+      "posicion": "Alero",
+      "nacimiento_fecha": "30 may 1988"
     },
     {
       "id": "jorge-garbajosa",
@@ -1536,7 +1568,9 @@
       "post_nba": [],
       "summer_league": [],
       "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/1005-1-5ccc1e530f1a1.jpg",
-      "draft_fecha": null
+      "draft_fecha": null,
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "24 may 1977"
     },
     {
       "id": "hugo-gonzalez",
@@ -1589,7 +1623,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2025"
+      "draft_fecha": "25 jun 2025",
+      "posicion": "Alero",
+      "nacimiento_fecha": "5 sep 2005"
     },
     {
       "id": "fernando-martin",
@@ -1643,7 +1679,9 @@
       "post_nba": [],
       "summer_league": [],
       "foto_url": "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/60573-1-5ec77db91fc38.jpg",
-      "draft_fecha": "18 jun 1985"
+      "draft_fecha": "18 jun 1985",
+      "posicion": "Alero",
+      "nacimiento_fecha": "25 ene 1962"
     },
     {
       "id": "jose-a-montero",
@@ -1688,7 +1726,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "22 jun 1987"
+      "draft_fecha": "22 jun 1987",
+      "posicion": "Base",
+      "nacimiento_fecha": null
     },
     {
       "id": "roberto-duenas",
@@ -1733,7 +1773,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 1997"
+      "draft_fecha": "25 jun 1997",
+      "posicion": "Pívot",
+      "nacimiento_fecha": "9 ago 1974"
     },
     {
       "id": "albert-miralles",
@@ -1778,7 +1820,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "24 jun 2004"
+      "draft_fecha": "24 jun 2004",
+      "posicion": "Ala-Pívot",
+      "nacimiento_fecha": "29 may 1982"
     },
     {
       "id": "fran-vazquez",
@@ -1823,7 +1867,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "28 jun 2005"
+      "draft_fecha": "28 jun 2005",
+      "posicion": "Pívot",
+      "nacimiento_fecha": "8 feb 1983"
     },
     {
       "id": "sergio-llull",
@@ -1868,7 +1914,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2009"
+      "draft_fecha": "25 jun 2009",
+      "posicion": "Base",
+      "nacimiento_fecha": "15 nov 1987"
     },
     {
       "id": "dani-diez",
@@ -1913,7 +1961,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "25 jun 2015"
+      "draft_fecha": "25 jun 2015",
+      "posicion": "Escolta",
+      "nacimiento_fecha": "18 mar 1989"
     },
     {
       "id": "juan-nunez",
@@ -1958,7 +2008,9 @@
       "pre_nba": null,
       "post_nba": [],
       "summer_league": [],
-      "draft_fecha": "26 jun 2024"
+      "draft_fecha": "26 jun 2024",
+      "posicion": "Base",
+      "nacimiento_fecha": "7 ene 2005"
     }
   ]
 }
