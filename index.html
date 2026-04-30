@@ -25,6 +25,7 @@
       <button class="nav-btn" onclick="showPremios()">Premios</button>
       <button class="nav-btn" onclick="showSummerLeague()">Summer League</button>
       <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
+      <button class="nav-btn" id="btn-recargar" onclick="recargarDatos()">Recargar datos</button>
       <span class="last-update" id="last-update"></span>
     </div>
   </div>
@@ -129,7 +130,7 @@
     <table id="trans-table">
       <thead>
         <tr>
-          <th>Fecha</th><th>Jugador</th><th>Tipo</th><th>De</th><th>A</th><th>Detalle</th>
+          <th>Fecha</th><th>Jugador</th><th>Tipo</th><th>Equipo</th><th>Equipo 2</th><th>Otros jugadores</th>
         </tr>
       </thead>
       <tbody id="trans-body"></tbody>
