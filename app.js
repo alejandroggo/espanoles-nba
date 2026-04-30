@@ -479,18 +479,23 @@ function mergeTrayectoriaFromSheet(csv) {
   const jugadorIdx  = col('jugador','player');
   const canteraIdx  = col('cantera','formacion','academy');
   const preNbaIdx   = col('pre','antes','before');
-  // todas las columnas que contengan "post" — puede haber varias
-  const postIdxs = headers.reduce((acc, h, i) => { if (h.includes('post')) acc.push(i); return acc; }, []);
+  // columnas post-NBA: "post", "despues/después", "after", o "equipo" que no sea la de pre-NBA
+  const postIdxs = headers.reduce((acc, h, i) => {
+    if (i === jugadorIdx || i === canteraIdx || i === preNbaIdx) return acc;
+    if (h.includes('post') || h.includes('despues') || h.includes('after') || h.includes('equipo')) acc.push(i);
+    return acc;
+  }, []);
 
   rows.slice(hi + 1).forEach(r => {
     const nombre = jugadorIdx >= 0 ? r[jugadorIdx] : '';
     if (!nombre) return;
     const j = DATA.jugadores.find(x => norm(x.nombre) === norm(nombre));
     if (!j) return;
-    if (canteraIdx >= 0 && r[canteraIdx]) j.cantera  = r[canteraIdx];
-    if (preNbaIdx  >= 0 && r[preNbaIdx])  j.pre_nba  = r[preNbaIdx];
-    const post = postIdxs.map(i => r[i]).filter(v => v && v.trim());
-    if (post.length) j.post_nba = post.map(equipo => ({ equipo }));
+    if (canteraIdx >= 0 && r[canteraIdx]) j.cantera = r[canteraIdx];
+    if (preNbaIdx  >= 0 && r[preNbaIdx])  j.pre_nba = r[preNbaIdx];
+    // si hay una sola columna con varios equipos separados por coma/punto y coma, los expandimos
+    const rawPost = postIdxs.flatMap(i => (r[i]||'').split(/[,;\/\n]+/).map(v => v.trim())).filter(Boolean);
+    if (rawPost.length) j.post_nba = rawPost.map(equipo => ({ equipo }));
   });
 }
 
