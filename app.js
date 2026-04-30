@@ -175,9 +175,25 @@ async function init() {
   } catch(e) {}
 
   // fusionar desde sheets (fallos silenciosos)
+  await fetchSheetData();
+
+  hideLoader();
+  renderHeroKpis();
+  renderTabla();
+  handleHash();
+}
+
+async function fetchSheetData() {
   await Promise.allSettled([
     fetch(PREMIOS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergePremiosFromSheet(parsePremiosCsv(csv))).catch(()=>{}),
-    fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', fecha:'fecha|date', tipo:'tipo|type', de:'^de$|origen|from', a:'^a$|destino|to', detalle:'detalle|descripcion|notas'}))).catch(()=>{}),
+    fetch(TRANS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTransaccionesFromSheet(parseSheetCsv(csv, {
+      jugador: 'jugador|player',
+      fecha:   '^fecha$|^date$',
+      tipo:    '^transaccion$|^tipo$|^type$',
+      de:      '^equipo$|^equipo 1$|^de$|origen|from',
+      a:       '^equipo 2$|^a$|destino|to',
+      detalle: 'otros|involucrados|detalle|descripcion',
+    }))).catch(()=>{}),
     fetch(SL_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeSummerLeagueFromSheet(parseSheetCsv(csv, {jugador:'jugador|player', year:'^ano$|^year$|^temporada$', equipo:'equipo|team'}))).catch(()=>{}),
     fetch(TEMPORADAS_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTemporadasFromSheet(parseSheetCsv(csv, {
       jugador:   'jugador|player',
@@ -205,11 +221,32 @@ async function init() {
     }))).catch(()=>{}),
     fetch(TRAYECTORIA_SHEET_URL).then(r => r.ok && r.text()).then(csv => csv && mergeTrayectoriaFromSheet(csv)).catch(()=>{}),
   ]);
+}
 
-  hideLoader();
-  renderHeroKpis();
+async function recargarDatos() {
+  const btn = document.getElementById('btn-recargar');
+  if (btn) { btn.disabled = true; btn.textContent = 'Actualizando…'; }
+  // reset sheet data on jugadores
+  DATA.jugadores.forEach(j => {
+    j.transacciones = []; j.temporadas_data = []; j.summer_league = [];
+    j.cantera = null; j.pre_nba = null; j.post_nba = [];
+  });
+  SL_ALL = null;
+  await fetchSheetData();
   renderTabla();
-  handleHash();
+  // re-render vista activa si es una de las de sheet
+  const activeView = document.querySelector('.view.active');
+  if (activeView) {
+    if (activeView.id === 'view-transacciones') renderTransacciones();
+    if (activeView.id === 'view-summer-league') renderSummerLeague();
+    if (activeView.id === 'view-premios') renderPremios();
+    if (activeView.id === 'view-jugador') {
+      const hash = location.hash.slice(1);
+      const j = DATA.jugadores.find(x => x.id === hash);
+      if (j) showJugador(j);
+    }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Recargar datos'; }
 }
 
 // ── GAME HIGHS DESDE GOOGLE SHEET ────────────
@@ -1090,7 +1127,7 @@ function buildTabTransacciones(j) {
   return `<div style="overflow-x:auto">
     <table class="tab-table">
       <thead><tr>
-        <th>Fecha</th><th>Tipo</th><th>De</th><th>A</th><th>Detalle</th>
+        <th>Fecha</th><th>Tipo</th><th>Equipo</th><th>Equipo 2</th><th>Otros jugadores</th>
       </tr></thead>
       <tbody>
         ${trans.map(t => `
