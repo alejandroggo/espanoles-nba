@@ -181,6 +181,17 @@ async function init() {
     }
   }
 
+  // asegurar arrays obligatorios en todos los jugadores
+  DATA.jugadores.forEach(j => {
+    j.premios            = j.premios            || [];
+    j.records            = j.records            || [];
+    j.temporadas_data    = j.temporadas_data    || [];
+    j.playoffs_temporadas= j.playoffs_temporadas|| [];
+    j.transacciones      = j.transacciones      || [];
+    j.summer_league      = j.summer_league      || [];
+    j.post_nba           = j.post_nba           || [];
+  });
+
   // fusionar game highs del sheet (fallo silencioso si no hay acceso)
   try {
     const res = await fetch(SHEET_URL);
@@ -655,7 +666,7 @@ function renderTransacciones() {
   DATA.jugadores.forEach(j => {
     (j.transacciones || []).forEach(t => all.push({ ...t, jugador: j.nombre, jugador_id: j.id }));
   });
-  all.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  all.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
 
   // construir filtros la primera vez (o cuando haya datos nuevos)
   const tipoEl  = document.getElementById('trans-tipo-filter');
@@ -733,7 +744,7 @@ function renderHeroKpis() {
 function enrichSeasonHighs(jugadores) {
   jugadores.forEach(j => {
     const mx = (arr, fn) => { const vals = arr.map(fn).filter(v => v != null); return vals.length ? Math.max(...vals) : null; };
-    const seas = (j.temporadas_data || []).filter(s => s.g > 0);
+    const seas = (j.temporadas_data || []).filter(s => (s.g || 0) > 0);
 
     if (seas.length) {
       // datos temporada a temporada del sheet → máximo real de cada categoría
@@ -798,7 +809,8 @@ function setViewMode(mode) {
 }
 
 function renderTabla() {
-  const mode = MODES[viewMode];
+  const mode = MODES[viewMode] || MODES.per_game;
+  if (!MODES[viewMode]) viewMode = 'per_game';
   let jugadores = [...DATA.jugadores];
 
   const PLAYOFF_MODES = ['playoffs_pg', 'playoffs_totals', 'playoffs_sh'];
@@ -818,7 +830,7 @@ function renderTabla() {
   jugadores.sort((a, b) => {
     const va = a[sortCol] ?? (sortAsc ? Infinity : -Infinity);
     const vb = b[sortCol] ?? (sortAsc ? Infinity : -Infinity);
-    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    if (typeof va === 'string') return sortAsc ? va.localeCompare(String(vb)) : String(vb).localeCompare(String(va));
     return sortAsc ? va - vb : vb - va;
   });
 
@@ -1085,8 +1097,10 @@ function buildTabTemporadas(j) {
 function toggleTemporadas(btn, mode) {
   btn.closest('.tab-panel').querySelectorAll('.tab-sub').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('temps-pg').style.display  = mode === 'pg'  ? '' : 'none';
-  document.getElementById('temps-tot').style.display = mode === 'tot' ? '' : 'none';
+  const pg  = document.getElementById('temps-pg');
+  const tot = document.getElementById('temps-tot');
+  if (pg)  pg.style.display  = mode === 'pg'  ? '' : 'none';
+  if (tot) tot.style.display = mode === 'tot' ? '' : 'none';
 }
 
 // ── TAB PLAYOFFS ────────────────────────────
@@ -1160,7 +1174,7 @@ function buildTabTrayectoria(j) {
 
 // ── TAB TRANSACCIONES ────────────────────────
 function buildTabTransacciones(j) {
-  const trans = [...(j.transacciones || [])].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  const trans = [...(j.transacciones || [])].sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
   if (!trans.length) return '<p class="empty-msg">Sin transacciones registradas</p>';
 
   return `<div style="overflow-x:auto">
