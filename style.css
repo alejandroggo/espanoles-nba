@@ -603,3 +603,52 @@ tr.separator-row td {
 @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
 .view.active { animation: fadeIn 0.25s ease; }
 tbody tr { animation: fadeIn 0.2s ease both; }
+
+/* ── FOOTER ──────────────────────────────────── */
+.ag-footer {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  padding: 2.5rem 2rem;
+  margin-top: 4rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.78rem;
+  color: var(--texto-dim);
+}
+.ag-footer-brand strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--texto);
+  margin-bottom: 0.25rem;
+}
+.ag-footer-projects,
+.ag-footer-pubs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ag-footer-projects a,
+.ag-footer-pubs a {
+  color: var(--texto-dim);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.ag-footer-projects a:hover,
+.ag-footer-pubs a:hover { color: var(--texto); }
+.ag-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: right;
+}
+@media (max-width: 768px) {
+  .ag-footer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .ag-footer-meta { text-align: left; }
+}
