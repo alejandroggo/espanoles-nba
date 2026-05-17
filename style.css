@@ -298,6 +298,7 @@ tbody tr {
 }
 tbody tr:hover { background: var(--surface); }
 tbody tr:hover td.nombre { color: var(--rojo); }
+tbody tr:focus-visible { outline: 2px solid var(--rojo); outline-offset: -2px; }
 
 td {
   padding: 0.85rem 0.75rem;
