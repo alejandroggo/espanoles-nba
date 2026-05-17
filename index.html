@@ -52,7 +52,7 @@
   <div class="controles">
     <div class="search-wrap">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Buscar jugador…" oninput="filterTabla()">
+      <input type="text" id="search-input" placeholder="Buscar jugador…" aria-label="Buscar jugador" oninput="filterTabla()">
     </div>
     <div class="mode-chips">
       <button class="mode-chip active" data-mode="per_game"        onclick="setViewMode('per_game')">Por partido</button>
@@ -85,7 +85,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Todos los premios</h2>
+    <h1 class="trans-title">Todos los premios</h1>
     <select id="premios-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
     <select id="premios-year-filter" class="sl-filter"><option value="">Todos los años</option></select>
   </div>
@@ -106,7 +106,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Summer League</h2>
+    <h1 class="trans-title">Summer League</h1>
     <input type="text" id="sl-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
     <select id="sl-year-filter" class="sl-filter">
       <option value="">Todos los años</option>
@@ -129,7 +129,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Todas las transacciones</h2>
+    <h1 class="trans-title">Todas las transacciones</h1>
     <input type="text" id="trans-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
     <select id="trans-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
     <select id="trans-year-filter" class="sl-filter"><option value="">Todos los años</option></select>

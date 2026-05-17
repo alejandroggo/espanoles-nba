@@ -50,6 +50,12 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
+/* ── FOCUS VISIBLE ───────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 2px;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -203,6 +209,7 @@ body {
   outline: none; transition: border 0.15s;
 }
 .search-wrap input:focus { border-color: var(--rojo); }
+.search-wrap input:focus-visible { outline: 2px solid var(--rojo); outline-offset: 0; }
 
 .sort-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .chip {
