@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Españoles en la NBA</title>
 <meta name="description" content="Base de datos completa de todos los jugadores españoles en la NBA. Estadísticas, temporadas, playoffs, premios y récords históricos.">
@@ -29,6 +30,7 @@
       <button class="nav-btn" onclick="showSummerLeague()">Summer League</button>
       <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
       <button class="nav-btn" id="btn-recargar" onclick="recargarDatos()">Recargar datos</button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
       <span class="last-update" id="last-update"></span>
     </div>
   </div>

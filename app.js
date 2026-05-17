@@ -166,7 +166,37 @@ let activeTab = {};
 // ══════════════════════════════════════════════
 // ARRANQUE
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// TEMA
+// ══════════════════════════════════════════════
+function initTheme() {
+  const stored = localStorage.getItem('ag-theme') || 'auto';
+  renderTheme(stored);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('ag-theme') || 'auto') === 'auto') renderTheme('auto');
+  });
+}
+
+function renderTheme(pref) {
+  const dark = pref === 'dark' || (pref === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  const labels = { auto: '◐ Auto', light: '☀ Claro', dark: '☾ Oscuro' };
+  btn.textContent = labels[pref] || labels.auto;
+  btn.setAttribute('aria-label', 'Tema: ' + (labels[pref] || labels.auto) + '. Pulsa para cambiar');
+  btn.dataset.themePref = pref;
+}
+
+function cycleTheme() {
+  const cur = document.getElementById('theme-toggle')?.dataset.themePref || 'auto';
+  const next = { auto: 'dark', dark: 'light', light: 'auto' }[cur] || 'auto';
+  localStorage.setItem('ag-theme', next);
+  renderTheme(next);
+}
+
 async function init() {
+  initTheme();
   try {
     const res = await fetch(LOCAL_URL);
     if (!res.ok) throw new Error('local');

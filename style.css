@@ -1,21 +1,51 @@
 /* ── VARIABLES ──────────────────────────────── */
 :root {
-  --rojo:        #c8102e;
-  --rojo-dark:   #8b0c1f;
-  --dorado:      #f5c518;
-  --negro:       #080808;
-  --bg:          #0d0d0d;
-  --surface:     #161616;
-  --surface2:    #1e1e1e;
-  --border:      #272727;
-  --border2:     #333;
-  --texto:       #ebebeb;
-  --texto-dim:   #888;
-  --texto-dimmer:#444;
-  --mono:        'IBM Plex Mono', monospace;
-  --display:     'Bebas Neue', sans-serif;
-  --serif:       'DM Serif Display', serif;
-  --body:        'Figtree', sans-serif;
+  /* Tipografías (invariantes) */
+  --mono:    'IBM Plex Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --serif:   'DM Serif Display', serif;
+  --body:    'Figtree', sans-serif;
+
+  /* Colores de marca (invariantes) */
+  --rojo:      #c8102e;
+  --rojo-dark: #8b0c1f;
+  --dorado:    #f5c518;
+  --negro:     #080808;
+
+  /* Modo CLARO (por defecto) */
+  --bg:           #f4f4f2;
+  --surface:      #ffffff;
+  --surface2:     #ebebeb;
+  --border:       #ddd;
+  --border2:      #ccc;
+  --texto:        #111111;
+  --texto-dim:    #555555;
+  --texto-dimmer: #999999;
+  --header-bg:    rgba(244,244,242,0.92);
+
+  /* Tokens spec */
+  --text:             var(--texto);
+  --text-muted:       var(--texto-dim);
+  --surface-2:        var(--surface2);
+  --accent:           var(--rojo);
+  --accent-contrast:  #ffffff;
+  --acento:           var(--rojo);
+  --danger:           #c8102e;
+  --success:          #2e7d52;
+}
+
+/* Modo OSCURO */
+[data-theme="dark"] {
+  --bg:           #0d0d0d;
+  --surface:      #161616;
+  --surface2:     #1e1e1e;
+  --border:       #272727;
+  --border2:      #333;
+  --texto:        #ebebeb;
+  --texto-dim:    #888;
+  --texto-dimmer: #444;
+  --header-bg:    rgba(8,8,8,0.92);
+  --success:      #6dbb8a;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -43,7 +73,7 @@ body {
   font-family: var(--display);
   font-size: 2.5rem;
   letter-spacing: 0.1em;
-  color: var(--texto);
+  color: #ebebeb;
 }
 #loader .loader-title span { color: var(--rojo); }
 .loader-bar {
@@ -64,7 +94,7 @@ body {
 /* ── HEADER ─────────────────────────────────── */
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(8,8,8,0.92);
+  background: var(--header-bg);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
@@ -652,6 +682,22 @@ tbody tr { animation: fadeIn 0.2s ease both; }
   }
   .ag-footer-meta { text-align: left; }
 }
+
+/* ── THEME TOGGLE ────────────────────────────── */
+.theme-toggle {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--texto-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.theme-toggle:hover { border-color: var(--texto-dim); color: var(--texto); }
 
 /* ── UPDATE BADGE ────────────────────────────── */
 .ag-update-badge {
