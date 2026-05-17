@@ -652,3 +652,16 @@ tbody tr { animation: fadeIn 0.2s ease both; }
   }
   .ag-footer-meta { text-align: left; }
 }
+
+/* ── UPDATE BADGE ────────────────────────────── */
+.ag-update-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--texto-dimmer);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}

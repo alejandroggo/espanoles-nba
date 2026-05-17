@@ -329,8 +329,17 @@ function hideLoader() {
 
   if (DATA.actualizado) {
     const d = new Date(DATA.actualizado);
+    const iso = d.toISOString();
+    const legible = d.toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'});
+
     document.getElementById('last-update').textContent =
-      'Actualizado: ' + d.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+      'Actualizado: ' + legible;
+
+    const timeEl = document.getElementById('ag-last-update');
+    if (timeEl) { timeEl.setAttribute('datetime', iso); timeEl.textContent = legible; }
+
+    const badge = document.getElementById('ag-update-badge');
+    if (badge) { badge.textContent = 'Datos a: ' + legible; badge.removeAttribute('hidden'); }
   }
 }
 
