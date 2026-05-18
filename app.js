@@ -1087,7 +1087,7 @@ function buildTabCarrera(j) {
         <tr><td>Partidos jugados (titular)</td><td>${fmt(j.partidos)}</td><td>${j.partidos_titular != null ? `(${fmt(j.partidos_titular)})` : '—'}</td></tr>
       </tfoot>
     </table>
-    ${j.equipos_nba ? `<p style="margin-top:1rem;font-family:var(--mono);font-size:0.65rem;color:var(--texto-dim);">EQUIPOS: ${j.equipos_nba}</p>` : ''}
+    ${j.equipos_nba ? `<p style="margin-top:1rem;font-family:var(--mono);font-size:0.65rem;color:var(--text-muted);">EQUIPOS: ${j.equipos_nba}</p>` : ''}
   `;
 }
 
