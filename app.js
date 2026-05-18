@@ -166,7 +166,41 @@ let activeTab = {};
 // ══════════════════════════════════════════════
 // ARRANQUE
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// TEMA
+// ══════════════════════════════════════════════
+function initTheme() {
+  const stored = localStorage.getItem('ag-theme') || 'auto';
+  renderTheme(stored);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('ag-theme') || 'auto') === 'auto') renderTheme('auto');
+  });
+}
+
+function renderTheme(pref) {
+  const dark = pref === 'dark' || (pref === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  const iSun  = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2m-3.5-7.5-1.5 1.5m-9 9-1.5 1.5m0-12 1.5 1.5m9 9 1.5 1.5"/></svg>`;
+  const iMoon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  const iAuto = `<svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>`;
+  const labels = { auto: `${iAuto} Auto`, light: `${iSun} Claro`, dark: `${iMoon} Oscuro` };
+  const names  = { auto: 'Auto', light: 'Claro', dark: 'Oscuro' };
+  btn.innerHTML = labels[pref] || labels.auto;
+  btn.setAttribute('aria-label', 'Tema: ' + (names[pref] || names.auto) + '. Pulsa para cambiar');
+  btn.dataset.themePref = pref;
+}
+
+function cycleTheme() {
+  const cur = document.getElementById('theme-toggle')?.dataset.themePref || 'auto';
+  const next = { auto: 'dark', dark: 'light', light: 'auto' }[cur] || 'auto';
+  localStorage.setItem('ag-theme', next);
+  renderTheme(next);
+}
+
 async function init() {
+  initTheme();
   try {
     const res = await fetch(LOCAL_URL);
     if (!res.ok) throw new Error('local');
@@ -329,8 +363,17 @@ function hideLoader() {
 
   if (DATA.actualizado) {
     const d = new Date(DATA.actualizado);
+    const iso = d.toISOString();
+    const legible = d.toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'});
+
     document.getElementById('last-update').textContent =
-      'Actualizado: ' + d.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+      'Actualizado: ' + legible;
+
+    const timeEl = document.getElementById('ag-last-update');
+    if (timeEl) { timeEl.setAttribute('datetime', iso); timeEl.textContent = legible; }
+
+    const badge = document.getElementById('ag-update-badge');
+    if (badge) { badge.textContent = 'Datos a: ' + legible; badge.removeAttribute('hidden'); }
   }
 }
 
@@ -836,8 +879,12 @@ function renderTabla() {
 
   // thead dinámico
   document.getElementById('ranking-thead').innerHTML = `<tr>
-    <th></th><th>Jugador</th><th></th>
-    ${mode.head.map(h => `<th data-col="${h.col}" onclick="sortTable('${h.col}')" class="${sortCol===h.col?'sorted'+(sortAsc?' asc':''):''}">${h.label}</th>`).join('')}
+    <th></th><th scope="col">Jugador</th><th></th>
+    ${mode.head.map(h => {
+      const active = sortCol === h.col;
+      const ariaSort = active ? (sortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" data-col="${h.col}" onclick="sortTable('${h.col}')" class="${active?'sorted'+(sortAsc?' asc':''):''}" aria-sort="${ariaSort}">${h.label}</th>`;
+    }).join('')}
   </tr>`;
 
   // chips dinámicos
@@ -856,7 +903,7 @@ function renderTabla() {
         ${j.nombre}${j.posicion ? ` <span class="pos-badge">${j.posicion}</span>` : ''}
       </td>`;
   const renderRow = (j, i) => `
-    <tr onclick="openJugador('${j.id}')" style="animation-delay:${i * 0.02}s">
+    <tr onclick="openJugador('${j.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openJugador('${j.id}');}" tabindex="0" style="animation-delay:${i * 0.02}s">
       ${j.partidos > 0 ? `<td class="rank">${i + 1}</td>
       <td class="nombre">
         ${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.display='none'" alt="">` : ''}
@@ -929,10 +976,10 @@ function buildFicha(j) {
     <div class="ficha-header">
       ${(j.foto_url || j.bref_id) ? `<img class="player-photo" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.display='none'" alt="${j.nombre}">` : ''}
       <div>
-        <h2 class="ficha-nombre">
+        <h1 class="ficha-nombre">
           ${j.nombre.split(' ').slice(0,1).join(' ')}<br>
           <em>${j.nombre.split(' ').slice(1).join(' ')}</em>
-        </h2>
+        </h1>
         <div class="ficha-meta">
           ${j.posicion ? `<span class="meta-pill meta-pill--pos">${j.posicion}</span>` : ''}
           ${j.draft
@@ -969,35 +1016,35 @@ function buildFicha(j) {
       ${statBox(fmtPct(j.ft_pct), 'FT%')}
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn" onclick="openTab(this,'tab-carrera')">Carrera</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-temporadas')">Temporadas</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-playoffs')">Playoffs ${poSeasons>0?`(${poSeasons})`:''}</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-premios')">Premios ${premiosCount>0?`(${premiosCount})`:''}</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-records')">Récords</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-tray')">Trayectoria</button>
-      <button class="tab-btn" onclick="openTab(this,'tab-trans')">Transacciones${transCount>0?` (${transCount})`:''}</button>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="tab-carrera"    id="tbtn-carrera"    onclick="openTab(this,'tab-carrera')">Carrera</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-temporadas" id="tbtn-temporadas" onclick="openTab(this,'tab-temporadas')">Temporadas</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-playoffs"   id="tbtn-playoffs"   onclick="openTab(this,'tab-playoffs')">Playoffs ${poSeasons>0?`(${poSeasons})`:''}</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-premios"    id="tbtn-premios"    onclick="openTab(this,'tab-premios')">Premios ${premiosCount>0?`(${premiosCount})`:''}</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-records"    id="tbtn-records"    onclick="openTab(this,'tab-records')">Récords</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-tray"       id="tbtn-tray"       onclick="openTab(this,'tab-tray')">Trayectoria</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-trans"      id="tbtn-trans"      onclick="openTab(this,'tab-trans')">Transacciones${transCount>0?` (${transCount})`:''}</button>
     </div>
 
-    <div id="tab-carrera" class="tab-panel">
+    <div id="tab-carrera"    class="tab-panel" role="tabpanel" aria-labelledby="tbtn-carrera">
       ${buildTabCarrera(j)}
     </div>
-    <div id="tab-temporadas" class="tab-panel">
+    <div id="tab-temporadas" class="tab-panel" role="tabpanel" aria-labelledby="tbtn-temporadas">
       ${buildTabTemporadas(j)}
     </div>
-    <div id="tab-playoffs" class="tab-panel">
+    <div id="tab-playoffs"   class="tab-panel" role="tabpanel" aria-labelledby="tbtn-playoffs">
       ${buildTabPlayoffs(j)}
     </div>
-    <div id="tab-premios" class="tab-panel">
+    <div id="tab-premios"    class="tab-panel" role="tabpanel" aria-labelledby="tbtn-premios">
       ${buildTabPremios(j)}
     </div>
-    <div id="tab-records" class="tab-panel">
+    <div id="tab-records"    class="tab-panel" role="tabpanel" aria-labelledby="tbtn-records">
       ${buildTabRecords(j)}
     </div>
-    <div id="tab-tray" class="tab-panel">
+    <div id="tab-tray"       class="tab-panel" role="tabpanel" aria-labelledby="tbtn-tray">
       ${buildTabTrayectoria(j)}
     </div>
-    <div id="tab-trans" class="tab-panel">
+    <div id="tab-trans"      class="tab-panel" role="tabpanel" aria-labelledby="tbtn-trans">
       ${buildTabTransacciones(j)}
     </div>
   `;
@@ -1008,9 +1055,10 @@ function statBox(val, label) {
 }
 
 function openTab(btn, tabId) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
   document.getElementById(tabId).classList.add('active');
 }
 
@@ -1039,7 +1087,7 @@ function buildTabCarrera(j) {
         <tr><td>Partidos jugados (titular)</td><td>${fmt(j.partidos)}</td><td>${j.partidos_titular != null ? `(${fmt(j.partidos_titular)})` : '—'}</td></tr>
       </tfoot>
     </table>
-    ${j.equipos_nba ? `<p style="margin-top:1rem;font-family:var(--mono);font-size:0.65rem;color:var(--texto-dim);">EQUIPOS: ${j.equipos_nba}</p>` : ''}
+    ${j.equipos_nba ? `<p style="margin-top:1rem;font-family:var(--mono);font-size:0.65rem;color:var(--text-muted);">EQUIPOS: ${j.equipos_nba}</p>` : ''}
   `;
 }
 

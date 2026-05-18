@@ -2,11 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Españoles en la NBA</title>
 <meta name="description" content="Base de datos completa de todos los jugadores españoles en la NBA. Estadísticas, temporadas, playoffs, premios y récords históricos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
+<link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,6 +31,7 @@
       <button class="nav-btn" onclick="showSummerLeague()">Summer League</button>
       <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
       <button class="nav-btn" id="btn-recargar" onclick="recargarDatos()">Recargar datos</button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
       <span class="last-update" id="last-update"></span>
     </div>
   </div>
@@ -36,8 +42,9 @@
   <div class="hero">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title">TODOS LOS<br><em>Españoles</em><br>EN LA NBA</h1>
+        <h1 class="hero-title ag-hero">TODOS LOS<br><em>Españoles</em><br>EN LA NBA</h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+        <span id="ag-update-badge" class="ag-update-badge" hidden></span>
       </div>
       <div class="hero-kpis" id="hero-kpis"></div>
     </div>
@@ -45,8 +52,8 @@
 
   <div class="controles">
     <div class="search-wrap">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Buscar jugador…" oninput="filterTabla()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Buscar jugador…" aria-label="Buscar jugador" oninput="filterTabla()">
     </div>
     <div class="mode-chips">
       <button class="mode-chip active" data-mode="per_game"        onclick="setViewMode('per_game')">Por partido</button>
@@ -79,7 +86,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Todos los premios</h2>
+    <h1 class="trans-title">Todos los premios</h1>
     <select id="premios-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
     <select id="premios-year-filter" class="sl-filter"><option value="">Todos los años</option></select>
   </div>
@@ -100,7 +107,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Summer League</h2>
+    <h1 class="trans-title">Summer League</h1>
     <input type="text" id="sl-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
     <select id="sl-year-filter" class="sl-filter">
       <option value="">Todos los años</option>
@@ -123,7 +130,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       Volver al ranking
     </button>
-    <h2 class="trans-title">Todas las transacciones</h2>
+    <h1 class="trans-title">Todas las transacciones</h1>
     <input type="text" id="trans-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
     <select id="trans-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
     <select id="trans-year-filter" class="sl-filter"><option value="">Todos los años</option></select>
@@ -148,6 +155,29 @@
   </button>
   <div id="ficha-content"></div>
 </div>
+
+<footer class="ag-footer">
+  <div class="ag-footer-brand">
+    <strong>Alejandro Gaitán</strong>
+    <span>Periodismo NBA en español</span>
+  </div>
+  <nav class="ag-footer-projects" aria-label="Otros proyectos">
+    <a href="https://alejandroggo.github.io/portfolio/" rel="noopener noreferrer">Portfolio</a>
+    <a href="https://alejandroggo.github.io/nba-rankings/" rel="noopener noreferrer">Rankings NBA</a>
+    <a href="https://alejandroggo.github.io/nba-offseason-2026/" rel="noopener noreferrer">Off-Season 2026</a>
+    <a href="https://alejandroggo.github.io/NBA-espanol/" rel="noopener noreferrer">NBA en Español</a>
+  </nav>
+  <nav class="ag-footer-pubs" aria-label="Publicaciones">
+    <a href="https://alejandroggo.substack.com" rel="noopener noreferrer">Substack</a>
+    <a href="https://www.relevo.com/autor/alejandro-gaitan-5475.html" rel="noopener noreferrer">Relevo</a>
+    <a href="https://www.gigantes.com" rel="noopener noreferrer">Gigantes</a>
+    <a href="https://alejandrogaitan.com" rel="noopener noreferrer">alejandrogaitan.com</a>
+  </nav>
+  <div class="ag-footer-meta">
+    <span>© Alejandro Gaitán</span>
+    <span>Última actualización: <time id="ag-last-update" datetime=""></time></span>
+  </div>
+</footer>
 
 <script src="app.js"></script>
 <script>init();</script>
