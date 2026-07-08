@@ -285,6 +285,23 @@ function renderSalariosTable() {
       <td class="td-num">${renderPct(j.pct)}</td>
       <td class="td-muted">${j.equipos_nba || '—'}</td>
     </tr>`).join('');
+
+  // Pie: totales
+  const tTotal   = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  const tCobrado = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
+  const tFuturo  = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
+  const tPct = (tCobrado || tFuturo) && tTotal ? Math.round(tCobrado / tTotal * 100) : null;
+
+  document.getElementById('sal-foot').innerHTML = `
+    <tr class="sal-total">
+      <td></td><td></td>
+      <td class="td-nombre">TOTAL (${salRows.length})</td>
+      <td class="td-num td-dinero">${fmtDinero(tTotal)}</td>
+      <td class="td-num">${fmtDinero(tCobrado)}</td>
+      <td class="td-num">${fmtDinero(tFuturo)}</td>
+      <td class="td-num">${renderPct(tPct)}</td>
+      <td></td>
+    </tr>`;
 }
 
 function renderPct(pct) {

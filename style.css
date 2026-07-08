@@ -311,6 +311,14 @@ td {
   border-radius: var(--radius-full);
 }
 
+/* Fila de totales */
+.sal-total td {
+  border-top: 2px solid var(--border-strong);
+  padding-top: var(--space-3);
+  font-weight: 700;
+}
+.sal-total .td-dinero { color: var(--dorado); }
+
 /* ── UNDRAFTED ───────────────────────────────── */
 .undrafted-wrap {
   max-width: 1400px; margin: 0 auto;
