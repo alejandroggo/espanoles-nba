@@ -334,15 +334,15 @@ td {
 .td-rank { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: var(--space-2); }
 .td-foto { width: 44px; padding-right: 0; }
 .td-notas { min-width: 180px; max-width: 320px; white-space: normal; word-break: break-word; }
-.premio-hito {
-  display: inline-block;
-  background: var(--dorado);
-  color: #111;
-  font-weight: 700;
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-full);
-  letter-spacing: 0.02em;
-}
+.td-center { text-align: center; }
+
+/* Filas destacadas (premios hito) */
+tr.row-oro   td { background: rgba(245, 197, 24, 0.14); }
+tr.row-oro:hover td { background: rgba(245, 197, 24, 0.22); }
+tr.row-oro   td:nth-child(2) { box-shadow: inset 3px 0 var(--dorado); font-weight: 600; }
+tr.row-verde td { background: rgba(22, 163, 74, 0.14); }
+tr.row-verde:hover td { background: rgba(22, 163, 74, 0.22); }
+tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weight: 600; }
 .player-thumb {
   width: 32px; height: 32px;
   border-radius: 50%;

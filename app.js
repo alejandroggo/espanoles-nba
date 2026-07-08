@@ -324,7 +324,7 @@ const SL_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'jugador', label: 'Jugador', sortable: true },
   { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
-  { key: 'equipo',  label: 'Equipo',  sortable: true },
+  { key: 'equipo',  label: 'Equipo',  sortable: true,  cls: 'td-center' },
 ];
 
 const SL_COLS_GROUP = [
@@ -332,7 +332,7 @@ const SL_COLS_GROUP = [
   { key: 'jugador', label: 'Jugador',        sortable: true },
   { key: 'count',   label: 'Participaciones', sortable: true, cls: 'td-num' },
   { key: 'years',   label: 'Años',           sortable: true,  cls: 'td-num' },
-  { key: 'equipos', label: 'Equipos',        sortable: false },
+  { key: 'equipos', label: 'Equipos',        sortable: false, cls: 'td-center' },
 ];
 
 async function initSummerPage() {
@@ -434,7 +434,7 @@ function renderSlFlat(rows) {
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${s.jugador}</td>
       <td class="td-num">${s.year || '—'}</td>
-      <td>${s.equipo || '—'}</td>
+      <td class="td-center">${s.equipo || '—'}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -476,7 +476,7 @@ function renderSlGrouped(entries) {
       <td class="td-nombre">${g.jugador}</td>
       <td class="td-num">${g.count}</td>
       <td class="td-num">${g.years.join(', ') || '—'}</td>
-      <td>${g.equipos.join(', ') || '—'}</td>
+      <td class="td-center">${g.equipos.join(', ') || '—'}</td>
     </tr>`).join('') || `<tr><td colspan="5" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -501,7 +501,7 @@ const PR_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'jugador', label: 'Jugador', sortable: true },
   { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
-  { key: 'team',    label: 'Equipo',  sortable: true },
+  { key: 'team',    label: 'Equipo',  sortable: true,  cls: 'td-center' },
   { key: 'tipo',    label: 'Premio',  sortable: true },
   { key: 'notas',   label: 'Notas',   sortable: false, cls: 'td-notas' },
 ];
@@ -605,19 +605,22 @@ function renderPrFlat(rows) {
 
   document.getElementById('pr-count').textContent = `${rows.length} premio${rows.length === 1 ? '' : 's'}`;
   renderPrHead(PR_COLS, prSortCol, prSortAsc);
-  document.getElementById('pr-body').innerHTML = rows.map((p, i) => {
-    const destacado = p.tipo === 'ROY' || p.tipo === 'DPOY';
-    const premioCell = destacado ? `<span class="premio-hito">${p.tipo}</span>` : p.tipo;
-    return `
-    <tr>
+  document.getElementById('pr-body').innerHTML = rows.map((p, i) => `
+    <tr class="${premioRowClass(p.tipo)}">
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${p.jugador}</td>
       <td class="td-num">${p.year || '—'}</td>
-      <td>${p.team || '—'}</td>
-      <td>${premioCell}</td>
+      <td class="td-center">${p.team || '—'}</td>
+      <td>${p.tipo}</td>
       <td class="td-muted td-notas">${p.notas || '—'}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+    </tr>`).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function premioRowClass(tipo) {
+  const t = (tipo || '').toLowerCase();
+  if (t === 'roy' || t === 'dpoy') return 'row-oro';
+  if (t === 'all nba' || t === 'all defense') return 'row-verde';
+  return '';
 }
 
 function renderPrGrouped(entries) {
