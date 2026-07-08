@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-08T19:54:31.554Z",
+  "actualizado": "2026-07-08T23:21:58.721Z",
   "summer_league": [
     {
       "year": 1985,
@@ -613,7 +613,7 @@
           "notas": "Oeste"
         },
         {
-          "tipo": "All Star",
+          "tipo": "All Star – Concursos",
           "year": 2010,
           "team": "LAL",
           "notas": "Shooting Challenge (2)"
@@ -625,7 +625,7 @@
           "notas": "Oeste"
         },
         {
-          "tipo": "All Star",
+          "tipo": "All Star – Concursos",
           "year": 2011,
           "team": "LAL",
           "notas": "Shooting Challenge (3)"
@@ -1543,7 +1543,7 @@
       ],
       "premios": [
         {
-          "tipo": "All Star",
+          "tipo": "All Star – Concursos",
           "year": 2011,
           "team": "OKC",
           "notas": "Dunk Contest"
@@ -2137,7 +2137,7 @@
           "notas": "2nd Team"
         },
         {
-          "tipo": "All Star",
+          "tipo": "All Star – Concursos",
           "year": 2009,
           "team": "POR",
           "notas": "Dunk Contest"
