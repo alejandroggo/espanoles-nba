@@ -214,7 +214,9 @@ main { flex: 1; }
   font-size: 2.2rem;
   line-height: 1;
   color: var(--dorado);
+  white-space: nowrap;
 }
+.kpi-num--text { font-size: 1.6rem; }
 .kpi-label {
   font-size: var(--font-xs);
   color: var(--text-muted);
@@ -280,7 +282,9 @@ td {
 .td-muted { color: var(--text-muted); }
 .td-nombre { font-weight: 600; white-space: nowrap; }
 .td-pick { color: var(--accent); font-weight: 500; }
+.td-rank { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: var(--space-2); }
 .td-foto { width: 44px; padding-right: 0; }
+.td-notas { width: 1%; max-width: 260px; white-space: normal; word-break: break-word; }
 .player-thumb {
   width: 32px; height: 32px;
   border-radius: 50%;
