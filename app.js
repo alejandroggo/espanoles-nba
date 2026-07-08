@@ -309,3 +309,110 @@ function sortSal(col) {
   else { salSortCol = col; salSortAsc = (col === 'nombre' || col === 'equipos'); }
   renderSalariosTable();
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA SUMMER LEAGUE
+// ══════════════════════════════════════════════
+let slAll = [];
+let slSortCol = 'year';
+let slSortAsc = false;
+let slSearch = '';
+let slYear = '';
+
+const SL_COLS = [
+  { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
+  { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
+  { key: 'jugador', label: 'Jugador', sortable: true },
+  { key: 'equipo',  label: 'Equipo',  sortable: true },
+];
+
+async function initSummerPage() {
+  let data;
+  try {
+    data = await loadData();
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  // Lista propia (incluye jugadores no-NBA). Compat: si viniera por-jugador, se aplana.
+  slAll = (data.summer_league || []).slice();
+  if (!slAll.length) {
+    slAll = (data.jugadores || []).flatMap(j =>
+      (j.summer_league || []).map(s => ({ year: s.year, equipo: s.equipo || s.team, jugador: j.nombre })));
+  }
+  slAll = slAll.filter(s => s.jugador && (s.year || s.equipo));
+
+  renderSlKpis();
+  buildSlYearFilter();
+
+  document.getElementById('sl-search').addEventListener('input', e => { slSearch = e.target.value.trim().toLowerCase(); renderSlTable(); });
+  document.getElementById('sl-year').addEventListener('change', e => { slYear = e.target.value; renderSlTable(); });
+
+  renderSlTable();
+}
+
+function renderSlKpis() {
+  const participaciones = slAll.length;
+  const jugadores = new Set(slAll.map(s => s.jugador)).size;
+  const porAnio = {};
+  slAll.forEach(s => { if (s.year) porAnio[s.year] = (porAnio[s.year] || 0) + 1; });
+  const maxCount = Math.max(0, ...Object.values(porAnio));
+  const topAnios = Object.keys(porAnio).filter(a => porAnio[a] === maxCount).sort();
+
+  document.getElementById('sl-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${participaciones}</div><div class="kpi-label">Participaciones</div></div>
+    <div class="kpi"><div class="kpi-num">${jugadores}</div><div class="kpi-label">Jugadores distintos</div></div>
+    <div class="kpi"><div class="kpi-num">${topAnios.join(' · ') || '—'}</div><div class="kpi-label">Año con más${maxCount ? ` (${maxCount})` : ''}</div></div>`;
+}
+
+function buildSlYearFilter() {
+  const years = [...new Set(slAll.map(s => s.year).filter(Boolean))].sort((a, b) => b - a);
+  document.getElementById('sl-year').innerHTML =
+    '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+}
+
+function renderSlTable() {
+  let rows = slAll.filter(s => {
+    if (slYear && String(s.year) !== slYear) return false;
+    if (slSearch) {
+      const hay = `${s.jugador} ${s.equipo || ''}`.toLowerCase();
+      if (!hay.includes(slSearch)) return false;
+    }
+    return true;
+  });
+
+  rows.sort((a, b) => {
+    let va = a[slSortCol], vb = b[slSortCol];
+    if (slSortCol === 'year') { va = va || 0; vb = vb || 0; return slSortAsc ? va - vb : vb - va; }
+    va = String(va || ''); vb = String(vb || '');
+    return slSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  document.getElementById('sl-count').textContent =
+    `${rows.length} participaci${rows.length === 1 ? 'ón' : 'ones'}`;
+
+  document.getElementById('sl-thead').innerHTML = `<tr>
+    ${SL_COLS.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = slSortCol === c.key;
+      const ariaSort = active ? (slSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (slSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortSl('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('sl-body').innerHTML = rows.map((s, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-num">${s.year || '—'}</td>
+      <td class="td-nombre">${s.jugador}</td>
+      <td>${s.equipo || '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function sortSl(col) {
+  if (slSortCol === col) slSortAsc = !slSortAsc;
+  else { slSortCol = col; slSortAsc = (col !== 'year'); }
+  renderSlTable();
+}
