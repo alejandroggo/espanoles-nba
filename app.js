@@ -61,12 +61,13 @@ let draftSortCol = 'draft_anio';
 let draftSortAsc = true;
 
 const DRAFT_COLS = [
-  { key: 'draft_anio',   label: 'Año',      sortable: true,  mono: true },
-  { key: 'draft_pick',   label: 'Pick',     sortable: true,  mono: true },
-  { key: 'nombre',       label: 'Jugador',  sortable: true },
-  { key: 'posicion',     label: 'Posición', sortable: false },
-  { key: 'draft_equipo', label: 'Equipo',   sortable: true,  mono: true },
-  { key: 'draft_fecha',  label: 'Fecha',    sortable: false, mono: true },
+  { key: 'foto',         label: '',        sortable: false },
+  { key: 'nombre',       label: 'Jugador', sortable: true },
+  { key: 'draft_pick',   label: 'Pick',    sortable: true },
+  { key: 'draft_equipo', label: 'Equipo',  sortable: true },
+  { key: 'draft_anio',   label: 'Año',     sortable: true },
+  { key: 'draft_fecha',  label: 'Fecha',   sortable: false },
+  { key: 'notas',        label: 'Notas',   sortable: false },
 ];
 
 async function initDraftPage() {
@@ -118,12 +119,13 @@ function renderDraftTable() {
 
   document.getElementById('draft-body').innerHTML = rows.map(j => `
     <tr>
-      <td class="td-mono">${j.draft_anio}</td>
-      <td class="td-mono td-pick">#${j.draft_pick}</td>
+      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.display='none'" alt="">` : ''}</td>
       <td class="td-nombre">${j.nombre}</td>
-      <td class="td-muted">${j.posicion || '—'}</td>
+      <td class="td-mono td-pick">#${j.draft_pick}</td>
       <td class="td-mono">${j.draft_equipo || '—'}</td>
+      <td class="td-mono">${j.draft_anio}</td>
       <td class="td-mono td-muted">${j.draft_fecha || '—'}</td>
+      <td class="td-muted">${j.draft_notas || j.notas || '—'}</td>
     </tr>`).join('');
 }
 
