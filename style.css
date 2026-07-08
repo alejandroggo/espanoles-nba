@@ -293,6 +293,7 @@ td {
   background: var(--surface-2);
   display: block;
 }
+.player-thumb--empty { border-style: dashed; }
 
 /* ── UNDRAFTED ───────────────────────────────── */
 .undrafted-wrap {
