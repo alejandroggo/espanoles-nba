@@ -190,6 +190,7 @@ main { flex: 1; }
   font-weight: 400;
   color: var(--accent);
 }
+.hero-title .enye { color: #ffe600; }
 .hero-sub {
   margin-top: var(--space-4);
   font-size: var(--font-sm);
