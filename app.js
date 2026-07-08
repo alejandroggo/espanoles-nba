@@ -485,3 +485,162 @@ function sortSl(col) {
   else { slSortCol = col; slSortAsc = (col === 'jugador'); }
   renderSlTable();
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA PREMIOS
+// ══════════════════════════════════════════════
+let prAll = [];
+let prSortCol = 'year';
+let prSortAsc = false;
+let prSearch = '';
+let prTipo = '';
+let prYear = '';
+let prGrouped = false;
+
+const PR_COLS = [
+  { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
+  { key: 'jugador', label: 'Jugador', sortable: true },
+  { key: 'tipo',    label: 'Premio',  sortable: true },
+  { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
+  { key: 'team',    label: 'Equipo',  sortable: true },
+];
+
+const PR_COLS_GROUP = [
+  { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
+  { key: 'jugador', label: 'Jugador', sortable: true },
+  { key: 'count',   label: 'Premios', sortable: true,  cls: 'td-num' },
+  { key: 'desglose', label: 'Palmarés', sortable: false },
+];
+
+async function initPremiosPage() {
+  let data;
+  try {
+    data = await loadData();
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  prAll = (data.jugadores || []).flatMap(j =>
+    (j.premios || []).map(p => ({ tipo: p.tipo, year: p.year || null, team: p.team || '', jugador: j.nombre })))
+    .filter(p => p.tipo);
+
+  renderPrKpis();
+  buildPrFilters();
+
+  document.getElementById('pr-search').addEventListener('input', e => { prSearch = e.target.value.trim().toLowerCase(); renderPrTable(); });
+  document.getElementById('pr-tipo').addEventListener('change', e => { prTipo = e.target.value; renderPrTable(); });
+  document.getElementById('pr-year').addEventListener('change', e => { prYear = e.target.value; renderPrTable(); });
+
+  renderPrTable();
+}
+
+function renderPrKpis() {
+  const total = prAll.length;
+  const porJug = {};
+  prAll.forEach(p => { porJug[p.jugador] = (porJug[p.jugador] || 0) + 1; });
+  const top = Object.entries(porJug).sort((a, b) => b[1] - a[1])[0] || ['—', 0];
+  const allStars = prAll.filter(p => /all[\s-]?star/i.test(p.tipo)).length;
+
+  document.getElementById('pr-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${total}</div><div class="kpi-label">Premios totales</div></div>
+    <div class="kpi"><div class="kpi-num">${top[1]}</div><div class="kpi-label">Más laureado · ${top[0]}</div></div>
+    <div class="kpi"><div class="kpi-num">${allStars}</div><div class="kpi-label">Selecciones All-Star</div></div>`;
+}
+
+function buildPrFilters() {
+  const tipos = [...new Set(prAll.map(p => p.tipo))].sort();
+  document.getElementById('pr-tipo').innerHTML =
+    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+  const years = [...new Set(prAll.map(p => p.year).filter(Boolean))].sort((a, b) => b - a);
+  document.getElementById('pr-year').innerHTML =
+    '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+}
+
+function togglePrGroup() {
+  prGrouped = !prGrouped;
+  const btn = document.getElementById('pr-group');
+  btn.classList.toggle('active', prGrouped);
+  btn.setAttribute('aria-pressed', String(prGrouped));
+  prSortCol = prGrouped ? 'count' : 'year';
+  prSortAsc = false;
+  renderPrTable();
+}
+
+function renderPrTable() {
+  const filtered = prAll.filter(p => {
+    if (prTipo && p.tipo !== prTipo) return false;
+    if (prYear && String(p.year) !== prYear) return false;
+    if (prSearch && !p.jugador.toLowerCase().includes(prSearch)) return false;
+    return true;
+  });
+  return prGrouped ? renderPrGrouped(filtered) : renderPrFlat(filtered);
+}
+
+function renderPrHead(cols, sortCol, sortAsc) {
+  document.getElementById('pr-thead').innerHTML = `<tr>
+    ${cols.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = sortCol === c.key;
+      const ariaSort = active ? (sortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (sortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortPr('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+}
+
+function renderPrFlat(rows) {
+  rows = [...rows].sort((a, b) => {
+    if (prSortCol === 'year') { const va = a.year || 0, vb = b.year || 0; return prSortAsc ? va - vb : vb - va; }
+    const va = String(a[prSortCol] || ''), vb = String(b[prSortCol] || '');
+    return prSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  document.getElementById('pr-count').textContent = `${rows.length} premio${rows.length === 1 ? '' : 's'}`;
+  renderPrHead(PR_COLS, prSortCol, prSortAsc);
+  document.getElementById('pr-body').innerHTML = rows.map((p, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-nombre">${p.jugador}</td>
+      <td>${p.tipo}</td>
+      <td class="td-num">${p.year || '—'}</td>
+      <td>${p.team || '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="5" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function renderPrGrouped(entries) {
+  const map = {};
+  entries.forEach(p => {
+    const g = map[p.jugador] || (map[p.jugador] = { jugador: p.jugador, count: 0, tipos: {} });
+    g.count++;
+    g.tipos[p.tipo] = (g.tipos[p.tipo] || 0) + 1;
+  });
+
+  let rows = Object.values(map).map(g => ({
+    jugador: g.jugador,
+    count: g.count,
+    desglose: Object.entries(g.tipos).sort((a, b) => b[1] - a[1])
+      .map(([t, n]) => n > 1 ? `${t} ×${n}` : t).join(' · '),
+  }));
+
+  rows.sort((a, b) => {
+    if (prSortCol === 'jugador') return prSortAsc ? a.jugador.localeCompare(b.jugador) : b.jugador.localeCompare(a.jugador);
+    return prSortAsc ? a.count - b.count : (b.count - a.count) || a.jugador.localeCompare(b.jugador);
+  });
+
+  document.getElementById('pr-count').textContent = `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
+  renderPrHead(PR_COLS_GROUP, prSortCol, prSortAsc);
+  document.getElementById('pr-body').innerHTML = rows.map((g, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-nombre">${g.jugador}</td>
+      <td class="td-num">${g.count}</td>
+      <td class="td-muted">${g.desglose}</td>
+    </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function sortPr(col) {
+  if (prSortCol === col) prSortAsc = !prSortAsc;
+  else { prSortCol = col; prSortAsc = (col === 'jugador' || col === 'tipo' || col === 'team'); }
+  renderPrTable();
+}
