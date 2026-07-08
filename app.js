@@ -67,7 +67,7 @@ const DRAFT_COLS = [
   { key: 'draft_equipo', label: 'Equipo',  sortable: true },
   { key: 'draft_anio',   label: 'Año',     sortable: true },
   { key: 'draft_fecha',  label: 'Fecha',   sortable: false },
-  { key: 'notas',        label: 'Notas',   sortable: false },
+  { key: 'notas',        label: 'Notas',   sortable: false, cls: 'td-notas' },
 ];
 
 async function initDraftPage() {
@@ -91,13 +91,31 @@ async function initDraftPage() {
 }
 
 function renderDraftKpis() {
+  // Pick más alto (número más bajo)
   const best = [...draftRows].sort((a, b) => a.draft_pick - b.draft_pick)[0];
-  const last = [...draftRows].sort((a, b) => b.draft_anio - a.draft_anio)[0];
-  const first = [...draftRows].sort((a, b) => a.draft_anio - b.draft_anio)[0];
+
+  // Año(s) con más elegidos
+  const porAnio = {};
+  draftRows.forEach(j => { porAnio[j.draft_anio] = (porAnio[j.draft_anio] || 0) + 1; });
+  const maxCount = Math.max(...Object.values(porAnio));
+  const topAnios = Object.keys(porAnio).filter(a => porAnio[a] === maxCount).sort();
+
+  // Equipos distintos que han elegido a un español
+  const equipos = new Set(draftRows.map(j => j.draft_equipo).filter(Boolean));
+
   document.getElementById('draft-kpis').innerHTML = `
-    <div class="kpi"><div class="kpi-num">#${best.draft_pick}</div><div class="kpi-label">Mejor pick · ${best.nombre} (${best.draft_anio})</div></div>
-    <div class="kpi"><div class="kpi-num">${first.draft_anio}</div><div class="kpi-label">Primero · ${first.nombre}</div></div>
-    <div class="kpi"><div class="kpi-num">${last.draft_anio}</div><div class="kpi-label">Último · ${last.nombre}</div></div>`;
+    <div class="kpi">
+      <div class="kpi-num kpi-num--text">${best.nombre} #${best.draft_pick}</div>
+      <div class="kpi-label">Pick más alto</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num">${topAnios.join(' · ')}</div>
+      <div class="kpi-label">Año con más elegidos (${maxCount})</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num">${equipos.size}</div>
+      <div class="kpi-label">Equipos con un español</div>
+    </div>`;
 }
 
 function renderDraftTable() {
@@ -109,7 +127,7 @@ function renderDraftTable() {
 
   document.getElementById('draft-thead').innerHTML = `<tr>
     ${DRAFT_COLS.map(c => {
-      if (!c.sortable) return `<th scope="col">${c.label}</th>`;
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = draftSortCol === c.key;
       const ariaSort = active ? (draftSortAsc ? 'ascending' : 'descending') : 'none';
       return `<th scope="col" class="th-sortable ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
@@ -125,7 +143,7 @@ function renderDraftTable() {
       <td class="td-num">${j.draft_equipo || '—'}</td>
       <td class="td-num">${j.draft_anio}</td>
       <td class="td-num td-muted">${j.draft_fecha || '—'}</td>
-      <td class="td-muted">${j.draft_notas || j.notas || '—'}</td>
+      <td class="td-muted td-notas">${j.draft_notas || j.notas || '—'}</td>
     </tr>`).join('');
 }
 
