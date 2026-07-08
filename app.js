@@ -119,7 +119,7 @@ function renderDraftTable() {
 
   document.getElementById('draft-body').innerHTML = rows.map(j => `
     <tr>
-      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.display='none'" alt="">` : ''}</td>
+      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
       <td class="td-nombre">${j.nombre}</td>
       <td class="td-mono td-pick">#${j.draft_pick}</td>
       <td class="td-mono">${j.draft_equipo || '—'}</td>
@@ -136,9 +136,12 @@ function sortDraft(col) {
 }
 
 function renderUndrafted(undrafted) {
-  document.getElementById('undrafted-grid').innerHTML = undrafted.map(j => `
+  document.getElementById('undrafted-grid').innerHTML = undrafted.map(j => {
+    const debutAnio = (j.primer_partido?.fecha || '').match(/\d{4}/)?.[0];
+    return `
     <div class="undrafted-card">
       <div class="undrafted-nombre">${j.nombre}</div>
-      <div class="undrafted-meta">${j.posicion || ''}${j.nacimiento ? ` · ${j.nacimiento}` : ''}</div>
-    </div>`).join('') || '<p class="td-muted">No hay jugadores undrafted.</p>';
+      <div class="undrafted-meta">${j.posicion || ''}${debutAnio ? ` · Debut ${debutAnio}` : ''}</div>
+    </div>`;
+  }).join('') || '<p class="td-muted">No hay jugadores undrafted.</p>';
 }
