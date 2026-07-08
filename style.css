@@ -282,6 +282,7 @@ td {
 .td-muted { color: var(--text-muted); }
 .td-nombre { font-weight: 600; white-space: nowrap; }
 .td-pick { color: var(--accent); font-weight: 500; }
+.td-rank { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: var(--space-2); }
 .td-foto { width: 44px; padding-right: 0; }
 .td-notas { width: 1%; max-width: 260px; white-space: normal; word-break: break-word; }
 .player-thumb {

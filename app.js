@@ -61,6 +61,7 @@ let draftSortCol = 'draft_anio';
 let draftSortAsc = true;
 
 const DRAFT_COLS = [
+  { key: 'rank',         label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'foto',         label: '',        sortable: false },
   { key: 'nombre',       label: 'Jugador', sortable: true },
   { key: 'draft_pick',   label: 'Pick',    sortable: true },
@@ -135,8 +136,9 @@ function renderDraftTable() {
     }).join('')}
   </tr>`;
 
-  document.getElementById('draft-body').innerHTML = rows.map(j => `
+  document.getElementById('draft-body').innerHTML = rows.map((j, i) => `
     <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
       <td class="td-nombre">${j.nombre}</td>
       <td class="td-num td-pick">#${j.draft_pick}</td>
