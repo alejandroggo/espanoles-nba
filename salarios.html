@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Españoles en la NBA</title>
-<meta name="description" content="Base de datos completa de todos los jugadores españoles en la NBA. Estadísticas, temporadas, playoffs, premios y récords históricos.">
+<title>Salarios · Españoles en la NBA</title>
+<meta name="description" content="Ganancias de carrera de todos los jugadores españoles en la NBA. Ranking por dinero bruto acumulado.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,48 +28,21 @@
 
 <!-- CONTENIDO -->
 <main>
-  <section class="hero">
-    <h1 class="hero-title ag-hero">TODOS LOS<br><em>Españoles</em><br>EN LA NBA</h1>
-    <p class="hero-sub">Base de datos histórica · Estadísticas, premios y récords</p>
+  <section class="hero hero--page">
+    <div class="hero-top">
+      <div>
+        <h1 class="hero-title ag-hero">Los <em>Salarios</em></h1>
+        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+      </div>
+      <div class="hero-kpis" id="sal-kpis"></div>
+    </div>
   </section>
 
-  <section class="home-grid" aria-label="Secciones">
-    <a class="home-card" href="draft.html">
-      <span class="home-card-num">01</span>
-      <h2 class="home-card-title">Draft</h2>
-      <p class="home-card-desc">Todos los españoles elegidos desde Fernando Martín (1985), pick a pick, y los que llegaron undrafted.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
-    <a class="home-card" href="ranking.html">
-      <span class="home-card-num">02</span>
-      <h2 class="home-card-title">Ranking</h2>
-      <p class="home-card-desc">Todos los jugadores españoles que han pisado la NBA, con sus estadísticas de carrera, temporada y playoffs.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
-    <a class="home-card" href="salarios.html">
-      <span class="home-card-num">03</span>
-      <h2 class="home-card-title">Salarios</h2>
-      <p class="home-card-desc">Cuánto ha ganado cada español en la NBA: ranking por dinero bruto acumulado de carrera.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
-    <a class="home-card" href="premios.html">
-      <span class="home-card-num">04</span>
-      <h2 class="home-card-title">Premios</h2>
-      <p class="home-card-desc">Anillos, All-Stars, quintetos y todos los reconocimientos individuales conseguidos por españoles.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
-    <a class="home-card" href="summer-league.html">
-      <span class="home-card-num">05</span>
-      <h2 class="home-card-title">Summer League</h2>
-      <p class="home-card-desc">Los españoles que han disputado la liga de verano, año a año y equipo a equipo.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
-    <a class="home-card" href="transacciones.html">
-      <span class="home-card-num">06</span>
-      <h2 class="home-card-title">Transacciones</h2>
-      <p class="home-card-desc">Drafts, fichajes, traspasos y cortes: el historial completo de movimientos.</p>
-      <span class="home-card-arrow" aria-hidden="true">→</span>
-    </a>
+  <section class="tabla-wrap" aria-label="Ganancias de los jugadores">
+    <table id="sal-table">
+      <thead id="sal-thead"></thead>
+      <tbody id="sal-body"></tbody>
+    </table>
   </section>
 </main>
 
@@ -97,6 +70,6 @@
 </footer>
 
 <script src="app.js"></script>
-<script>initTheme();</script>
+<script>initTheme(); initSalariosPage();</script>
 </body>
 </html>

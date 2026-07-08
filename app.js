@@ -165,3 +165,103 @@ function renderUndrafted(undrafted) {
     </div>`;
   }).join('') || '<p class="td-muted">No hay jugadores undrafted.</p>';
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA SALARIOS
+// ══════════════════════════════════════════════
+let salRows = [];
+let salSortCol = 'ganancias';
+let salSortAsc = false;
+
+const SAL_COLS = [
+  { key: 'rank',      label: '#',         sortable: false, cls: 'td-rank' },
+  { key: 'foto',      label: '',          sortable: false },
+  { key: 'nombre',    label: 'Jugador',   sortable: true },
+  { key: 'ganancias', label: 'Ganancias', sortable: true,  cls: 'td-num' },
+  { key: 'equipos',   label: 'Equipos',   sortable: false },
+  { key: 'partidos',  label: 'Partidos',  sortable: true,  cls: 'td-num' },
+];
+
+const ROOKIES_CONTRATO = ['Sergio De Larrea', 'Baba Miller', 'Aday Mara'];
+
+function fmtDinero(n) {
+  if (!n) return '—';
+  return '$' + Math.round(n).toLocaleString('es-ES');
+}
+
+async function initSalariosPage() {
+  let jugadores;
+  try {
+    jugadores = (await loadData()).jugadores || [];
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  // Debutados en la NBA o con contrato firmado (los tres rookies)
+  salRows = jugadores.filter(j => (j.partidos || 0) > 0 || ROOKIES_CONTRATO.includes(j.nombre));
+
+  document.getElementById('hero-sub').textContent =
+    `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas de carrera (USD)`;
+
+  renderSalariosKpis();
+  renderSalariosTable();
+}
+
+function renderSalariosKpis() {
+  const total = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  const top = [...salRows].sort((a, b) => (b.ganancias || 0) - (a.ganancias || 0))[0];
+  const gasol = salRows
+    .filter(j => j.nombre === 'Pau Gasol' || j.nombre === 'Marc Gasol')
+    .reduce((s, j) => s + (j.ganancias || 0), 0);
+  const pctGasol = total ? Math.round(gasol / total * 1000) / 10 : 0;
+
+  document.getElementById('sal-kpis').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-num">${fmtDinero(total)}</div>
+      <div class="kpi-label">Total acumulado</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num">${fmtDinero(top.ganancias)}</div>
+      <div class="kpi-label">Mejor pagado · ${top.nombre}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num">${pctGasol}%</div>
+      <div class="kpi-label">De la familia Gasol</div>
+    </div>`;
+}
+
+function renderSalariosTable() {
+  const rows = [...salRows].sort((a, b) => {
+    let va = a[salSortCol], vb = b[salSortCol];
+    if (salSortCol === 'ganancias' || salSortCol === 'partidos') { va = va || 0; vb = vb || 0; }
+    if (typeof va === 'string') return salSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return salSortAsc ? va - vb : vb - va;
+  });
+
+  document.getElementById('sal-thead').innerHTML = `<tr>
+    ${SAL_COLS.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = salSortCol === c.key;
+      const ariaSort = active ? (salSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (salSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortSal('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
+      <td class="td-nombre">${j.nombre}</td>
+      <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
+      <td class="td-muted">${j.equipos_nba || '—'}</td>
+      <td class="td-num td-muted">${j.partidos || 0}</td>
+    </tr>`).join('');
+}
+
+function sortSal(col) {
+  if (salSortCol === col) salSortAsc = !salSortAsc;
+  else { salSortCol = col; salSortAsc = (col === 'nombre' || col === 'equipos'); }
+  renderSalariosTable();
+}
