@@ -194,11 +194,8 @@ main { flex: 1; }
 }
 .hero-sub {
   margin-top: var(--space-4);
-  font-family: var(--mono);
-  font-size: var(--font-xs);
-  color: var(--dorado);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: var(--font-sm);
+  color: var(--text-muted);
 }
 
 .hero--page { padding: var(--space-12) var(--space-6) var(--space-8); }
@@ -247,7 +244,7 @@ main { flex: 1; }
 .tabla-wrap {
   max-width: 1400px; margin: 0 auto;
   padding: 0 var(--space-6) var(--space-8);
-  overflow-x: auto;
+  /* sin overflow en desktop: un contenedor con overflow rompe el sticky del thead */
 }
 table {
   width: 100%;
@@ -287,6 +284,15 @@ td {
 .td-muted { color: var(--text-muted); }
 .td-nombre { font-weight: 600; white-space: nowrap; }
 .td-pick { color: var(--accent); font-weight: 500; }
+.td-foto { width: 44px; padding-right: 0; }
+.player-thumb {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  object-fit: cover; object-position: top center;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  display: block;
+}
 
 /* ── UNDRAFTED ───────────────────────────────── */
 .undrafted-wrap {
@@ -375,7 +381,7 @@ td {
   .hero-kpis { gap: var(--space-6); }
   .kpi { text-align: left; }
   .home-grid { padding: 0 var(--space-4) var(--space-8); }
-  .tabla-wrap { padding: 0 var(--space-4) var(--space-6); }
+  .tabla-wrap { padding: 0 var(--space-4) var(--space-6); overflow-x: auto; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
   thead th { top: 48px; }
 }
