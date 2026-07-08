@@ -605,15 +605,19 @@ function renderPrFlat(rows) {
 
   document.getElementById('pr-count').textContent = `${rows.length} premio${rows.length === 1 ? '' : 's'}`;
   renderPrHead(PR_COLS, prSortCol, prSortAsc);
-  document.getElementById('pr-body').innerHTML = rows.map((p, i) => `
+  document.getElementById('pr-body').innerHTML = rows.map((p, i) => {
+    const destacado = p.tipo === 'ROY' || p.tipo === 'DPOY';
+    const premioCell = destacado ? `<span class="premio-hito">${p.tipo}</span>` : p.tipo;
+    return `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${p.jugador}</td>
       <td class="td-num">${p.year || '—'}</td>
       <td>${p.team || '—'}</td>
-      <td>${p.tipo}</td>
+      <td>${premioCell}</td>
       <td class="td-muted td-notas">${p.notas || '—'}</td>
-    </tr>`).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
 function renderPrGrouped(entries) {
