@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer League · Españoles en la NBA</title>
+<meta name="description" content="Todos los españoles que han disputado la NBA Summer League, año a año y equipo a equipo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
+<link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index.html">ESPAÑOLES <span>EN LA</span> NBA</a>
+    <div class="header-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
+    </div>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+  <section class="hero hero--page">
+    <div class="hero-top">
+      <div>
+        <h1 class="hero-title ag-hero"><em>Summer</em> League</h1>
+        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+      </div>
+      <div class="hero-kpis" id="sl-kpis"></div>
+    </div>
+  </section>
+
+  <section class="controles" aria-label="Filtros">
+    <div class="search-wrap">
+      <input type="text" id="sl-search" placeholder="Buscar jugador o equipo…" aria-label="Buscar jugador o equipo">
+    </div>
+    <label class="sel-wrap">
+      <span class="sr-only">Filtrar por año</span>
+      <select id="sl-year" class="sel"></select>
+    </label>
+    <span class="results-count" id="sl-count"></span>
+  </section>
+
+  <section class="tabla-wrap" aria-label="Participaciones en Summer League">
+    <table id="sl-table">
+      <thead id="sl-thead"></thead>
+      <tbody id="sl-body"></tbody>
+    </table>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="ag-footer">
+  <div class="ag-footer-brand">
+    <strong>Alejandro Gaitán</strong>
+    <span>Periodismo NBA en español</span>
+  </div>
+  <nav class="ag-footer-projects" aria-label="Otros proyectos">
+    <a href="https://alejandroggo.github.io/portfolio/" rel="noopener noreferrer">Portfolio</a>
+    <a href="https://alejandroggo.github.io/nba-rankings/" rel="noopener noreferrer">Rankings NBA</a>
+    <a href="https://alejandroggo.github.io/nba-offseason-2026/" rel="noopener noreferrer">Off-Season 2026</a>
+    <a href="https://alejandroggo.github.io/NBA-espanol/" rel="noopener noreferrer">NBA en Español</a>
+  </nav>
+  <nav class="ag-footer-pubs" aria-label="Publicaciones">
+    <a href="https://alejandroggo.substack.com" rel="noopener noreferrer">Substack</a>
+    <a href="https://www.gigantes.com/author/alejandrogaitan/" rel="noopener noreferrer">Gigantes</a>
+    <a href="https://alejandrogaitan.com" rel="noopener noreferrer">alejandrogaitan.com</a>
+  </nav>
+  <div class="ag-footer-meta">
+    <span>© Alejandro Gaitán</span>
+    <span>Última actualización: <time id="ag-last-update" datetime=""></time></span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>initTheme(); initSummerPage();</script>
+</body>
+</html>
