@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-08T14:57:43.808Z",
+  "actualizado": "2026-07-08T15:09:04.315Z",
   "jugadores": [
     {
       "id": "pau-gasol",
@@ -32,7 +32,7 @@
       "draft_pick": 3,
       "draft_equipo": "ATL",
       "draft_fecha": "27 jun 2001",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Memphis la noche del draft",
       "ganancias": 220990766,
       "equipos_nba": "MEM, LAL, CHI, SAS",
       "temporadas_data": [
@@ -530,7 +530,7 @@
       "draft_pick": 48,
       "draft_equipo": "LAL",
       "draft_fecha": "28 jun 2007",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Memphis antes del debut.",
       "ganancias": 181665456,
       "equipos_nba": "MEM, TOR, LAL",
       "temporadas_data": [
@@ -862,7 +862,7 @@
       "draft_pick": 23,
       "draft_equipo": "HOU",
       "draft_fecha": "23 jun 2011",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Chicago la noche del draft",
       "ganancias": 41631175,
       "equipos_nba": "",
       "temporadas_data": [
@@ -1394,7 +1394,7 @@
       "draft_pick": 40,
       "draft_equipo": "WAS",
       "draft_fecha": "26 jun 2002",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Memphis antes del debut.",
       "ganancias": 538090,
       "equipos_nba": "",
       "temporadas_data": [
@@ -1725,7 +1725,7 @@
       "draft_pick": 30,
       "draft_equipo": "UTA",
       "draft_fecha": "29 jul 2021",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Memphis la noche del draft",
       "ganancias": 62743371,
       "equipos_nba": "MEM",
       "temporadas_data": [
@@ -1850,7 +1850,7 @@
       "draft_pick": 24,
       "draft_equipo": "PHX",
       "draft_fecha": "28 jun 2007",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Portland la noche del draft",
       "ganancias": 5676523,
       "equipos_nba": "",
       "temporadas_data": [
@@ -2390,7 +2390,7 @@
       "draft_pick": 35,
       "draft_equipo": "PHI",
       "draft_fecha": "25 jun 2015",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a New York la noche del draft",
       "ganancias": 12435586,
       "equipos_nba": "",
       "temporadas_data": [
@@ -3015,7 +3015,7 @@
       "draft_pick": 27,
       "draft_equipo": "PHX",
       "draft_fecha": "28 jun 2006",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Portland la noche del draft",
       "ganancias": 11469835,
       "equipos_nba": "",
       "temporadas_data": [
@@ -3430,7 +3430,7 @@
       "draft_pick": 38,
       "draft_equipo": "BRK",
       "draft_fecha": "18 jun 1985",
-      "draft_notas": null,
+      "draft_notas": "No llegó a debutar con Portland. Agente libre al año siguiente.",
       "ganancias": 145000,
       "equipos_nba": "",
       "temporadas_data": [
@@ -3538,7 +3538,7 @@
       "draft_pick": 25,
       "draft_equipo": "LAL",
       "draft_fecha": "23 jun 2026",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a Dallas la noche del draft",
       "ganancias": 0,
       "equipos_nba": "",
       "temporadas_data": [],
@@ -3850,7 +3850,7 @@
       "draft_pick": 36,
       "draft_equipo": "IND",
       "draft_fecha": "27 jun 2024",
-      "draft_notas": null,
+      "draft_notas": "Traspasado a San Antonio la noche del draft",
       "ganancias": 0,
       "equipos_nba": "",
       "temporadas_data": [],
