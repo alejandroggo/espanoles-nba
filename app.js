@@ -500,9 +500,10 @@ let prGrouped = false;
 const PR_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'jugador', label: 'Jugador', sortable: true },
-  { key: 'tipo',    label: 'Premio',  sortable: true },
   { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
   { key: 'team',    label: 'Equipo',  sortable: true },
+  { key: 'tipo',    label: 'Premio',  sortable: true },
+  { key: 'notas',   label: 'Notas',   sortable: false, cls: 'td-notas' },
 ];
 
 const PR_COLS_GROUP = [
@@ -522,8 +523,14 @@ async function initPremiosPage() {
   }
 
   prAll = (data.jugadores || []).flatMap(j =>
-    (j.premios || []).map(p => ({ tipo: p.tipo, year: p.year || null, team: p.team || '', jugador: j.nombre })))
-    .filter(p => p.tipo);
+    (j.premios || []).map(p => ({
+      tipo: p.tipo,
+      year: p.year || null,
+      team: p.team || '',
+      // notas: campo propio, o detalle si aporta algo distinto del tipo
+      notas: p.notas || (p.detalle && p.detalle !== p.tipo ? p.detalle : ''),
+      jugador: j.nombre,
+    }))).filter(p => p.tipo);
 
   renderPrKpis();
   buildPrFilters();
@@ -602,10 +609,11 @@ function renderPrFlat(rows) {
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${p.jugador}</td>
-      <td>${p.tipo}</td>
       <td class="td-num">${p.year || '—'}</td>
       <td>${p.team || '—'}</td>
-    </tr>`).join('') || `<tr><td colspan="5" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+      <td>${p.tipo}</td>
+      <td class="td-muted td-notas">${p.notas || '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
 function renderPrGrouped(entries) {
