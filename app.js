@@ -659,3 +659,130 @@ function sortPr(col) {
   else { prSortCol = col; prSortAsc = (col === 'jugador' || col === 'tipo' || col === 'team'); }
   renderPrTable();
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA RANKING
+// ══════════════════════════════════════════════
+let rkAll = [];
+let rkMode = 'pg';          // 'pg' (por partido) | 'tot' (totales)
+let rkSortCol = 'pts_g';
+let rkSortAsc = false;
+let rkSearch = '';
+
+const RK_COLS_PG = [
+  { key: 'rank',      label: '#',   sortable: false, cls: 'td-rank' },
+  { key: 'foto',      label: '',    sortable: false },
+  { key: 'nombre',    label: 'Jugador', sortable: true },
+  { key: 'partidos',  label: 'PJ',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'min_g',     label: 'MIN', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'pts_g',     label: 'PTS', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'rbd_g',     label: 'REB', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'ast_g',     label: 'AST', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'stl_g',     label: 'ROB', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'blk_g',     label: 'TAP', sortable: true, cls: 'td-num', fmt: fmtDec1 },
+  { key: 'fg_pct',    label: 'FG%', sortable: true, cls: 'td-num', fmt: fmtPct },
+  { key: 'tres_pct',  label: '3P%', sortable: true, cls: 'td-num', fmt: fmtPct },
+  { key: 'ft_pct',    label: 'FT%', sortable: true, cls: 'td-num', fmt: fmtPct },
+];
+
+const RK_COLS_TOT = [
+  { key: 'rank',        label: '#',    sortable: false, cls: 'td-rank' },
+  { key: 'foto',        label: '',     sortable: false },
+  { key: 'nombre',      label: 'Jugador', sortable: true },
+  { key: 'partidos',    label: 'PJ',   sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'min_total',   label: 'MIN',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'pts_total',   label: 'PTS',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'rbd_total',   label: 'REB',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'ast_total',   label: 'AST',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'stl_total',   label: 'ROB',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'blk_total',   label: 'TAP',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'tres_total',  label: '3PM',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'tov_total',   label: 'PÉRD', sortable: true, cls: 'td-num', fmt: fmtEnt },
+];
+
+function fmtEnt(n)  { return (n || n === 0) ? Math.round(n).toLocaleString('es-ES') : '—'; }
+function fmtDec1(n) { return (n || n === 0) ? n.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—'; }
+function fmtPct(n)  { return (n || n === 0) ? (n * 100).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'; }
+
+async function initRankingPage() {
+  let data;
+  try {
+    data = await loadData();
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  rkAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
+
+  document.getElementById('hero-sub').textContent =
+    `${rkAll.length} jugadores con partidos en la NBA · Estadísticas de carrera`;
+
+  renderRkKpis();
+  document.getElementById('rk-search').addEventListener('input', e => { rkSearch = e.target.value.trim().toLowerCase(); renderRkTable(); });
+  renderRkTable();
+}
+
+function renderRkKpis() {
+  const leader = (k) => [...rkAll].sort((a, b) => (b[k] || 0) - (a[k] || 0))[0] || {};
+  const anot = leader('pts_total');
+  const asist = leader('ast_total');
+
+  document.getElementById('rk-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${rkAll.length}</div><div class="kpi-label">Jugadores</div></div>
+    <div class="kpi"><div class="kpi-num">${fmtEnt(anot.pts_total)}</div><div class="kpi-label">Máximo anotador · ${anot.nombre || '—'}</div></div>
+    <div class="kpi"><div class="kpi-num">${fmtEnt(asist.ast_total)}</div><div class="kpi-label">Más asistencias · ${asist.nombre || '—'}</div></div>`;
+}
+
+function setRkMode(mode) {
+  if (rkMode === mode) return;
+  rkMode = mode;
+  document.getElementById('rk-mode-pg').classList.toggle('active', mode === 'pg');
+  document.getElementById('rk-mode-pg').setAttribute('aria-pressed', String(mode === 'pg'));
+  document.getElementById('rk-mode-tot').classList.toggle('active', mode === 'tot');
+  document.getElementById('rk-mode-tot').setAttribute('aria-pressed', String(mode === 'tot'));
+  rkSortCol = mode === 'pg' ? 'pts_g' : 'pts_total';
+  rkSortAsc = false;
+  renderRkTable();
+}
+
+function renderRkTable() {
+  const cols = rkMode === 'pg' ? RK_COLS_PG : RK_COLS_TOT;
+
+  let rows = rkAll.filter(j => !rkSearch || j.nombre.toLowerCase().includes(rkSearch));
+  rows.sort((a, b) => {
+    if (rkSortCol === 'nombre') return rkSortAsc ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre);
+    const va = a[rkSortCol] || 0, vb = b[rkSortCol] || 0;
+    return rkSortAsc ? va - vb : vb - va;
+  });
+
+  document.getElementById('rk-count').textContent = `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
+
+  document.getElementById('rk-thead').innerHTML = `<tr>
+    ${cols.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = rkSortCol === c.key;
+      const ariaSort = active ? (rkSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (rkSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortRk('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('rk-body').innerHTML = rows.map((j, i) => `
+    <tr>
+      ${cols.map(c => {
+        if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
+        if (c.key === 'foto') return `<td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>`;
+        if (c.key === 'nombre') return `<td class="td-nombre">${j.nombre}</td>`;
+        const val = c.fmt ? c.fmt(j[c.key]) : (j[c.key] ?? '—');
+        const hl = rkSortCol === c.key ? ' td-hl' : '';
+        return `<td class="${c.cls || ''}${hl}">${val}</td>`;
+      }).join('')}
+    </tr>`).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function sortRk(col) {
+  if (rkSortCol === col) rkSortAsc = !rkSortAsc;
+  else { rkSortCol = col; rkSortAsc = (col === 'nombre'); }
+  renderRkTable();
+}
