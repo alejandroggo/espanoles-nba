@@ -294,6 +294,22 @@ td {
   display: block;
 }
 .player-thumb--empty { border-style: dashed; }
+.td-dinero { font-weight: 600; }
+
+/* Barra de % cobrado */
+.pct-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 64px; }
+.pct-val { font-variant-numeric: tabular-nums; font-size: var(--font-xs); }
+.pct-bar {
+  width: 100%; height: 4px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.pct-fill {
+  display: block; height: 100%;
+  background: var(--dorado);
+  border-radius: var(--radius-full);
+}
 
 /* ── UNDRAFTED ───────────────────────────────── */
 .undrafted-wrap {
