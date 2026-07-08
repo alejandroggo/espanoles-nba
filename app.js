@@ -174,12 +174,14 @@ let salSortCol = 'ganancias';
 let salSortAsc = false;
 
 const SAL_COLS = [
-  { key: 'rank',      label: '#',         sortable: false, cls: 'td-rank' },
-  { key: 'foto',      label: '',          sortable: false },
-  { key: 'nombre',    label: 'Jugador',   sortable: true },
-  { key: 'ganancias', label: 'Ganancias', sortable: true,  cls: 'td-num' },
-  { key: 'equipos',   label: 'Equipos',   sortable: false },
-  { key: 'partidos',  label: 'Partidos',  sortable: true,  cls: 'td-num' },
+  { key: 'rank',             label: '#',         sortable: false, cls: 'td-rank' },
+  { key: 'foto',             label: '',          sortable: false },
+  { key: 'nombre',           label: 'Jugador',   sortable: true },
+  { key: 'ganancias',        label: 'Total',     sortable: true,  cls: 'td-num' },
+  { key: 'ganancias_ganado', label: 'Cobrado',   sortable: true,  cls: 'td-num' },
+  { key: 'ganancias_futuro', label: 'Firmado',   sortable: true,  cls: 'td-num' },
+  { key: 'pct',              label: '% cobrado', sortable: true,  cls: 'td-num' },
+  { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
 
 const ROOKIES_CONTRATO = ['Sergio De Larrea', 'Baba Miller', 'Aday Mara'];
@@ -187,6 +189,15 @@ const ROOKIES_CONTRATO = ['Sergio De Larrea', 'Baba Miller', 'Aday Mara'];
 function fmtDinero(n) {
   if (!n) return '—';
   return '$' + Math.round(n).toLocaleString('es-ES');
+}
+
+// % ya cobrado sobre el total; null si no hay desglose todavía
+function pctCobrado(j) {
+  const total = j.ganancias || 0;
+  const ganado = j.ganancias_ganado || 0;
+  const futuro = j.ganancias_futuro || 0;
+  if (!total || (!ganado && !futuro)) return null;
+  return Math.round(ganado / total * 100);
 }
 
 async function initSalariosPage() {
@@ -200,6 +211,7 @@ async function initSalariosPage() {
 
   // Debutados en la NBA o con contrato firmado (los tres rookies)
   salRows = jugadores.filter(j => (j.partidos || 0) > 0 || ROOKIES_CONTRATO.includes(j.nombre));
+  salRows.forEach(j => { j.pct = pctCobrado(j); });
 
   document.getElementById('hero-sub').textContent =
     `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas de carrera (USD)`;
@@ -209,22 +221,33 @@ async function initSalariosPage() {
 }
 
 function renderSalariosKpis() {
-  const total = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  const total   = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  const cobrado = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
+  const futuro  = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
   const top = [...salRows].sort((a, b) => (b.ganancias || 0) - (a.ganancias || 0))[0];
   const gasol = salRows
     .filter(j => j.nombre === 'Pau Gasol' || j.nombre === 'Marc Gasol')
     .reduce((s, j) => s + (j.ganancias || 0), 0);
   const pctGasol = total ? Math.round(gasol / total * 1000) / 10 : 0;
 
+  // Si hay desglose, el 2º KPI muestra cobrado vs firmado; si no, el mejor pagado
+  const hayDesglose = cobrado > 0 || futuro > 0;
+  const kpi2 = hayDesglose
+    ? `<div class="kpi">
+         <div class="kpi-num">${total ? Math.round(cobrado / total * 100) : 0}%</div>
+         <div class="kpi-label">Ya cobrado · ${fmtDinero(futuro)} por cobrar</div>
+       </div>`
+    : `<div class="kpi">
+         <div class="kpi-num">${fmtDinero(top.ganancias)}</div>
+         <div class="kpi-label">Mejor pagado · ${top.nombre}</div>
+       </div>`;
+
   document.getElementById('sal-kpis').innerHTML = `
     <div class="kpi">
       <div class="kpi-num">${fmtDinero(total)}</div>
       <div class="kpi-label">Total acumulado</div>
     </div>
-    <div class="kpi">
-      <div class="kpi-num">${fmtDinero(top.ganancias)}</div>
-      <div class="kpi-label">Mejor pagado · ${top.nombre}</div>
-    </div>
+    ${kpi2}
     <div class="kpi">
       <div class="kpi-num">${pctGasol}%</div>
       <div class="kpi-label">De la familia Gasol</div>
@@ -234,7 +257,9 @@ function renderSalariosKpis() {
 function renderSalariosTable() {
   const rows = [...salRows].sort((a, b) => {
     let va = a[salSortCol], vb = b[salSortCol];
-    if (salSortCol === 'ganancias' || salSortCol === 'partidos') { va = va || 0; vb = vb || 0; }
+    if (['ganancias', 'ganancias_ganado', 'ganancias_futuro', 'pct'].includes(salSortCol)) {
+      va = va ?? -1; vb = vb ?? -1;
+    }
     if (typeof va === 'string') return salSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
     return salSortAsc ? va - vb : vb - va;
   });
@@ -255,9 +280,19 @@ function renderSalariosTable() {
       <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
       <td class="td-nombre">${j.nombre}</td>
       <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
+      <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
+      <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
+      <td class="td-num">${renderPct(j.pct)}</td>
       <td class="td-muted">${j.equipos_nba || '—'}</td>
-      <td class="td-num td-muted">${j.partidos || 0}</td>
     </tr>`).join('');
+}
+
+function renderPct(pct) {
+  if (pct === null || pct === undefined) return '<span class="td-muted">—</span>';
+  return `<div class="pct-wrap">
+    <span class="pct-val">${pct}%</span>
+    <span class="pct-bar"><span class="pct-fill" style="width:${pct}%"></span></span>
+  </div>`;
 }
 
 function sortSal(col) {
