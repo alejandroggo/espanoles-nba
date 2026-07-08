@@ -30,3 +30,113 @@ function cycleTheme() {
   localStorage.setItem('ag-theme', next);
   renderTheme(next);
 }
+
+// ══════════════════════════════════════════════
+// DATOS COMPARTIDOS
+// ══════════════════════════════════════════════
+async function loadData() {
+  const res = await fetch('data.json');
+  if (!res.ok) throw new Error('No se pudo cargar data.json');
+  const data = await res.json();
+  setLastUpdate(data.actualizado);
+  return data;
+}
+
+function setLastUpdate(iso) {
+  if (!iso) return;
+  const d = new Date(iso);
+  if (isNaN(d)) return;
+  const timeEl = document.getElementById('ag-last-update');
+  if (timeEl) {
+    timeEl.setAttribute('datetime', d.toISOString());
+    timeEl.textContent = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA DRAFT
+// ══════════════════════════════════════════════
+let draftRows = [];
+let draftSortCol = 'draft_anio';
+let draftSortAsc = true;
+
+const DRAFT_COLS = [
+  { key: 'draft_anio',   label: 'Año',      sortable: true,  mono: true },
+  { key: 'draft_pick',   label: 'Pick',     sortable: true,  mono: true },
+  { key: 'nombre',       label: 'Jugador',  sortable: true },
+  { key: 'posicion',     label: 'Posición', sortable: false },
+  { key: 'draft_equipo', label: 'Equipo',   sortable: true,  mono: true },
+  { key: 'draft_fecha',  label: 'Fecha',    sortable: false, mono: true },
+];
+
+async function initDraftPage() {
+  let jugadores;
+  try {
+    jugadores = (await loadData()).jugadores || [];
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  draftRows = jugadores.filter(j => j.draft);
+  const undrafted = jugadores.filter(j => !j.draft);
+
+  document.getElementById('hero-sub').textContent =
+    `${draftRows.length} elegidos · ${undrafted.length} undrafted · ${jugadores.length} jugadores en total`;
+
+  renderDraftKpis();
+  renderDraftTable();
+  renderUndrafted(undrafted);
+}
+
+function renderDraftKpis() {
+  const best = [...draftRows].sort((a, b) => a.draft_pick - b.draft_pick)[0];
+  const last = [...draftRows].sort((a, b) => b.draft_anio - a.draft_anio)[0];
+  const first = [...draftRows].sort((a, b) => a.draft_anio - b.draft_anio)[0];
+  document.getElementById('draft-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">#${best.draft_pick}</div><div class="kpi-label">Mejor pick · ${best.nombre} (${best.draft_anio})</div></div>
+    <div class="kpi"><div class="kpi-num">${first.draft_anio}</div><div class="kpi-label">Primero · ${first.nombre}</div></div>
+    <div class="kpi"><div class="kpi-num">${last.draft_anio}</div><div class="kpi-label">Último · ${last.nombre}</div></div>`;
+}
+
+function renderDraftTable() {
+  const rows = [...draftRows].sort((a, b) => {
+    const va = a[draftSortCol], vb = b[draftSortCol];
+    if (typeof va === 'string') return draftSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return draftSortAsc ? va - vb : vb - va;
+  });
+
+  document.getElementById('draft-thead').innerHTML = `<tr>
+    ${DRAFT_COLS.map(c => {
+      if (!c.sortable) return `<th scope="col">${c.label}</th>`;
+      const active = draftSortCol === c.key;
+      const ariaSort = active ? (draftSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortDraft('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('draft-body').innerHTML = rows.map(j => `
+    <tr>
+      <td class="td-mono">${j.draft_anio}</td>
+      <td class="td-mono td-pick">#${j.draft_pick}</td>
+      <td class="td-nombre">${j.nombre}</td>
+      <td class="td-muted">${j.posicion || '—'}</td>
+      <td class="td-mono">${j.draft_equipo || '—'}</td>
+      <td class="td-mono td-muted">${j.draft_fecha || '—'}</td>
+    </tr>`).join('');
+}
+
+function sortDraft(col) {
+  if (draftSortCol === col) draftSortAsc = !draftSortAsc;
+  else { draftSortCol = col; draftSortAsc = true; }
+  renderDraftTable();
+}
+
+function renderUndrafted(undrafted) {
+  document.getElementById('undrafted-grid').innerHTML = undrafted.map(j => `
+    <div class="undrafted-card">
+      <div class="undrafted-nombre">${j.nombre}</div>
+      <div class="undrafted-meta">${j.posicion || ''}${j.nacimiento ? ` · ${j.nacimiento}` : ''}</div>
+    </div>`).join('') || '<p class="td-muted">No hay jugadores undrafted.</p>';
+}
