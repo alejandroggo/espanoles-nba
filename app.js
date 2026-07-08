@@ -322,8 +322,8 @@ let slGrouped = false;
 
 const SL_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
-  { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
   { key: 'jugador', label: 'Jugador', sortable: true },
+  { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
   { key: 'equipo',  label: 'Equipo',  sortable: true },
 ];
 
@@ -432,8 +432,8 @@ function renderSlFlat(rows) {
   document.getElementById('sl-body').innerHTML = rows.map((s, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-num">${s.year || '—'}</td>
       <td class="td-nombre">${s.jugador}</td>
+      <td class="td-num">${s.year || '—'}</td>
       <td>${s.equipo || '—'}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
