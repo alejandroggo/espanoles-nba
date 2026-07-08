@@ -180,7 +180,7 @@ const SAL_COLS = [
   { key: 'ganancias',        label: 'Total',     sortable: true,  cls: 'td-num' },
   { key: 'ganancias_ganado', label: 'Cobrado',   sortable: true,  cls: 'td-num' },
   { key: 'ganancias_futuro', label: 'Firmado',   sortable: true,  cls: 'td-num' },
-  { key: 'pct',              label: '% cobrado', sortable: true,  cls: 'td-num' },
+  { key: 'pct',              label: '% del total', sortable: true,  cls: 'td-num' },
   { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
 
@@ -189,15 +189,6 @@ const ROOKIES_CONTRATO = ['Sergio De Larrea', 'Baba Miller', 'Aday Mara'];
 function fmtDinero(n) {
   if (!n) return '—';
   return '$' + Math.round(n).toLocaleString('es-ES');
-}
-
-// % ya cobrado sobre el total; null si no hay desglose todavía
-function pctCobrado(j) {
-  const total = j.ganancias || 0;
-  const ganado = j.ganancias_ganado || 0;
-  const futuro = j.ganancias_futuro || 0;
-  if (!total || (!ganado && !futuro)) return null;
-  return Math.round(ganado / total * 100);
 }
 
 async function initSalariosPage() {
@@ -211,7 +202,10 @@ async function initSalariosPage() {
 
   // Debutados en la NBA o con contrato firmado (los tres rookies)
   salRows = jugadores.filter(j => (j.partidos || 0) > 0 || ROOKIES_CONTRATO.includes(j.nombre));
-  salRows.forEach(j => { j.pct = pctCobrado(j); });
+
+  // % = cuota de cada jugador sobre el total ganado por todos los españoles
+  const granTotal = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  salRows.forEach(j => { j.pct = granTotal ? j.ganancias / granTotal * 100 : null; });
 
   document.getElementById('hero-sub').textContent =
     `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas de carrera (USD)`;
@@ -274,6 +268,9 @@ function renderSalariosTable() {
     }).join('')}
   </tr>`;
 
+  // barra escalada respecto a la mayor cuota (el líder llena la barra)
+  const maxPct = Math.max(...salRows.map(j => j.pct || 0), 0);
+
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
@@ -282,7 +279,7 @@ function renderSalariosTable() {
       <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
-      <td class="td-num">${renderPct(j.pct)}</td>
+      <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
       <td class="td-muted">${j.equipos_nba || '—'}</td>
     </tr>`).join('');
 
@@ -290,7 +287,6 @@ function renderSalariosTable() {
   const tTotal   = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
   const tCobrado = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
   const tFuturo  = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
-  const tPct = (tCobrado || tFuturo) && tTotal ? Math.round(tCobrado / tTotal * 100) : null;
 
   document.getElementById('sal-foot').innerHTML = `
     <tr class="sal-total">
@@ -299,16 +295,17 @@ function renderSalariosTable() {
       <td class="td-num td-dinero">${fmtDinero(tTotal)}</td>
       <td class="td-num">${fmtDinero(tCobrado)}</td>
       <td class="td-num">${fmtDinero(tFuturo)}</td>
-      <td class="td-num">${renderPct(tPct)}</td>
+      <td class="td-num">${renderPct(100, 100)}</td>
       <td></td>
     </tr>`;
 }
 
-function renderPct(pct) {
+function renderPct(pct, barWidth) {
   if (pct === null || pct === undefined) return '<span class="td-muted">—</span>';
+  const w = barWidth === undefined ? pct : barWidth;
   return `<div class="pct-wrap">
-    <span class="pct-val">${pct}%</span>
-    <span class="pct-bar"><span class="pct-fill" style="width:${pct}%"></span></span>
+    <span class="pct-val">${pct.toFixed(1)}%</span>
+    <span class="pct-bar"><span class="pct-fill" style="width:${w}%"></span></span>
   </div>`;
 }
 
