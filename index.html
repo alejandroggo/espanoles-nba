@@ -16,146 +16,21 @@
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-title">ESPAÑOLES <span>EN LA</span> NBA</div>
-  <div class="loader-bar"></div>
-</div>
-
 <!-- HEADER -->
 <header class="site-header">
   <div class="header-inner">
-    <div class="logo" onclick="goHome()">ESPAÑOLES <span>EN LA</span> NBA</div>
+    <div class="logo">ESPAÑOLES <span>EN LA</span> NBA</div>
     <div class="header-right">
-      <button class="nav-btn" onclick="showPremios()">Premios</button>
-      <button class="nav-btn" onclick="showSummerLeague()">Summer League</button>
-      <button class="nav-btn" onclick="showTransacciones()">Transacciones</button>
-      <button class="nav-btn" id="btn-recargar" onclick="recargarDatos()">Recargar datos</button>
       <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
-      <span class="last-update" id="last-update"></span>
     </div>
   </div>
 </header>
 
-<!-- VISTA RANKING -->
-<div id="view-ranking" class="view active">
-  <div class="hero">
-    <div class="hero-top">
-      <div>
-        <h1 class="hero-title ag-hero">TODOS LOS<br><em>Españoles</em><br>EN LA NBA</h1>
-        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
-        <span id="ag-update-badge" class="ag-update-badge" hidden></span>
-      </div>
-      <div class="hero-kpis" id="hero-kpis"></div>
-    </div>
-  </div>
+<!-- CONTENIDO -->
+<main>
+</main>
 
-  <div class="controles">
-    <div class="search-wrap">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Buscar jugador…" aria-label="Buscar jugador" oninput="filterTabla()">
-    </div>
-    <div class="mode-chips">
-      <button class="mode-chip active" data-mode="per_game"        onclick="setViewMode('per_game')">Por partido</button>
-      <button class="mode-chip"        data-mode="season_highs"    onclick="setViewMode('season_highs')">Mejor temp.</button>
-      <button class="mode-chip"        data-mode="totals"          onclick="setViewMode('totals')">Totales</button>
-      <span class="mode-chips-sep"></span>
-      <button class="mode-chip"        data-mode="playoffs_pg"     onclick="setViewMode('playoffs_pg')">PO PG</button>
-      <button class="mode-chip"        data-mode="playoffs_sh"     onclick="setViewMode('playoffs_sh')">PO Mejor</button>
-      <button class="mode-chip"        data-mode="playoffs_totals" onclick="setViewMode('playoffs_totals')">PO Tot.</button>
-      <span class="mode-chips-sep"></span>
-      <button class="mode-chip"        data-mode="bio"            onclick="setViewMode('bio')">Biográfico</button>
-    </div>
-    <div class="controles-sep"></div>
-    <div id="sort-chips" class="sort-chips"></div>
-    <span class="results-count" id="results-count"></span>
-  </div>
-
-  <div class="tabla-wrap">
-    <table id="ranking-table">
-      <thead id="ranking-thead"></thead>
-      <tbody id="ranking-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- VISTA PREMIOS -->
-<div id="view-premios" class="view">
-  <div class="trans-header">
-    <button class="back-btn" onclick="goHome()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      Volver al ranking
-    </button>
-    <h1 class="trans-title">Todos los premios</h1>
-    <select id="premios-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
-    <select id="premios-year-filter" class="sl-filter"><option value="">Todos los años</option></select>
-  </div>
-  <div class="tabla-wrap">
-    <table id="premios-table">
-      <thead>
-        <tr><th>Año</th><th>Jugador</th><th>Tipo</th><th>Detalle</th><th>Equipo</th></tr>
-      </thead>
-      <tbody id="premios-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- VISTA SUMMER LEAGUE -->
-<div id="view-summer-league" class="view">
-  <div class="trans-header">
-    <button class="back-btn" onclick="goHome()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      Volver al ranking
-    </button>
-    <h1 class="trans-title">Summer League</h1>
-    <input type="text" id="sl-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
-    <select id="sl-year-filter" class="sl-filter">
-      <option value="">Todos los años</option>
-    </select>
-  </div>
-  <div class="tabla-wrap">
-    <table id="sl-table">
-      <thead>
-        <tr><th>Año</th><th>Jugador</th><th>Equipo</th></tr>
-      </thead>
-      <tbody id="sl-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- VISTA TRANSACCIONES -->
-<div id="view-transacciones" class="view">
-  <div class="trans-header">
-    <button class="back-btn" onclick="goHome()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      Volver al ranking
-    </button>
-    <h1 class="trans-title">Todas las transacciones</h1>
-    <input type="text" id="trans-search" class="sl-filter sl-search" placeholder="Buscar jugador…">
-    <select id="trans-tipo-filter" class="sl-filter"><option value="">Todos los tipos</option></select>
-    <select id="trans-year-filter" class="sl-filter"><option value="">Todos los años</option></select>
-  </div>
-  <div class="tabla-wrap">
-    <table id="trans-table">
-      <thead>
-        <tr>
-          <th>Fecha</th><th>Jugador</th><th>Tipo</th><th>Equipo</th><th>Equipo 2</th><th>Otros jugadores</th>
-        </tr>
-      </thead>
-      <tbody id="trans-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- VISTA JUGADOR -->
-<div id="view-jugador" class="view">
-  <button class="back-btn" onclick="goHome()">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-    Volver al ranking
-  </button>
-  <div id="ficha-content"></div>
-</div>
-
+<!-- FOOTER -->
 <footer class="ag-footer">
   <div class="ag-footer-brand">
     <strong>Alejandro Gaitán</strong>
@@ -179,6 +54,6 @@
 </footer>
 
 <script src="app.js"></script>
-<script>init();</script>
+<script>initTheme();</script>
 </body>
 </html>
