@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-08T19:51:53.946Z",
+  "actualizado": "2026-07-08T19:54:31.554Z",
   "summer_league": [
     {
       "year": 1985,
@@ -565,124 +565,124 @@
       ],
       "premios": [
         {
-          "tipo": "ROY",
-          "year": 2002,
-          "team": "MEM",
-          "notas": ""
+          "tipo": "All NBA",
+          "year": 2009,
+          "team": "LAL",
+          "notas": "3rd Team"
         },
         {
-          "tipo": "Rookie of the Month",
-          "year": 2002,
-          "team": "MEM",
-          "notas": ""
+          "tipo": "All NBA",
+          "year": 2010,
+          "team": "LAL",
+          "notas": "3rd Team"
         },
         {
-          "tipo": "Rookie of the Month",
-          "year": 2002,
-          "team": "MEM",
-          "notas": ""
+          "tipo": "All NBA",
+          "year": 2011,
+          "team": "LAL",
+          "notas": "2nd Team"
         },
         {
-          "tipo": "Rookie of the Month",
-          "year": 2002,
-          "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "Rising Stars",
-          "year": 2002,
-          "team": "MEM",
-          "notas": ""
+          "tipo": "All NBA",
+          "year": 2015,
+          "team": "CHI",
+          "notas": "2nd Team"
         },
         {
           "tipo": "All Rookie",
           "year": 2002,
           "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "Rising Stars",
-          "year": 2003,
-          "team": "MEM",
-          "notas": ""
+          "notas": "1st Team"
         },
         {
           "tipo": "All Star",
           "year": 2006,
           "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "Player of the Month",
-          "year": 2009,
-          "team": "LAL",
-          "notas": ""
+          "notas": "Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2009,
           "team": "LAL",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2009,
-          "team": "LAL",
-          "notas": ""
+          "notas": "Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2010,
           "team": "LAL",
-          "notas": ""
+          "notas": "Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2010,
           "team": "LAL",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2010,
-          "team": "LAL",
-          "notas": ""
+          "notas": "Shooting Challenge (2)"
         },
         {
           "tipo": "All Star",
           "year": 2011,
           "team": "LAL",
-          "notas": ""
+          "notas": "Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2011,
           "team": "LAL",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2011,
-          "team": "LAL",
-          "notas": ""
+          "notas": "Shooting Challenge (3)"
         },
         {
           "tipo": "All Star",
           "year": 2015,
           "team": "CHI",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2015,
-          "team": "CHI",
-          "notas": ""
+          "notas": "Titular"
         },
         {
           "tipo": "All Star",
           "year": 2016,
           "team": "CHI",
-          "notas": ""
+          "notas": "Este"
+        },
+        {
+          "tipo": "Player of the Month",
+          "year": 2009,
+          "team": "LAL",
+          "notas": "February 2009"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2002,
+          "team": "MEM",
+          "notas": "Novatos"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2003,
+          "team": "MEM",
+          "notas": "Sophomores"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2002,
+          "team": "MEM",
+          "notas": "Noviembre 2001"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2002,
+          "team": "MEM",
+          "notas": "Enero 2002"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2002,
+          "team": "MEM",
+          "notas": "Marzo 2002"
+        },
+        {
+          "tipo": "ROY",
+          "year": 2002,
+          "team": "MEM",
+          "notas": "2001/02"
         }
       ],
       "records": [],
@@ -953,70 +953,70 @@
       ],
       "premios": [
         {
-          "tipo": "Rising Stars",
-          "year": 2009,
+          "tipo": "All Defense",
+          "year": 2013,
           "team": "MEM",
-          "notas": ""
+          "notas": "2nd Team"
+        },
+        {
+          "tipo": "All NBA",
+          "year": 2013,
+          "team": "MEM",
+          "notas": "2nd Team"
+        },
+        {
+          "tipo": "All NBA",
+          "year": 2015,
+          "team": "MEM",
+          "notas": "1st Team"
         },
         {
           "tipo": "All Rookie",
           "year": 2009,
           "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "Rising Stars",
-          "year": 2010,
-          "team": "MEM",
-          "notas": ""
+          "notas": "2nd Team"
         },
         {
           "tipo": "All Star",
           "year": 2012,
           "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "DPOY",
-          "year": 2013,
-          "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2013,
-          "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "All Defense",
-          "year": 2013,
-          "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "MVP",
-          "year": 2015,
-          "team": "MEM",
-          "notas": ""
+          "notas": "Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2015,
           "team": "MEM",
-          "notas": ""
-        },
-        {
-          "tipo": "All NBA",
-          "year": 2015,
-          "team": "MEM",
-          "notas": ""
+          "notas": "Titular"
         },
         {
           "tipo": "All Star",
           "year": 2017,
           "team": "MEM",
-          "notas": ""
+          "notas": "Oeste"
+        },
+        {
+          "tipo": "DPOY",
+          "year": 2013,
+          "team": "MEM",
+          "notas": "Oeste"
+        },
+        {
+          "tipo": "MVP",
+          "year": 2015,
+          "team": "MEM",
+          "notas": "Octavo (3 votos)"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2009,
+          "team": "MEM",
+          "notas": "Novatos"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2010,
+          "team": "MEM",
+          "notas": "Sophomores"
         }
       ],
       "records": [],
@@ -1203,34 +1203,34 @@
       ],
       "premios": [
         {
-          "tipo": "Rookie of the Month",
+          "tipo": "All Rookie",
           "year": 2015,
           "team": "CHI",
-          "notas": ""
-        },
-        {
-          "tipo": "Rookie of the Month",
-          "year": 2015,
-          "team": "CHI",
-          "notas": ""
+          "notas": "1st Team"
         },
         {
           "tipo": "Rising Stars",
           "year": 2015,
           "team": "CHI",
-          "notas": ""
-        },
-        {
-          "tipo": "All Rookie",
-          "year": 2015,
-          "team": "CHI",
-          "notas": ""
+          "notas": "Rookies"
         },
         {
           "tipo": "Rising Stars",
           "year": 2016,
           "team": "CHI",
-          "notas": ""
+          "notas": "Sophomores (lesionado)"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2015,
+          "team": "CHI",
+          "notas": "Diciembre 2014"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2015,
+          "team": "CHI",
+          "notas": "Marzo 2015"
         }
       ],
       "records": [],
@@ -1543,16 +1543,16 @@
       ],
       "premios": [
         {
-          "tipo": "Rising Stars",
-          "year": 2011,
-          "team": "OKC",
-          "notas": ""
-        },
-        {
           "tipo": "All Star",
           "year": 2011,
           "team": "OKC",
-          "notas": ""
+          "notas": "Dunk Contest"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2011,
+          "team": "OKC",
+          "notas": "Sophomores"
         }
       ],
       "records": [],
@@ -1627,16 +1627,16 @@
       ],
       "premios": [
         {
-          "tipo": "Rising Stars",
-          "year": 2008,
-          "team": "MEM",
-          "notas": ""
-        },
-        {
           "tipo": "All Rookie",
           "year": 2008,
           "team": "MEM",
-          "notas": ""
+          "notas": "2nd Team"
+        },
+        {
+          "tipo": "Rising Stars",
+          "year": 2008,
+          "team": "MEM",
+          "notas": "Novatos"
         }
       ],
       "records": [],
@@ -1866,28 +1866,28 @@
       ],
       "premios": [
         {
-          "tipo": "Rookie of the Month",
+          "tipo": "All Rookie",
           "year": 2012,
           "team": "MIN",
-          "notas": ""
+          "notas": "1st Team"
         },
         {
           "tipo": "Rising Stars",
           "year": 2012,
           "team": "MIN",
-          "notas": ""
-        },
-        {
-          "tipo": "All Rookie",
-          "year": 2012,
-          "team": "MIN",
-          "notas": ""
+          "notas": "Rookies"
         },
         {
           "tipo": "Rising Stars",
           "year": 2013,
           "team": "MIN",
-          "notas": ""
+          "notas": "Sophomores"
+        },
+        {
+          "tipo": "Rookie of the Month",
+          "year": 2012,
+          "team": "MIN",
+          "notas": "Enero 2012"
         }
       ],
       "records": [],
@@ -2131,22 +2131,22 @@
       ],
       "premios": [
         {
-          "tipo": "Rising Stars",
+          "tipo": "All Rookie",
           "year": 2009,
           "team": "POR",
-          "notas": ""
+          "notas": "2nd Team"
         },
         {
           "tipo": "All Star",
           "year": 2009,
           "team": "POR",
-          "notas": ""
+          "notas": "Dunk Contest"
         },
         {
-          "tipo": "All Rookie",
+          "tipo": "Rising Stars",
           "year": 2009,
           "team": "POR",
-          "notas": ""
+          "notas": "Novatos"
         }
       ],
       "records": [],
@@ -2544,22 +2544,22 @@
       ],
       "premios": [
         {
-          "tipo": "Rookie of the Month",
+          "tipo": "All Rookie",
           "year": 2007,
           "team": "TOR",
-          "notas": ""
+          "notas": "1st Team"
         },
         {
           "tipo": "Rising Stars",
           "year": 2007,
           "team": "TOR",
-          "notas": ""
+          "notas": "Novatos"
         },
         {
-          "tipo": "All Rookie",
+          "tipo": "Rookie of the Month",
           "year": 2007,
           "team": "TOR",
-          "notas": ""
+          "notas": "Diciembre 2006"
         }
       ],
       "records": [],
@@ -2747,22 +2747,22 @@
       ],
       "premios": [
         {
-          "tipo": "Rookie of the Month",
+          "tipo": "All Rookie",
           "year": 2017,
           "team": "NYK",
-          "notas": ""
+          "notas": "1st Team"
         },
         {
           "tipo": "Rising Stars",
           "year": 2017,
           "team": "NYK",
-          "notas": ""
+          "notas": "Rookies"
         },
         {
-          "tipo": "All Rookie",
+          "tipo": "Rookie of the Month",
           "year": 2017,
           "team": "NYK",
-          "notas": ""
+          "notas": "Abril 2017"
         }
       ],
       "records": [],
@@ -2954,7 +2954,7 @@
           "tipo": "Rising Stars",
           "year": 2017,
           "team": "OKC",
-          "notas": ""
+          "notas": "Rookies"
         }
       ],
       "records": [],
