@@ -318,12 +318,21 @@ let slSortCol = 'year';
 let slSortAsc = false;
 let slSearch = '';
 let slYear = '';
+let slGrouped = false;
 
 const SL_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
   { key: 'jugador', label: 'Jugador', sortable: true },
   { key: 'equipo',  label: 'Equipo',  sortable: true },
+];
+
+const SL_COLS_GROUP = [
+  { key: 'rank',    label: '#',              sortable: false, cls: 'td-rank' },
+  { key: 'jugador', label: 'Jugador',        sortable: true },
+  { key: 'count',   label: 'Participaciones', sortable: true, cls: 'td-num' },
+  { key: 'years',   label: 'Años',           sortable: true,  cls: 'td-num' },
+  { key: 'equipos', label: 'Equipos',        sortable: false },
 ];
 
 async function initSummerPage() {
@@ -372,8 +381,19 @@ function buildSlYearFilter() {
     '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
 }
 
+function toggleSlGroup() {
+  slGrouped = !slGrouped;
+  const btn = document.getElementById('sl-group');
+  btn.classList.toggle('active', slGrouped);
+  btn.setAttribute('aria-pressed', String(slGrouped));
+  // reajustar orden por defecto de cada modo
+  slSortCol = slGrouped ? 'count' : 'year';
+  slSortAsc = false;
+  renderSlTable();
+}
+
 function renderSlTable() {
-  let rows = slAll.filter(s => {
+  const filtered = slAll.filter(s => {
     if (slYear && String(s.year) !== slYear) return false;
     if (slSearch) {
       const hay = `${s.jugador} ${s.equipo || ''}`.toLowerCase();
@@ -382,7 +402,23 @@ function renderSlTable() {
     return true;
   });
 
-  rows.sort((a, b) => {
+  return slGrouped ? renderSlGrouped(filtered) : renderSlFlat(filtered);
+}
+
+function renderSlHead(cols) {
+  document.getElementById('sl-thead').innerHTML = `<tr>
+    ${cols.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = slSortCol === c.key;
+      const ariaSort = active ? (slSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (slSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortSl('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+}
+
+function renderSlFlat(rows) {
+  rows = [...rows].sort((a, b) => {
     let va = a[slSortCol], vb = b[slSortCol];
     if (slSortCol === 'year') { va = va || 0; vb = vb || 0; return slSortAsc ? va - vb : vb - va; }
     va = String(va || ''); vb = String(vb || '');
@@ -392,16 +428,7 @@ function renderSlTable() {
   document.getElementById('sl-count').textContent =
     `${rows.length} participaci${rows.length === 1 ? 'ón' : 'ones'}`;
 
-  document.getElementById('sl-thead').innerHTML = `<tr>
-    ${SL_COLS.map(c => {
-      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
-      const active = slSortCol === c.key;
-      const ariaSort = active ? (slSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (slSortAsc ? ' asc' : '') : ''}"
-        aria-sort="${ariaSort}" onclick="sortSl('${c.key}')">${c.label}</th>`;
-    }).join('')}
-  </tr>`;
-
+  renderSlHead(SL_COLS);
   document.getElementById('sl-body').innerHTML = rows.map((s, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
@@ -411,8 +438,50 @@ function renderSlTable() {
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
+function renderSlGrouped(entries) {
+  const map = {};
+  entries.forEach(s => {
+    const g = map[s.jugador] || (map[s.jugador] = { jugador: s.jugador, years: [], equipos: [] });
+    if (s.year) g.years.push(s.year);
+    if (s.equipo) g.equipos.push(s.equipo);
+  });
+
+  let rows = Object.values(map).map(g => {
+    const years = [...new Set(g.years)].sort((a, b) => a - b);
+    return {
+      jugador: g.jugador,
+      count: g.years.length || g.equipos.length,
+      years,
+      maxYear: years.length ? years[years.length - 1] : 0,
+      equipos: [...new Set(g.equipos)],
+    };
+  });
+
+  rows.sort((a, b) => {
+    if (slSortCol === 'jugador') return slSortAsc ? a.jugador.localeCompare(b.jugador) : b.jugador.localeCompare(a.jugador);
+    if (slSortCol === 'equipos') return slSortAsc ? a.equipos.length - b.equipos.length : b.equipos.length - a.equipos.length;
+    // count o years (por año más reciente)
+    const va = slSortCol === 'years' ? a.maxYear : a.count;
+    const vb = slSortCol === 'years' ? b.maxYear : b.count;
+    return slSortAsc ? va - vb : (vb - va) || a.jugador.localeCompare(b.jugador);
+  });
+
+  document.getElementById('sl-count').textContent =
+    `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
+
+  renderSlHead(SL_COLS_GROUP);
+  document.getElementById('sl-body').innerHTML = rows.map((g, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-nombre">${g.jugador}</td>
+      <td class="td-num">${g.count}</td>
+      <td class="td-num">${g.years.join(', ') || '—'}</td>
+      <td>${g.equipos.join(', ') || '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="5" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
 function sortSl(col) {
   if (slSortCol === col) slSortAsc = !slSortAsc;
-  else { slSortCol = col; slSortAsc = (col !== 'year'); }
+  else { slSortCol = col; slSortAsc = (col === 'jugador'); }
   renderSlTable();
 }
