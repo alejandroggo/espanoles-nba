@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-08T18:54:26.110Z",
+  "actualizado": "2026-07-08T19:03:55.504Z",
   "jugadores": [
     {
       "id": "pau-gasol",
@@ -34,6 +34,8 @@
       "draft_fecha": "27 jun 2001",
       "draft_notas": "Traspasado a Memphis la noche del draft",
       "ganancias": 220990766,
+      "ganancias_ganado": 220990766,
+      "ganancias_futuro": 0,
       "equipos_nba": "MEM, LAL, CHI, SAS, MIL",
       "temporadas_data": [
         {
@@ -532,6 +534,8 @@
       "draft_fecha": "28 jun 2007",
       "draft_notas": "Traspasado a Memphis antes del debut.",
       "ganancias": 181665456,
+      "ganancias_ganado": 181665456,
+      "ganancias_futuro": 0,
       "equipos_nba": "MEM, TOR, LAL",
       "temporadas_data": [
         {
@@ -864,6 +868,8 @@
       "draft_fecha": "23 jun 2011",
       "draft_notas": "Traspasado a Chicago la noche del draft",
       "ganancias": 41631175,
+      "ganancias_ganado": 41631175,
+      "ganancias_futuro": 0,
       "equipos_nba": "CHI, NOL, MIL",
       "temporadas_data": [
         {
@@ -1076,6 +1082,8 @@
       "draft_fecha": "26 jun 2008",
       "draft_notas": null,
       "ganancias": 141250191,
+      "ganancias_ganado": 141250191,
+      "ganancias_futuro": 0,
       "equipos_nba": "OKC, ORL, TOR, LAC, MIL",
       "temporadas_data": [
         {
@@ -1396,6 +1404,8 @@
       "draft_fecha": "26 jun 2002",
       "draft_notas": "Traspasado a Memphis antes del debut.",
       "ganancias": 538090,
+      "ganancias_ganado": 538090,
+      "ganancias_futuro": 0,
       "equipos_nba": "MEM",
       "temporadas_data": [
         {
@@ -1479,6 +1489,8 @@
       "draft_fecha": "25 jun 2009",
       "draft_notas": null,
       "ganancias": 131001894,
+      "ganancias_ganado": 131001894,
+      "ganancias_futuro": 0,
       "equipos_nba": "MIN, UTA, PHX, CLE, IND",
       "temporadas_data": [
         {
@@ -1727,6 +1739,8 @@
       "draft_fecha": "29 jul 2021",
       "draft_notas": "Traspasado a Memphis la noche del draft",
       "ganancias": 62743373,
+      "ganancias_ganado": 28729287,
+      "ganancias_futuro": 34014086,
       "equipos_nba": "MEM, DAL",
       "temporadas_data": [
         {
@@ -1852,6 +1866,8 @@
       "draft_fecha": "28 jun 2007",
       "draft_notas": "Traspasado a Portland la noche del draft",
       "ganancias": 5676523,
+      "ganancias_ganado": 5676523,
+      "ganancias_futuro": 0,
       "equipos_nba": "POR, DEN",
       "temporadas_data": [
         {
@@ -1982,6 +1998,8 @@
       "draft_fecha": null,
       "draft_notas": null,
       "ganancias": 84201469,
+      "ganancias_ganado": 84201469,
+      "ganancias_futuro": 0,
       "equipos_nba": "TOR, DET, DAL, NYK, LAL, ATL, CLE",
       "temporadas_data": [
         {
@@ -2289,6 +2307,8 @@
       "draft_fecha": null,
       "draft_notas": null,
       "ganancias": 12120000,
+      "ganancias_ganado": 12120000,
+      "ganancias_futuro": 0,
       "equipos_nba": "TOR",
       "temporadas_data": [
         {
@@ -2392,6 +2412,8 @@
       "draft_fecha": "25 jun 2015",
       "draft_notas": "Traspasado a New York la noche del draft",
       "ganancias": 12435586,
+      "ganancias_ganado": 12435586,
+      "ganancias_futuro": 0,
       "equipos_nba": "NYK, CHA, NOL",
       "temporadas_data": [
         {
@@ -2592,6 +2614,8 @@
       "draft_fecha": "27 jun 2001",
       "draft_notas": null,
       "ganancias": 3941313,
+      "ganancias_ganado": 3941313,
+      "ganancias_futuro": 0,
       "equipos_nba": "UTA",
       "temporadas_data": [
         {
@@ -2676,6 +2700,8 @@
       "draft_fecha": "27 jun 2013",
       "draft_notas": null,
       "ganancias": 15294947,
+      "ganancias_ganado": 15294947,
+      "ganancias_futuro": 0,
       "equipos_nba": "OKC",
       "temporadas_data": [
         {
@@ -2780,6 +2806,8 @@
       "draft_fecha": "23 jun 2016",
       "draft_notas": null,
       "ganancias": 24938681,
+      "ganancias_ganado": 24938681,
+      "ganancias_futuro": 0,
       "equipos_nba": "DEN, MIN, BOS, SAS, UTA, TOR",
       "temporadas_data": [
         {
@@ -3017,6 +3045,8 @@
       "draft_fecha": "28 jun 2006",
       "draft_notas": "Traspasado a Portland la noche del draft",
       "ganancias": 11469835,
+      "ganancias_ganado": 11469835,
+      "ganancias_futuro": 0,
       "equipos_nba": "POR, SAC, NYK, PHI",
       "temporadas_data": [
         {
@@ -3170,6 +3200,8 @@
       "draft_fecha": "25 jun 2025",
       "draft_notas": null,
       "ganancias": 14298145,
+      "ganancias_ganado": 2783880,
+      "ganancias_futuro": 11514265,
       "equipos_nba": "BOS",
       "temporadas_data": [],
       "premios": [],
@@ -3224,6 +3256,8 @@
       "draft_fecha": "25 jun 2009",
       "draft_notas": null,
       "ganancias": 4000000,
+      "ganancias_ganado": 4000000,
+      "ganancias_futuro": 0,
       "equipos_nba": "POR",
       "temporadas_data": [
         {
@@ -3321,6 +3355,8 @@
       "draft_fecha": "29 jul 2021",
       "draft_notas": null,
       "ganancias": 7424488,
+      "ganancias_ganado": 7424488,
+      "ganancias_futuro": 0,
       "equipos_nba": "HOU, GSW",
       "temporadas_data": [
         {
@@ -3432,6 +3468,8 @@
       "draft_fecha": "18 jun 1985",
       "draft_notas": "No llegó a debutar con New Jersey. Agente libre al año siguiente.",
       "ganancias": 145000,
+      "ganancias_ganado": 145000,
+      "ganancias_futuro": 0,
       "equipos_nba": "POR",
       "temporadas_data": [
         {
@@ -3501,6 +3539,8 @@
       "draft_fecha": "24 jun 2026",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "LAC",
       "temporadas_data": [],
       "premios": [],
@@ -3540,6 +3580,8 @@
       "draft_fecha": "23 jun 2026",
       "draft_notas": "Traspasado a Dallas la noche del draft",
       "ganancias": 16329526,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 16329526,
       "equipos_nba": "DAL",
       "temporadas_data": [],
       "premios": [],
@@ -3579,6 +3621,8 @@
       "draft_fecha": "23 jun 2026",
       "draft_notas": null,
       "ganancias": 27023779,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 27023779,
       "equipos_nba": "OKC",
       "temporadas_data": [],
       "premios": [],
@@ -3618,6 +3662,8 @@
       "draft_fecha": "22 jun 1987",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3657,6 +3703,8 @@
       "draft_fecha": "25 jun 1997",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3696,6 +3744,8 @@
       "draft_fecha": "24 jun 2004",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3735,6 +3785,8 @@
       "draft_fecha": "28 jun 2005",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3774,6 +3826,8 @@
       "draft_fecha": "25 jun 2009",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3813,6 +3867,8 @@
       "draft_fecha": "25 jun 2015",
       "draft_notas": null,
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
@@ -3852,6 +3908,8 @@
       "draft_fecha": "27 jun 2024",
       "draft_notas": "Traspasado a San Antonio la noche del draft",
       "ganancias": 0,
+      "ganancias_ganado": 0,
+      "ganancias_futuro": 0,
       "equipos_nba": "",
       "temporadas_data": [],
       "premios": [],
