@@ -1,5 +1,207 @@
 {
-  "actualizado": "2026-07-08T19:03:55.504Z",
+  "actualizado": "2026-07-08T19:23:37.928Z",
+  "summer_league": [
+    {
+      "year": 1985,
+      "jugador": "Fernando Martín",
+      "equipo": "POR"
+    },
+    {
+      "year": 1986,
+      "jugador": "Fernando Martín",
+      "equipo": "POR"
+    },
+    {
+      "year": 1993,
+      "jugador": "José Miguel Antúnez",
+      "equipo": "HOU"
+    },
+    {
+      "year": 1994,
+      "jugador": "Alberto Herreros",
+      "equipo": "IND"
+    },
+    {
+      "year": 1995,
+      "jugador": "Tomás Jofresa",
+      "equipo": "DEN"
+    },
+    {
+      "year": 1998,
+      "jugador": "Ferran Martínez",
+      "equipo": "TOR"
+    },
+    {
+      "year": 2003,
+      "jugador": "Raül Lopez",
+      "equipo": "UTA"
+    },
+    {
+      "year": 2004,
+      "jugador": "Albert Miralles",
+      "equipo": "MIA"
+    },
+    {
+      "year": 2005,
+      "jugador": "Javier Mendiburu",
+      "equipo": "MIL"
+    },
+    {
+      "year": 2006,
+      "jugador": "Juanjo Triguero",
+      "equipo": "ORL"
+    },
+    {
+      "year": 2007,
+      "jugador": "Juanjo Triguero",
+      "equipo": "ORL"
+    },
+    {
+      "year": 2007,
+      "jugador": "Sergio Sánchez",
+      "equipo": "BOS"
+    },
+    {
+      "year": 2009,
+      "jugador": "Serge Ibaka",
+      "equipo": "OKC"
+    },
+    {
+      "year": 2009,
+      "jugador": "David Doblas",
+      "equipo": "TOR"
+    },
+    {
+      "year": 2010,
+      "jugador": "Serge Ibaka",
+      "equipo": "OKC"
+    },
+    {
+      "year": 2012,
+      "jugador": "Xavi Rey",
+      "equipo": "MEM"
+    },
+    {
+      "year": 2013,
+      "jugador": "Víctor Claver",
+      "equipo": "POR"
+    },
+    {
+      "year": 2014,
+      "jugador": "Xavi Rey",
+      "equipo": "SAS"
+    },
+    {
+      "year": 2015,
+      "jugador": "Pablo Aguilar",
+      "equipo": "DAL"
+    },
+    {
+      "year": 2015,
+      "jugador": "Tomás Bellas",
+      "equipo": "ATL"
+    },
+    {
+      "year": 2016,
+      "jugador": "Juancho Hernangómez",
+      "equipo": "DEN"
+    },
+    {
+      "year": 2017,
+      "jugador": "Sebas Saiz",
+      "equipo": "MIA"
+    },
+    {
+      "year": 2017,
+      "jugador": "Oriol Paulí",
+      "equipo": "ORL"
+    },
+    {
+      "year": 2018,
+      "jugador": "Willy Hernangómez",
+      "equipo": "CHI"
+    },
+    {
+      "year": 2021,
+      "jugador": "Usman Garuba",
+      "equipo": "HOU"
+    },
+    {
+      "year": 2021,
+      "jugador": "Santi Aldama",
+      "equipo": "MEM"
+    },
+    {
+      "year": 2022,
+      "jugador": "Usman Garuba",
+      "equipo": "HOU"
+    },
+    {
+      "year": 2022,
+      "jugador": "Santi Aldama",
+      "equipo": "MEM"
+    },
+    {
+      "year": 2025,
+      "jugador": "Hugo González",
+      "equipo": "BOS"
+    },
+    {
+      "year": 2025,
+      "jugador": "Great Osobor",
+      "equipo": "HOU"
+    },
+    {
+      "year": 2025,
+      "jugador": "Izan Almansa",
+      "equipo": "PHI"
+    },
+    {
+      "year": 2025,
+      "jugador": "Isaac Nogués",
+      "equipo": "SAC"
+    },
+    {
+      "year": 2025,
+      "jugador": "Eli Ndiaye",
+      "equipo": "ATL"
+    },
+    {
+      "year": 2026,
+      "jugador": "Baba Miller",
+      "equipo": "LAC"
+    },
+    {
+      "year": 2026,
+      "jugador": "Sergio De Larrea",
+      "equipo": "DAL"
+    },
+    {
+      "year": 2026,
+      "jugador": "Aday Mara",
+      "equipo": "OKC"
+    },
+    {
+      "year": 2026,
+      "jugador": "Jorge Díaz Graham",
+      "equipo": "DAL"
+    },
+    {
+      "year": 2026,
+      "jugador": "Guillermo Díaz Graham",
+      "equipo": "DAL"
+    },
+    {
+      "year": 2026,
+      "jugador": "Eli Ndiaye",
+      "equipo": "ATL"
+    },
+    {
+      "year": 2026,
+      "jugador": "Hugo González",
+      "equipo": "BOS"
+    }
+  ],
   "jugadores": [
     {
       "id": "pau-gasol",
