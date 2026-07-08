@@ -64,10 +64,10 @@ const DRAFT_COLS = [
   { key: 'rank',         label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'foto',         label: '',        sortable: false },
   { key: 'nombre',       label: 'Jugador', sortable: true },
-  { key: 'draft_pick',   label: 'Pick',    sortable: true },
-  { key: 'draft_equipo', label: 'Equipo',  sortable: true },
-  { key: 'draft_anio',   label: 'Año',     sortable: true },
-  { key: 'draft_fecha',  label: 'Fecha',   sortable: false },
+  { key: 'draft_pick',   label: 'Pick',    sortable: true,  cls: 'td-num' },
+  { key: 'draft_equipo', label: 'Equipo',  sortable: true,  cls: 'td-num' },
+  { key: 'draft_anio',   label: 'Año',     sortable: true,  cls: 'td-num' },
+  { key: 'draft_fecha',  label: 'Fecha',   sortable: false, cls: 'td-num' },
   { key: 'notas',        label: 'Notas',   sortable: false, cls: 'td-notas' },
 ];
 
@@ -106,7 +106,7 @@ function renderDraftKpis() {
 
   document.getElementById('draft-kpis').innerHTML = `
     <div class="kpi">
-      <div class="kpi-num kpi-num--text">${best.nombre} #${best.draft_pick}</div>
+      <div class="kpi-num">${best.nombre} #${best.draft_pick}</div>
       <div class="kpi-label">Pick más alto</div>
     </div>
     <div class="kpi">
@@ -131,7 +131,7 @@ function renderDraftTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = draftSortCol === c.key;
       const ariaSort = active ? (draftSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortDraft('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
