@@ -215,26 +215,21 @@ async function initSalariosPage() {
 }
 
 function renderSalariosKpis() {
-  const total   = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
-  const cobrado = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
-  const futuro  = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
-  const top = [...salRows].sort((a, b) => (b.ganancias || 0) - (a.ganancias || 0))[0];
+  const total = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
   const gasol = salRows
     .filter(j => j.nombre === 'Pau Gasol' || j.nombre === 'Marc Gasol')
     .reduce((s, j) => s + (j.ganancias || 0), 0);
   const pctGasol = total ? Math.round(gasol / total * 1000) / 10 : 0;
 
-  // Si hay desglose, el 2º KPI muestra cobrado vs firmado; si no, el mejor pagado
-  const hayDesglose = cobrado > 0 || futuro > 0;
-  const kpi2 = hayDesglose
+  // Cobrado por partido, agregado de todos los españoles
+  const totCobrado  = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
+  const totPartidos = salRows.reduce((s, j) => s + (j.partidos || 0), 0);
+  const kpi2 = totPartidos
     ? `<div class="kpi">
-         <div class="kpi-num">${total ? Math.round(cobrado / total * 100) : 0}%</div>
-         <div class="kpi-label">Ya cobrado · ${fmtDinero(futuro)} por cobrar</div>
+         <div class="kpi-num">${fmtDinero(totCobrado / totPartidos)}</div>
+         <div class="kpi-label">Cobrado por partido jugado</div>
        </div>`
-    : `<div class="kpi">
-         <div class="kpi-num">${fmtDinero(top.ganancias)}</div>
-         <div class="kpi-label">Mejor pagado · ${top.nombre}</div>
-       </div>`;
+    : '';
 
   document.getElementById('sal-kpis').innerHTML = `
     <div class="kpi">
