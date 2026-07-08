@@ -121,10 +121,10 @@ function renderDraftTable() {
     <tr>
       <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
       <td class="td-nombre">${j.nombre}</td>
-      <td class="td-mono td-pick">#${j.draft_pick}</td>
-      <td class="td-mono">${j.draft_equipo || '—'}</td>
-      <td class="td-mono">${j.draft_anio}</td>
-      <td class="td-mono td-muted">${j.draft_fecha || '—'}</td>
+      <td class="td-num td-pick">#${j.draft_pick}</td>
+      <td class="td-num">${j.draft_equipo || '—'}</td>
+      <td class="td-num">${j.draft_anio}</td>
+      <td class="td-num td-muted">${j.draft_fecha || '—'}</td>
       <td class="td-muted">${j.draft_notas || j.notas || '—'}</td>
     </tr>`).join('');
 }
