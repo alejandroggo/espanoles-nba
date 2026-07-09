@@ -792,6 +792,27 @@ function renderRkTable() {
         return `<td class="${c.cls || ''}${hl}${lead}">${val}${rankTag}</td>`;
       }).join('')}
     </tr>`).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+
+  renderRkFoot(rows, cols);
+}
+
+// Fila de totales (suma de todos), solo en modo Totales
+function renderRkFoot(rows, cols) {
+  const foot = document.getElementById('rk-foot');
+  if (!foot) return;
+  if (rkMode !== 'tot') { foot.innerHTML = ''; return; }
+
+  const sum = k => rows.reduce((s, j) => s + (j[k] || 0), 0);
+  const tp = sum('partidos'), tgs = sum('partidos_titular');
+
+  const cells = cols.map(c => {
+    if (c.key === 'nombre') return `<td class="td-nombre">TOTAL (${rows.length})</td>`;
+    if (c.key === 'rank' || c.key === 'foto') return '<td></td>';
+    if (c.key === 'pct_gs') return `<td class="${c.cls || ''}">${tp ? fmtPct(tgs / tp) : '—'}</td>`;
+    return `<td class="${c.cls || ''}">${fmtEnt(sum(c.key))}</td>`;
+  }).join('');
+
+  foot.innerHTML = `<tr class="rk-total">${cells}</tr>`;
 }
 
 // Posición de cada jugador en cada estadística (sobre todos los que tienen partidos)
