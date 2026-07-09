@@ -597,12 +597,31 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .dorsal-head { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); }
 .dorsal-big { font-family: var(--display); font-size: 3rem; line-height: 1; color: var(--accent); }
 .dorsal-count { font-size: var(--font-sm); color: var(--text-muted); }
-.dorsal-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
-.dorsal-player { display: flex; flex-direction: column; gap: 2px; }
+.dorsal-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
+.dorsal-player { display: flex; align-items: flex-start; gap: var(--space-3); }
+.dp-photo {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: 50%; overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  display: block;
+}
+.dp-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.dp-info { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
 .dp-name { font-weight: 600; }
-.dp-meta { display: flex; flex-direction: column; gap: 1px; font-size: var(--font-xs); color: var(--text-muted); }
-.dp-stint b { color: var(--text); font-weight: 600; }
-.dp-nota { margin-top: 3px; font-size: var(--font-xs); color: var(--accent); }
+.dp-teams { display: flex; flex-direction: column; gap: var(--space-1); }
+.dp-team { display: flex; align-items: center; gap: var(--space-2); }
+.dp-team-code {
+  flex-shrink: 0;
+  min-width: 34px; text-align: center;
+  font-weight: 700; font-size: var(--font-xs);
+  padding: 2px 6px; border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--text);
+  letter-spacing: 0.03em;
+}
+.dp-team-yrs { font-size: var(--font-xs); color: var(--text-muted); }
+.dp-nota { font-size: var(--font-xs); color: var(--accent); }
 .dp-nota b { color: var(--accent); font-weight: 700; }
 
 .dr-por-jugador {

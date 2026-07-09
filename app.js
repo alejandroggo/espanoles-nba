@@ -850,6 +850,15 @@ function sortRk(col) {
 // ══════════════════════════════════════════════
 let drByNum = {};
 let drAll = [];
+let drMeta = {};  // nombre normalizado → jugador (para la foto)
+
+function drNorm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+
+function drPhoto(jugador) {
+  const j = drMeta[drNorm(jugador)];
+  const src = j && (j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg` : ''));
+  return `<span class="dp-photo">${src ? `<img src="${src}" onerror="this.remove()" alt="">` : ''}</span>`;
+}
 
 async function initDorsalesPage() {
   let data;
@@ -862,6 +871,8 @@ async function initDorsalesPage() {
 
   const dorsales = data.dorsales || [];
   drAll = dorsales;
+  drMeta = {};
+  (data.jugadores || []).forEach(j => { drMeta[drNorm(j.nombre)] = j; });
   drByNum = {};
   for (let n = 0; n <= 99; n++) drByNum[n] = [];
   dorsales.forEach(d => {
@@ -990,9 +1001,9 @@ function showDorsal(n) {
   entries.forEach(e => { (byPlayer[e.jugador] = byPlayer[e.jugador] || []).push(e); });
 
   const items = Object.entries(byPlayer).map(([jug, es]) => {
-    const detalle = es
+    const teamsHtml = es
       .sort((a, b) => (a.desde || 0) - (b.desde || 0))
-      .map(e => `<span class="dp-stint">${e.team ? `<b>${e.team}</b> ` : ''}${drPeriodo(e.desde, e.hasta)}</span>`)
+      .map(e => `<span class="dp-team"><span class="dp-team-code">${e.team || '—'}</span><span class="dp-team-yrs">${drPeriodo(e.desde, e.hasta)}</span></span>`)
       .join('');
 
     // ¿Este jugador llevó OTRO dorsal en el mismo equipo?
@@ -1003,11 +1014,18 @@ function showDorsal(n) {
         drAll.filter(d => d.jugador === jug && d.team === team && Number(d.numero) !== n)
              .map(d => Number(d.numero))
       )].sort((a, b) => a - b);
-      otros.forEach(num => notas.push(`También llevó el <b>#${num}</b> en su otra etapa en ${team}`));
+      otros.forEach(num => notas.push(`También llevó el <b>#${num}</b> en ${team}`));
     });
     const notaHtml = notas.length ? `<span class="dp-nota">${notas.join('<br>')}</span>` : '';
 
-    return `<li class="dorsal-player"><span class="dp-name">${jug}</span><span class="dp-meta">${detalle}</span>${notaHtml}</li>`;
+    return `<li class="dorsal-player">
+      ${drPhoto(jug)}
+      <div class="dp-info">
+        <span class="dp-name">${jug}</span>
+        <div class="dp-teams">${teamsHtml}</div>
+        ${notaHtml}
+      </div>
+    </li>`;
   }).join('');
 
   panel.innerHTML = `
