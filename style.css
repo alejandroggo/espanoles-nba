@@ -651,3 +651,24 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .dorsales-legend { padding: 0 var(--space-4) var(--space-4); }
   .dorsales-layout { padding: 0 var(--space-4) var(--space-12); }
 }
+
+/* ── TRANSACCIONES ───────────────────────────── */
+.tr-tipo {
+  display: inline-block;
+  font-size: var(--font-xs); font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.tt-draft  { background: rgba(245,197,24,0.15);  color: #a67c00; }
+.tt-trade  { background: rgba(234,88,12,0.14);   color: #c2410c; }
+.tt-sign   { background: rgba(22,163,74,0.14);   color: #16a34a; }
+.tt-waive  { background: rgba(220,38,38,0.12);   color: #dc2626; }
+.tt-option { background: rgba(217,119,6,0.14);   color: #b45309; }
+.tt-retire { background: var(--surface-2);       color: var(--text-muted); }
+.tt-other  { background: var(--surface-2);       color: var(--text-muted); }
+[data-theme="dark"] .tt-draft  { color: #f5c518; }
+[data-theme="dark"] .tt-trade  { color: #fb923c; }
+[data-theme="dark"] .tt-sign   { color: #4ade80; }
+[data-theme="dark"] .tt-waive  { color: #f87171; }
+[data-theme="dark"] .tt-option { color: #fbbf24; }
