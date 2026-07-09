@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -50,7 +50,8 @@
       <span class="sr-only">Filtrar por año</span>
       <select id="pr-year" class="sel"></select>
     </label>
-    <button type="button" id="pr-group" class="toggle-chip" aria-pressed="false" onclick="togglePrGroup()">Agrupar por jugador</button>
+    <button type="button" id="pr-group-player" class="toggle-chip" aria-pressed="false" onclick="setPrGroup('player')">Agrupar por jugador</button>
+    <button type="button" id="pr-group-tipo" class="toggle-chip" aria-pressed="false" onclick="setPrGroup('tipo')">Agrupar por premio</button>
     <span class="results-count" id="pr-count"></span>
   </section>
 
@@ -85,7 +86,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 <script>initTheme(); initPremiosPage();</script>
 </body>
 </html>

@@ -584,7 +584,7 @@ let prSortAsc = false;
 let prSearch = '';
 let prTipo = '';
 let prYear = '';
-let prGrouped = false;
+let prGroup = '';   // '' | 'player' | 'tipo'
 
 const PR_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
@@ -600,6 +600,13 @@ const PR_COLS_GROUP = [
   { key: 'jugador', label: 'Jugador', sortable: true },
   { key: 'count',   label: 'Premios', sortable: true,  cls: 'td-num' },
   { key: 'desglose', label: 'Palmarés', sortable: false },
+];
+
+const PR_COLS_TIPO = [
+  { key: 'rank',      label: '#',        sortable: false, cls: 'td-rank' },
+  { key: 'tipo',      label: 'Premio',   sortable: true },
+  { key: 'count',     label: 'Veces',    sortable: true,  cls: 'td-num' },
+  { key: 'jugadores', label: 'Jugadores', sortable: false },
 ];
 
 async function initPremiosPage() {
@@ -654,12 +661,15 @@ function buildPrFilters() {
     '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
 }
 
-function togglePrGroup() {
-  prGrouped = !prGrouped;
-  const btn = document.getElementById('pr-group');
-  btn.classList.toggle('active', prGrouped);
-  btn.setAttribute('aria-pressed', String(prGrouped));
-  prSortCol = prGrouped ? 'count' : 'year';
+function setPrGroup(mode) {
+  prGroup = (prGroup === mode) ? '' : mode;
+  const bp = document.getElementById('pr-group-player');
+  const bt = document.getElementById('pr-group-tipo');
+  bp.classList.toggle('active', prGroup === 'player');
+  bp.setAttribute('aria-pressed', String(prGroup === 'player'));
+  bt.classList.toggle('active', prGroup === 'tipo');
+  bt.setAttribute('aria-pressed', String(prGroup === 'tipo'));
+  prSortCol = prGroup ? 'count' : 'year';
   prSortAsc = false;
   renderPrTable();
 }
@@ -671,7 +681,9 @@ function renderPrTable() {
     if (prSearch && !p.jugador.toLowerCase().includes(prSearch)) return false;
     return true;
   });
-  return prGrouped ? renderPrGrouped(filtered) : renderPrFlat(filtered);
+  if (prGroup === 'player') return renderPrGrouped(filtered);
+  if (prGroup === 'tipo') return renderPrGroupedTipo(filtered);
+  return renderPrFlat(filtered);
 }
 
 function renderPrHead(cols, sortCol, sortAsc) {
@@ -742,6 +754,38 @@ function renderPrGrouped(entries) {
       <td class="td-num">${g.count}</td>
       <td class="td-muted">${g.desglose}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function renderPrGroupedTipo(entries) {
+  const map = {};
+  entries.forEach(p => {
+    const g = map[p.tipo] || (map[p.tipo] = { tipo: p.tipo, count: 0, jugadores: {} });
+    g.count++;
+    g.jugadores[p.jugador] = (g.jugadores[p.jugador] || 0) + 1;
+  });
+
+  let rows = Object.values(map).map(g => ({
+    tipo: g.tipo,
+    count: g.count,
+    jugadores: Object.entries(g.jugadores).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+  }));
+
+  rows.sort((a, b) => {
+    if (prSortCol === 'tipo') return prSortAsc ? a.tipo.localeCompare(b.tipo) : b.tipo.localeCompare(a.tipo);
+    return prSortAsc ? a.count - b.count : (b.count - a.count) || a.tipo.localeCompare(b.tipo);
+  });
+
+  document.getElementById('pr-count').textContent = `${rows.length} tipo${rows.length === 1 ? '' : 's'} de premio`;
+  renderPrHead(PR_COLS_TIPO, prSortCol, prSortAsc);
+  document.getElementById('pr-body').innerHTML = rows.map((g, i) => {
+    const jl = g.jugadores.map(([jug, n]) => `${plLink(jug, jug)}${n > 1 ? ` ×${n}` : ''}`).join(', ');
+    return `<tr class="${premioRowClass(g.tipo)}">
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td>${g.tipo}</td>
+      <td class="td-num">${g.count}</td>
+      <td class="td-muted">${jl}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
 function sortPr(col) {
