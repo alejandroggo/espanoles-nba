@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -45,6 +45,15 @@
     <label class="sel-wrap">
       <span class="sr-only">Filtrar por franquicia</span>
       <select id="draft-team" class="sel"></select>
+    </label>
+    <label class="sel-wrap">
+      <span class="sr-only">Filtrar por ronda</span>
+      <select id="draft-round" class="sel">
+        <option value="">Todas las rondas</option>
+        <option value="lottery">Lotería (1-14)</option>
+        <option value="first">1ª ronda (1-30)</option>
+        <option value="second">2ª ronda (31+)</option>
+      </select>
     </label>
     <span class="results-count" id="draft-count"></span>
   </section>
@@ -86,7 +95,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 <script>initTheme(); initDraftPage();</script>
 </body>
 </html>

@@ -74,6 +74,7 @@ let draftSortCol = 'draft_anio';
 let draftSortAsc = true;
 let draftSearch = '';
 let draftTeam = '';
+let draftRound = '';
 
 const DRAFT_COLS = [
   { key: 'rank',         label: '#',       sortable: false, cls: 'td-rank' },
@@ -108,6 +109,7 @@ async function initDraftPage() {
     '<option value="">Todas las franquicias</option>' + teams.map(t => `<option value="${t}">${t}</option>`).join('');
   document.getElementById('draft-search').addEventListener('input', e => { draftSearch = e.target.value.trim().toLowerCase(); renderDraftTable(); });
   document.getElementById('draft-team').addEventListener('change', e => { draftTeam = e.target.value; renderDraftTable(); });
+  document.getElementById('draft-round').addEventListener('change', e => { draftRound = e.target.value; renderDraftTable(); });
 
   renderDraftKpis();
   renderDraftTable();
@@ -127,22 +129,10 @@ function renderDraftKpis() {
   // Equipos distintos que han elegido a un español
   const equipos = new Set(draftRows.map(j => j.draft_equipo).filter(Boolean));
 
-  // Elegidos en lotería (1-14) y en primera ronda (1-30)
-  const loteria = draftRows.filter(j => j.draft_pick >= 1 && j.draft_pick <= 14).length;
-  const primera = draftRows.filter(j => j.draft_pick >= 1 && j.draft_pick <= 30).length;
-
   document.getElementById('draft-kpis').innerHTML = `
     <div class="kpi">
       <div class="kpi-num">${best.nombre} #${best.draft_pick}</div>
       <div class="kpi-label">Pick más alto</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-num">${loteria}</div>
-      <div class="kpi-label">En lotería (1-14)</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-num">${primera}</div>
-      <div class="kpi-label">En 1ª ronda (1-30)</div>
     </div>
     <div class="kpi">
       <div class="kpi-num">${topAnios.join(' · ')}</div>
@@ -158,6 +148,10 @@ function renderDraftTable() {
   const rows = draftRows.filter(j => {
     if (draftTeam && j.draft_equipo !== draftTeam) return false;
     if (draftSearch && !j.nombre.toLowerCase().includes(draftSearch)) return false;
+    const pick = j.draft_pick || 0;
+    if (draftRound === 'lottery' && !(pick >= 1 && pick <= 14)) return false;
+    if (draftRound === 'first' && !(pick >= 1 && pick <= 30)) return false;
+    if (draftRound === 'second' && !(pick >= 31)) return false;
     return true;
   }).sort((a, b) => {
     const va = a[draftSortCol], vb = b[draftSortCol];
