@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transacciones · Españoles en la NBA</title>
-<meta name="description" content="Todos los movimientos de mercado de los jugadores españoles en la NBA: drafts, fichajes, traspasos, renovaciones y cortes.">
+<title>Jugadores · Españoles en la NBA</title>
+<meta name="description" content="Directorio de todos los jugadores españoles en la NBA. Accede al perfil completo de cada uno.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,33 +31,21 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">Las <em>Transacciones</em></h1>
-        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+        <h1 class="hero-title ag-hero">Los <em>Jugadores</em></h1>
+        <p class="hero-sub" id="hero-sub">Cargando…</p>
       </div>
-      <div class="hero-kpis" id="tr-kpis"></div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Filtros">
+  <section class="controles" aria-label="Buscar">
     <div class="search-wrap">
-      <input type="text" id="tr-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+      <input type="text" id="jug-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
     </div>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por tipo</span>
-      <select id="tr-tipo" class="sel"></select>
-    </label>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por año</span>
-      <select id="tr-year" class="sel"></select>
-    </label>
-    <span class="results-count" id="tr-count"></span>
+    <span class="results-count" id="jug-count"></span>
   </section>
 
-  <section class="tabla-wrap" aria-label="Transacciones">
-    <table id="tr-table">
-      <thead id="tr-thead"></thead>
-      <tbody id="tr-body"></tbody>
-    </table>
+  <section class="jugs-wrap">
+    <div class="jugs-grid" id="jugs-grid"></div>
   </section>
 </main>
 
@@ -85,6 +73,6 @@
 </footer>
 
 <script src="app.js?v=15"></script>
-<script>initTheme(); initTransaccionesPage();</script>
+<script>initTheme(); initJugadoresPage();</script>
 </body>
 </html>

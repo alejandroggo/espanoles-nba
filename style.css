@@ -784,3 +784,27 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 }
 
 .highs-empty { padding: 2rem; text-align: center; color: var(--text-muted); }
+
+/* ── DIRECTORIO DE JUGADORES ──────────────────── */
+.jugs-wrap { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-16); }
+.jugs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-3); }
+.jug-card {
+  display: flex; align-items: center; gap: var(--space-3);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
+  text-decoration: none; color: var(--text);
+  transition: border-color var(--transition), transform var(--transition);
+}
+.jug-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.jug-card-photo {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+  background: var(--surface-2); border: 1px solid var(--border-strong);
+}
+.jug-card-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.jug-card-info { display: flex; flex-direction: column; min-width: 0; }
+.jug-card-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jug-card-meta { font-size: var(--font-xs); color: var(--text-muted); }
+@media (max-width: 560px) {
+  .jugs-wrap { padding: 0 var(--space-4) var(--space-12); }
+  .jugs-grid { grid-template-columns: 1fr; }
+}

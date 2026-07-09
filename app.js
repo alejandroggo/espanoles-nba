@@ -1867,3 +1867,39 @@ function debutResultado(res) {
   if (/^[dl]/i.test(s)) return `<span class="tr-tipo tt-waive">${s}</span>`;   // derrota/loss → rojo
   return s;
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA JUGADORES (directorio)
+// ══════════════════════════════════════════════
+let jugsAll = [];
+let jugsSearch = '';
+
+async function initJugadoresPage() {
+  let jugadores;
+  try { jugadores = (await loadData()).jugadores || []; }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+
+  buildPlayerIds(jugadores);
+  jugsAll = [...jugadores].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+
+  document.getElementById('hero-sub').textContent = `${jugsAll.length} jugadores · pulsa para ver su ficha`;
+  document.getElementById('jug-search').addEventListener('input', e => { jugsSearch = e.target.value.trim().toLowerCase(); renderJugs(); });
+  renderJugs();
+}
+
+function renderJugs() {
+  const rows = jugsAll.filter(j => !jugsSearch || j.nombre.toLowerCase().includes(jugsSearch));
+  document.getElementById('jug-count').textContent = `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
+
+  document.getElementById('jugs-grid').innerHTML = rows.map(j => {
+    const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg` : '');
+    const meta = j.posicion || (j.draft ? `Draft ${j.draft_anio || ''}` : '');
+    return `<a class="jug-card" href="${jugadorHref(j.id)}">
+      <span class="jug-card-photo">${src ? `<img src="${src}" onerror="this.remove()" alt="">` : ''}</span>
+      <span class="jug-card-info">
+        <span class="jug-card-name">${j.nombre}</span>
+        <span class="jug-card-meta">${meta}</span>
+      </span>
+    </a>`;
+  }).join('') || '<p class="td-muted" style="padding:2rem">Sin resultados.</p>';
+}
