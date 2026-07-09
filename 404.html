@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Página no encontrada · Españoles en la NBA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
+<link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css?v=16">
+<style>
+  .nf-wrap { max-width: 640px; margin: 0 auto; padding: var(--space-16) var(--space-6); text-align: center; }
+  .nf-code { font-family: var(--display); font-size: clamp(5rem, 20vw, 10rem); line-height: 0.9; color: var(--accent); }
+  .nf-title { font-family: var(--display); font-size: var(--font-xl); letter-spacing: 0.03em; margin-top: var(--space-2); }
+  .nf-sub { color: var(--text-muted); margin-top: var(--space-3); }
+  .nf-btn {
+    display: inline-block; margin-top: var(--space-6);
+    padding: var(--space-3) var(--space-6);
+    background: var(--accent); color: var(--accent-contrast);
+    border-radius: var(--radius-md); text-decoration: none; font-weight: 600;
+  }
+  .nf-btn:hover { background: var(--accent-hover); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="/espanoles-nba/index.html">ESPAÑOLES <span>EN LA</span> NBA</a>
+    <div class="header-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="nf-wrap">
+    <div class="nf-code">404</div>
+    <h1 class="nf-title">Página no encontrada</h1>
+    <p class="nf-sub">Esta página no existe o se ha movido. Te llevamos al inicio…</p>
+    <a class="nf-btn" href="/espanoles-nba/index.html">Ir al inicio</a>
+  </div>
+</main>
+
+<script src="app.js?v=16"></script>
+<script>
+  initTheme();
+  // Redirección automática al inicio tras un breve momento
+  setTimeout(function () { location.replace('/espanoles-nba/index.html'); }, 2500);
+</script>
+</body>
+</html>

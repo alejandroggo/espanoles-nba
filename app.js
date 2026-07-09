@@ -7,6 +7,58 @@ function initTheme() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if ((localStorage.getItem('ag-theme') || 'auto') === 'auto') renderTheme('auto');
   });
+  buildNav();
+  showLoadBar();
+}
+
+// ── NAVEGACIÓN GLOBAL ─────────────────────────
+const NAV_LINKS = [
+  ['Inicio', 'index.html'], ['Draft', 'draft.html'], ['Ranking', 'ranking.html'],
+  ['Salarios', 'salarios.html'], ['Premios', 'premios.html'], ['Summer League', 'summer-league.html'],
+  ['Dorsales', 'dorsales.html'], ['Transacciones', 'transacciones.html'], ['Career Highs', 'career-highs.html'],
+  ['Debut', 'debut.html'], ['Jugadores', 'jugadores.html'], ['Test', 'test.html'],
+];
+function buildNav() {
+  const right = document.querySelector('.header-right');
+  if (!right || document.getElementById('nav-menu')) return;
+  const here = (location.pathname.split('/').pop() || 'index.html');
+  const items = NAV_LINKS.map(([label, href]) =>
+    `<a href="${href}" class="nav-item${href === here ? ' current' : ''}">${label}</a>`).join('');
+  const wrap = document.createElement('div');
+  wrap.className = 'nav-menu';
+  wrap.id = 'nav-menu';
+  wrap.innerHTML = `
+    <button class="nav-toggle" id="nav-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Menú de secciones" onclick="toggleNav(event)">Secciones ▾</button>
+    <div class="nav-dropdown" id="nav-dropdown" hidden>${items}</div>`;
+  right.insertBefore(wrap, right.firstChild);
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) closeNav();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+}
+function toggleNav(e) {
+  e && e.stopPropagation();
+  const dd = document.getElementById('nav-dropdown'), btn = document.getElementById('nav-toggle');
+  const open = dd.hasAttribute('hidden');
+  if (open) { dd.removeAttribute('hidden'); btn.setAttribute('aria-expanded', 'true'); }
+  else closeNav();
+}
+function closeNav() {
+  const dd = document.getElementById('nav-dropdown'), btn = document.getElementById('nav-toggle');
+  if (dd) dd.setAttribute('hidden', '');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+// ── BARRA DE CARGA ────────────────────────────
+function showLoadBar() {
+  if (document.getElementById('load-bar')) return;
+  const bar = document.createElement('div');
+  bar.className = 'load-bar'; bar.id = 'load-bar';
+  document.body.appendChild(bar);
+}
+function hideLoadBar() {
+  const bar = document.getElementById('load-bar');
+  if (bar) { bar.classList.add('done'); setTimeout(() => bar.remove(), 400); }
 }
 
 function renderTheme(pref) {
@@ -39,6 +91,7 @@ async function loadData() {
   if (!res.ok) throw new Error('No se pudo cargar data.json');
   const data = await res.json();
   setLastUpdate(data.actualizado);
+  hideLoadBar();
   return data;
 }
 
@@ -53,6 +106,14 @@ function setLastUpdate(iso) {
   }
 }
 
+// Guarda un parámetro en la URL sin recargar (deep-linking de modos/filtros)
+function updateUrlParam(key, value) {
+  const url = new URL(location.href);
+  if (value == null || value === '') url.searchParams.delete(key);
+  else url.searchParams.set(key, value);
+  history.replaceState(null, '', url);
+}
+
 // Enlaces a la ficha del jugador (nombre → id)
 let PLAYER_IDS = {};
 function buildPlayerIds(jugadores) {
@@ -64,6 +125,28 @@ function plLink(name, inner) {
   const id = PLAYER_IDS[drNorm(name)];
   const content = inner == null ? name : inner;
   return id ? `<a class="pl-link" href="${jugadorHref(id)}">${content}</a>` : content;
+}
+
+// ══════════════════════════════════════════════
+// HOME · subtítulo dinámico
+// ══════════════════════════════════════════════
+async function initHome() {
+  const sub = document.getElementById('hero-sub');
+  let data;
+  try { data = await loadData(); }
+  catch (e) { return; }   // se mantiene el subtítulo por defecto
+
+  const J = data.jugadores || [];
+  const conNBA = J.filter(j => (j.partidos || 0) > 0).length;
+  const premios = J.reduce((s, j) => s + ((j.premios || []).length), 0);
+  const totalSal = J.reduce((s, j) => s + (j.ganancias || 0), 0);
+
+  const partes = [`${J.length} jugadores`];
+  if (conNBA) partes.push(`${conNBA} con partidos NBA`);
+  if (premios) partes.push(`${premios} premios`);
+  if (totalSal) partes.push(`${fmtDinero(totalSal)} en salarios`);
+
+  if (sub) sub.textContent = partes.join(' · ');
 }
 
 // ══════════════════════════════════════════════
@@ -162,6 +245,8 @@ function renderDraftTable() {
   const countEl = document.getElementById('draft-count');
   if (countEl) countEl.textContent = `${rows.length} elegido${rows.length === 1 ? '' : 's'}`;
 
+  const bestPick = Math.min(...draftRows.map(j => j.draft_pick || Infinity));
+
   document.getElementById('draft-thead').innerHTML = `<tr>
     ${DRAFT_COLS.map(c => {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
@@ -177,7 +262,7 @@ function renderDraftTable() {
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
-      <td class="td-num td-pick">#${j.draft_pick}</td>
+      <td class="td-num td-pick${j.draft_pick === bestPick ? ' td-leader' : ''}">#${j.draft_pick}</td>
       <td class="td-num">${j.draft_equipo || '—'}</td>
       <td class="td-num">${j.draft_anio}</td>
       <td class="td-num td-muted">${j.draft_fecha || '—'}</td>
@@ -306,13 +391,14 @@ function renderSalariosTable() {
 
   // barra escalada respecto a la mayor cuota (el líder llena la barra)
   const maxPct = Math.max(...salRows.map(j => j.pct || 0), 0);
+  const maxGan = Math.max(...salRows.map(j => j.ganancias || 0), 0);
 
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
-      <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
+      <td class="td-num td-dinero${maxGan && j.ganancias === maxGan ? ' td-leader' : ''}">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
       <td class="td-num">${fmtDinero(j.sueldo_pj)}</td>
@@ -407,10 +493,28 @@ async function initSummerPage() {
   renderSlKpis();
   buildSlYearFilter();
 
+  // Agrupación desde la URL (?grupo=player|year)
+  const grupo = new URLSearchParams(location.search).get('grupo');
+  if (grupo === 'player' || grupo === 'year') {
+    slGroup = grupo;
+    slSortCol = 'count';
+    syncSlGroupButtons();
+  }
+
   document.getElementById('sl-search').addEventListener('input', e => { slSearch = e.target.value.trim().toLowerCase(); renderSlTable(); });
   document.getElementById('sl-year').addEventListener('change', e => { slYear = e.target.value; renderSlTable(); });
 
   renderSlTable();
+}
+
+function syncSlGroupButtons() {
+  const bp = document.getElementById('sl-group-player');
+  const by = document.getElementById('sl-group-year');
+  if (!bp || !by) return;
+  bp.classList.toggle('active', slGroup === 'player');
+  bp.setAttribute('aria-pressed', String(slGroup === 'player'));
+  by.classList.toggle('active', slGroup === 'year');
+  by.setAttribute('aria-pressed', String(slGroup === 'year'));
 }
 
 function renderSlKpis() {
@@ -435,15 +539,11 @@ function buildSlYearFilter() {
 
 function setSlGroup(mode) {
   slGroup = (slGroup === mode) ? '' : mode;   // clic en el activo lo desactiva
-  const bp = document.getElementById('sl-group-player');
-  const by = document.getElementById('sl-group-year');
-  bp.classList.toggle('active', slGroup === 'player');
-  bp.setAttribute('aria-pressed', String(slGroup === 'player'));
-  by.classList.toggle('active', slGroup === 'year');
-  by.setAttribute('aria-pressed', String(slGroup === 'year'));
+  syncSlGroupButtons();
   // orden por defecto de cada modo
   slSortCol = slGroup ? 'count' : 'year';
   slSortAsc = false;
+  updateUrlParam('grupo', slGroup);
   renderSlTable();
 }
 
@@ -812,7 +912,7 @@ const RK_STAT_KEYS = [
 const RK_COLS_PG = [
   { key: 'rank',      label: '#',   sortable: false, cls: 'td-rank' },
   { key: 'foto',      label: '',    sortable: false },
-  { key: 'nombre',    label: 'Jugador', sortable: true },
+  { key: 'nombre',    label: 'Jugador', sortable: true, cls: 'td-nombre' },
   { key: 'partidos',  label: 'PJ',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'min_g',     label: 'MIN', sortable: true, cls: 'td-num', fmt: fmtDec1 },
   { key: 'pts_g',     label: 'PTS', sortable: true, cls: 'td-num', fmt: fmtDec1 },
@@ -828,7 +928,7 @@ const RK_COLS_PG = [
 const RK_COLS_TOT = [
   { key: 'rank',        label: '#',    sortable: false, cls: 'td-rank' },
   { key: 'foto',        label: '',     sortable: false },
-  { key: 'nombre',      label: 'Jugador', sortable: true },
+  { key: 'nombre',      label: 'Jugador', sortable: true, cls: 'td-nombre' },
   { key: 'partidos',         label: 'PJ',   sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'partidos_titular', label: 'GS',   sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'pct_gs',           label: '%GS',  sortable: true, cls: 'td-num', fmt: fmtPct },
@@ -860,6 +960,12 @@ async function initRankingPage() {
   buildPlayerIds(data.jugadores);
   buildRkRanks();
 
+  // Modo desde la URL (?modo=totales)
+  const modo = new URLSearchParams(location.search).get('modo');
+  if (modo === 'totales' || modo === 'tot') rkMode = 'tot';
+  rkSortCol = rkMode === 'pg' ? 'pts_g' : 'pts_total';
+  syncRkModeButtons();
+
   document.getElementById('hero-sub').textContent =
     `${rkAll.length} jugadores con partidos en la NBA · Estadísticas de carrera`;
 
@@ -879,15 +985,20 @@ function renderRkKpis() {
     <div class="kpi"><div class="kpi-num">${fmtEnt(asist.ast_total)}</div><div class="kpi-label">Más asistencias · ${asist.nombre || '—'}</div></div>`;
 }
 
+function syncRkModeButtons() {
+  const pg = document.getElementById('rk-mode-pg'), tot = document.getElementById('rk-mode-tot');
+  if (!pg || !tot) return;
+  pg.classList.toggle('active', rkMode === 'pg'); pg.setAttribute('aria-pressed', String(rkMode === 'pg'));
+  tot.classList.toggle('active', rkMode === 'tot'); tot.setAttribute('aria-pressed', String(rkMode === 'tot'));
+}
+
 function setRkMode(mode) {
   if (rkMode === mode) return;
   rkMode = mode;
-  document.getElementById('rk-mode-pg').classList.toggle('active', mode === 'pg');
-  document.getElementById('rk-mode-pg').setAttribute('aria-pressed', String(mode === 'pg'));
-  document.getElementById('rk-mode-tot').classList.toggle('active', mode === 'tot');
-  document.getElementById('rk-mode-tot').setAttribute('aria-pressed', String(mode === 'tot'));
+  syncRkModeButtons();
   rkSortCol = mode === 'pg' ? 'pts_g' : 'pts_total';
   rkSortAsc = false;
+  updateUrlParam('modo', mode === 'tot' ? 'totales' : 'partido');
   renderRkTable();
 }
 
@@ -1643,18 +1754,30 @@ async function initHighsPage() {
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   highsJ = (data.jugadores || []).filter(j => (j.temporadas_data || []).length);
   buildPlayerIds(highsJ);
+
+  // Modo desde la URL (?modo=total|pg|game)
+  const modo = new URLSearchParams(location.search).get('modo');
+  if (['total', 'pg', 'game'].includes(modo)) highsMode = modo;
+  syncHighsButtons();
+
   renderHighs();
+}
+
+function syncHighsButtons() {
+  ['total', 'pg', 'game'].forEach(x => {
+    const btn = document.getElementById('hi-mode-' + x);
+    if (!btn) return;
+    btn.classList.toggle('active', x === highsMode);
+    btn.setAttribute('aria-pressed', String(x === highsMode));
+  });
 }
 
 function setHighsMode(m) {
   if (highsMode === m) return;
   highsMode = m;
-  ['total', 'pg', 'game'].forEach(x => {
-    const btn = document.getElementById('hi-mode-' + x);
-    btn.classList.toggle('active', x === m);
-    btn.setAttribute('aria-pressed', String(x === m));
-  });
+  syncHighsButtons();
   highsSortCol = 'pts_g'; highsSortAsc = false;
+  updateUrlParam('modo', m);
   renderHighs();
 }
 
@@ -1700,7 +1823,7 @@ function renderHighs() {
   const cols = [
     { key: 'rank', label: '#', cls: 'td-rank', sortable: false },
     { key: 'foto', label: '', sortable: false },
-    { key: 'nombre', label: 'Jugador', sortable: true },
+    { key: 'nombre', label: 'Jugador', sortable: true, cls: 'td-nombre' },
     ...stats.map(s => ({ ...s, cls: 'td-num', sortable: true })),
   ];
 
@@ -1755,7 +1878,7 @@ let debutSearch = '';
 const DEBUT_COLS = [
   { key: 'rank',      label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'foto',      label: '',        sortable: false },
-  { key: 'nombre',    label: 'Jugador', sortable: true },
+  { key: 'nombre',    label: 'Jugador', sortable: true, cls: 'td-nombre' },
   { key: 'fecha',     label: 'Fecha',   sortable: true, cls: 'td-center' },
   { key: 'edad',      label: 'Edad',    sortable: true, cls: 'td-num' },
   { key: 'equipo',    label: 'Equipo',  sortable: true, cls: 'td-center' },
@@ -1831,6 +1954,8 @@ function renderDebutTable() {
 
   document.getElementById('debut-count').textContent = `${rows.length} debut${rows.length === 1 ? '' : 's'}`;
 
+  const maxPts = Math.max(...debutRows.map(r => r.pts ?? -Infinity));
+
   document.getElementById('debut-thead').innerHTML = `<tr>
     ${DEBUT_COLS.map(c => {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
@@ -1852,7 +1977,7 @@ function renderDebutTable() {
       <td class="td-center">${r.rival || '—'}</td>
       <td class="td-center">${debutResultado(r.resultado)}</td>
       <td class="td-num">${r.min || '—'}</td>
-      <td class="td-num">${r.pts ?? '—'}</td>
+      <td class="td-num${(r.pts != null && r.pts === maxPts) ? ' td-leader' : ''}">${r.pts ?? '—'}</td>
       <td class="td-num">${r.rbd ?? '—'}</td>
       <td class="td-num">${r.ast ?? '—'}</td>
       <td class="td-num">${r.stl ?? '—'}</td>

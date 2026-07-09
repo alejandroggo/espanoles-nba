@@ -171,6 +171,59 @@ main { flex: 1; }
 }
 .theme-toggle:hover { border-color: var(--text-muted); color: var(--text); }
 
+/* ── NAV MENU ────────────────────────────────── */
+.nav-menu { position: relative; }
+.nav-toggle {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  font-size: var(--font-xs);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; white-space: nowrap;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  transition: border-color var(--transition), color var(--transition);
+}
+.nav-toggle:hover { border-color: var(--text-muted); color: var(--text); }
+.nav-dropdown {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2);
+  display: flex; flex-direction: column;
+  z-index: 200;
+}
+.nav-dropdown[hidden] { display: none; }
+.nav-item {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  color: var(--text); text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+}
+.nav-item:hover { background: var(--surface-2); color: var(--accent); }
+.nav-item.current { color: var(--accent); font-weight: 600; }
+
+/* ── BARRA DE CARGA ──────────────────────────── */
+.load-bar {
+  position: fixed; top: 0; left: 0; z-index: 300;
+  height: 3px; width: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background-size: 40% 100%; background-repeat: no-repeat;
+  animation: load-slide 1.1s ease-in-out infinite;
+}
+@keyframes load-slide {
+  0%   { background-position: -40% 0; }
+  100% { background-position: 140% 0; }
+}
+.load-bar.done { animation: none; opacity: 0; transition: opacity 0.35s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .load-bar { animation: none; background: var(--accent); background-size: 100% 100%; opacity: 0.6; }
+}
+
 /* ── HERO ────────────────────────────────────── */
 .hero {
   max-width: 1400px; margin: 0 auto;
@@ -321,7 +374,7 @@ thead th {
   border-bottom: 2px solid var(--border);
   text-align: left;
   white-space: nowrap;
-  position: sticky; top: 56px;
+  position: sticky; top: 56px; z-index: 10;
 }
 thead th.th-sortable { cursor: pointer; user-select: none; transition: color var(--transition); }
 thead th.th-sortable:hover { color: var(--text); }
@@ -476,6 +529,18 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .tabla-wrap { padding: 0 var(--space-4) var(--space-6); overflow-x: auto; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
   thead th { top: 48px; }
+  /* Columna de jugador fija al hacer scroll horizontal en tablas anchas */
+  td.td-nombre {
+    position: sticky; left: 0; z-index: 3;
+    background: var(--bg);
+    box-shadow: 1px 0 0 var(--border);
+  }
+  th.td-nombre {
+    position: sticky; left: 0; z-index: 11;
+    background: var(--surface-2);
+    box-shadow: 1px 0 0 var(--border);
+  }
+  tbody tr:hover td.td-nombre { background: var(--surface-2); }
 }
 
 /* ── FOOTER ──────────────────────────────────── */
