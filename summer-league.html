@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -31,7 +31,7 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero"><em>Summer</em> League</h1>
+        <h1 class="hero-title ag-hero">LA <em>Summer League</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
       <div class="hero-kpis" id="sl-kpis"></div>
@@ -46,7 +46,8 @@
       <span class="sr-only">Filtrar por año</span>
       <select id="sl-year" class="sel"></select>
     </label>
-    <button type="button" id="sl-group" class="toggle-chip" aria-pressed="false" onclick="toggleSlGroup()">Agrupar por jugador</button>
+    <button type="button" id="sl-group-player" class="toggle-chip" aria-pressed="false" onclick="setSlGroup('player')">Agrupar por jugador</button>
+    <button type="button" id="sl-group-year" class="toggle-chip" aria-pressed="false" onclick="setSlGroup('year')">Agrupar por año</button>
     <span class="results-count" id="sl-count"></span>
   </section>
 
@@ -81,7 +82,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 <script>initTheme(); initSummerPage();</script>
 </body>
 </html>

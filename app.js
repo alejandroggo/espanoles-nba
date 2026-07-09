@@ -362,13 +362,20 @@ let slSortCol = 'year';
 let slSortAsc = false;
 let slSearch = '';
 let slYear = '';
-let slGrouped = false;
+let slGroup = '';   // '' | 'player' | 'year'
 
 const SL_COLS = [
   { key: 'rank',    label: '#',       sortable: false, cls: 'td-rank' },
   { key: 'jugador', label: 'Jugador', sortable: true },
   { key: 'year',    label: 'Año',     sortable: true,  cls: 'td-num' },
   { key: 'equipo',  label: 'Equipo',  sortable: true,  cls: 'td-center' },
+];
+
+const SL_COLS_YEAR = [
+  { key: 'rank',      label: '#',              sortable: false, cls: 'td-rank' },
+  { key: 'year',      label: 'Año',            sortable: true,  cls: 'td-num' },
+  { key: 'count',     label: 'Participaciones', sortable: true, cls: 'td-num' },
+  { key: 'jugadores', label: 'Jugadores',      sortable: false },
 ];
 
 const SL_COLS_GROUP = [
@@ -426,13 +433,16 @@ function buildSlYearFilter() {
     '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
 }
 
-function toggleSlGroup() {
-  slGrouped = !slGrouped;
-  const btn = document.getElementById('sl-group');
-  btn.classList.toggle('active', slGrouped);
-  btn.setAttribute('aria-pressed', String(slGrouped));
-  // reajustar orden por defecto de cada modo
-  slSortCol = slGrouped ? 'count' : 'year';
+function setSlGroup(mode) {
+  slGroup = (slGroup === mode) ? '' : mode;   // clic en el activo lo desactiva
+  const bp = document.getElementById('sl-group-player');
+  const by = document.getElementById('sl-group-year');
+  bp.classList.toggle('active', slGroup === 'player');
+  bp.setAttribute('aria-pressed', String(slGroup === 'player'));
+  by.classList.toggle('active', slGroup === 'year');
+  by.setAttribute('aria-pressed', String(slGroup === 'year'));
+  // orden por defecto de cada modo
+  slSortCol = slGroup ? 'count' : 'year';
   slSortAsc = false;
   renderSlTable();
 }
@@ -447,7 +457,9 @@ function renderSlTable() {
     return true;
   });
 
-  return slGrouped ? renderSlGrouped(filtered) : renderSlFlat(filtered);
+  if (slGroup === 'player') return renderSlGrouped(filtered);
+  if (slGroup === 'year') return renderSlGroupedYear(filtered);
+  return renderSlFlat(filtered);
 }
 
 function renderSlHead(cols) {
@@ -523,6 +535,38 @@ function renderSlGrouped(entries) {
       <td class="td-num">${g.years.join(', ') || '—'}</td>
       <td class="td-center">${g.equipos.join(', ') || '—'}</td>
     </tr>`).join('') || `<tr><td colspan="5" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function renderSlGroupedYear(entries) {
+  const map = {};
+  entries.forEach(s => {
+    if (!s.year) return;
+    const g = map[s.year] || (map[s.year] = { year: s.year, jugadores: [] });
+    g.jugadores.push(s.jugador);
+  });
+
+  let rows = Object.values(map).map(g => ({
+    year: g.year,
+    count: g.jugadores.length,
+    jugadores: [...new Set(g.jugadores)],
+  }));
+
+  rows.sort((a, b) => {
+    if (slSortCol === 'count') return slSortAsc ? a.count - b.count : (b.count - a.count) || b.year - a.year;
+    // por defecto y 'year'
+    return slSortAsc ? a.year - b.year : b.year - a.year;
+  });
+
+  document.getElementById('sl-count').textContent = `${rows.length} año${rows.length === 1 ? '' : 's'}`;
+
+  renderSlHead(SL_COLS_YEAR);
+  document.getElementById('sl-body').innerHTML = rows.map((g, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-num">${g.year}</td>
+      <td class="td-num">${g.count}</td>
+      <td>${g.jugadores.map(j => plLink(j, j)).join(', ')}</td>
+    </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
 function sortSl(col) {
