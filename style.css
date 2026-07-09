@@ -526,3 +526,83 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   }
   .ag-footer-meta { text-align: left; }
 }
+
+/* ── DORSALES ────────────────────────────────── */
+.kpi-sub { font-size: 0.9rem; color: var(--text-muted); }
+
+.dorsales-legend {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-4);
+  display: flex; flex-wrap: wrap; gap: var(--space-4);
+  font-size: var(--font-sm); color: var(--text-muted);
+}
+.leg-item { display: inline-flex; align-items: center; gap: var(--space-2); }
+.leg-chip { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border-strong); }
+.leg-chip.j0 { background: var(--surface); }
+.leg-chip.j1 { background: #2563eb; border-color: #2563eb; }
+.leg-chip.j2 { background: #16a34a; border-color: #16a34a; }
+.leg-chip.j3 { background: var(--accent); border-color: var(--accent); }
+
+.dorsales-layout {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-16);
+  display: grid; grid-template-columns: 1fr 320px; gap: var(--space-8);
+  align-items: start;
+}
+.dorsales-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--space-2);
+}
+.jersey {
+  border: none; background: none; cursor: pointer; padding: 0;
+  transition: transform var(--transition);
+}
+.jersey:hover { transform: translateY(-3px); }
+.jersey.sel { transform: translateY(-3px); }
+.jersey-svg { width: 100%; height: auto; display: block; }
+.jersey-shape {
+  fill: var(--surface);
+  stroke: var(--border-strong); stroke-width: 1.5;
+  transition: fill var(--transition), stroke var(--transition);
+}
+.jersey-num {
+  font-family: var(--display); font-size: 22px;
+  fill: var(--text-muted);
+}
+.jersey.j1 .jersey-shape { fill: #2563eb; stroke: #1d4ed8; }
+.jersey.j2 .jersey-shape { fill: #16a34a; stroke: #15803d; }
+.jersey.j3 .jersey-shape { fill: var(--accent); stroke: var(--accent-hover); }
+.jersey.j1 .jersey-num,
+.jersey.j2 .jersey-num,
+.jersey.j3 .jersey-num { fill: #fff; }
+.jersey.sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
+
+.dorsal-detail {
+  position: sticky; top: 72px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  min-height: 160px;
+}
+.dorsal-hint { color: var(--text-muted); font-size: var(--font-sm); }
+.dorsal-head { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); }
+.dorsal-big { font-family: var(--display); font-size: 3rem; line-height: 1; color: var(--accent); }
+.dorsal-count { font-size: var(--font-sm); color: var(--text-muted); }
+.dorsal-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.dorsal-player { display: flex; flex-direction: column; gap: 2px; }
+.dp-name { font-weight: 600; }
+.dp-meta { display: flex; flex-direction: column; gap: 1px; font-size: var(--font-xs); color: var(--text-muted); }
+.dp-stint b { color: var(--text); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .dorsales-layout { grid-template-columns: 1fr; }
+  .dorsal-detail { position: static; order: -1; }
+}
+@media (max-width: 560px) {
+  .dorsales-grid { grid-template-columns: repeat(5, 1fr); }
+  .dorsales-legend { padding: 0 var(--space-4) var(--space-4); }
+  .dorsales-layout { padding: 0 var(--space-4) var(--space-12); }
+}
