@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premios · Españoles en la NBA</title>
-<meta name="description" content="Todos los premios y reconocimientos individuales de los jugadores españoles en la NBA: MVP, All-Star, All-NBA, ROY y más.">
+<title>Career Highs · Españoles en la NBA</title>
+<meta name="description" content="Los máximos de los españoles en la NBA: mejores registros en un solo partido y en una sola temporada.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,35 +31,21 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">Los <em>Premios</em></h1>
-        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+        <h1 class="hero-title ag-hero">Career <em>Highs</em></h1>
+        <p class="hero-sub" id="hero-sub">Los mejores registros de los españoles</p>
       </div>
-      <div class="hero-kpis" id="pr-kpis"></div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Filtros">
-    <div class="search-wrap">
-      <input type="text" id="pr-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+  <section class="controles" aria-label="Modo">
+    <div class="mode-switch" role="group" aria-label="Tipo de máximo">
+      <button type="button" id="hi-mode-season" class="toggle-chip active" aria-pressed="true" onclick="setHighsMode('season')">En una temporada</button>
+      <button type="button" id="hi-mode-game" class="toggle-chip" aria-pressed="false" onclick="setHighsMode('game')">En un partido</button>
     </div>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por tipo</span>
-      <select id="pr-tipo" class="sel"></select>
-    </label>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por año</span>
-      <select id="pr-year" class="sel"></select>
-    </label>
-    <button type="button" id="pr-group-player" class="toggle-chip" aria-pressed="false" onclick="setPrGroup('player')">Agrupar por jugador</button>
-    <button type="button" id="pr-group-tipo" class="toggle-chip" aria-pressed="false" onclick="setPrGroup('tipo')">Agrupar por premio</button>
-    <span class="results-count" id="pr-count"></span>
   </section>
 
-  <section class="tabla-wrap" aria-label="Premios y reconocimientos">
-    <table id="pr-table">
-      <thead id="pr-thead"></thead>
-      <tbody id="pr-body"></tbody>
-    </table>
+  <section class="highs-wrap">
+    <div class="highs-grid" id="highs-grid"></div>
   </section>
 </main>
 
@@ -87,6 +73,6 @@
 </footer>
 
 <script src="app.js?v=10"></script>
-<script>initTheme(); initPremiosPage();</script>
+<script>initTheme(); initHighsPage();</script>
 </body>
 </html>
