@@ -53,6 +53,19 @@ function setLastUpdate(iso) {
   }
 }
 
+// Enlaces a la ficha del jugador (nombre → id)
+let PLAYER_IDS = {};
+function buildPlayerIds(jugadores) {
+  PLAYER_IDS = {};
+  (jugadores || []).forEach(j => { PLAYER_IDS[drNorm(j.nombre)] = j.id; });
+}
+// Envuelve `inner` (o el nombre) en un enlace a la ficha si el jugador existe
+function plLink(name, inner) {
+  const id = PLAYER_IDS[drNorm(name)];
+  const content = inner == null ? name : inner;
+  return id ? `<a class="pl-link" href="${jugadorHref(id)}">${content}</a>` : content;
+}
+
 // ══════════════════════════════════════════════
 // PÁGINA DRAFT
 // ══════════════════════════════════════════════
@@ -80,6 +93,7 @@ async function initDraftPage() {
     return;
   }
 
+  buildPlayerIds(jugadores);
   draftRows = jugadores.filter(j => j.draft);
   const undrafted = jugadores.filter(j => !j.draft);
 
@@ -139,8 +153,8 @@ function renderDraftTable() {
   document.getElementById('draft-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
-      <td class="td-nombre">${j.nombre}</td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
+      <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-pick">#${j.draft_pick}</td>
       <td class="td-num">${j.draft_equipo || '—'}</td>
       <td class="td-num">${j.draft_anio}</td>
@@ -159,10 +173,10 @@ function renderUndrafted(undrafted) {
   document.getElementById('undrafted-grid').innerHTML = undrafted.map(j => {
     const debutAnio = (j.primer_partido?.fecha || '').match(/\d{4}/)?.[0];
     return `
-    <div class="undrafted-card">
+    <a class="undrafted-card pl-link" href="${jugadorHref(j.id)}">
       <div class="undrafted-nombre">${j.nombre}</div>
       <div class="undrafted-meta">${j.posicion || ''}${debutAnio ? ` · Debut ${debutAnio}` : ''}</div>
-    </div>`;
+    </a>`;
   }).join('') || '<p class="td-muted">No hay jugadores undrafted.</p>';
 }
 
@@ -201,6 +215,7 @@ async function initSalariosPage() {
     return;
   }
 
+  buildPlayerIds(jugadores);
   // Debutados en la NBA o con contrato firmado (los tres rookies)
   salRows = jugadores.filter(j => (j.partidos || 0) > 0 || ROOKIES_CONTRATO.includes(j.nombre));
 
@@ -273,8 +288,8 @@ function renderSalariosTable() {
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>
-      <td class="td-nombre">${j.nombre}</td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
+      <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
@@ -352,6 +367,7 @@ async function initSummerPage() {
   }
 
   // Lista propia (incluye jugadores no-NBA). Compat: si viniera por-jugador, se aplana.
+  buildPlayerIds(data.jugadores);
   slAll = (data.summer_league || []).slice();
   if (!slAll.length) {
     slAll = (data.jugadores || []).flatMap(j =>
@@ -439,7 +455,7 @@ function renderSlFlat(rows) {
   document.getElementById('sl-body').innerHTML = rows.map((s, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-nombre">${s.jugador}</td>
+      <td class="td-nombre">${plLink(s.jugador, s.jugador)}</td>
       <td class="td-num">${s.year || '—'}</td>
       <td class="td-center">${s.equipo || '—'}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
@@ -480,7 +496,7 @@ function renderSlGrouped(entries) {
   document.getElementById('sl-body').innerHTML = rows.map((g, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-nombre">${g.jugador}</td>
+      <td class="td-nombre">${plLink(g.jugador, g.jugador)}</td>
       <td class="td-num">${g.count}</td>
       <td class="td-num">${g.years.join(', ') || '—'}</td>
       <td class="td-center">${g.equipos.join(', ') || '—'}</td>
@@ -529,6 +545,7 @@ async function initPremiosPage() {
     return;
   }
 
+  buildPlayerIds(data.jugadores);
   prAll = (data.jugadores || []).flatMap(j =>
     (j.premios || []).map(p => ({
       tipo: p.tipo,
@@ -615,7 +632,7 @@ function renderPrFlat(rows) {
   document.getElementById('pr-body').innerHTML = rows.map((p, i) => `
     <tr class="${premioRowClass(p.tipo)}">
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-nombre">${p.jugador}</td>
+      <td class="td-nombre">${plLink(p.jugador, p.jugador)}</td>
       <td class="td-num">${p.year || '—'}</td>
       <td class="td-center">${p.team || '—'}</td>
       <td>${p.tipo}</td>
@@ -655,7 +672,7 @@ function renderPrGrouped(entries) {
   document.getElementById('pr-body').innerHTML = rows.map((g, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-nombre">${g.jugador}</td>
+      <td class="td-nombre">${plLink(g.jugador, g.jugador)}</td>
       <td class="td-num">${g.count}</td>
       <td class="td-muted">${g.desglose}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
@@ -730,6 +747,7 @@ async function initRankingPage() {
 
   rkAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
   rkAll.forEach(j => { j.pct_gs = j.partidos ? (j.partidos_titular || 0) / j.partidos : 0; });
+  buildPlayerIds(data.jugadores);
   buildRkRanks();
 
   document.getElementById('hero-sub').textContent =
@@ -789,8 +807,8 @@ function renderRkTable() {
     <tr>
       ${cols.map(c => {
         if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
-        if (c.key === 'foto') return `<td class="td-foto">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</td>`;
-        if (c.key === 'nombre') return `<td class="td-nombre">${j.nombre}</td>`;
+        if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>`;
+        if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
         const val = c.fmt ? c.fmt(j[c.key]) : (j[c.key] ?? '—');
         const hl = rkSortCol === c.key ? ' td-hl' : '';
         const rank = (c.fmt && rkRanks[c.key] && j[c.key] != null) ? rkRanks[c.key][j.id] : null;
@@ -873,6 +891,7 @@ async function initDorsalesPage() {
   drAll = dorsales;
   drMeta = {};
   (data.jugadores || []).forEach(j => { drMeta[drNorm(j.nombre)] = j; });
+  buildPlayerIds(data.jugadores);
   drByNum = {};
   for (let n = 0; n <= 99; n++) drByNum[n] = [];
   dorsales.forEach(d => {
@@ -1019,9 +1038,9 @@ function showDorsal(n) {
     const notaHtml = notas.length ? `<span class="dp-nota">${notas.join('<br>')}</span>` : '';
 
     return `<li class="dorsal-player">
-      ${drPhoto(jug)}
+      ${plLink(jug, drPhoto(jug))}
       <div class="dp-info">
-        <span class="dp-name">${jug}</span>
+        <span class="dp-name">${plLink(jug, jug)}</span>
         <div class="dp-teams">${teamsHtml}</div>
         ${notaHtml}
       </div>
@@ -1088,6 +1107,7 @@ async function initTransaccionesPage() {
     return;
   }
 
+  buildPlayerIds(data.jugadores);
   trAll = (data.transacciones || []).filter(t => t.tipo);
 
   document.getElementById('hero-sub').textContent =
@@ -1152,7 +1172,7 @@ function renderTrTable() {
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
-      <td class="td-nombre">${t.jugador}</td>
+      <td class="td-nombre">${plLink(t.jugador, t.jugador)}</td>
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
       <td class="td-center">${t.equipo1 || '—'}</td>
       <td class="td-center">${t.equipo2 || '—'}</td>
@@ -1165,4 +1185,171 @@ function sortTr(col) {
   if (trSortCol === col) trSortAsc = !trSortAsc;
   else { trSortCol = col; trSortAsc = (col === 'jugador' || col === 'tipo'); }
   renderTrTable();
+}
+
+// ══════════════════════════════════════════════
+// FICHA DE JUGADOR
+// ══════════════════════════════════════════════
+function jugadorHref(id) { return `jugador.html?id=${encodeURIComponent(id)}`; }
+
+function jugPhoto(j, cls) {
+  const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg` : '');
+  return `<span class="jug-photo ${cls || ''}">${src ? `<img src="${src}" onerror="this.remove()" alt="${j.nombre}">` : ''}</span>`;
+}
+
+function jugSection(title, body) {
+  return `<section class="jug-section"><h2 class="section-title">${title}</h2>${body}</section>`;
+}
+function statBox(label, val) {
+  return `<div class="stat-box"><div class="stat-box-val">${val}</div><div class="stat-box-lbl">${label}</div></div>`;
+}
+
+async function initJugadorPage() {
+  const id = new URLSearchParams(location.search).get('id');
+  const el = document.getElementById('jug-content');
+  let data;
+  try { data = await loadData(); }
+  catch (e) { el.innerHTML = '<p class="td-muted" style="padding:2rem">Error al cargar los datos.</p>'; return; }
+
+  const j = (data.jugadores || []).find(p => p.id === id);
+  if (!j) { el.innerHTML = '<p class="td-muted" style="padding:2rem">Jugador no encontrado.</p>'; return; }
+  document.title = `${j.nombre} · Españoles en la NBA`;
+
+  const n = drNorm(j.nombre);
+  const dorsales = (data.dorsales || []).filter(d => drNorm(d.jugador) === n);
+  const sl = (data.summer_league || []).filter(s => drNorm(s.jugador) === n);
+  const trans = (data.transacciones || []).filter(t => drNorm(t.jugador) === n);
+
+  el.innerHTML = [
+    jugHeader(j),
+    jugStats(j),
+    jugTemporadas(j),
+    jugPlayoffs(j),
+    jugPremios(j),
+    jugRecords(j),
+    jugSalario(j),
+    jugDorsalesSec(dorsales),
+    jugSummer(sl),
+    jugTransSec(trans),
+  ].filter(Boolean).join('');
+}
+
+function jugHeader(j) {
+  const pills = [];
+  if (j.posicion) pills.push(j.posicion);
+  if (j.nacimiento_fecha || j.nacimiento) pills.push('Nac. ' + (j.nacimiento_fecha || j.nacimiento));
+  pills.push(j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'} ${j.draft_equipo || ''}`.trim() : 'No drafteado');
+  if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut ' + j.primer_partido.fecha);
+  if (j.temporadas) pills.push(`${j.temporadas} temporadas`);
+  if (j.equipos_nba) pills.push(j.equipos_nba);
+  return `<header class="jug-header">
+    ${jugPhoto(j, 'jug-photo--big')}
+    <div class="jug-headinfo">
+      <h1 class="jug-name">${j.nombre}</h1>
+      <div class="jug-pills">${pills.map(p => `<span class="jug-pill">${p}</span>`).join('')}</div>
+    </div>
+  </header>`;
+}
+
+function jugStats(j) {
+  if (!(j.partidos > 0)) return '';
+  const pg = [
+    statBox('PJ', fmtEnt(j.partidos)), statBox('MIN', fmtDec1(j.min_g)), statBox('PTS', fmtDec1(j.pts_g)),
+    statBox('REB', fmtDec1(j.rbd_g)), statBox('AST', fmtDec1(j.ast_g)), statBox('ROB', fmtDec1(j.stl_g)),
+    statBox('TAP', fmtDec1(j.blk_g)), statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
+  ].join('');
+  const tot = [
+    statBox('PTS', fmtEnt(j.pts_total)), statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)),
+    statBox('ROB', fmtEnt(j.stl_total)), statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
+    statBox('MIN', fmtEnt(j.min_total)), statBox('PÉRD', fmtEnt(j.tov_total)),
+  ].join('');
+  return jugSection('Estadísticas de carrera',
+    `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
+     <h3 class="jug-subh">Totales</h3><div class="stat-grid">${tot}</div>`);
+}
+
+function jugTemporadas(j) {
+  const s = (j.temporadas_data || []).filter(x => x.year);
+  if (!s.length) return '';
+  const rows = [...s].sort((a, b) => (a.year || 0) - (b.year || 0)).map(t => `<tr>
+    <td class="td-center">${drSeason(t.year)}</td><td class="td-center">${t.team || '—'}</td>
+    <td class="td-num">${fmtEnt(t.g)}</td><td class="td-num">${fmtDec1(t.min_g)}</td><td class="td-num">${fmtDec1(t.pts_g)}</td>
+    <td class="td-num">${fmtDec1(t.rbd_g)}</td><td class="td-num">${fmtDec1(t.ast_g)}</td><td class="td-num">${fmtDec1(t.stl_g)}</td>
+    <td class="td-num">${fmtDec1(t.blk_g)}</td><td class="td-num">${fmtPct(t.fg_pct)}</td><td class="td-num">${fmtPct(t.tres_pct)}</td><td class="td-num">${fmtPct(t.ft_pct)}</td>
+  </tr>`).join('');
+  return jugSection('Temporada a temporada',
+    `<div class="tabla-scroll"><table><thead><tr>
+      <th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">PJ</th><th class="td-num">MIN</th><th class="td-num">PTS</th>
+      <th class="td-num">REB</th><th class="td-num">AST</th><th class="td-num">ROB</th><th class="td-num">TAP</th>
+      <th class="td-num">FG%</th><th class="td-num">3P%</th><th class="td-num">FT%</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+function jugPlayoffs(j) {
+  const p = (j.playoffs_temporadas || []).filter(x => x && (x.year || x.g));
+  if (!p.length) return '';
+  const rows = [...p].sort((a, b) => (a.year || 0) - (b.year || 0)).map(t =>
+    `<tr><td class="td-center">${t.year ? drSeason(t.year) : '—'}</td><td class="td-center">${t.team || '—'}</td><td class="td-num">${fmtEnt(t.g)}</td></tr>`).join('');
+  return jugSection('Playoffs',
+    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">PJ</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+function jugPremios(j) {
+  const p = j.premios || [];
+  if (!p.length) return '';
+  const items = [...p].sort((a, b) => (b.year || 0) - (a.year || 0)).map(a => {
+    const hito = a.tipo === 'ROY' || a.tipo === 'DPOY';
+    return `<li class="jug-award">
+      <span class="jug-award-tipo${hito ? ' jug-award-hito' : ''}">${a.tipo}</span>
+      <span class="td-muted">${[a.year, a.team, a.notas].filter(Boolean).join(' · ')}</span>
+    </li>`;
+  }).join('');
+  return jugSection(`Premios (${p.length})`, `<ul class="jug-awards">${items}</ul>`);
+}
+
+function jugRecords(j) {
+  const r = j.records || [];
+  if (!r.length) return '';
+  const items = r.map(x => `<li><b>${x.categoria}</b>: ${x.valor} <span class="td-muted">${[x.team, x.rival, x.fecha].filter(Boolean).join(' · ')}</span></li>`).join('');
+  return jugSection('Récords personales', `<ul class="jug-list">${items}</ul>`);
+}
+
+function jugSalario(j) {
+  if (!j.ganancias) return '';
+  const parts = [statBox('Total', fmtDinero(j.ganancias))];
+  if (j.ganancias_ganado) parts.push(statBox('Cobrado', fmtDinero(j.ganancias_ganado)));
+  if (j.ganancias_futuro) parts.push(statBox('Firmado', fmtDinero(j.ganancias_futuro)));
+  if (j.partidos > 0 && j.ganancias_ganado) parts.push(statBox('$/partido', fmtDinero(j.ganancias_ganado / j.partidos)));
+  return jugSection('Salario', `<div class="stat-grid">${parts.join('')}</div>`);
+}
+
+function jugDorsalesSec(dorsales) {
+  if (!dorsales.length) return '';
+  const byNum = {};
+  dorsales.forEach(d => { (byNum[d.numero] = byNum[d.numero] || []).push(d); });
+  const items = Object.keys(byNum).sort((a, b) => a - b).map(num => {
+    const stints = byNum[num].sort((a, b) => (a.desde || 0) - (b.desde || 0))
+      .map(d => `<span class="dp-team"><span class="dp-team-code">${d.team || '—'}</span><span class="dp-team-yrs">${drPeriodo(d.desde, d.hasta)}</span></span>`).join('');
+    return `<li class="jug-dorsal"><span class="jug-dorsal-num">${num}</span><div class="dp-teams">${stints}</div></li>`;
+  }).join('');
+  return jugSection('Dorsales', `<ul class="jug-dorsals">${items}</ul>`);
+}
+
+function jugSummer(sl) {
+  if (!sl.length) return '';
+  const rows = [...sl].sort((a, b) => (b.year || 0) - (a.year || 0))
+    .map(s => `<li><b>${s.year || '—'}</b> <span class="td-muted">${s.equipo || ''}</span></li>`).join('');
+  return jugSection('Summer League', `<ul class="jug-list">${rows}</ul>`);
+}
+
+function jugTransSec(trans) {
+  if (!trans.length) return '';
+  const rows = [...trans].sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || ''))).map(t => `<tr>
+    <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
+    <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
+    <td class="td-center">${t.equipo1 || '—'}</td><td class="td-center">${t.equipo2 || '—'}</td>
+    <td class="td-muted">${t.otros || '—'}</td><td class="td-muted">${t.notas || '—'}</td>
+  </tr>`).join('');
+  return jugSection('Transacciones',
+    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th><th>Otros</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table></div>`);
 }
