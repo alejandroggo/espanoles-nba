@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-09T00:50:39.127Z",
+  "actualizado": "2026-07-09T00:57:46.990Z",
   "summer_league": [
     {
       "year": 1985,
@@ -200,6 +200,428 @@
       "year": 2026,
       "jugador": "Hugo González",
       "equipo": "BOS"
+    }
+  ],
+  "dorsales": [
+    {
+      "jugador": "Aday Mara",
+      "numero": 15,
+      "team": "OKC",
+      "desde": 2026,
+      "hasta": null
+    },
+    {
+      "jugador": "Alex Abrines",
+      "numero": 8,
+      "team": "OKC",
+      "desde": 2017,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Baba Miller",
+      "numero": 18,
+      "team": "LAC",
+      "desde": 2026,
+      "hasta": null
+    },
+    {
+      "jugador": "Fernando Martín",
+      "numero": 10,
+      "team": "POR",
+      "desde": 1987,
+      "hasta": 1087
+    },
+    {
+      "jugador": "Hugo González",
+      "numero": 28,
+      "team": "BOS",
+      "desde": 2025,
+      "hasta": null
+    },
+    {
+      "jugador": "Jorge Garbajosa",
+      "numero": 15,
+      "team": "TOR",
+      "desde": 2007,
+      "hasta": 2008
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 3,
+      "team": "NYK",
+      "desde": 2015,
+      "hasta": 2016
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 5,
+      "team": "LAL",
+      "desde": 2017,
+      "hasta": 2017
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 8,
+      "team": "DAL",
+      "desde": 2014,
+      "hasta": 2014
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 8,
+      "team": "DET",
+      "desde": 2013,
+      "hasta": 2013
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 8,
+      "team": "TOR",
+      "desde": 2006,
+      "hasta": 2013
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 13,
+      "team": "ATL",
+      "desde": 2017,
+      "hasta": 2017
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 81,
+      "team": "DET",
+      "desde": 2019,
+      "hasta": 2019
+    },
+    {
+      "jugador": "José M. Calderón",
+      "numero": 81,
+      "team": "CLE",
+      "desde": 2018,
+      "hasta": 2018
+    },
+    {
+      "jugador": "Juan Carlos Navarro",
+      "numero": 2,
+      "team": "MEM",
+      "desde": 2008,
+      "hasta": 2008
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "TOR",
+      "desde": 2023,
+      "hasta": 2023
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "BOS",
+      "desde": 2022,
+      "hasta": 2022
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "SAS",
+      "desde": 2022,
+      "hasta": 2022
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "UTA",
+      "desde": 2022,
+      "hasta": 2022
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "MIN",
+      "desde": 2020,
+      "hasta": 2021
+    },
+    {
+      "jugador": "Juancho Hernangómez",
+      "numero": 41,
+      "team": "DEN",
+      "desde": 2017,
+      "hasta": 2020
+    },
+    {
+      "jugador": "Marc Gasol",
+      "numero": 14,
+      "team": "LAL",
+      "desde": 2021,
+      "hasta": 2021
+    },
+    {
+      "jugador": "Marc Gasol",
+      "numero": 33,
+      "team": "TOR",
+      "desde": 2019,
+      "hasta": 2020
+    },
+    {
+      "jugador": "Marc Gasol",
+      "numero": 33,
+      "team": "MEM",
+      "desde": 2009,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Nikola Mirotic",
+      "numero": 3,
+      "team": "NOL",
+      "desde": 2018,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Nikola Mirotic",
+      "numero": 41,
+      "team": "MIL",
+      "desde": 2019,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Nikola Mirotic",
+      "numero": 44,
+      "team": "CHI",
+      "desde": 2015,
+      "hasta": 2018
+    },
+    {
+      "jugador": "Pau Gasol",
+      "numero": 16,
+      "team": "SAS",
+      "desde": 2017,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Pau Gasol",
+      "numero": 16,
+      "team": "CHI",
+      "desde": 2015,
+      "hasta": 2016
+    },
+    {
+      "jugador": "Pau Gasol",
+      "numero": 16,
+      "team": "LAL",
+      "desde": 2008,
+      "hasta": 2014
+    },
+    {
+      "jugador": "Pau Gasol",
+      "numero": 16,
+      "team": "MEM",
+      "desde": 2002,
+      "hasta": 2008
+    },
+    {
+      "jugador": "Pau Gasol",
+      "numero": 17,
+      "team": "MIL",
+      "desde": 2019,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Raül Lopez",
+      "numero": 24,
+      "team": "UTA",
+      "desde": 2004,
+      "hasta": 2005
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 3,
+      "team": "CLE",
+      "desde": 2022,
+      "hasta": 2022
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 9,
+      "team": "MIN",
+      "desde": 2021,
+      "hasta": 2021
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 9,
+      "team": "MIN",
+      "desde": 2012,
+      "hasta": 2017
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 11,
+      "team": "PHX",
+      "desde": 2020,
+      "hasta": 2020
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 11,
+      "team": "UTA",
+      "desde": 2018,
+      "hasta": 2019
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "numero": 13,
+      "team": "CLE",
+      "desde": 2023,
+      "hasta": 2024
+    },
+    {
+      "jugador": "Rudy Fernández",
+      "numero": 5,
+      "team": "DEN",
+      "desde": 2012,
+      "hasta": 2012
+    },
+    {
+      "jugador": "Rudy Fernández",
+      "numero": 5,
+      "team": "POR",
+      "desde": 2009,
+      "hasta": 2011
+    },
+    {
+      "jugador": "Santi Aldama",
+      "numero": 7,
+      "team": "MEM",
+      "desde": 2022,
+      "hasta": 2026
+    },
+    {
+      "jugador": "Santi Aldama",
+      "numero": 34,
+      "team": "DAL",
+      "desde": 2026,
+      "hasta": null
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "numero": 7,
+      "team": "ORL",
+      "desde": 2017,
+      "hasta": 2017
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "numero": 9,
+      "team": "LAC",
+      "desde": 2021,
+      "hasta": 2022
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "numero": 9,
+      "team": "TOR",
+      "desde": 2017,
+      "hasta": 2020
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "numero": 9,
+      "team": "OKC",
+      "desde": 2010,
+      "hasta": 2016
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "numero": 25,
+      "team": "MIL",
+      "desde": 2022,
+      "hasta": 2023
+    },
+    {
+      "jugador": "Sergio De Larrea",
+      "numero": 55,
+      "team": "DAL",
+      "desde": 2026,
+      "hasta": null
+    },
+    {
+      "jugador": "Sergio Rodríguez",
+      "numero": 10,
+      "team": "SAC",
+      "desde": 2010,
+      "hasta": 2010
+    },
+    {
+      "jugador": "Sergio Rodríguez",
+      "numero": 11,
+      "team": "POR",
+      "desde": 2007,
+      "hasta": 2009
+    },
+    {
+      "jugador": "Sergio Rodríguez",
+      "numero": 13,
+      "team": "NYK",
+      "desde": 2010,
+      "hasta": 2010
+    },
+    {
+      "jugador": "Sergio Rodríguez",
+      "numero": 14,
+      "team": "PHI",
+      "desde": 2017,
+      "hasta": 2017
+    },
+    {
+      "jugador": "Usman Garuba",
+      "numero": 12,
+      "team": "GSW",
+      "desde": 2024,
+      "hasta": 2024
+    },
+    {
+      "jugador": "Usman Garuba",
+      "numero": 16,
+      "team": "HOU",
+      "desde": 2022,
+      "hasta": 2023
+    },
+    {
+      "jugador": "Víctor Claver",
+      "numero": 18,
+      "team": "POR",
+      "desde": 2013,
+      "hasta": 2015
+    },
+    {
+      "jugador": "Willy Hernangómez",
+      "numero": 9,
+      "team": "NOL",
+      "desde": 2021,
+      "hasta": 2023
+    },
+    {
+      "jugador": "Willy Hernangómez",
+      "numero": 9,
+      "team": "CHA",
+      "desde": 2020,
+      "hasta": 2020
+    },
+    {
+      "jugador": "Willy Hernangómez",
+      "numero": 14,
+      "team": "NYK",
+      "desde": 2017,
+      "hasta": 2018
+    },
+    {
+      "jugador": "Willy Hernangómez",
+      "numero": 41,
+      "team": "CHA",
+      "desde": 2018,
+      "hasta": 2019
     }
   ],
   "jugadores": [
