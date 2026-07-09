@@ -844,3 +844,139 @@ function sortRk(col) {
   else { rkSortCol = col; rkSortAsc = (col === 'nombre'); }
   renderRkTable();
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA DORSALES
+// ══════════════════════════════════════════════
+let drByNum = {};
+
+async function initDorsalesPage() {
+  let data;
+  try {
+    data = await loadData();
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  const dorsales = data.dorsales || [];
+  drByNum = {};
+  for (let n = 0; n <= 99; n++) drByNum[n] = [];
+  dorsales.forEach(d => {
+    const n = Number(d.numero);
+    if (Number.isInteger(n) && n >= 0 && n <= 99) drByNum[n].push(d);
+  });
+
+  document.getElementById('hero-sub').textContent =
+    dorsales.length
+      ? `${dorsales.length} registros · 100 dorsales, del 0 al 99`
+      : 'Aún no hay datos de dorsales';
+
+  renderDrKpis();
+  renderDrLegend();
+  renderDrGrid();
+  showDorsal(null);
+}
+
+function drPlayers(entries) { return [...new Set(entries.map(e => e.jugador))]; }
+function drCount(n) { return drPlayers(drByNum[n] || []).length; }
+
+function jerseyClass(count) {
+  if (!count) return 'j0';
+  if (count === 1) return 'j1';
+  if (count === 2) return 'j2';
+  return 'j3';
+}
+
+function renderDrKpis() {
+  let usados = 0, sinUsar = 0, top = { n: null, c: 0 };
+  for (let n = 0; n <= 99; n++) {
+    const c = drCount(n);
+    if (c > 0) usados++; else sinUsar++;
+    if (c > top.c) top = { n, c };
+  }
+  document.getElementById('dr-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${usados}<span class="kpi-sub">/100</span></div><div class="kpi-label">Dorsales usados</div></div>
+    <div class="kpi"><div class="kpi-num">${top.n ?? '—'}</div><div class="kpi-label">Más llevado${top.c ? ` · ${top.c} jugadores` : ''}</div></div>
+    <div class="kpi"><div class="kpi-num">${sinUsar}</div><div class="kpi-label">Sin estrenar</div></div>`;
+}
+
+function renderDrLegend() {
+  document.getElementById('dr-legend').innerHTML = `
+    <span class="leg-item"><span class="leg-chip j0"></span>Sin usar</span>
+    <span class="leg-item"><span class="leg-chip j1"></span>1 jugador</span>
+    <span class="leg-item"><span class="leg-chip j2"></span>2 jugadores</span>
+    <span class="leg-item"><span class="leg-chip j3"></span>3 o más</span>`;
+}
+
+function jerseySvg(n) {
+  return `<svg class="jersey-svg" viewBox="0 0 64 66" aria-hidden="true">
+    <path class="jersey-shape" d="M20 11 L28 6 Q32 12 36 6 L44 11 L55 17 L50 28 L44 24 L44 59 Q44 61 42 61 L22 61 Q20 61 20 59 L20 24 L14 28 L9 17 Z"/>
+    <text class="jersey-num" x="32" y="46" text-anchor="middle">${n}</text>
+  </svg>`;
+}
+
+function renderDrGrid() {
+  let html = '';
+  for (let n = 0; n <= 99; n++) {
+    const c = drCount(n);
+    html += `<button class="jersey ${jerseyClass(c)}" role="listitem" onclick="showDorsal(${n})"
+      aria-label="Dorsal ${n}, ${c} jugador${c === 1 ? '' : 'es'}">${jerseySvg(n)}</button>`;
+  }
+  document.getElementById('dr-grid').innerHTML = html;
+}
+
+// Año NBA → temporada (2024 = 2023-24)
+function drSeason(y) {
+  if (!y) return '';
+  const yy = Number(y);
+  return `${yy - 1}-${String(yy).slice(2)}`;
+}
+function drPeriodo(desde, hasta) {
+  const d = drSeason(desde);
+  if (hasta === null || hasta === undefined || hasta === '') return d ? `${d} → actual` : 'actual';
+  const h = drSeason(hasta);
+  return d === h ? d : `${d} → ${h}`;
+}
+
+function showDorsal(n) {
+  const btns = document.querySelectorAll('.jersey');
+  btns.forEach(b => b.classList.remove('sel'));
+  const panel = document.getElementById('dr-detail');
+
+  if (n === null || n === undefined) {
+    panel.innerHTML = `<p class="dorsal-hint">Elige un dorsal para ver qué españoles lo han llevado.</p>`;
+    return;
+  }
+  if (btns[n]) btns[n].classList.add('sel');
+
+  const entries = drByNum[n] || [];
+  const players = drPlayers(entries);
+
+  if (!players.length) {
+    panel.innerHTML = `
+      <div class="dorsal-head"><span class="dorsal-big">${n}</span></div>
+      <p class="dorsal-hint">Ningún español ha llevado el dorsal ${n} en la NBA.</p>`;
+    return;
+  }
+
+  const byPlayer = {};
+  entries.forEach(e => { (byPlayer[e.jugador] = byPlayer[e.jugador] || []).push(e); });
+
+  const items = Object.entries(byPlayer).map(([jug, es]) => {
+    const detalle = es
+      .sort((a, b) => (a.desde || 0) - (b.desde || 0))
+      .map(e => `<span class="dp-stint">${e.team ? `<b>${e.team}</b> ` : ''}${drPeriodo(e.desde, e.hasta)}</span>`)
+      .join('');
+    return `<li class="dorsal-player"><span class="dp-name">${jug}</span><span class="dp-meta">${detalle}</span></li>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="dorsal-head">
+      <span class="dorsal-big">${n}</span>
+      <span class="dorsal-count">${players.length} jugador${players.length === 1 ? '' : 'es'}</span>
+    </div>
+    <ul class="dorsal-list">${items}</ul>`;
+
+  if (window.matchMedia('(max-width: 900px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
