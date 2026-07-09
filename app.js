@@ -885,7 +885,8 @@ function jerseyClass(count) {
   if (!count) return 'j0';
   if (count === 1) return 'j1';
   if (count === 2) return 'j2';
-  return 'j3';
+  if (count === 3) return 'j3';
+  return 'j4';
 }
 
 function renderDrKpis() {
@@ -906,13 +907,15 @@ function renderDrLegend() {
     <span class="leg-item"><span class="leg-chip j0"></span>Sin usar</span>
     <span class="leg-item"><span class="leg-chip j1"></span>1 jugador</span>
     <span class="leg-item"><span class="leg-chip j2"></span>2 jugadores</span>
-    <span class="leg-item"><span class="leg-chip j3"></span>3 o más</span>`;
+    <span class="leg-item"><span class="leg-chip j3"></span>3 jugadores</span>
+    <span class="leg-item"><span class="leg-chip j4"></span>4 o más</span>`;
 }
 
 function jerseySvg(n) {
+  // Camiseta de baloncesto (tirantes + sisas abiertas)
   return `<svg class="jersey-svg" viewBox="0 0 64 66" aria-hidden="true">
-    <path class="jersey-shape" d="M20 11 L28 6 Q32 12 36 6 L44 11 L55 17 L50 28 L44 24 L44 59 Q44 61 42 61 L22 61 Q20 61 20 59 L20 24 L14 28 L9 17 Z"/>
-    <text class="jersey-num" x="32" y="46" text-anchor="middle">${n}</text>
+    <path class="jersey-shape" d="M14 7 L26 7 Q32 13 38 7 L50 7 C49 18 45 24 41 28 L41 58 Q41 60 39 60 L25 60 Q23 60 23 58 L23 28 C19 24 15 18 14 7 Z"/>
+    <text class="jersey-num" x="32" y="47" text-anchor="middle">${n}</text>
   </svg>`;
 }
 

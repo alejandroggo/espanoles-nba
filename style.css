@@ -539,9 +539,10 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .leg-item { display: inline-flex; align-items: center; gap: var(--space-2); }
 .leg-chip { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border-strong); }
 .leg-chip.j0 { background: var(--surface); }
-.leg-chip.j1 { background: #2563eb; border-color: #2563eb; }
-.leg-chip.j2 { background: #16a34a; border-color: #16a34a; }
-.leg-chip.j3 { background: var(--accent); border-color: var(--accent); }
+.leg-chip.j1 { background: #16a34a; border-color: #15803d; }
+.leg-chip.j2 { background: #1e40af; border-color: #1e3a8a; }
+.leg-chip.j3 { background: #38bdf8; border-color: #0ea5e9; }
+.leg-chip.j4 { background: #ea580c; border-color: #c2410c; }
 
 .dorsales-layout {
   max-width: 1400px; margin: 0 auto;
@@ -567,15 +568,17 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   transition: fill var(--transition), stroke var(--transition);
 }
 .jersey-num {
-  font-family: var(--display); font-size: 22px;
+  font-family: var(--display); font-size: 19px;
   fill: var(--text-muted);
 }
-.jersey.j1 .jersey-shape { fill: #2563eb; stroke: #1d4ed8; }
-.jersey.j2 .jersey-shape { fill: #16a34a; stroke: #15803d; }
-.jersey.j3 .jersey-shape { fill: var(--accent); stroke: var(--accent-hover); }
+.jersey.j1 .jersey-shape { fill: #16a34a; stroke: #15803d; }   /* verde  · 1 */
+.jersey.j2 .jersey-shape { fill: #1e40af; stroke: #1e3a8a; }   /* azul oscuro · 2 */
+.jersey.j3 .jersey-shape { fill: #38bdf8; stroke: #0ea5e9; }   /* azul claro · 3 */
+.jersey.j4 .jersey-shape { fill: #ea580c; stroke: #c2410c; }   /* naranja · 4+ */
 .jersey.j1 .jersey-num,
 .jersey.j2 .jersey-num,
-.jersey.j3 .jersey-num { fill: #fff; }
+.jersey.j4 .jersey-num { fill: #fff; }
+.jersey.j3 .jersey-num { fill: #0c4a6e; }   /* número oscuro sobre azul claro */
 .jersey.sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
 
 .dorsal-detail {
