@@ -1753,16 +1753,20 @@ let debutSortAsc = true;
 let debutSearch = '';
 
 const DEBUT_COLS = [
-  { key: 'rank',   label: '#',       sortable: false, cls: 'td-rank' },
-  { key: 'foto',   label: '',        sortable: false },
-  { key: 'nombre', label: 'Jugador', sortable: true },
-  { key: 'fecha',  label: 'Fecha',   sortable: true, cls: 'td-center' },
-  { key: 'equipo', label: 'Equipo',  sortable: true, cls: 'td-center' },
-  { key: 'rival',  label: 'Rival',   sortable: true, cls: 'td-center' },
-  { key: 'min',    label: 'MIN',     sortable: true, cls: 'td-num' },
-  { key: 'pts',    label: 'PTS',     sortable: true, cls: 'td-num' },
-  { key: 'rbd',    label: 'REB',     sortable: true, cls: 'td-num' },
-  { key: 'ast',    label: 'AST',     sortable: true, cls: 'td-num' },
+  { key: 'rank',      label: '#',       sortable: false, cls: 'td-rank' },
+  { key: 'foto',      label: '',        sortable: false },
+  { key: 'nombre',    label: 'Jugador', sortable: true },
+  { key: 'fecha',     label: 'Fecha',   sortable: true, cls: 'td-center' },
+  { key: 'edad',      label: 'Edad',    sortable: true, cls: 'td-num' },
+  { key: 'equipo',    label: 'Equipo',  sortable: true, cls: 'td-center' },
+  { key: 'rival',     label: 'Rival',   sortable: true, cls: 'td-center' },
+  { key: 'resultado', label: 'Resultado', sortable: true, cls: 'td-center' },
+  { key: 'min',       label: 'MIN',     sortable: true, cls: 'td-num' },
+  { key: 'pts',       label: 'PTS',     sortable: true, cls: 'td-num' },
+  { key: 'rbd',       label: 'REB',     sortable: true, cls: 'td-num' },
+  { key: 'ast',       label: 'AST',     sortable: true, cls: 'td-num' },
+  { key: 'stl',       label: 'ROB',     sortable: true, cls: 'td-num' },
+  { key: 'blk',       label: 'TAP',     sortable: true, cls: 'td-num' },
 ];
 
 function debutDateKey(fecha) {
@@ -1782,16 +1786,16 @@ async function initDebutPage() {
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
 
   buildPlayerIds(jugadores);
-  debutRows = jugadores.filter(j => j.primer_partido && j.primer_partido.fecha).map(j => ({
-    id: j.id, nombre: j.nombre, foto_url: j.foto_url, bref_id: j.bref_id,
-    fecha: j.primer_partido.fecha,
-    equipo: j.primer_partido.equipo || '',
-    rival: j.primer_partido.rival || '',
-    min: j.primer_partido.min || '',
-    pts: j.primer_partido.pts, rbd: j.primer_partido.rbd, ast: j.primer_partido.ast,
-    _key: debutDateKey(j.primer_partido.fecha),
-    _min: minToSec(j.primer_partido.min),
-  }));
+  debutRows = jugadores.filter(j => j.primer_partido && j.primer_partido.fecha).map(j => {
+    const p = j.primer_partido;
+    return {
+      id: j.id, nombre: j.nombre, foto_url: j.foto_url, bref_id: j.bref_id,
+      fecha: p.fecha, edad: p.edad ?? null,
+      equipo: p.equipo || '', rival: p.rival || '', resultado: p.resultado || '',
+      min: p.min || '', pts: p.pts, rbd: p.rbd, ast: p.ast, stl: p.stl ?? null, blk: p.blk ?? null,
+      _key: debutDateKey(p.fecha), _min: minToSec(p.min),
+    };
+  });
 
   document.getElementById('hero-sub').textContent = `${debutRows.length} debuts en la NBA`;
   renderDebutKpis();
@@ -1820,7 +1824,7 @@ function renderDebutTable() {
     let va, vb;
     if (debutSortCol === 'fecha') { va = a._key; vb = b._key; }
     else if (debutSortCol === 'min') { va = a._min; vb = b._min; }
-    else if (['pts', 'rbd', 'ast'].includes(debutSortCol)) { va = a[debutSortCol] || 0; vb = b[debutSortCol] || 0; }
+    else if (['pts', 'rbd', 'ast', 'stl', 'blk', 'edad'].includes(debutSortCol)) { va = a[debutSortCol] ?? -1; vb = b[debutSortCol] ?? -1; }
     else { va = String(a[debutSortCol] || ''); vb = String(b[debutSortCol] || ''); return debutSortAsc ? va.localeCompare(vb) : vb.localeCompare(va); }
     return debutSortAsc ? va - vb : vb - va;
   });
@@ -1843,11 +1847,23 @@ function renderDebutTable() {
       <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
       <td class="td-nombre">${plLink(r.nombre, r.nombre)}</td>
       <td class="td-center">${r.fecha}</td>
+      <td class="td-num">${r.edad ?? '—'}</td>
       <td class="td-center">${r.equipo || '—'}</td>
       <td class="td-center">${r.rival || '—'}</td>
+      <td class="td-center">${debutResultado(r.resultado)}</td>
       <td class="td-num">${r.min || '—'}</td>
       <td class="td-num">${r.pts ?? '—'}</td>
       <td class="td-num">${r.rbd ?? '—'}</td>
       <td class="td-num">${r.ast ?? '—'}</td>
+      <td class="td-num">${r.stl ?? '—'}</td>
+      <td class="td-num">${r.blk ?? '—'}</td>
     </tr>`).join('') || `<tr><td colspan="${DEBUT_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function debutResultado(res) {
+  if (!res) return '—';
+  const s = String(res).trim();
+  if (/^[vw]/i.test(s)) return `<span class="tr-tipo tt-sign">${s}</span>`;   // victoria/win → verde
+  if (/^[dl]/i.test(s)) return `<span class="tr-tipo tt-waive">${s}</span>`;   // derrota/loss → rojo
+  return s;
 }
