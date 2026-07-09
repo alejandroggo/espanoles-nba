@@ -180,6 +180,7 @@ const SAL_COLS = [
   { key: 'ganancias',        label: 'Total',     sortable: true,  cls: 'td-num' },
   { key: 'ganancias_ganado', label: 'Cobrado',   sortable: true,  cls: 'td-num' },
   { key: 'ganancias_futuro', label: 'Firmado',   sortable: true,  cls: 'td-num' },
+  { key: 'sueldo_pj',        label: '$/PJ',      sortable: true,  cls: 'td-num' },
   { key: 'pct',              label: '% del total', sortable: true,  cls: 'td-num' },
   { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
@@ -205,7 +206,10 @@ async function initSalariosPage() {
 
   // % = cuota de cada jugador sobre el total ganado por todos los españoles
   const granTotal = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
-  salRows.forEach(j => { j.pct = granTotal ? j.ganancias / granTotal * 100 : null; });
+  salRows.forEach(j => {
+    j.pct = granTotal ? j.ganancias / granTotal * 100 : null;
+    j.sueldo_pj = (j.partidos || 0) > 0 ? (j.ganancias_ganado || 0) / j.partidos : null;
+  });
 
   document.getElementById('hero-sub').textContent =
     `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas de carrera (USD)`;
@@ -246,7 +250,7 @@ function renderSalariosKpis() {
 function renderSalariosTable() {
   const rows = [...salRows].sort((a, b) => {
     let va = a[salSortCol], vb = b[salSortCol];
-    if (['ganancias', 'ganancias_ganado', 'ganancias_futuro', 'pct'].includes(salSortCol)) {
+    if (['ganancias', 'ganancias_ganado', 'ganancias_futuro', 'sueldo_pj', 'pct'].includes(salSortCol)) {
       va = va ?? -1; vb = vb ?? -1;
     }
     if (typeof va === 'string') return salSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
@@ -274,14 +278,16 @@ function renderSalariosTable() {
       <td class="td-num td-dinero">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
+      <td class="td-num">${fmtDinero(j.sueldo_pj)}</td>
       <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
       <td class="td-muted">${j.equipos_nba || '—'}</td>
     </tr>`).join('');
 
   // Pie: totales
-  const tTotal   = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
-  const tCobrado = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
-  const tFuturo  = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
+  const tTotal    = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
+  const tCobrado  = salRows.reduce((s, j) => s + (j.ganancias_ganado || 0), 0);
+  const tFuturo   = salRows.reduce((s, j) => s + (j.ganancias_futuro || 0), 0);
+  const tPartidos = salRows.reduce((s, j) => s + (j.partidos || 0), 0);
 
   document.getElementById('sal-foot').innerHTML = `
     <tr class="sal-total">
@@ -290,6 +296,7 @@ function renderSalariosTable() {
       <td class="td-num td-dinero">${fmtDinero(tTotal)}</td>
       <td class="td-num">${fmtDinero(tCobrado)}</td>
       <td class="td-num">${fmtDinero(tFuturo)}</td>
+      <td class="td-num">${fmtDinero(tPartidos ? tCobrado / tPartidos : 0)}</td>
       <td class="td-num">${renderPct(100, 100)}</td>
       <td></td>
     </tr>`;
