@@ -945,10 +945,10 @@ function renderDrLegend() {
 }
 
 function jerseySvg(n) {
-  // Camiseta de baloncesto: cuello redondo, tirantes y sisas abiertas
-  return `<svg class="jersey-svg" viewBox="0 0 100 104" aria-hidden="true">
-    <path class="jersey-shape" d="M20 18 L38 16 C42 34 58 34 62 16 L80 18 C74 30 70 42 70 52 L74 94 Q74 97 71 97 L29 97 Q26 97 26 94 L30 52 C30 42 26 30 20 18 Z"/>
-    <path class="jersey-trim" d="M38 19 C42 33 58 33 62 19 M77 20 C72 30 68 42 68 53 M23 20 C28 30 32 42 32 53"/>
+  // Camiseta de baloncesto: cuerpo ancho, cuello redondo, sisas y vivos
+  return `<svg class="jersey-svg" viewBox="0 0 100 110" aria-hidden="true">
+    <path class="jersey-shape" d="M21 21 Q21 15 27 15 L37 15 C40 34 60 34 63 15 L73 15 Q79 15 79 21 Q76 30 70 34 Q76 38 79 45 L79 100 Q79 104 75 104 L25 104 Q21 104 21 100 L21 45 Q24 38 30 34 Q24 30 21 21 Z"/>
+    <path class="jersey-trim" d="M37 17 C40 32 60 32 63 17 M64 16 L73 16 Q77 16 77 21 Q74 29 69 33 M36 16 L27 16 Q23 16 23 21 Q26 29 31 33"/>
     <text class="jersey-num" x="50" y="82" text-anchor="middle">${n}</text>
   </svg>`;
 }
