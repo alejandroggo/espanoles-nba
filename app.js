@@ -1547,6 +1547,12 @@ const QUIZ_GENS = [
     const u = qPick(und); const three = qSample(D.drafted, 3).map(x => x.nombre);
     return { q: '¿Cuál de estos jugadores <b>NO fue drafteado</b>?', correct: u.nombre, options: qShuffle([u.nombre, ...three]) };
   },
+  D => { // equipo con el que jugó la Summer League
+    const teams = [...new Set(D.sl.map(x => x.equipo))];
+    if (D.sl.length < 4 || teams.length < 4) return null;
+    const s = qPick(D.sl);
+    return { q: `¿Con qué equipo disputó <b>${s.jugador}</b> la Summer League${s.year ? ` de ${s.year}` : ''}?`, correct: s.equipo, options: qOptions(s.equipo, teams) };
+  },
 ];
 
 async function initTestPage() {
@@ -1560,6 +1566,7 @@ async function initTestPage() {
     stat: J.filter(j => (j.partidos || 0) > 0),
     dorsales: (data.dorsales || []).filter(d => d.numero != null),
     premios: J.flatMap(j => (j.premios || []).map(p => ({ ...p, jugador: j.nombre }))),
+    sl: (data.summer_league || []).filter(s => s.equipo && s.jugador),
   };
   quizNext();
 }
