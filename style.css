@@ -564,11 +564,14 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .jersey-svg { width: 100%; height: auto; display: block; }
 .jersey-shape {
   fill: var(--surface);
-  stroke: var(--border-strong); stroke-width: 1.5;
+  stroke: var(--border-strong); stroke-width: 2; stroke-linejoin: round;
   transition: fill var(--transition), stroke var(--transition);
 }
+.jersey-trim { fill: none; stroke: rgba(255,255,255,0.65); stroke-width: 1.6; }
+.jersey.j0 .jersey-trim { stroke: var(--border-strong); }
+.jersey.j3 .jersey-trim { stroke: rgba(12,74,110,0.45); }
 .jersey-num {
-  font-family: var(--display); font-size: 19px;
+  font-family: var(--display); font-size: 30px;
   fill: var(--text-muted);
 }
 .jersey.j1 .jersey-shape { fill: #16a34a; stroke: #15803d; }   /* verde  · 1 */
@@ -581,8 +584,8 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .jersey.j3 .jersey-num { fill: #0c4a6e; }   /* número oscuro sobre azul claro */
 .jersey.sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
 
+.dorsal-side { position: sticky; top: 72px; display: flex; flex-direction: column; gap: var(--space-4); }
 .dorsal-detail {
-  position: sticky; top: 72px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -599,10 +602,28 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .dp-name { font-weight: 600; }
 .dp-meta { display: flex; flex-direction: column; gap: 1px; font-size: var(--font-xs); color: var(--text-muted); }
 .dp-stint b { color: var(--text); font-weight: 600; }
+.dp-nota { margin-top: 3px; font-size: var(--font-xs); color: var(--accent); }
+.dp-nota b { color: var(--accent); font-weight: 700; }
+
+.dr-por-jugador {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+.dr-pj-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
+.dr-pj-item { display: flex; align-items: center; gap: var(--space-3); font-size: var(--font-sm); }
+.dr-pj-n {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 4px;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+  font-weight: 700; font-size: var(--font-xs); color: var(--accent);
+}
 
 @media (max-width: 900px) {
   .dorsales-layout { grid-template-columns: 1fr; }
-  .dorsal-detail { position: static; order: -1; }
+  .dorsal-side { position: static; }
 }
 @media (max-width: 560px) {
   .dorsales-grid { grid-template-columns: repeat(5, 1fr); }

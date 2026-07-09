@@ -849,6 +849,7 @@ function sortRk(col) {
 // PÁGINA DORSALES
 // ══════════════════════════════════════════════
 let drByNum = {};
+let drAll = [];
 
 async function initDorsalesPage() {
   let data;
@@ -860,6 +861,7 @@ async function initDorsalesPage() {
   }
 
   const dorsales = data.dorsales || [];
+  drAll = dorsales;
   drByNum = {};
   for (let n = 0; n <= 99; n++) drByNum[n] = [];
   dorsales.forEach(d => {
@@ -876,6 +878,26 @@ async function initDorsalesPage() {
   renderDrLegend();
   renderDrGrid();
   showDorsal(null);
+  renderDrPorJugador();
+}
+
+// Nº de dorsales distintos por jugador (panel fijo bajo el drawer)
+function renderDrPorJugador() {
+  const el = document.getElementById('dr-por-jugador');
+  if (!el) return;
+  const porJug = {};
+  drAll.forEach(d => { (porJug[d.jugador] = porJug[d.jugador] || new Set()).add(Number(d.numero)); });
+  const rows = Object.entries(porJug)
+    .map(([jug, set]) => ({ jug, n: set.size }))
+    .sort((a, b) => b.n - a.n || a.jug.localeCompare(b.jug));
+  if (!rows.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = `
+    <h2 class="section-title">Dorsales por jugador</h2>
+    <p class="section-sub">Cuántos números distintos ha vestido cada español.</p>
+    <ul class="dr-pj-list">
+      ${rows.map(r => `<li class="dr-pj-item"><span class="dr-pj-n">${r.n}</span><span>${r.jug}</span></li>`).join('')}
+    </ul>`;
 }
 
 function drPlayers(entries) { return [...new Set(entries.map(e => e.jugador))]; }
@@ -912,10 +934,11 @@ function renderDrLegend() {
 }
 
 function jerseySvg(n) {
-  // Camiseta de baloncesto (tirantes + sisas abiertas)
-  return `<svg class="jersey-svg" viewBox="0 0 64 66" aria-hidden="true">
-    <path class="jersey-shape" d="M14 7 L26 7 Q32 13 38 7 L50 7 C49 18 45 24 41 28 L41 58 Q41 60 39 60 L25 60 Q23 60 23 58 L23 28 C19 24 15 18 14 7 Z"/>
-    <text class="jersey-num" x="32" y="47" text-anchor="middle">${n}</text>
+  // Camiseta de baloncesto: cuello redondo, tirantes y sisas abiertas
+  return `<svg class="jersey-svg" viewBox="0 0 100 104" aria-hidden="true">
+    <path class="jersey-shape" d="M20 18 L38 16 C42 34 58 34 62 16 L80 18 C74 30 70 42 70 52 L74 94 Q74 97 71 97 L29 97 Q26 97 26 94 L30 52 C30 42 26 30 20 18 Z"/>
+    <path class="jersey-trim" d="M38 19 C42 33 58 33 62 19 M77 20 C72 30 68 42 68 53 M23 20 C28 30 32 42 32 53"/>
+    <text class="jersey-num" x="50" y="82" text-anchor="middle">${n}</text>
   </svg>`;
 }
 
@@ -971,7 +994,20 @@ function showDorsal(n) {
       .sort((a, b) => (a.desde || 0) - (b.desde || 0))
       .map(e => `<span class="dp-stint">${e.team ? `<b>${e.team}</b> ` : ''}${drPeriodo(e.desde, e.hasta)}</span>`)
       .join('');
-    return `<li class="dorsal-player"><span class="dp-name">${jug}</span><span class="dp-meta">${detalle}</span></li>`;
+
+    // ¿Este jugador llevó OTRO dorsal en el mismo equipo?
+    const teams = [...new Set(es.map(e => e.team).filter(Boolean))];
+    const notas = [];
+    teams.forEach(team => {
+      const otros = [...new Set(
+        drAll.filter(d => d.jugador === jug && d.team === team && Number(d.numero) !== n)
+             .map(d => Number(d.numero))
+      )].sort((a, b) => a - b);
+      otros.forEach(num => notas.push(`También llevó el <b>#${num}</b> en su otra etapa en ${team}`));
+    });
+    const notaHtml = notas.length ? `<span class="dp-nota">${notas.join('<br>')}</span>` : '';
+
+    return `<li class="dorsal-player"><span class="dp-name">${jug}</span><span class="dp-meta">${detalle}</span>${notaHtml}</li>`;
   }).join('');
 
   panel.innerHTML = `
