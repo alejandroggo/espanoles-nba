@@ -571,17 +571,19 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .jersey.j0 .jersey-trim { stroke: var(--border-strong); }
 .jersey.j3 .jersey-trim { stroke: rgba(12,74,110,0.45); }
 .jersey-num {
-  font-family: var(--display); font-size: 30px;
+  font-family: var(--display); font-size: 27px;
   fill: var(--text-muted);
+  paint-order: stroke; stroke: transparent; stroke-width: 2.4px; stroke-linejoin: round;
 }
 .jersey.j1 .jersey-shape { fill: #16a34a; stroke: #15803d; }   /* verde  · 1 */
 .jersey.j2 .jersey-shape { fill: #1e40af; stroke: #1e3a8a; }   /* azul oscuro · 2 */
 .jersey.j3 .jersey-shape { fill: #38bdf8; stroke: #0ea5e9; }   /* azul claro · 3 */
 .jersey.j4 .jersey-shape { fill: #ea580c; stroke: #c2410c; }   /* naranja · 4+ */
-.jersey.j1 .jersey-num,
-.jersey.j2 .jersey-num,
-.jersey.j4 .jersey-num { fill: #fff; }
-.jersey.j3 .jersey-num { fill: #0c4a6e; }   /* número oscuro sobre azul claro */
+/* número con contorno tipo camiseta */
+.jersey.j1 .jersey-num { fill: #fff; stroke: #15803d; }
+.jersey.j2 .jersey-num { fill: #fff; stroke: #1e3a8a; }
+.jersey.j3 .jersey-num { fill: #0c4a6e; stroke: #fff; }
+.jersey.j4 .jersey-num { fill: #fff; stroke: #c2410c; }
 .jersey.sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
 
 .dorsal-side { position: sticky; top: 72px; display: flex; flex-direction: column; gap: var(--space-4); }
