@@ -567,7 +567,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   transition: fill var(--transition), stroke var(--transition);
 }
 .jersey-num {
-  font-family: var(--display); font-size: 22px;
+  font-family: var(--display); font-size: 19px;
   fill: var(--text-muted);
 }
 .jersey.j1 .jersey-shape { fill: #2563eb; stroke: #1d4ed8; }
