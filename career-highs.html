@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -39,8 +39,9 @@
 
   <section class="controles" aria-label="Modo">
     <div class="mode-switch" role="group" aria-label="Tipo de máximo">
-      <button type="button" id="hi-mode-season" class="toggle-chip active" aria-pressed="true" onclick="setHighsMode('season')">En una temporada</button>
-      <button type="button" id="hi-mode-game" class="toggle-chip" aria-pressed="false" onclick="setHighsMode('game')">En un partido</button>
+      <button type="button" id="hi-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setHighsMode('total')">Total en temporada</button>
+      <button type="button" id="hi-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setHighsMode('pg')">Por partido en temporada</button>
+      <button type="button" id="hi-mode-game" class="toggle-chip" aria-pressed="false" onclick="setHighsMode('game')">Por partido</button>
     </div>
   </section>
 
@@ -72,7 +73,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 <script>initTheme(); initHighsPage();</script>
 </body>
 </html>

@@ -1610,18 +1610,30 @@ function quizAnswer(i) {
 // PÁGINA CAREER HIGHS
 // ══════════════════════════════════════════════
 let highsJ = [];
-let highsMode = 'season';
+let highsMode = 'total';   // 'total' | 'pg' | 'game'
+const HIGHS_MIN_G = 55;    // mínimo de partidos para "por partido en temporada"
 
-const SEASON_STATS = [
-  { key: 'pts_g',    label: 'Puntos',       fmt: fmtDec1, minG: 15 },
-  { key: 'rbd_g',    label: 'Rebotes',      fmt: fmtDec1, minG: 15 },
-  { key: 'ast_g',    label: 'Asistencias',  fmt: fmtDec1, minG: 15 },
-  { key: 'stl_g',    label: 'Robos',        fmt: fmtDec1, minG: 15 },
-  { key: 'blk_g',    label: 'Tapones',      fmt: fmtDec1, minG: 15 },
-  { key: 'min_g',    label: 'Minutos',      fmt: fmtDec1, minG: 15 },
-  { key: 'fg_pct',   label: '% Tiros de campo', fmt: fmtPct, minG: 25 },
-  { key: 'tres_pct', label: '% Triples',    fmt: fmtPct,  minG: 25 },
-  { key: 'ft_pct',   label: '% Tiros libres', fmt: fmtPct, minG: 25 },
+// Medias por temporada (estadística por partido)
+const SEASON_PG_STATS = [
+  { key: 'pts_g',    label: 'Puntos',       fmt: fmtDec1 },
+  { key: 'rbd_g',    label: 'Rebotes',      fmt: fmtDec1 },
+  { key: 'ast_g',    label: 'Asistencias',  fmt: fmtDec1 },
+  { key: 'stl_g',    label: 'Robos',        fmt: fmtDec1 },
+  { key: 'blk_g',    label: 'Tapones',      fmt: fmtDec1 },
+  { key: 'min_g',    label: 'Minutos',      fmt: fmtDec1 },
+  { key: 'fg_pct',   label: '% Tiros de campo', fmt: fmtPct },
+  { key: 'tres_pct', label: '% Triples',    fmt: fmtPct },
+  { key: 'ft_pct',   label: '% Tiros libres', fmt: fmtPct },
+];
+
+// Totales por temporada (media × partidos)
+const SEASON_TOTAL_STATS = [
+  { key: 'pts_g', label: 'Puntos' },
+  { key: 'rbd_g', label: 'Rebotes' },
+  { key: 'ast_g', label: 'Asistencias' },
+  { key: 'stl_g', label: 'Robos' },
+  { key: 'blk_g', label: 'Tapones' },
+  { key: 'min_g', label: 'Minutos' },
 ];
 
 async function initHighsPage() {
@@ -1636,10 +1648,11 @@ async function initHighsPage() {
 function setHighsMode(m) {
   if (highsMode === m) return;
   highsMode = m;
-  document.getElementById('hi-mode-season').classList.toggle('active', m === 'season');
-  document.getElementById('hi-mode-season').setAttribute('aria-pressed', String(m === 'season'));
-  document.getElementById('hi-mode-game').classList.toggle('active', m === 'game');
-  document.getElementById('hi-mode-game').setAttribute('aria-pressed', String(m === 'game'));
+  ['total', 'pg', 'game'].forEach(x => {
+    const btn = document.getElementById('hi-mode-' + x);
+    btn.classList.toggle('active', x === m);
+    btn.setAttribute('aria-pressed', String(x === m));
+  });
   renderHighs();
 }
 
@@ -1649,7 +1662,20 @@ function bestSeason(key, minG) {
     (j.temporadas_data || []).forEach(t => {
       const v = t[key];
       if (v == null || (t.g || 0) < minG) return;
-      if (!best || v > best.value) best = { value: v, jugador: j.nombre, year: t.year, team: t.team };
+      if (!best || v > best.value) best = { value: v, jugador: j.nombre, year: t.year, team: t.team, g: t.g };
+    });
+  });
+  return best;
+}
+
+function bestSeasonTotal(keyG) {
+  let best = null;
+  highsJ.forEach(j => {
+    (j.temporadas_data || []).forEach(t => {
+      const avg = t[keyG], g = t.g || 0;
+      if (avg == null || !g) return;
+      const total = avg * g;
+      if (!best || total > best.value) best = { value: total, jugador: j.nombre, year: t.year, team: t.team };
     });
   });
   return best;
@@ -1666,18 +1692,30 @@ function highCard(label, value, jugador, ctx) {
 
 function renderHighs() {
   const grid = document.getElementById('highs-grid');
-  document.getElementById('hero-sub').textContent = highsMode === 'season'
-    ? 'Mejores medias en una sola temporada'
-    : 'Mejores registros en un solo partido';
+  const subs = {
+    total: 'Mejores totales en una sola temporada',
+    pg: `Mejores medias en una temporada (mín. ${HIGHS_MIN_G} partidos)`,
+    game: 'Mejores registros en un solo partido',
+  };
+  document.getElementById('hero-sub').textContent = subs[highsMode];
 
-  if (highsMode === 'season') {
-    const cards = SEASON_STATS.map(s => {
-      const b = bestSeason(s.key, s.minG);
+  if (highsMode === 'total') {
+    const cards = SEASON_TOTAL_STATS.map(s => {
+      const b = bestSeasonTotal(s.key);
       if (!b) return '';
-      const ctx = `${drSeason(b.year)}${b.team ? ` · ${b.team}` : ''}`;
-      return highCard(s.label, s.fmt(b.value), b.jugador, ctx);
+      return highCard(s.label, fmtEnt(b.value), b.jugador, `${drSeason(b.year)}${b.team ? ` · ${b.team}` : ''}`);
     }).filter(Boolean).join('');
     grid.innerHTML = cards || '<p class="td-muted" style="padding:2rem">Sin datos de temporadas.</p>';
+    return;
+  }
+
+  if (highsMode === 'pg') {
+    const cards = SEASON_PG_STATS.map(s => {
+      const b = bestSeason(s.key, HIGHS_MIN_G);
+      if (!b) return '';
+      return highCard(s.label, s.fmt(b.value), b.jugador, `${drSeason(b.year)}${b.team ? ` · ${b.team}` : ''}`);
+    }).filter(Boolean).join('');
+    grid.innerHTML = cards || `<p class="td-muted" style="padding:2rem;grid-column:1/-1">Ningún jugador alcanza el mínimo de ${HIGHS_MIN_G} partidos en una temporada.</p>`;
     return;
   }
 
