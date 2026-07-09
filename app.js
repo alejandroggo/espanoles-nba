@@ -788,7 +788,8 @@ function renderRkTable() {
         const hl = rkSortCol === c.key ? ' td-hl' : '';
         const rank = (c.fmt && rkRanks[c.key] && j[c.key] != null) ? rkRanks[c.key][j.id] : null;
         const rankTag = rank ? ` <span class="stat-rank">(${rank})</span>` : '';
-        return `<td class="${c.cls || ''}${hl}">${val}${rankTag}</td>`;
+        const lead = rank === 1 ? ' td-leader' : '';
+        return `<td class="${c.cls || ''}${hl}${lead}">${val}${rankTag}</td>`;
       }).join('')}
     </tr>`).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
