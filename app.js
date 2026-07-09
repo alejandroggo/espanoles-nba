@@ -1037,3 +1037,132 @@ function showDorsal(n) {
 
   if (window.matchMedia('(max-width: 900px)').matches) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA TRANSACCIONES
+// ══════════════════════════════════════════════
+let trAll = [];
+let trSortCol = 'fecha';
+let trSortAsc = false;
+let trSearch = '';
+let trTipo = '';
+let trYear = '';
+
+const TR_COLS = [
+  { key: 'rank',    label: '#',        sortable: false, cls: 'td-rank' },
+  { key: 'fecha',   label: 'Fecha',    sortable: true,  cls: 'td-center' },
+  { key: 'jugador', label: 'Jugador',  sortable: true },
+  { key: 'tipo',    label: 'Tipo',     sortable: true },
+  { key: 'equipo1', label: 'Equipo',   sortable: true,  cls: 'td-center' },
+  { key: 'equipo2', label: 'Equipo 2', sortable: true,  cls: 'td-center' },
+  { key: 'otros',   label: 'Otros jugadores', sortable: false },
+  { key: 'notas',   label: 'Notas',    sortable: false, cls: 'td-notas' },
+];
+
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function trFechaDisplay(iso) {
+  if (!iso) return '—';
+  const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return iso;
+  return `${parseInt(m[3])} ${MESES[parseInt(m[2]) - 1]} ${m[1]}`;
+}
+function trYearOf(iso) { const m = String(iso || '').match(/^(\d{4})/); return m ? m[1] : ''; }
+
+function trTipoClass(t) {
+  const s = (t || '').toLowerCase();
+  if (s.includes('draft')) return 'tt-draft';
+  if (s.includes('traspas')) return 'tt-trade';
+  if (s.includes('firma') || s.includes('renov') || s.includes('agente libre')) return 'tt-sign';
+  if (s.includes('cortad') || s.includes('waiver') || s.includes('renuncia')) return 'tt-waive';
+  if (s.includes('rechaza') || s.includes('opción') || s.includes('opcion')) return 'tt-option';
+  if (s.includes('retir')) return 'tt-retire';
+  return 'tt-other';
+}
+
+async function initTransaccionesPage() {
+  let data;
+  try {
+    data = await loadData();
+  } catch (e) {
+    document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
+    return;
+  }
+
+  trAll = (data.transacciones || []).filter(t => t.tipo);
+
+  document.getElementById('hero-sub').textContent =
+    trAll.length ? `${trAll.length} movimientos de mercado` : 'Aún no hay datos de transacciones';
+
+  renderTrKpis();
+  buildTrFilters();
+  document.getElementById('tr-search').addEventListener('input', e => { trSearch = e.target.value.trim().toLowerCase(); renderTrTable(); });
+  document.getElementById('tr-tipo').addEventListener('change', e => { trTipo = e.target.value; renderTrTable(); });
+  document.getElementById('tr-year').addEventListener('change', e => { trYear = e.target.value; renderTrTable(); });
+  renderTrTable();
+}
+
+function renderTrKpis() {
+  const total = trAll.length;
+  const porTipo = {}, porJug = {};
+  trAll.forEach(t => { porTipo[t.tipo] = (porTipo[t.tipo] || 0) + 1; porJug[t.jugador] = (porJug[t.jugador] || 0) + 1; });
+  const topTipo = Object.entries(porTipo).sort((a, b) => b[1] - a[1])[0] || ['—', 0];
+  const topJug = Object.entries(porJug).sort((a, b) => b[1] - a[1])[0] || ['—', 0];
+
+  document.getElementById('tr-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${total}</div><div class="kpi-label">Movimientos</div></div>
+    <div class="kpi"><div class="kpi-num">${topTipo[1]}</div><div class="kpi-label">Más común · ${topTipo[0]}</div></div>
+    <div class="kpi"><div class="kpi-num">${topJug[1]}</div><div class="kpi-label">Más movido · ${topJug[0]}</div></div>`;
+}
+
+function buildTrFilters() {
+  const tipos = [...new Set(trAll.map(t => t.tipo))].sort();
+  document.getElementById('tr-tipo').innerHTML =
+    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+  const years = [...new Set(trAll.map(t => trYearOf(t.fecha)).filter(Boolean))].sort((a, b) => b - a);
+  document.getElementById('tr-year').innerHTML =
+    '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+}
+
+function renderTrTable() {
+  let rows = trAll.filter(t => {
+    if (trTipo && t.tipo !== trTipo) return false;
+    if (trYear && trYearOf(t.fecha) !== trYear) return false;
+    if (trSearch && !t.jugador.toLowerCase().includes(trSearch)) return false;
+    return true;
+  });
+
+  rows.sort((a, b) => {
+    const va = String(a[trSortCol] || ''), vb = String(b[trSortCol] || '');
+    return trSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  document.getElementById('tr-count').textContent = `${rows.length} movimiento${rows.length === 1 ? '' : 's'}`;
+
+  document.getElementById('tr-thead').innerHTML = `<tr>
+    ${TR_COLS.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = trSortCol === c.key;
+      const ariaSort = active ? (trSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (trSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortTr('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('tr-body').innerHTML = rows.map((t, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
+      <td class="td-nombre">${t.jugador}</td>
+      <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
+      <td class="td-center">${t.equipo1 || '—'}</td>
+      <td class="td-center">${t.equipo2 || '—'}</td>
+      <td class="td-muted">${t.otros || '—'}</td>
+      <td class="td-muted td-notas">${t.notas || '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function sortTr(col) {
+  if (trSortCol === col) trSortAsc = !trSortAsc;
+  else { trSortCol = col; trSortAsc = (col === 'jugador' || col === 'tipo'); }
+  renderTrTable();
+}
