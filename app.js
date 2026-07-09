@@ -671,7 +671,7 @@ let rkSearch = '';
 let rkRanks = {};           // { statKey: { playerId: posición } }
 
 const RK_STAT_KEYS = [
-  'partidos', 'min_g', 'pts_g', 'rbd_g', 'ast_g', 'stl_g', 'blk_g', 'fg_pct', 'tres_pct', 'ft_pct',
+  'partidos', 'partidos_titular', 'pct_gs', 'min_g', 'pts_g', 'rbd_g', 'ast_g', 'stl_g', 'blk_g', 'fg_pct', 'tres_pct', 'ft_pct',
   'min_total', 'pts_total', 'rbd_total', 'ast_total', 'stl_total', 'blk_total', 'tres_total', 'tov_total',
 ];
 
@@ -695,7 +695,9 @@ const RK_COLS_TOT = [
   { key: 'rank',        label: '#',    sortable: false, cls: 'td-rank' },
   { key: 'foto',        label: '',     sortable: false },
   { key: 'nombre',      label: 'Jugador', sortable: true },
-  { key: 'partidos',    label: 'PJ',   sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'partidos',         label: 'PJ',   sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'partidos_titular', label: 'GS',   sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'pct_gs',           label: '%GS',  sortable: true, cls: 'td-num', fmt: fmtPct },
   { key: 'min_total',   label: 'MIN',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'pts_total',   label: 'PTS',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'rbd_total',   label: 'REB',  sortable: true, cls: 'td-num', fmt: fmtEnt },
@@ -720,6 +722,7 @@ async function initRankingPage() {
   }
 
   rkAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
+  rkAll.forEach(j => { j.pct_gs = j.partidos ? (j.partidos_titular || 0) / j.partidos : 0; });
   buildRkRanks();
 
   document.getElementById('hero-sub').textContent =
