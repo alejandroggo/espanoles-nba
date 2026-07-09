@@ -668,6 +668,12 @@ let rkMode = 'pg';          // 'pg' (por partido) | 'tot' (totales)
 let rkSortCol = 'pts_g';
 let rkSortAsc = false;
 let rkSearch = '';
+let rkRanks = {};           // { statKey: { playerId: posición } }
+
+const RK_STAT_KEYS = [
+  'partidos', 'min_g', 'pts_g', 'rbd_g', 'ast_g', 'stl_g', 'blk_g', 'fg_pct', 'tres_pct', 'ft_pct',
+  'min_total', 'pts_total', 'rbd_total', 'ast_total', 'stl_total', 'blk_total', 'tres_total', 'tov_total',
+];
 
 const RK_COLS_PG = [
   { key: 'rank',      label: '#',   sortable: false, cls: 'td-rank' },
@@ -714,6 +720,7 @@ async function initRankingPage() {
   }
 
   rkAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
+  buildRkRanks();
 
   document.getElementById('hero-sub').textContent =
     `${rkAll.length} jugadores con partidos en la NBA · Estadísticas de carrera`;
@@ -776,9 +783,28 @@ function renderRkTable() {
         if (c.key === 'nombre') return `<td class="td-nombre">${j.nombre}</td>`;
         const val = c.fmt ? c.fmt(j[c.key]) : (j[c.key] ?? '—');
         const hl = rkSortCol === c.key ? ' td-hl' : '';
-        return `<td class="${c.cls || ''}${hl}">${val}</td>`;
+        const rank = (c.fmt && rkRanks[c.key] && j[c.key] != null) ? rkRanks[c.key][j.id] : null;
+        const rankTag = rank ? ` <span class="stat-rank">(${rank}º)</span>` : '';
+        return `<td class="${c.cls || ''}${hl}">${val}${rankTag}</td>`;
       }).join('')}
     </tr>`).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+// Posición de cada jugador en cada estadística (sobre todos los que tienen partidos)
+function buildRkRanks() {
+  rkRanks = {};
+  RK_STAT_KEYS.forEach(key => {
+    const sorted = [...rkAll].filter(j => j[key] != null).sort((a, b) => (b[key] || 0) - (a[key] || 0));
+    const map = {};
+    let prevVal = null, prevRank = 0;
+    sorted.forEach((j, i) => {
+      const v = j[key] || 0;
+      const rank = (v === prevVal) ? prevRank : i + 1;
+      map[j.id] = rank;
+      prevVal = v; prevRank = rank;
+    });
+    rkRanks[key] = map;
+  });
 }
 
 function sortRk(col) {
