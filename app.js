@@ -885,7 +885,8 @@ function jerseyClass(count) {
   if (!count) return 'j0';
   if (count === 1) return 'j1';
   if (count === 2) return 'j2';
-  return 'j3';
+  if (count === 3) return 'j3';
+  return 'j4';
 }
 
 function renderDrKpis() {
@@ -906,7 +907,8 @@ function renderDrLegend() {
     <span class="leg-item"><span class="leg-chip j0"></span>Sin usar</span>
     <span class="leg-item"><span class="leg-chip j1"></span>1 jugador</span>
     <span class="leg-item"><span class="leg-chip j2"></span>2 jugadores</span>
-    <span class="leg-item"><span class="leg-chip j3"></span>3 o más</span>`;
+    <span class="leg-item"><span class="leg-chip j3"></span>3 jugadores</span>
+    <span class="leg-item"><span class="leg-chip j4"></span>4 o más</span>`;
 }
 
 function jerseySvg(n) {
