@@ -1743,3 +1743,111 @@ function renderHighs() {
     return `<tr>${cells}</tr>`;
   }).join('');
 }
+
+// ══════════════════════════════════════════════
+// PÁGINA DEBUT
+// ══════════════════════════════════════════════
+let debutRows = [];
+let debutSortCol = 'fecha';
+let debutSortAsc = true;
+let debutSearch = '';
+
+const DEBUT_COLS = [
+  { key: 'rank',   label: '#',       sortable: false, cls: 'td-rank' },
+  { key: 'foto',   label: '',        sortable: false },
+  { key: 'nombre', label: 'Jugador', sortable: true },
+  { key: 'fecha',  label: 'Fecha',   sortable: true, cls: 'td-center' },
+  { key: 'equipo', label: 'Equipo',  sortable: true, cls: 'td-center' },
+  { key: 'rival',  label: 'Rival',   sortable: true, cls: 'td-center' },
+  { key: 'min',    label: 'MIN',     sortable: true, cls: 'td-num' },
+  { key: 'pts',    label: 'PTS',     sortable: true, cls: 'td-num' },
+  { key: 'rbd',    label: 'REB',     sortable: true, cls: 'td-num' },
+  { key: 'ast',    label: 'AST',     sortable: true, cls: 'td-num' },
+];
+
+function debutDateKey(fecha) {
+  const m = String(fecha || '').match(/(\d{1,2})\s+(\w+|\w{3})\s+(\d{4})/) || String(fecha || '').match(/(\d{1,2})\s+([a-zé]+)\s+(\d{4})/i);
+  if (!m) return 0;
+  const mes = MESES.indexOf(m[2].toLowerCase().slice(0, 3));
+  return parseInt(m[3]) * 10000 + (mes + 1) * 100 + parseInt(m[1]);
+}
+function minToSec(v) {
+  const m = String(v || '').match(/(\d+):(\d+)/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : (parseFloat(v) || 0);
+}
+
+async function initDebutPage() {
+  let jugadores;
+  try { jugadores = (await loadData()).jugadores || []; }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+
+  buildPlayerIds(jugadores);
+  debutRows = jugadores.filter(j => j.primer_partido && j.primer_partido.fecha).map(j => ({
+    id: j.id, nombre: j.nombre, foto_url: j.foto_url, bref_id: j.bref_id,
+    fecha: j.primer_partido.fecha,
+    equipo: j.primer_partido.equipo || '',
+    rival: j.primer_partido.rival || '',
+    min: j.primer_partido.min || '',
+    pts: j.primer_partido.pts, rbd: j.primer_partido.rbd, ast: j.primer_partido.ast,
+    _key: debutDateKey(j.primer_partido.fecha),
+    _min: minToSec(j.primer_partido.min),
+  }));
+
+  document.getElementById('hero-sub').textContent = `${debutRows.length} debuts en la NBA`;
+  renderDebutKpis();
+  document.getElementById('debut-search').addEventListener('input', e => { debutSearch = e.target.value.trim().toLowerCase(); renderDebutTable(); });
+  renderDebutTable();
+}
+
+function renderDebutKpis() {
+  const primero = [...debutRows].sort((a, b) => a._key - b._key)[0];
+  const masPuntos = [...debutRows].sort((a, b) => (b.pts || 0) - (a.pts || 0))[0];
+  document.getElementById('debut-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-num">${debutRows.length}</div><div class="kpi-label">Debutantes</div></div>
+    <div class="kpi"><div class="kpi-num">${primero ? primero.fecha.match(/\d{4}/)[0] : '—'}</div><div class="kpi-label">Primer debut · ${primero ? primero.nombre : ''}</div></div>
+    <div class="kpi"><div class="kpi-num">${masPuntos ? masPuntos.pts : '—'}</div><div class="kpi-label">Mejor debut (pts) · ${masPuntos ? masPuntos.nombre : ''}</div></div>`;
+}
+
+function sortDebut(col) {
+  if (debutSortCol === col) debutSortAsc = !debutSortAsc;
+  else { debutSortCol = col; debutSortAsc = (col === 'fecha' || col === 'nombre' || col === 'equipo' || col === 'rival'); }
+  renderDebutTable();
+}
+
+function renderDebutTable() {
+  let rows = debutRows.filter(r => !debutSearch || r.nombre.toLowerCase().includes(debutSearch));
+  rows.sort((a, b) => {
+    let va, vb;
+    if (debutSortCol === 'fecha') { va = a._key; vb = b._key; }
+    else if (debutSortCol === 'min') { va = a._min; vb = b._min; }
+    else if (['pts', 'rbd', 'ast'].includes(debutSortCol)) { va = a[debutSortCol] || 0; vb = b[debutSortCol] || 0; }
+    else { va = String(a[debutSortCol] || ''); vb = String(b[debutSortCol] || ''); return debutSortAsc ? va.localeCompare(vb) : vb.localeCompare(va); }
+    return debutSortAsc ? va - vb : vb - va;
+  });
+
+  document.getElementById('debut-count').textContent = `${rows.length} debut${rows.length === 1 ? '' : 's'}`;
+
+  document.getElementById('debut-thead').innerHTML = `<tr>
+    ${DEBUT_COLS.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = debutSortCol === c.key;
+      const ariaSort = active ? (debutSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (debutSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortDebut('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('debut-body').innerHTML = rows.map((r, i) => `
+    <tr>
+      <td class="td-rank td-muted">${i + 1}</td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
+      <td class="td-nombre">${plLink(r.nombre, r.nombre)}</td>
+      <td class="td-center">${r.fecha}</td>
+      <td class="td-center">${r.equipo || '—'}</td>
+      <td class="td-center">${r.rival || '—'}</td>
+      <td class="td-num">${r.min || '—'}</td>
+      <td class="td-num">${r.pts ?? '—'}</td>
+      <td class="td-num">${r.rbd ?? '—'}</td>
+      <td class="td-num">${r.ast ?? '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="${DEBUT_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
