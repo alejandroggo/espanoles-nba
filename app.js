@@ -737,7 +737,7 @@ function renderPrGrouped(entries) {
     jugador: g.jugador,
     count: g.count,
     desglose: Object.entries(g.tipos).sort((a, b) => b[1] - a[1])
-      .map(([t, n]) => n > 1 ? `${t} ×${n}` : t).join(' · '),
+      .map(([t, n]) => n > 1 ? `${t} ×${n}` : t).join(', '),
   }));
 
   rows.sort((a, b) => {
@@ -752,7 +752,7 @@ function renderPrGrouped(entries) {
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${plLink(g.jugador, g.jugador)}</td>
       <td class="td-num">${g.count}</td>
-      <td class="td-muted">${g.desglose}</td>
+      <td>${g.desglose}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -783,7 +783,7 @@ function renderPrGroupedTipo(entries) {
       <td class="td-rank td-muted">${i + 1}</td>
       <td>${g.tipo}</td>
       <td class="td-num">${g.count}</td>
-      <td class="td-muted">${jl}</td>
+      <td>${jl}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
