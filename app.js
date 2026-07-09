@@ -1463,3 +1463,138 @@ function jugTransSec(trans) {
   return jugSection('Transacciones',
     `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th><th>Otros</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table></div>`);
 }
+
+// ══════════════════════════════════════════════
+// TEST / TRIVIA
+// ══════════════════════════════════════════════
+let quizData = null, quizCurrent = null, quizAnswered = false;
+let quizScore = 0, quizTotal = 0, quizStreak = 0, quizBest = 0;
+
+function qPick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function qShuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+function qSample(a, n) { return qShuffle(a).slice(0, n); }
+function qMax(arr, key) { return arr.reduce((a, b) => (b[key] || 0) > (a[key] || 0) ? b : a); }
+function qOptions(correct, pool, n = 3) {
+  const seen = new Set([String(correct)]); const out = [];
+  for (const x of qShuffle(pool)) { if (out.length >= n) break; if (!seen.has(String(x))) { seen.add(String(x)); out.push(x); } }
+  return qShuffle([correct, ...out]);
+}
+function qFourPlayers(D) { return qSample(D.stat, 4).map(x => x.nombre); }
+
+const QUIZ_GENS = [
+  D => { // año de draft
+    const pool = D.drafted; const years = [...new Set(pool.map(x => x.draft_anio))];
+    if (pool.length < 4 || years.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿En qué año fue elegido <b>${j.nombre}</b> en el draft?`, correct: j.draft_anio, options: qOptions(j.draft_anio, years) };
+  },
+  D => { // equipo del draft
+    const pool = D.drafted.filter(x => x.draft_equipo); const teams = [...new Set(pool.map(x => x.draft_equipo))];
+    if (pool.length < 4 || teams.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿Qué equipo eligió a <b>${j.nombre}</b> en el draft?`, correct: j.draft_equipo, options: qOptions(j.draft_equipo, teams) };
+  },
+  D => { // pick del draft
+    const pool = D.drafted.filter(x => x.draft_pick); const picks = [...new Set(pool.map(x => '#' + x.draft_pick))];
+    if (pool.length < 4 || picks.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿Con qué número fue elegido <b>${j.nombre}</b> (${j.draft_anio})?`, correct: '#' + j.draft_pick, options: qOptions('#' + j.draft_pick, picks) };
+  },
+  D => { // máximo anotador PPG entre 4
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Cuál de estos jugadores promedió más <b>puntos por partido</b> en su carrera?', correct: qMax(four, 'pts_g').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más puntos totales entre 4
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Quién ha anotado más <b>puntos totales</b> en la NBA?', correct: qMax(four, 'pts_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más rebotes totales
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Quién ha capturado más <b>rebotes totales</b> en la NBA?', correct: qMax(four, 'rbd_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más asistencias totales
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Quién ha dado más <b>asistencias totales</b> en la NBA?', correct: qMax(four, 'ast_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más partidos
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Cuál de estos jugadores ha disputado más <b>partidos</b> en la NBA?', correct: qMax(four, 'partidos').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // mejor pagado
+    const pool = D.J.filter(j => j.ganancias > 0); if (pool.length < 4) return null; const four = qSample(pool, 4);
+    return { q: '¿Cuál de estos jugadores ha <b>ganado más dinero</b> en la NBA?', correct: qMax(four, 'ganancias').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // premio único (ROY, DPOY, MVP...)
+    const unis = ['DPOY', 'ROY', 'MVP', 'All Defense'].filter(t => D.premios.some(p => p.tipo === t));
+    if (!unis.length || D.J.length < 4) return null;
+    const t = qPick(unis); const winner = qPick(D.premios.filter(p => p.tipo === t)).jugador;
+    return { q: `¿Qué español ganó el premio <b>${t}</b>?`, correct: winner, options: qOptions(winner, D.J.map(j => j.nombre).filter(n => n !== winner)) };
+  },
+  D => { // dorsal en un equipo
+    const pool = D.dorsales.filter(x => x.team); const nums = [...new Set(D.dorsales.map(x => String(x.numero)))];
+    if (pool.length < 4 || nums.length < 4) return null;
+    const d = qPick(pool);
+    return { q: `¿Qué <b>dorsal</b> llevó ${d.jugador} en ${d.team}?`, correct: String(d.numero), options: qOptions(String(d.numero), nums) };
+  },
+  D => { // posición
+    const pool = D.J.filter(j => j.posicion); const pos = [...new Set(pool.map(x => x.posicion))];
+    if (pool.length < 4 || pos.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿En qué <b>posición</b> jugaba ${j.nombre}?`, correct: j.posicion, options: qOptions(j.posicion, pos) };
+  },
+  D => { // cuál NO fue drafteado
+    const und = D.J.filter(j => !j.draft && (j.partidos || 0) > 0); if (und.length < 1 || D.drafted.length < 3) return null;
+    const u = qPick(und); const three = qSample(D.drafted, 3).map(x => x.nombre);
+    return { q: '¿Cuál de estos jugadores <b>NO fue drafteado</b>?', correct: u.nombre, options: qShuffle([u.nombre, ...three]) };
+  },
+];
+
+async function initTestPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('quiz-q').textContent = 'Error al cargar los datos'; return; }
+  const J = data.jugadores || [];
+  quizData = {
+    J,
+    drafted: J.filter(j => j.draft && j.draft_anio),
+    stat: J.filter(j => (j.partidos || 0) > 0),
+    dorsales: (data.dorsales || []).filter(d => d.numero != null),
+    premios: J.flatMap(j => (j.premios || []).map(p => ({ ...p, jugador: j.nombre }))),
+  };
+  quizNext();
+}
+
+function quizNext() {
+  let q = null, tries = 0;
+  while (!q && tries < 60) { q = qPick(QUIZ_GENS)(quizData); tries++; }
+  if (!q) { document.getElementById('quiz-q').textContent = 'No hay datos suficientes para el test.'; return; }
+  quizCurrent = q; quizAnswered = false;
+  document.getElementById('quiz-next').hidden = true;
+  const fb = document.getElementById('quiz-feedback'); fb.textContent = ''; fb.className = 'quiz-feedback';
+  document.getElementById('quiz-q').innerHTML = q.q;
+  document.getElementById('quiz-options').innerHTML =
+    q.options.map((o, i) => `<button class="quiz-opt" onclick="quizAnswer(${i})">${o}</button>`).join('');
+}
+
+function quizAnswer(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const opts = [...document.querySelectorAll('.quiz-opt')];
+  const chosen = quizCurrent.options[i];
+  const correct = quizCurrent.correct;
+  const ok = String(chosen) === String(correct);
+  quizTotal++;
+  if (ok) { quizScore++; quizStreak++; quizBest = Math.max(quizBest, quizStreak); } else { quizStreak = 0; }
+
+  opts.forEach((b, k) => {
+    b.disabled = true;
+    if (String(quizCurrent.options[k]) === String(correct)) b.classList.add('quiz-ok');
+    else if (k === i) b.classList.add('quiz-ko');
+  });
+  document.getElementById('quiz-score').textContent = `${quizScore} / ${quizTotal}`;
+  document.getElementById('quiz-streak').textContent = quizStreak >= 2 ? `🔥 ${quizStreak}` : '';
+  const fb = document.getElementById('quiz-feedback');
+  fb.innerHTML = ok ? '¡Correcto!' : `Respuesta: <b>${correct}</b>`;
+  fb.className = 'quiz-feedback ' + (ok ? 'fb-ok' : 'fb-ko');
+  document.getElementById('quiz-next').hidden = false;
+}

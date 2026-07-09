@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dorsales · Españoles en la NBA</title>
-<meta name="description" content="Todos los dorsales (0-99) que han vestido los jugadores españoles en la NBA. Descubre quién llevó cada número.">
+<title>Test · Españoles en la NBA</title>
+<meta name="description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA: test de preguntas aleatorias con 4 opciones.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,23 +28,21 @@
 
 <!-- CONTENIDO -->
 <main>
-  <section class="hero hero--page">
-    <div class="hero-top">
-      <div>
-        <h1 class="hero-title ag-hero">Los <em>Dorsales</em></h1>
-        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+  <section class="quiz-wrap">
+    <div class="quiz-head">
+      <h1 class="hero-title ag-hero">El <em>Test</em></h1>
+      <div class="quiz-score">
+        <span id="quiz-score">0 / 0</span>
+        <span class="quiz-streak" id="quiz-streak"></span>
       </div>
-      <div class="hero-kpis" id="dr-kpis"></div>
     </div>
-  </section>
-
-  <section class="dorsales-legend" id="dr-legend" aria-label="Leyenda"></section>
-
-  <section class="dorsales-layout">
-    <div class="dorsales-grid" id="dr-grid" role="list" aria-label="Dorsales del 0 al 99"></div>
-    <div class="dorsal-side">
-      <aside class="dorsal-detail" id="dr-detail" aria-live="polite"></aside>
-      <div class="dr-por-jugador" id="dr-por-jugador"></div>
+    <div class="quiz-card">
+      <p class="quiz-q" id="quiz-q">Cargando…</p>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-foot">
+        <span class="quiz-feedback" id="quiz-feedback"></span>
+        <button class="quiz-next" id="quiz-next" onclick="quizNext()" hidden>Siguiente →</button>
+      </div>
     </div>
   </section>
 </main>
@@ -73,6 +71,6 @@
 </footer>
 
 <script src="app.js?v=8"></script>
-<script>initTheme(); initDorsalesPage();</script>
+<script>initTheme(); initTestPage();</script>
 </body>
 </html>
