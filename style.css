@@ -782,3 +782,5 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .highs-wrap { padding: 0 var(--space-4) var(--space-12); }
   .highs-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.highs-empty { padding: 2rem; text-align: center; color: var(--text-muted); }

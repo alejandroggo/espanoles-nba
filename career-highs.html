@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -45,8 +45,12 @@
     </div>
   </section>
 
-  <section class="highs-wrap">
-    <div class="highs-grid" id="highs-grid"></div>
+  <section class="tabla-wrap" aria-label="Máximos por jugador">
+    <table id="highs-table">
+      <thead id="highs-thead"></thead>
+      <tbody id="highs-body"></tbody>
+    </table>
+    <p class="highs-empty" id="highs-empty" hidden></p>
   </section>
 </main>
 
@@ -73,7 +77,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 <script>initTheme(); initHighsPage();</script>
 </body>
 </html>

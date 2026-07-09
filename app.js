@@ -1606,41 +1606,42 @@ function quizAnswer(i) {
   document.getElementById('quiz-next').hidden = false;
 }
 
+
 // ══════════════════════════════════════════════
 // PÁGINA CAREER HIGHS
 // ══════════════════════════════════════════════
 let highsJ = [];
-let highsMode = 'total';   // 'total' | 'pg' | 'game'
-const HIGHS_MIN_G = 55;    // mínimo de partidos para "por partido en temporada"
+let highsMode = 'total';    // 'total' | 'pg' | 'game'
+let highsSortCol = 'pts_g';
+let highsSortAsc = false;
+const HIGHS_MIN_G = 55;     // mínimo de partidos para "por partido en temporada"
 
-// Medias por temporada (estadística por partido)
-const SEASON_PG_STATS = [
-  { key: 'pts_g',    label: 'Puntos',       fmt: fmtDec1 },
-  { key: 'rbd_g',    label: 'Rebotes',      fmt: fmtDec1 },
-  { key: 'ast_g',    label: 'Asistencias',  fmt: fmtDec1 },
-  { key: 'stl_g',    label: 'Robos',        fmt: fmtDec1 },
-  { key: 'blk_g',    label: 'Tapones',      fmt: fmtDec1 },
-  { key: 'min_g',    label: 'Minutos',      fmt: fmtDec1 },
-  { key: 'fg_pct',   label: '% Tiros de campo', fmt: fmtPct },
-  { key: 'tres_pct', label: '% Triples',    fmt: fmtPct },
-  { key: 'ft_pct',   label: '% Tiros libres', fmt: fmtPct },
+// Columnas de estadística (key = campo de temporadas_data)
+const HIGHS_TOTAL_STATS = [
+  { key: 'pts_g', label: 'PTS', fmt: fmtEnt },
+  { key: 'rbd_g', label: 'REB', fmt: fmtEnt },
+  { key: 'ast_g', label: 'AST', fmt: fmtEnt },
+  { key: 'stl_g', label: 'ROB', fmt: fmtEnt },
+  { key: 'blk_g', label: 'TAP', fmt: fmtEnt },
+  { key: 'min_g', label: 'MIN', fmt: fmtEnt },
 ];
-
-// Totales por temporada (media × partidos)
-const SEASON_TOTAL_STATS = [
-  { key: 'pts_g', label: 'Puntos' },
-  { key: 'rbd_g', label: 'Rebotes' },
-  { key: 'ast_g', label: 'Asistencias' },
-  { key: 'stl_g', label: 'Robos' },
-  { key: 'blk_g', label: 'Tapones' },
-  { key: 'min_g', label: 'Minutos' },
+const HIGHS_PG_STATS = [
+  { key: 'pts_g', label: 'PTS', fmt: fmtDec1 },
+  { key: 'rbd_g', label: 'REB', fmt: fmtDec1 },
+  { key: 'ast_g', label: 'AST', fmt: fmtDec1 },
+  { key: 'stl_g', label: 'ROB', fmt: fmtDec1 },
+  { key: 'blk_g', label: 'TAP', fmt: fmtDec1 },
+  { key: 'min_g', label: 'MIN', fmt: fmtDec1 },
+  { key: 'fg_pct', label: 'FG%', fmt: fmtPct },
+  { key: 'tres_pct', label: '3P%', fmt: fmtPct },
+  { key: 'ft_pct', label: 'FT%', fmt: fmtPct },
 ];
 
 async function initHighsPage() {
   let data;
   try { data = await loadData(); }
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
-  highsJ = data.jugadores || [];
+  highsJ = (data.jugadores || []).filter(j => (j.temporadas_data || []).length);
   buildPlayerIds(highsJ);
   renderHighs();
 }
@@ -1653,86 +1654,92 @@ function setHighsMode(m) {
     btn.classList.toggle('active', x === m);
     btn.setAttribute('aria-pressed', String(x === m));
   });
+  highsSortCol = 'pts_g'; highsSortAsc = false;
   renderHighs();
 }
 
-function bestSeason(key, minG) {
+// Mejor registro del jugador en una estadística según el modo
+function playerBest(j, key) {
   let best = null;
-  highsJ.forEach(j => {
-    (j.temporadas_data || []).forEach(t => {
-      const v = t[key];
-      if (v == null || (t.g || 0) < minG) return;
-      if (!best || v > best.value) best = { value: v, jugador: j.nombre, year: t.year, team: t.team, g: t.g };
-    });
+  (j.temporadas_data || []).forEach(t => {
+    const avg = t[key], g = t.g || 0;
+    if (avg == null) return;
+    let v;
+    if (highsMode === 'total') { if (!g) return; v = avg * g; }
+    else { if (g < HIGHS_MIN_G) return; v = avg; }   // 'pg'
+    if (best == null || v > best) best = v;
   });
   return best;
 }
 
-function bestSeasonTotal(keyG) {
-  let best = null;
-  highsJ.forEach(j => {
-    (j.temporadas_data || []).forEach(t => {
-      const avg = t[keyG], g = t.g || 0;
-      if (avg == null || !g) return;
-      const total = avg * g;
-      if (!best || total > best.value) best = { value: total, jugador: j.nombre, year: t.year, team: t.team };
-    });
-  });
-  return best;
-}
-
-function highCard(label, value, jugador, ctx) {
-  return `<div class="hc-card">
-    <div class="hc-label">${label}</div>
-    <div class="hc-val">${value}</div>
-    <div class="hc-who">${plLink(jugador, jugador)}</div>
-    <div class="hc-ctx">${ctx || ''}</div>
-  </div>`;
+function sortHighs(col) {
+  if (highsSortCol === col) highsSortAsc = !highsSortAsc;
+  else { highsSortCol = col; highsSortAsc = (col === 'nombre'); }
+  renderHighs();
 }
 
 function renderHighs() {
-  const grid = document.getElementById('highs-grid');
   const subs = {
-    total: 'Mejores totales en una sola temporada',
-    pg: `Mejores medias en una temporada (mín. ${HIGHS_MIN_G} partidos)`,
-    game: 'Mejores registros en un solo partido',
+    total: 'Máximo de cada jugador en una sola temporada (totales)',
+    pg: `Máxima media de cada jugador en una temporada (mín. ${HIGHS_MIN_G} partidos)`,
+    game: 'Máximo de cada jugador en un solo partido',
   };
   document.getElementById('hero-sub').textContent = subs[highsMode];
 
-  if (highsMode === 'total') {
-    const cards = SEASON_TOTAL_STATS.map(s => {
-      const b = bestSeasonTotal(s.key);
-      if (!b) return '';
-      return highCard(s.label, fmtEnt(b.value), b.jugador, `${drSeason(b.year)}${b.team ? ` · ${b.team}` : ''}`);
-    }).filter(Boolean).join('');
-    grid.innerHTML = cards || '<p class="td-muted" style="padding:2rem">Sin datos de temporadas.</p>';
-    return;
-  }
+  const table = document.getElementById('highs-table');
+  const empty = document.getElementById('highs-empty');
 
-  if (highsMode === 'pg') {
-    const cards = SEASON_PG_STATS.map(s => {
-      const b = bestSeason(s.key, HIGHS_MIN_G);
-      if (!b) return '';
-      return highCard(s.label, s.fmt(b.value), b.jugador, `${drSeason(b.year)}${b.team ? ` · ${b.team}` : ''}`);
-    }).filter(Boolean).join('');
-    grid.innerHTML = cards || `<p class="td-muted" style="padding:2rem;grid-column:1/-1">Ningún jugador alcanza el mínimo de ${HIGHS_MIN_G} partidos en una temporada.</p>`;
+  if (highsMode === 'game') {
+    table.hidden = true; empty.hidden = false;
+    empty.textContent = 'Aún no hay datos de máximos por partido. Se rellenarán cuando el bot exporte la pestaña GAME HIGHS.';
     return;
   }
+  table.hidden = false; empty.hidden = true;
 
-  // Máximo en un partido (game highs / records)
-  const recs = highsJ.flatMap(j => (j.records || []).map(r => ({ ...r, jugador: j.nombre })));
-  if (!recs.length) {
-    grid.innerHTML = `<p class="td-muted" style="padding:2rem;grid-column:1/-1">
-      Aún no hay datos de máximos por partido. Se rellenarán cuando el bot exporte la pestaña GAME HIGHS.</p>`;
-    return;
-  }
-  const byCat = {};
-  recs.forEach(r => {
-    const v = Number(String(r.valor).replace(/[^0-9.]/g, ''));
-    if (isNaN(v)) return;
-    if (!byCat[r.categoria] || v > byCat[r.categoria].num) byCat[r.categoria] = { ...r, num: v };
+  const stats = highsMode === 'total' ? HIGHS_TOTAL_STATS : HIGHS_PG_STATS;
+  const cols = [
+    { key: 'rank', label: '#', cls: 'td-rank', sortable: false },
+    { key: 'foto', label: '', sortable: false },
+    { key: 'nombre', label: 'Jugador', sortable: true },
+    ...stats.map(s => ({ ...s, cls: 'td-num', sortable: true })),
+  ];
+
+  // valores por jugador + máximo por columna (para resaltar el líder)
+  const rows = highsJ.map(j => {
+    const best = {};
+    stats.forEach(s => { best[s.key] = playerBest(j, s.key); });
+    return { j, best };
   });
-  grid.innerHTML = Object.values(byCat).map(r =>
-    highCard(r.categoria, r.valor, r.jugador, [r.team, r.rival, r.fecha].filter(Boolean).join(' · '))
-  ).join('') || '<p class="td-muted" style="padding:2rem">Sin datos.</p>';
+  const colMax = {};
+  stats.forEach(s => { colMax[s.key] = Math.max(...rows.map(r => r.best[s.key] ?? -Infinity)); });
+
+  rows.sort((a, b) => {
+    if (highsSortCol === 'nombre') return highsSortAsc ? a.j.nombre.localeCompare(b.j.nombre) : b.j.nombre.localeCompare(a.j.nombre);
+    const va = a.best[highsSortCol] ?? -1, vb = b.best[highsSortCol] ?? -1;
+    return highsSortAsc ? va - vb : vb - va;
+  });
+
+  document.getElementById('highs-thead').innerHTML = `<tr>
+    ${cols.map(c => {
+      if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
+      const active = highsSortCol === c.key;
+      const ariaSort = active ? (highsSortAsc ? 'ascending' : 'descending') : 'none';
+      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (highsSortAsc ? ' asc' : '') : ''}"
+        aria-sort="${ariaSort}" onclick="sortHighs('${c.key}')">${c.label}</th>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('highs-body').innerHTML = rows.map((r, i) => {
+    const j = r.j;
+    const cells = cols.map(c => {
+      if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
+      if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>`;
+      if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
+      const v = r.best[c.key];
+      const lead = (v != null && v === colMax[c.key]) ? ' td-leader' : '';
+      const hl = highsSortCol === c.key ? ' td-hl' : '';
+      return `<td class="td-num${hl}${lead}">${v != null ? c.fmt(v) : '—'}</td>`;
+    }).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
 }
