@@ -679,8 +679,8 @@ function sortSl(col) {
 // PÁGINA PREMIOS
 // ══════════════════════════════════════════════
 let prAll = [];
-let prSortCol = 'year';
-let prSortAsc = false;
+let prSortCol = 'tipo';   // por defecto ordenado por importancia del premio
+let prSortAsc = true;
 let prSearch = '';
 let prTipo = '';
 let prYear = '';
@@ -729,6 +729,10 @@ async function initPremiosPage() {
       jugador: j.nombre,
     }))).filter(p => p.tipo);
 
+  const laureados = new Set(prAll.map(p => p.jugador)).size;
+  document.getElementById('hero-sub').textContent =
+    prAll.length ? `${prAll.length} reconocimientos individuales · ${laureados} jugadores premiados` : 'Aún no hay datos de premios';
+
   renderPrKpis();
   buildPrFilters();
 
@@ -769,8 +773,8 @@ function setPrGroup(mode) {
   bp.setAttribute('aria-pressed', String(prGroup === 'player'));
   bt.classList.toggle('active', prGroup === 'tipo');
   bt.setAttribute('aria-pressed', String(prGroup === 'tipo'));
-  prSortCol = prGroup ? 'count' : 'year';
-  prSortAsc = false;
+  prSortCol = prGroup ? 'count' : 'tipo';
+  prSortAsc = !prGroup;   // sin agrupar: por importancia (asc); agrupado: por count (desc)
   renderPrTable();
 }
 
@@ -801,6 +805,11 @@ function renderPrHead(cols, sortCol, sortAsc) {
 function renderPrFlat(rows) {
   rows = [...rows].sort((a, b) => {
     if (prSortCol === 'year') { const va = a.year || 0, vb = b.year || 0; return prSortAsc ? va - vb : vb - va; }
+    if (prSortCol === 'tipo') {
+      const pa = premioPrio(a.tipo), pb = premioPrio(b.tipo);
+      if (pa !== pb) return prSortAsc ? pa - pb : pb - pa;
+      return (b.year || 0) - (a.year || 0) || a.jugador.localeCompare(b.jugador);   // desempate: año ↓, jugador
+    }
     const va = String(a[prSortCol] || ''), vb = String(b[prSortCol] || '');
     return prSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
   });
@@ -823,6 +832,15 @@ function premioRowClass(tipo) {
   if (t === 'roy' || t === 'dpoy') return 'row-oro';
   if (t === 'all nba' || t === 'all defense') return 'row-verde';
   return '';
+}
+
+// Orden de importancia (menor índice = más importante, arriba). Concursos siempre al final.
+const PREMIO_ORDEN = ['mvp', 'dpoy', 'roy', 'all nba', 'all defense', 'all rookie', 'player of the month', 'rookie of the month', 'all star', 'rising stars'];
+function premioPrio(tipo) {
+  const t = drNorm(tipo).replace(/[^a-z0-9]+/g, ' ').trim();
+  if (/concurso|triples?|mate|dunk|skill|habilidad/.test(t)) return 90;   // concursos: lo último
+  for (let i = 0; i < PREMIO_ORDEN.length; i++) if (t.includes(PREMIO_ORDEN[i])) return i;
+  return 50;   // desconocidos, en medio
 }
 
 function renderPrGrouped(entries) {
@@ -871,7 +889,7 @@ function renderPrGroupedTipo(entries) {
   }));
 
   rows.sort((a, b) => {
-    if (prSortCol === 'tipo') return prSortAsc ? a.tipo.localeCompare(b.tipo) : b.tipo.localeCompare(a.tipo);
+    if (prSortCol === 'tipo') { const pa = premioPrio(a.tipo), pb = premioPrio(b.tipo); return prSortAsc ? pa - pb : pb - pa; }
     return prSortAsc ? a.count - b.count : (b.count - a.count) || a.tipo.localeCompare(b.tipo);
   });
 
