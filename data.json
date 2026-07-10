@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-10T01:15:28.473Z",
+  "actualizado": "2026-07-10T14:28:37.562Z",
   "summer_league": [
     {
       "year": 1985,
@@ -2331,7 +2331,7 @@
           "tipo": "All Star",
           "year": 2015,
           "team": "CHI",
-          "notas": "Titular"
+          "notas": "Titular, Este"
         },
         {
           "tipo": "All Star",
@@ -2343,7 +2343,7 @@
           "tipo": "Player of the Month",
           "year": 2009,
           "team": "LAL",
-          "notas": "February 2009"
+          "notas": "Febrero 2009"
         },
         {
           "tipo": "Rising Stars",
@@ -2696,22 +2696,22 @@
           "tipo": "All Star",
           "year": 2015,
           "team": "MEM",
-          "notas": "Titular"
+          "notas": "Titular, Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2017,
           "team": "MEM",
-          "notas": "Oeste"
+          "notas": "Oeste, Oeste"
         },
         {
           "tipo": "DPOY",
           "year": 2013,
           "team": "MEM",
-          "notas": "Oeste"
+          "notas": ""
         },
         {
-          "tipo": "MVP",
+          "tipo": "MVP (votos)",
           "year": 2015,
           "team": "MEM",
           "notas": "Octavo (3 votos)"
@@ -4857,7 +4857,7 @@
         "equipo": "DEN",
         "rival": "NOL",
         "resultado": "true",
-        "min": "Sat Dec 30 1899 00:39:00 GMT-0500 (hora estándar oriental)",
+        "min": "00:39",
         "pts": 0,
         "rbd": 0,
         "ast": 0,
@@ -5277,20 +5277,20 @@
         "equipo": "BOS",
         "rival": "NYK",
         "resultado": "false",
-        "min": "",
-        "pts": 0,
-        "rbd": 0,
-        "ast": 0,
-        "stl": 0,
+        "min": "Sat Dec 30 1899 22:36:00 GMT-0500 (hora estándar oriental)",
+        "pts": 6,
+        "rbd": 4,
+        "ast": 1,
+        "stl": 2,
         "blk": 0,
-        "fgm": 0,
-        "fga": 0,
+        "fgm": 3,
+        "fga": 6,
         "tres_m": 0,
-        "tres_a": 0,
+        "tres_a": 2,
         "ftm": 0,
         "fta": 0,
         "tov": 0,
-        "pf": 0,
+        "pf": 4,
         "dd": "false"
       },
       "ganancias": 14298145,
