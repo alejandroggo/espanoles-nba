@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=31">
+<link rel="stylesheet" href="style.css?v=32">
 </head>
 <body>
 
@@ -37,12 +37,20 @@
     </div>
   </section>
 
-  <section class="controles" aria-label="Orden">
+  <section class="controles" aria-label="Orden y filtros">
     <div class="mode-switch" role="group" aria-label="Ordenar por">
       <button type="button" id="tl-sort-debut" class="toggle-chip active" aria-pressed="true" onclick="setTlSort('debut')">Por debut</button>
       <button type="button" id="tl-sort-seas" class="toggle-chip" aria-pressed="false" onclick="setTlSort('seas')">Por temporadas</button>
       <button type="button" id="tl-sort-alpha" class="toggle-chip" aria-pressed="false" onclick="setTlSort('alpha')">Alfabético</button>
     </div>
+    <label class="sel-wrap tl-range">
+      <span class="tl-range-lbl">Desde</span>
+      <select id="tl-from" class="sel" aria-label="Año de inicio"></select>
+    </label>
+    <label class="sel-wrap tl-range">
+      <span class="tl-range-lbl">Hasta</span>
+      <select id="tl-to" class="sel" aria-label="Año final"></select>
+    </label>
   </section>
 
   <section class="tl-wrap" aria-label="Línea temporal de trayectorias">
@@ -77,7 +85,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 <script>initTheme(); initLineaTemporalPage();</script>
 </body>
 </html>

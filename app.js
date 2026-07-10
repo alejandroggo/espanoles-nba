@@ -2244,7 +2244,7 @@ const TEAM_INFO = {
   CHA: { name: 'Charlotte Hornets',      label: 'Charlotte',     color: '#3a7a6a' },
   CHI: { name: 'Chicago Bulls',          label: 'Chicago',       color: '#b23a3a' },
   CLE: { name: 'Cleveland Cavaliers',    label: 'Cleveland',     color: '#6a1e3a' },
-  DAL: { name: 'Dallas Mavericks',       label: 'Dallas',        color: '#2e6fb8' },
+  DAL: { name: 'Dallas Mavericks',       label: 'Dallas',        color: '#14459c' },
   DEN: { name: 'Denver Nuggets',         label: 'Denver',        color: '#1f3a78' },
   DET: { name: 'Detroit Pistons',        label: 'Detroit',       color: '#1d4b94' },
   GSW: { name: 'Golden State Warriors',  label: 'Golden State',  color: '#1f4a9c' },
@@ -2259,8 +2259,8 @@ const TEAM_INFO = {
   NOL: { name: 'New Orleans Pelicans',   label: 'New Orleans',   color: '#1f3a4a' },
   NOP: { name: 'New Orleans Pelicans',   label: 'New Orleans',   color: '#1f3a4a' },
   NYK: { name: 'New York Knicks',        label: 'New York',      color: '#f47b2e' },
-  OKC: { name: 'Oklahoma City Thunder',  label: 'Oklahoma City', color: '#2e6fb8' },
-  ORL: { name: 'Orlando Magic',          label: 'Orlando',       color: '#1f6ab8' },
+  OKC: { name: 'Oklahoma City Thunder',  label: 'Oklahoma City', color: '#12a5d6' },
+  ORL: { name: 'Orlando Magic',          label: 'Orlando',       color: '#0a2f5e' },
   PHI: { name: 'Philadelphia 76ers',     label: 'Philadelphia',  color: '#2e6fb8' },
   PHX: { name: 'Phoenix Suns',           label: 'Phoenix',       color: '#e68a1f' },
   POR: { name: 'Portland Trail Blazers', label: 'Portland',      color: '#8f2b2b' },
@@ -2303,9 +2303,58 @@ const TL_PROYECTADAS = {
   'santi aldama':     [[2027, 'DAL']],
 };
 
+// Estado especial por (jugador, año): 'cut' = cortado a media temporada · 'tw' = two-way · 'tw-cut' = two-way cortado
+const TL_ESTADO = {
+  'serge ibaka':          { 2023: 'cut' },
+  'victor claver':        { 2015: 'cut' },
+  'alex abrines':         { 2019: 'cut' },
+  'juancho hernangomez':  { 2023: 'cut' },
+  'ricky rubio':          { 2023: 'cut' },
+  'usman garuba':         { 2024: 'tw' },
+};
+
+// Jugadores que no están en data.json (se añaden a mano a la línea temporal)
+const TL_EXTRA = [
+  { nombre: 'Eli Ndiaye', id: null, seasons: { 2026: ['ATL'] }, estado: { 2026: 'tw-cut' }, total: 0.5, debut: '2026' },
+];
+
+// Anillos NBA por (jugador, año) → equipo campeón
+const TL_ANILLOS = {
+  'pau gasol':   { 2009: 'LAL', 2010: 'LAL' },
+  'marc gasol':  { 2019: 'TOR' },
+  'serge ibaka': { 2019: 'TOR' },
+};
+
+// Corrección del orden cronológico de equipos en un año multi-equipo
+const TL_ORDEN = {
+  'nikola mirotic': { 2018: ['CHI', 'NOL'] },   // primero Chicago, luego New Orleans
+};
+
+// Cara del jugador (foto) con las iniciales de respaldo si no carga / no hay foto
+function tlFace(p) {
+  const j = p.j || {};
+  const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
+  return `<span class="tl-facewrap">${avatarHtml(j.nombre, 'tl-avatar')}${src ? `<img class="tl-face" src="${src}" onerror="this.remove()" alt="">` : ''}</span>`;
+}
+
+// Celda de un año con estado especial (cortado / two-way). fc = clases de conexión (fl/fr)
+function tlSpecialCell(tm, est, year, fc) {
+  const info = teamInfo(tm);
+  const st = `background-color:${info.color};color:${info.text || '#fff'}`;
+  const per = drSeason(year);
+  fc = fc || '';
+  if (est === 'tw')
+    return `<td class="tl-cell tl-tw${fc}" data-team="${tm}" style="${st}" title="${info.name} · contrato two-way · ${per}"><span class="tl-lbl">${tm}</span></td>`;
+  if (est === 'cut')
+    return `<td class="tl-cell tl-split${fc}" title="${info.name} · cortado a mitad de temporada · ${per}"><div class="tl-segrow"><span class="tl-seg" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
+  return `<td class="tl-cell tl-split${fc}" title="${info.name} · two-way, cortado · ${per}"><div class="tl-segrow"><span class="tl-seg tl-tw" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
+}
+
 let tlPlayers = [];
 let tlAxis = [];
 let tlSortMode = 'debut';
+let tlYearFrom = null;
+let tlYearTo = null;
 
 async function initLineaTemporalPage() {
   let data;
@@ -2314,20 +2363,34 @@ async function initLineaTemporalPage() {
   buildPlayerIds(data.jugadores);
 
   tlPlayers = (data.jugadores || []).map(j => {
+    const key = drNorm(j.nombre);
     const real = seasonTeams(j);
-    const proj = TL_PROYECTADAS[drNorm(j.nombre)] || [];
+    const orden = TL_ORDEN[key] || {};
+    Object.keys(orden).forEach(y => { if (real[y]) real[y] = orden[y]; });   // corrige orden de equipos
+    const proj = TL_PROYECTADAS[key] || [];
     const seasons = { ...real };
     const projYears = new Set();
     proj.forEach(([y, tm]) => { if (!seasons[y]) seasons[y] = [tm]; projYears.add(y); });
-    return { j, real, seasons, projYears, proj };
+    return { j, real, seasons, projYears, proj, estado: TL_ESTADO[key] || {}, rings: TL_ANILLOS[key] || {} };
   }).filter(p => Object.keys(p.seasons).length);
 
   tlPlayers.forEach(p => {
     const ys = Object.keys(p.seasons).map(Number);
     p.first = Math.min(...ys);
     const realCount = p.j.temporadas != null ? p.j.temporadas : Object.keys(p.real).length;
+    // Temporada cortada a media = 0,5
+    const cutCount = Object.keys(p.real).filter(y => p.estado[y] === 'cut' || p.estado[y] === 'tw-cut').length;
     const projNew = p.proj.filter(([y]) => !p.real[y]).length;
-    p.total = realCount + projNew;
+    p.total = realCount - 0.5 * cutCount + projNew;
+  });
+
+  // Jugadores fuera del data.json (Ndiaye, etc.)
+  TL_EXTRA.forEach(e => {
+    tlPlayers.push({
+      j: { nombre: e.nombre, id: e.id, temporadas: null }, seasons: e.seasons, estado: e.estado || {},
+      projYears: new Set(), proj: [], first: Math.min(...Object.keys(e.seasons).map(Number)),
+      total: e.total, _debut: e.debut,
+    });
   });
 
   const allYears = [...new Set(tlPlayers.flatMap(p => Object.keys(p.seasons).map(Number)))].sort((a, b) => a - b);
@@ -2342,6 +2405,17 @@ async function initLineaTemporalPage() {
 
   document.getElementById('hero-sub').textContent =
     `${tlPlayers.length} jugadores · desde ${allYears[0]} · en qué equipo estuvo cada uno, temporada a temporada`;
+
+  // Filtro de años
+  const yc = tlAxis.filter(c => typeof c === 'number');
+  tlYearFrom = yc[0]; tlYearTo = yc[yc.length - 1];
+  buildTlYearOptions(yc);
+
+  // Resaltar por equipo al pasar el ratón sobre una barra
+  const body = document.getElementById('tl-body');
+  body.addEventListener('mouseover', e => { const el = e.target.closest('[data-team]'); tlFocusTeam(el ? el.getAttribute('data-team') : null); });
+  body.addEventListener('mouseleave', () => tlFocusTeam(null));
+
   renderTimeline();
 }
 
@@ -2355,14 +2429,25 @@ function setTlSort(mode) {
 }
 
 function renderTimeline() {
-  const players = [...tlPlayers];
-  if (tlSortMode === 'seas') players.sort((a, b) => tlSeas(b.j, b.seasons) - tlSeas(a.j, a.seasons) || a.first - b.first);
+  // Rango de años seleccionado
+  const yearCols = tlAxis.filter(c => typeof c === 'number');
+  const fromY = tlYearFrom != null ? tlYearFrom : yearCols[0];
+  const toY = tlYearTo != null ? tlYearTo : yearCols[yearCols.length - 1];
+  const years = yearCols.filter(y => y >= fromY && y <= toY);
+  const yearSet = new Set(years);
+  const axis = [];
+  for (let k = 0; k < years.length; k++) {
+    if (k > 0 && years[k] - years[k - 1] > 1) axis.push({ brk: [years[k - 1] + 1, years[k] - 1] });
+    axis.push(years[k]);
+  }
+
+  let players = tlPlayers.filter(p => Object.keys(p.seasons).some(y => +y >= fromY && +y <= toY));
+  if (tlSortMode === 'seas') players.sort((a, b) => b.total - a.total || a.first - b.first);
   else if (tlSortMode === 'alpha') players.sort((a, b) => a.j.nombre.localeCompare(b.j.nombre, 'es'));
   else players.sort((a, b) => a.first - b.first || a.j.nombre.localeCompare(b.j.nombre));
 
-  const axis = tlAxis;
   const activeBy = {};
-  players.forEach(p => Object.keys(p.seasons).forEach(y => { activeBy[y] = (activeBy[y] || 0) + 1; }));
+  players.forEach(p => years.forEach(y => { if (p.seasons[y]) activeBy[y] = (activeBy[y] || 0) + 1; }));
 
   // Cabecera
   const headCells = axis.map(c => (typeof c === 'object')
@@ -2373,6 +2458,13 @@ function renderTimeline() {
 
   // Filas de jugadores
   document.getElementById('tl-body').innerHTML = players.map(p => {
+    // Conectar bloques: un año engancha con el vecino si el equipo continúa (traspasos/cortes)
+    const lTeam = y => { const t = p.seasons[y]; return t ? t[0] : null; };
+    const rTeam = y => { const t = p.seasons[y]; return t ? t[t.length - 1] : null; };
+    const connL = y => yearSet.has(y - 1) && !!p.seasons[y - 1] && rTeam(y - 1) === lTeam(y);
+    const connR = y => yearSet.has(y + 1) && !!p.seasons[y + 1] && lTeam(y + 1) === rTeam(y);
+    const flush = (l, r) => (l ? ' fl' : '') + (r ? ' fr' : '');
+
     const cells = [];
     let i = 0;
     while (i < axis.length) {
@@ -2383,32 +2475,37 @@ function renderTimeline() {
       if (teams.length > 1) {
         const segs = teams.map(tm => {
           const info = teamInfo(tm);
-          return `<span class="tl-seg" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}">${tm}</span>`;
+          return `<span class="tl-seg" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}">${tm}</span>`;
         }).join('');
-        cells.push(`<td class="tl-cell tl-split" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div></td>`);
+        const rIdx = p.rings[c] ? teams.indexOf(p.rings[c]) : -1;
+        const ringHtml = rIdx >= 0 ? `<span class="tl-ring" style="left:${((rIdx + 0.5) / teams.length * 100).toFixed(1)}%">🏆</span>` : '';
+        cells.push(`<td class="tl-cell tl-split${flush(connL(c), connR(c))}" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div>${ringHtml}</td>`);
         i++; continue;
       }
       const tm = teams[0];
+      if (p.estado[c]) { cells.push(tlSpecialCell(tm, p.estado[c], c, flush(connL(c), connR(c)))); i++; continue; }
       let span = 1, j = i + 1;
       while (j < axis.length && typeof axis[j] !== 'object') {
         const ts = p.seasons[axis[j]];
-        if (!ts || ts.length !== 1 || ts[0] !== tm) break;
+        if (!ts || ts.length !== 1 || ts[0] !== tm || p.estado[axis[j]]) break;
         span++; j++;
       }
       const info = teamInfo(tm);
       const y0 = c, y1 = axis[i + span - 1];
-      let proj = true;
-      for (let k = i; k < i + span; k++) if (!p.projYears.has(axis[k])) { proj = false; break; }
+      const ringOffs = [];
+      for (let k = i; k < i + span; k++) if (p.rings[axis[k]] === tm) ringOffs.push(k - i);
+      const ringHtml = ringOffs.map(off => `<span class="tl-ring" style="left:${((off + 0.5) / span * 100).toFixed(1)}%">🏆</span>`).join('');
       const label = span >= 4 ? info.label : tm;
       const per = y1 !== y0 ? `${drSeason(y0)}–${drSeason(y1)}` : drSeason(y0);
-      cells.push(`<td class="tl-cell${proj ? ' tl-proj' : ''}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${proj ? ' · previsto' : ''}"><span class="tl-lbl">${label}${proj ? ' *' : ''}</span></td>`);
+      cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
       i += span;
     }
+    const nTeams = new Set(Object.values(p.seasons).flat()).size;
     return `<tr>
-      <th scope="row" class="tl-name"><span class="tl-namewrap">${avatarHtml(p.j.nombre, 'tl-avatar')}<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a></span></th>
-      <td class="tl-debut">${tlDebutYear(p.j, p.first)}</td>
+      <th scope="row" class="tl-name"><span class="tl-namewrap">${tlFace(p)}${p.j.id ? `<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>` : `<span class="tl-pname">${p.j.nombre}</span>`}</span></th>
+      <td class="tl-debut">${p._debut || tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
-      <td class="tl-seas">${tlFmtSeas(p.total)}</td>
+      <td class="tl-seas">${tlFmtSeas(p.total)}<span class="tl-nteams">${nTeams} eq.</span></td>
     </tr>`;
   }).join('');
 
@@ -2419,4 +2516,27 @@ function renderTimeline() {
   const totalSeas = players.reduce((s, p) => s + p.total, 0);
   document.getElementById('tl-tfoot').innerHTML =
     `<tr><td class="tl-name-f">Españoles activos</td><td class="tl-debut"></td>${footCells}<td class="tl-seas tl-seas-total">${tlFmtSeas(totalSeas)}</td></tr>`;
+}
+
+// Resaltar todas las etapas de un equipo al pasar el ratón
+let tlFocusLast = null;
+function tlFocusTeam(code) {
+  if (code === tlFocusLast) return;
+  tlFocusLast = code;
+  const t = document.getElementById('tl-table');
+  if (!t) return;
+  const els = t.querySelectorAll('[data-team]');
+  if (!code) { t.classList.remove('tl-focusing'); els.forEach(el => el.classList.remove('tl-match')); return; }
+  t.classList.add('tl-focusing');
+  els.forEach(el => el.classList.toggle('tl-match', el.getAttribute('data-team') === code));
+}
+
+function buildTlYearOptions(years) {
+  const from = document.getElementById('tl-from'), to = document.getElementById('tl-to');
+  if (!from || !to) return;
+  const opts = years.map(y => `<option value="${y}">${drSeason(y)}</option>`).join('');
+  from.innerHTML = opts; to.innerHTML = opts;
+  from.value = String(tlYearFrom); to.value = String(tlYearTo);
+  from.onchange = () => { tlYearFrom = +from.value; if (tlYearFrom > tlYearTo) { tlYearTo = tlYearFrom; to.value = String(tlYearTo); } renderTimeline(); };
+  to.onchange = () => { tlYearTo = +to.value; if (tlYearTo < tlYearFrom) { tlYearFrom = tlYearTo; from.value = String(tlYearFrom); } renderTimeline(); };
 }
