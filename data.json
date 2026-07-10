@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-10T14:06:48.218Z",
+  "actualizado": "2026-07-10T14:14:39.200Z",
   "summer_league": [
     {
       "year": 1985,
@@ -2331,7 +2331,7 @@
           "tipo": "All Star",
           "year": 2015,
           "team": "CHI",
-          "notas": "Titular"
+          "notas": "Titular, Este"
         },
         {
           "tipo": "All Star",
@@ -2343,7 +2343,7 @@
           "tipo": "Player of the Month",
           "year": 2009,
           "team": "LAL",
-          "notas": "February 2009"
+          "notas": "Febrero 2009"
         },
         {
           "tipo": "Rising Stars",
@@ -2696,19 +2696,19 @@
           "tipo": "All Star",
           "year": 2015,
           "team": "MEM",
-          "notas": "Titular"
+          "notas": "Titular, Oeste"
         },
         {
           "tipo": "All Star",
           "year": 2017,
           "team": "MEM",
-          "notas": "Oeste"
+          "notas": "Oeste, Oeste"
         },
         {
           "tipo": "DPOY",
           "year": 2013,
           "team": "MEM",
-          "notas": "Oeste"
+          "notas": ""
         },
         {
           "tipo": "MVP (votos)",
