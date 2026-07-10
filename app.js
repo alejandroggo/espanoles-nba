@@ -2038,6 +2038,8 @@ const DEBUT_COLS = [
   { key: 'ast',       label: 'AST',     sortable: true, cls: 'td-num' },
   { key: 'stl',       label: 'ROB',     sortable: true, cls: 'td-num' },
   { key: 'blk',       label: 'TAP',     sortable: true, cls: 'td-num' },
+  { key: 'tov',       label: 'TOV',     sortable: true, cls: 'td-num' },
+  { key: 'pf',        label: 'PF',      sortable: true, cls: 'td-num' },
 ];
 
 function debutDateKey(fecha) {
@@ -2064,6 +2066,7 @@ async function initDebutPage() {
       fecha: p.fecha, edad: p.edad ?? null,
       equipo: p.equipo || '', rival: p.rival || '', resultado: p.resultado || '',
       min: p.min || '', pts: p.pts, rbd: p.rbd, ast: p.ast, stl: p.stl ?? null, blk: p.blk ?? null,
+      tov: p.tov ?? null, pf: p.pf ?? null,
       _key: debutDateKey(p.fecha), _min: minToSec(p.min),
     };
   });
@@ -2095,14 +2098,19 @@ function renderDebutTable() {
     let va, vb;
     if (debutSortCol === 'fecha') { va = a._key; vb = b._key; }
     else if (debutSortCol === 'min') { va = a._min; vb = b._min; }
-    else if (['pts', 'rbd', 'ast', 'stl', 'blk', 'edad'].includes(debutSortCol)) { va = a[debutSortCol] ?? -1; vb = b[debutSortCol] ?? -1; }
+    else if (['pts', 'rbd', 'ast', 'stl', 'blk', 'tov', 'pf', 'edad'].includes(debutSortCol)) { va = a[debutSortCol] ?? -1; vb = b[debutSortCol] ?? -1; }
     else { va = String(a[debutSortCol] || ''); vb = String(b[debutSortCol] || ''); return debutSortAsc ? va.localeCompare(vb) : vb.localeCompare(va); }
     return debutSortAsc ? va - vb : vb - va;
   });
 
   document.getElementById('debut-count').textContent = `${rows.length} debut${rows.length === 1 ? '' : 's'}`;
 
-  const maxPts = Math.max(...debutRows.map(r => r.pts ?? -Infinity));
+  // Máximo por categoría (para resaltar al líder en dorado); solo si el máximo es > 0
+  const DEBUT_STATS = ['pts', 'rbd', 'ast', 'stl', 'blk', 'tov', 'pf'];
+  const dMax = {};
+  DEBUT_STATS.forEach(k => { dMax[k] = Math.max(...debutRows.map(r => r[k] ?? -Infinity)); });
+  const dMaxMin = Math.max(...debutRows.map(r => r._min ?? -Infinity));
+  const gold = (k, v) => (v != null && dMax[k] > 0 && v === dMax[k]) ? ' td-leader' : '';
 
   document.getElementById('debut-thead').innerHTML = `<tr>
     ${DEBUT_COLS.map(c => {
@@ -2124,12 +2132,14 @@ function renderDebutTable() {
       <td class="td-center">${r.equipo || '—'}</td>
       <td class="td-center">${r.rival || '—'}</td>
       <td class="td-center">${debutResultado(r.resultado)}</td>
-      <td class="td-num">${r.min || '—'}</td>
-      <td class="td-num${(r.pts != null && r.pts === maxPts) ? ' td-leader' : ''}">${r.pts ?? '—'}</td>
-      <td class="td-num">${r.rbd ?? '—'}</td>
-      <td class="td-num">${r.ast ?? '—'}</td>
-      <td class="td-num">${r.stl ?? '—'}</td>
-      <td class="td-num">${r.blk ?? '—'}</td>
+      <td class="td-num${(r._min > 0 && r._min === dMaxMin) ? ' td-leader' : ''}">${r.min || '—'}</td>
+      <td class="td-num${gold('pts', r.pts)}">${r.pts ?? '—'}</td>
+      <td class="td-num${gold('rbd', r.rbd)}">${r.rbd ?? '—'}</td>
+      <td class="td-num${gold('ast', r.ast)}">${r.ast ?? '—'}</td>
+      <td class="td-num${gold('stl', r.stl)}">${r.stl ?? '—'}</td>
+      <td class="td-num${gold('blk', r.blk)}">${r.blk ?? '—'}</td>
+      <td class="td-num${gold('tov', r.tov)}">${r.tov ?? '—'}</td>
+      <td class="td-num${gold('pf', r.pf)}">${r.pf ?? '—'}</td>
     </tr>`).join('') || `<tr><td colspan="${DEBUT_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
