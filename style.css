@@ -947,3 +947,14 @@ tr.season-tot td { font-weight: 600; }
   .jugs-wrap { padding: 0 var(--space-4) var(--space-12); }
   .jugs-grid { grid-template-columns: 1fr; }
 }
+
+/* ── AVATAR CON INICIALES (jugadores sin foto) ─── */
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-family: var(--display); letter-spacing: 0.06em; line-height: 1;
+  overflow: hidden; border-color: transparent; text-align: center;
+}
+.player-thumb.avatar   { font-size: 0.72rem; }
+.jug-card-photo.avatar { font-size: 0.9rem; }
+.dp-photo.avatar       { font-size: 1rem; }
+.jug-photo.avatar      { font-size: 2.8rem; }
