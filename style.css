@@ -961,21 +961,24 @@ tr.season-tot td { font-weight: 600; }
 
 /* ── LÍNEA TEMPORAL (trayectorias) ───────────── */
 .tl-wrap {
-  max-width: 1400px; margin: 0 auto;
-  padding: 0 var(--space-6) var(--space-16);
-  overflow-x: auto;
+  max-width: 1400px; margin: 0 auto var(--space-16);
+  padding: 0 var(--space-6);
+  position: sticky; top: 56px;
+  max-height: calc(100vh - 72px);
+  overflow: auto; overscroll-behavior: contain;
 }
 #tl-table { border-collapse: separate; border-spacing: 0; width: auto; }
 #tl-table th, #tl-table td { padding: 0; }
 
 #tl-table thead th {
+  position: sticky; top: 0; z-index: 6;
   background: var(--surface-2); color: var(--text-muted);
   font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em;
   text-align: center; vertical-align: bottom;
   padding: var(--space-2) 2px;
   border-bottom: 2px solid var(--border); white-space: nowrap;
 }
-.tl-year { min-width: 34px; width: 34px; font-variant-numeric: tabular-nums; }
+.tl-year { min-width: 34px; width: 34px; font-variant-numeric: tabular-nums; box-shadow: inset -1px 0 0 var(--border); }
 
 /* Columna de nombre + Debut (fijas a la izquierda) */
 .tl-name, .tl-name-h, .tl-name-f {
@@ -1024,6 +1027,10 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
   overflow: hidden; text-overflow: ellipsis; padding: 0 4px;
 }
 .tl-cell.tl-split { padding: 0; }
+.tl-proj {
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.42) 0, rgba(255,255,255,0.42) 3px, transparent 3px, transparent 7px);
+}
+.tl-empty { box-shadow: inset -1px 0 0 var(--border); }
 .tl-segrow { display: flex; height: 26px; border-radius: 3px; overflow: hidden; }
 .tl-seg {
   flex: 1 1 0; min-width: 0;
@@ -1049,5 +1056,5 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .tl-seas-total { color: var(--dorado); }
 
 @media (max-width: 768px) {
-  .tl-wrap { padding: 0 var(--space-4) var(--space-12); }
+  .tl-wrap { padding: 0 var(--space-4); top: 48px; max-height: calc(100vh - 60px); }
 }

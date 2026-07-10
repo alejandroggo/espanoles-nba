@@ -2293,6 +2293,16 @@ function tlSeas(j, seasons) {
 function tlFmtSeas(n) { return Number.isInteger(n) ? String(n) : n.toLocaleString('es-ES', { maximumFractionDigits: 1 }); }
 function tlYY(y) { return `’${String(y).slice(-2)}`; }
 
+// Temporadas previstas (jugadores aún sin debutar / próxima temporada), por nombre normalizado.
+// Año = temporada NBA (fin): 2027 = 2026-27.
+const TL_PROYECTADAS = {
+  'sergio de larrea': [[2027, 'DAL']],
+  'baba miller':      [[2027, 'LAC']],
+  'aday mara':        [[2027, 'OKC']],
+  'hugo gonzalez':    [[2027, 'BOS']],
+  'santi aldama':     [[2027, 'DAL']],
+};
+
 let tlPlayers = [];
 let tlAxis = [];
 let tlSortMode = 'debut';
@@ -2303,15 +2313,27 @@ async function initLineaTemporalPage() {
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   buildPlayerIds(data.jugadores);
 
-  tlPlayers = (data.jugadores || [])
-    .map(j => ({ j, seasons: seasonTeams(j) }))
-    .filter(p => Object.keys(p.seasons).length);
-  tlPlayers.forEach(p => { p.first = Math.min(...Object.keys(p.seasons).map(Number)); });
+  tlPlayers = (data.jugadores || []).map(j => {
+    const real = seasonTeams(j);
+    const proj = TL_PROYECTADAS[drNorm(j.nombre)] || [];
+    const seasons = { ...real };
+    const projYears = new Set();
+    proj.forEach(([y, tm]) => { if (!seasons[y]) seasons[y] = [tm]; projYears.add(y); });
+    return { j, real, seasons, projYears, proj };
+  }).filter(p => Object.keys(p.seasons).length);
+
+  tlPlayers.forEach(p => {
+    const ys = Object.keys(p.seasons).map(Number);
+    p.first = Math.min(...ys);
+    const realCount = p.j.temporadas != null ? p.j.temporadas : Object.keys(p.real).length;
+    const projNew = p.proj.filter(([y]) => !p.real[y]).length;
+    p.total = realCount + projNew;
+  });
 
   const allYears = [...new Set(tlPlayers.flatMap(p => Object.keys(p.seasons).map(Number)))].sort((a, b) => a - b);
   const dataMax = allYears[allYears.length - 1];
   const years = [...allYears];
-  for (let y = dataMax + 1; y <= dataMax + 2; y++) years.push(y);   // deja hueco para las próximas temporadas
+  for (let y = dataMax + 1; y <= dataMax + 1; y++) years.push(y);   // un año de margen
   tlAxis = [];
   for (let i = 0; i < years.length; i++) {
     if (i > 0 && years[i] - years[i - 1] > 1) tlAxis.push({ brk: [years[i - 1] + 1, years[i] - 1] });
@@ -2361,7 +2383,7 @@ function renderTimeline() {
       if (teams.length > 1) {
         const segs = teams.map(tm => {
           const info = teamInfo(tm);
-          return `<span class="tl-seg" style="background:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}">${tm}</span>`;
+          return `<span class="tl-seg" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}">${tm}</span>`;
         }).join('');
         cells.push(`<td class="tl-cell tl-split" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div></td>`);
         i++; continue;
@@ -2375,16 +2397,18 @@ function renderTimeline() {
       }
       const info = teamInfo(tm);
       const y0 = c, y1 = axis[i + span - 1];
+      let proj = true;
+      for (let k = i; k < i + span; k++) if (!p.projYears.has(axis[k])) { proj = false; break; }
       const label = span >= 4 ? info.label : tm;
       const per = y1 !== y0 ? `${drSeason(y0)}–${drSeason(y1)}` : drSeason(y0);
-      cells.push(`<td class="tl-cell" colspan="${span}" style="background:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}"><span class="tl-lbl">${label}</span></td>`);
+      cells.push(`<td class="tl-cell${proj ? ' tl-proj' : ''}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${proj ? ' · previsto' : ''}"><span class="tl-lbl">${label}${proj ? ' *' : ''}</span></td>`);
       i += span;
     }
     return `<tr>
       <th scope="row" class="tl-name"><span class="tl-namewrap">${avatarHtml(p.j.nombre, 'tl-avatar')}<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a></span></th>
       <td class="tl-debut">${tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
-      <td class="tl-seas">${tlFmtSeas(tlSeas(p.j, p.seasons))}</td>
+      <td class="tl-seas">${tlFmtSeas(p.total)}</td>
     </tr>`;
   }).join('');
 
@@ -2392,7 +2416,7 @@ function renderTimeline() {
   const footCells = axis.map(c => (typeof c === 'object')
     ? `<td class="tl-break"></td>`
     : `<td class="tl-count">${activeBy[c] || ''}</td>`).join('');
-  const totalSeas = players.reduce((s, p) => s + tlSeas(p.j, p.seasons), 0);
+  const totalSeas = players.reduce((s, p) => s + p.total, 0);
   document.getElementById('tl-tfoot').innerHTML =
     `<tr><td class="tl-name-f">Españoles activos</td><td class="tl-debut"></td>${footCells}<td class="tl-seas tl-seas-total">${tlFmtSeas(totalSeas)}</td></tr>`;
 }
