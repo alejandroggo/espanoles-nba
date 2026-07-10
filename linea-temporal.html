@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Summer League · Españoles en la NBA</title>
-<meta name="description" content="Todos los españoles que han disputado la NBA Summer League, año a año y equipo a equipo.">
+<title>Línea temporal · Españoles en la NBA</title>
+<meta name="description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,30 +31,17 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">LA <em>Summer League</em></h1>
+        <h1 class="hero-title ag-hero">La <em>Línea temporal</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
-      <div class="hero-kpis" id="sl-kpis"></div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Filtros">
-    <div class="search-wrap">
-      <input type="text" id="sl-search" placeholder="Buscar jugador o equipo…" aria-label="Buscar jugador o equipo">
-    </div>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por año</span>
-      <select id="sl-year" class="sel"></select>
-    </label>
-    <button type="button" id="sl-group-player" class="toggle-chip" aria-pressed="false" onclick="setSlGroup('player')">Agrupar por jugador</button>
-    <button type="button" id="sl-group-year" class="toggle-chip" aria-pressed="false" onclick="setSlGroup('year')">Agrupar por año</button>
-    <span class="results-count" id="sl-count"></span>
-  </section>
-
-  <section class="tabla-wrap" aria-label="Participaciones en Summer League">
-    <table id="sl-table">
-      <thead id="sl-thead"></thead>
-      <tbody id="sl-body"></tbody>
+  <section class="tl-wrap" aria-label="Línea temporal de trayectorias">
+    <table id="tl-table">
+      <thead id="tl-thead"></thead>
+      <tbody id="tl-body"></tbody>
+      <tfoot id="tl-tfoot"></tfoot>
     </table>
   </section>
 </main>
@@ -83,6 +70,6 @@
 </footer>
 
 <script src="app.js?v=29"></script>
-<script>initTheme(); initSummerPage();</script>
+<script>initTheme(); initLineaTemporalPage();</script>
 </body>
 </html>

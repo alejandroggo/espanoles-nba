@@ -958,3 +958,84 @@ tr.season-tot td { font-weight: 600; }
 .jug-card-photo.avatar { font-size: 0.9rem; }
 .dp-photo.avatar       { font-size: 1rem; }
 .jug-photo.avatar      { font-size: 2.8rem; }
+
+/* ── LÍNEA TEMPORAL (trayectorias) ───────────── */
+.tl-wrap {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-16);
+  overflow-x: auto;
+}
+#tl-table { border-collapse: separate; border-spacing: 0; width: auto; }
+#tl-table th, #tl-table td { padding: 0; }
+
+#tl-table thead th {
+  position: sticky; top: 56px; z-index: 6;
+  background: var(--surface-2); color: var(--text-muted);
+  font-size: 0.62rem; font-weight: 700;
+  text-align: center; vertical-align: bottom;
+  padding: var(--space-2) 2px;
+  border-bottom: 2px solid var(--border); white-space: nowrap;
+}
+.tl-year { min-width: 40px; width: 40px; }
+th.tl-break, td.tl-break {
+  min-width: 12px; width: 12px;
+  background: var(--bg) !important; border-bottom-color: transparent !important;
+}
+
+.tl-name, .tl-name-h, .tl-name-f {
+  position: sticky; left: 0; z-index: 5;
+  background: var(--surface); text-align: left;
+  min-width: 152px; max-width: 200px;
+  padding: 0 var(--space-3) !important;
+  box-shadow: 1px 0 0 var(--border); white-space: nowrap;
+}
+.tl-name-h { z-index: 8; background: var(--surface-2); }
+.tl-name a { color: var(--text); text-decoration: none; font-weight: 600; }
+.tl-name a:hover { color: var(--accent); }
+.tl-birth { color: var(--text-dim); font-size: var(--font-xs); margin-left: var(--space-2); font-variant-numeric: tabular-nums; }
+
+#tl-body tr { height: 30px; }
+#tl-body tr:nth-child(even) .tl-name { background: var(--surface-2); }
+#tl-body tr:hover .tl-name { background: var(--accent-light); }
+#tl-body td { border-bottom: 2px solid var(--bg); }
+
+.tl-cell {
+  border-left: 2px solid var(--bg); border-right: 2px solid var(--bg);
+  text-align: center; overflow: hidden; vertical-align: middle;
+}
+.tl-lbl {
+  display: block; color: #fff;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em;
+  text-transform: uppercase; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  padding: 0 4px; text-shadow: 0 1px 1px rgba(0,0,0,0.35);
+}
+.tl-cell.tl-split { padding: 0; }
+.tl-segrow { display: flex; height: 26px; }
+.tl-seg {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.52rem; font-weight: 700;
+  overflow: hidden; text-shadow: 0 1px 1px rgba(0,0,0,0.35);
+}
+
+.tl-seas, .tl-seas-h {
+  min-width: 46px; text-align: center;
+  font-variant-numeric: tabular-nums; font-weight: 700;
+  padding: 0 var(--space-2) !important; background: var(--surface);
+}
+.tl-seas-h { background: var(--surface-2); color: var(--text-muted); }
+
+#tl-tfoot td {
+  background: var(--surface-2); border-top: 2px solid var(--border);
+  text-align: center; font-size: var(--font-xs); font-weight: 600;
+  color: var(--text-muted); padding: var(--space-1) 2px;
+  font-variant-numeric: tabular-nums;
+}
+.tl-name-f { text-align: left !important; }
+.tl-seas-total { color: var(--dorado); }
+
+@media (max-width: 768px) {
+  #tl-table thead th { top: 48px; }
+  .tl-wrap { padding: 0 var(--space-4) var(--space-12); }
+}

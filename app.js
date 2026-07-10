@@ -16,7 +16,8 @@ const NAV_LINKS = [
   ['Inicio', 'index.html'], ['Jugadores', 'jugadores.html'], ['Draft', 'draft.html'],
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
-  ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'], ['Test', 'test.html'],
+  ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -2231,4 +2232,145 @@ function renderJugs() {
       </span>
     </a>`;
   }).join('') || '<p class="td-muted" style="padding:2rem">Sin resultados.</p>';
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA LÍNEA TEMPORAL (trayectorias por equipo/temporada)
+// ══════════════════════════════════════════════
+const TEAM_INFO = {
+  ATL: { name: 'Atlanta Hawks',          color: '#E03A3E' },
+  BOS: { name: 'Boston Celtics',         color: '#007A33' },
+  BKN: { name: 'Brooklyn Nets',          color: '#111111' },
+  CHA: { name: 'Charlotte Hornets',      color: '#1D1160' },
+  CHI: { name: 'Chicago Bulls',          color: '#CE1141' },
+  CLE: { name: 'Cleveland Cavaliers',    color: '#860038' },
+  DAL: { name: 'Dallas Mavericks',       color: '#00538C' },
+  DEN: { name: 'Denver Nuggets',         color: '#0E2240' },
+  DET: { name: 'Detroit Pistons',        color: '#1D42BA' },
+  GSW: { name: 'Golden State Warriors',  color: '#1D428A' },
+  HOU: { name: 'Houston Rockets',        color: '#CE1141' },
+  IND: { name: 'Indiana Pacers',         color: '#002D62' },
+  LAC: { name: 'Los Angeles Clippers',   color: '#C8102E' },
+  LAL: { name: 'Los Angeles Lakers',     color: '#552583' },
+  MEM: { name: 'Memphis Grizzlies',      color: '#5D76A9' },
+  MIA: { name: 'Miami Heat',             color: '#98002E' },
+  MIL: { name: 'Milwaukee Bucks',        color: '#00471B' },
+  MIN: { name: 'Minnesota Timberwolves', color: '#0C2340' },
+  NOL: { name: 'New Orleans Pelicans',   color: '#0C2340' },
+  NOP: { name: 'New Orleans Pelicans',   color: '#0C2340' },
+  NYK: { name: 'New York Knicks',        color: '#006BB6' },
+  OKC: { name: 'Oklahoma City Thunder',  color: '#007AC1' },
+  ORL: { name: 'Orlando Magic',          color: '#0077C0' },
+  PHI: { name: 'Philadelphia 76ers',     color: '#006BB6' },
+  PHX: { name: 'Phoenix Suns',           color: '#1D1160' },
+  POR: { name: 'Portland Trail Blazers', color: '#E03A3E' },
+  SAC: { name: 'Sacramento Kings',       color: '#5A2D81' },
+  SAS: { name: 'San Antonio Spurs',      color: '#1A1A1A' },
+  TOR: { name: 'Toronto Raptors',        color: '#CE1141' },
+  UTA: { name: 'Utah Jazz',              color: '#002B5C' },
+  WAS: { name: 'Washington Wizards',     color: '#002B5C' },
+};
+function teamInfo(code) { return TEAM_INFO[code] || { name: code, color: '#6b7280' }; }
+
+// año -> [equipos] (cronológico, sin TOT)
+function seasonTeams(j) {
+  const map = {};
+  (j.temporadas_data || []).forEach(t => {
+    const y = t.year, tm = (t.team || '').toUpperCase();
+    if (!y || !tm || tm === 'TOT') return;
+    (map[y] = map[y] || []).push(tm);
+  });
+  return map;
+}
+function tlBirthYear(j) {
+  const m = String(j.nacimiento_fecha || j.nacimiento || '').match(/(\d{4})/);
+  return m ? m[1] : '';
+}
+function tlSeas(j, seasons) {
+  return j.temporadas != null ? j.temporadas : Object.keys(seasons).length;
+}
+function tlFmtSeas(n) { return Number.isInteger(n) ? String(n) : n.toLocaleString('es-ES', { maximumFractionDigits: 1 }); }
+
+async function initLineaTemporalPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+
+  const players = (data.jugadores || [])
+    .map(j => ({ j, seasons: seasonTeams(j) }))
+    .filter(p => Object.keys(p.seasons).length);
+  players.forEach(p => { p.first = Math.min(...Object.keys(p.seasons).map(Number)); });
+  players.sort((a, b) => a.first - b.first || a.j.nombre.localeCompare(b.j.nombre));
+
+  const allYears = [...new Set(players.flatMap(p => Object.keys(p.seasons).map(Number)))].sort((a, b) => a - b);
+  const axis = [];
+  for (let i = 0; i < allYears.length; i++) {
+    if (i > 0 && allYears[i] - allYears[i - 1] > 1) axis.push('break');
+    axis.push(allYears[i]);
+  }
+
+  document.getElementById('hero-sub').textContent =
+    `${players.length} jugadores · ${allYears[0]}–${allYears[allYears.length - 1]} · en qué equipo estuvo cada uno, temporada a temporada`;
+  renderTimeline(players, axis, allYears);
+}
+
+function renderTimeline(players, axis, allYears) {
+  const activeBy = {};
+  players.forEach(p => Object.keys(p.seasons).forEach(y => { activeBy[y] = (activeBy[y] || 0) + 1; }));
+
+  // Cabecera
+  const headCells = axis.map(c => c === 'break'
+    ? `<th class="tl-break" aria-hidden="true"></th>`
+    : `<th class="tl-year">${c}</th>`).join('');
+  document.getElementById('tl-thead').innerHTML =
+    `<tr><th class="tl-name-h" scope="col">Jugador</th>${headCells}<th class="tl-seas-h" scope="col">SEAS</th></tr>`;
+
+  // Filas de jugadores
+  document.getElementById('tl-body').innerHTML = players.map(p => {
+    const cells = [];
+    let i = 0;
+    while (i < axis.length) {
+      const c = axis[i];
+      if (c === 'break') { cells.push(`<td class="tl-break"></td>`); i++; continue; }
+      const teams = p.seasons[c];
+      if (!teams || !teams.length) { cells.push(`<td class="tl-empty"></td>`); i++; continue; }
+      if (teams.length > 1) {
+        const segs = teams.map(tm => {
+          const info = teamInfo(tm);
+          return `<span class="tl-seg" style="background:${info.color}" title="${info.name} · ${drSeason(c)}">${tm}</span>`;
+        }).join('');
+        cells.push(`<td class="tl-cell tl-split" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div></td>`);
+        i++; continue;
+      }
+      const tm = teams[0];
+      let span = 1, j = i + 1;
+      while (j < axis.length && axis[j] !== 'break') {
+        const ts = p.seasons[axis[j]];
+        if (!ts || ts.length !== 1 || ts[0] !== tm) break;
+        span++; j++;
+      }
+      const info = teamInfo(tm);
+      const y0 = c, y1 = axis[i + span - 1];
+      const label = span >= 5 ? info.name : (span >= 2 ? tm : tm);
+      const per = y1 !== y0 ? `${drSeason(y0)}–${drSeason(y1)}` : drSeason(y0);
+      cells.push(`<td class="tl-cell" colspan="${span}" style="background:${info.color}" title="${info.name} · ${per}"><span class="tl-lbl">${label}</span></td>`);
+      i += span;
+    }
+    const birth = tlBirthYear(p.j);
+    const birthHtml = birth ? `<span class="tl-birth">${birth}</span>` : '';
+    return `<tr>
+      <th scope="row" class="tl-name"><a class="pl-link" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>${birthHtml}</th>
+      ${cells.join('')}
+      <td class="tl-seas">${tlFmtSeas(tlSeas(p.j, p.seasons))}</td>
+    </tr>`;
+  }).join('');
+
+  // Fila de conteo (españoles activos por temporada)
+  const footCells = axis.map(c => c === 'break'
+    ? `<td class="tl-break"></td>`
+    : `<td class="tl-count">${activeBy[c] || ''}</td>`).join('');
+  const totalSeas = players.reduce((s, p) => s + tlSeas(p.j, p.seasons), 0);
+  document.getElementById('tl-tfoot').innerHTML =
+    `<tr><td class="tl-name-f">Españoles activos</td>${footCells}<td class="tl-seas tl-seas-total">${tlFmtSeas(totalSeas)}</td></tr>`;
 }
