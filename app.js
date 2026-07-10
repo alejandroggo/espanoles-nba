@@ -953,7 +953,7 @@ let rkRanks = {};           // { statKey: { playerId: posición } }
 
 const RK_STAT_KEYS = [
   'partidos', 'partidos_titular', 'pct_gs', 'min_g', 'pts_g', 'rbd_g', 'ast_g', 'stl_g', 'blk_g', 'fg_pct', 'tres_pct', 'ft_pct',
-  'min_total', 'pts_total', 'rbd_total', 'ast_total', 'stl_total', 'blk_total', 'tres_total', 'tov_total',
+  'min_total', 'pts_total', 'rbd_total', 'ast_total', 'stl_total', 'blk_total', 'tres_total', 'tov_total', 'td_total',
 ];
 
 const RK_COLS_PG = [
@@ -987,6 +987,7 @@ const RK_COLS_TOT = [
   { key: 'blk_total',   label: 'TAP',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'tres_total',  label: '3PM',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'tov_total',   label: 'TOV', sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'td_total',    label: 'TD',  sortable: true, cls: 'td-num', fmt: fmtEnt },
 ];
 
 function fmtEnt(n)  { return (n || n === 0) ? Math.round(n).toLocaleString('es-ES') : '—'; }
@@ -1883,6 +1884,12 @@ const HIGHS_TOTAL_STATS = [
   { key: 'stl_g', label: 'ROB', fmt: fmtEnt },
   { key: 'blk_g', label: 'TAP', fmt: fmtEnt },
   { key: 'min_g', label: 'MIN', fmt: fmtEnt },
+  { key: 'fgm_g', label: 'FGM', fmt: fmtEnt },
+  { key: 'tres_g', label: '3PM', fmt: fmtEnt },
+  { key: 'ftm_g', label: 'FTM', fmt: fmtEnt },
+  { key: 'tov_g', label: 'TOV', fmt: fmtEnt },
+  { key: 'pf_g', label: 'PF', fmt: fmtEnt },
+  { key: 'td', label: 'TD', fmt: fmtEnt },
 ];
 const HIGHS_PG_STATS = [
   { key: 'pts_g', label: 'PTS', fmt: fmtDec1 },
@@ -1891,21 +1898,40 @@ const HIGHS_PG_STATS = [
   { key: 'stl_g', label: 'ROB', fmt: fmtDec1 },
   { key: 'blk_g', label: 'TAP', fmt: fmtDec1 },
   { key: 'min_g', label: 'MIN', fmt: fmtDec1 },
+  { key: 'fgm_g', label: 'FGM', fmt: fmtDec1 },
+  { key: 'tres_g', label: '3PM', fmt: fmtDec1 },
+  { key: 'tov_g', label: 'TOV', fmt: fmtDec1 },
+  { key: 'pf_g', label: 'PF', fmt: fmtDec1 },
   { key: 'fg_pct', label: 'FG%', fmt: fmtPct },
   { key: 'tres_pct', label: '3P%', fmt: fmtPct },
   { key: 'ft_pct', label: 'FT%', fmt: fmtPct },
+];
+// "En un partido" (datos de GAME HIGHS, máximo de un solo partido)
+const HIGHS_GAME_STATS = [
+  { key: 'pts', label: 'PTS', fmt: fmtEnt },
+  { key: 'rbd', label: 'REB', fmt: fmtEnt },
+  { key: 'ast', label: 'AST', fmt: fmtEnt },
+  { key: 'stl', label: 'ROB', fmt: fmtEnt },
+  { key: 'blk', label: 'TAP', fmt: fmtEnt },
+  { key: 'min', label: 'MIN', fmt: fmtEnt },
+  { key: 'fgm', label: 'FGM', fmt: fmtEnt },
+  { key: 'tres_m', label: '3PM', fmt: fmtEnt },
+  { key: 'ftm', label: 'FTM', fmt: fmtEnt },
+  { key: 'tov', label: 'TOV', fmt: fmtEnt },
+  { key: 'pf', label: 'PF', fmt: fmtEnt },
 ];
 
 async function initHighsPage() {
   let data;
   try { data = await loadData(); }
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
-  highsJ = (data.jugadores || []).filter(j => (j.temporadas_data || []).length);
+  highsJ = data.jugadores || [];
   buildPlayerIds(highsJ);
 
   // Modo desde la URL (?modo=total|pg|game)
   const modo = new URLSearchParams(location.search).get('modo');
   if (['total', 'pg', 'game'].includes(modo)) highsMode = modo;
+  if (highsMode === 'game') highsSortCol = 'pts';
   syncHighsButtons();
 
   renderHighs();
@@ -1924,7 +1950,7 @@ function setHighsMode(m) {
   if (highsMode === m) return;
   highsMode = m;
   syncHighsButtons();
-  highsSortCol = 'pts_g'; highsSortAsc = false;
+  highsSortCol = (m === 'game') ? 'pts' : 'pts_g'; highsSortAsc = false;
   updateUrlParam('modo', m);
   renderHighs();
 }
@@ -1933,11 +1959,15 @@ function setHighsMode(m) {
 function playerBest(j, key) {
   let best = null;
   (j.temporadas_data || []).forEach(t => {
-    const avg = t[key], g = t.g || 0;
-    if (avg == null) return;
+    const g = t.g || 0;
     let v;
-    if (highsMode === 'total') { if (!g) return; v = avg * g; }
-    else { if (g < HIGHS_MIN_G) return; v = avg; }   // 'pg'
+    if (key === 'td') { v = t.td; if (v == null) return; }   // triples-dobles: conteo de la temporada (no ×G)
+    else {
+      const avg = t[key];
+      if (avg == null) return;
+      if (highsMode === 'total') { if (!g) return; v = avg * g; }
+      else { if (g < HIGHS_MIN_G) return; v = avg; }   // 'pg'
+    }
     if (best == null || v > best) best = v;
   });
   return best;
@@ -1960,14 +1990,26 @@ function renderHighs() {
   const table = document.getElementById('highs-table');
   const empty = document.getElementById('highs-empty');
 
-  if (highsMode === 'game') {
+  const stats = highsMode === 'total' ? HIGHS_TOTAL_STATS
+              : highsMode === 'pg' ? HIGHS_PG_STATS
+              : HIGHS_GAME_STATS;
+  const pool = highsMode === 'game'
+    ? highsJ.filter(j => j.game_highs)
+    : highsJ.filter(j => (j.temporadas_data || []).length);
+  const valOf = highsMode === 'game'
+    ? (j, key) => (j.game_highs ? (j.game_highs[key] ?? null) : null)
+    : (j, key) => playerBest(j, key);
+
+  if (!pool.length) {
     table.hidden = true; empty.hidden = false;
-    empty.textContent = 'Aún no hay datos de máximos por partido. Se rellenarán cuando el bot exporte la pestaña GAME HIGHS.';
+    empty.textContent = 'Aún no hay datos para este modo.';
     return;
   }
   table.hidden = false; empty.hidden = true;
 
-  const stats = highsMode === 'total' ? HIGHS_TOTAL_STATS : HIGHS_PG_STATS;
+  // el orden activo debe existir en las columnas del modo actual
+  if (highsSortCol !== 'nombre' && !stats.some(s => s.key === highsSortCol)) highsSortCol = stats[0].key;
+
   const cols = [
     { key: 'rank', label: '#', cls: 'td-rank', sortable: false },
     { key: 'foto', label: '', sortable: false },
@@ -1976,9 +2018,9 @@ function renderHighs() {
   ];
 
   // valores por jugador + máximo por columna (para resaltar el líder)
-  const rows = highsJ.map(j => {
+  const rows = pool.map(j => {
     const best = {};
-    stats.forEach(s => { best[s.key] = playerBest(j, s.key); });
+    stats.forEach(s => { best[s.key] = valOf(j, s.key); });
     return { j, best };
   });
   const colMax = {};
@@ -2007,7 +2049,7 @@ function renderHighs() {
       if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
       if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
       const v = r.best[c.key];
-      const lead = (v != null && v === colMax[c.key]) ? ' td-leader' : '';
+      const lead = (v != null && v === colMax[c.key] && colMax[c.key] > 0) ? ' td-leader' : '';
       const hl = highsSortCol === c.key ? ' td-hl' : '';
       return `<td class="td-num${hl}${lead}">${v != null ? c.fmt(v) : '—'}</td>`;
     }).join('');
