@@ -13,10 +13,10 @@ function initTheme() {
 
 // ── NAVEGACIÓN GLOBAL ─────────────────────────
 const NAV_LINKS = [
-  ['Inicio', 'index.html'], ['Draft', 'draft.html'], ['Ranking', 'ranking.html'],
-  ['Salarios', 'salarios.html'], ['Premios', 'premios.html'], ['Summer League', 'summer-league.html'],
-  ['Dorsales', 'dorsales.html'], ['Transacciones', 'transacciones.html'], ['Career Highs', 'career-highs.html'],
-  ['Debut', 'debut.html'], ['Jugadores', 'jugadores.html'], ['Test', 'test.html'],
+  ['Inicio', 'index.html'], ['Jugadores', 'jugadores.html'], ['Draft', 'draft.html'],
+  ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
+  ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Dorsales', 'dorsales.html'],
+  ['Summer League', 'summer-league.html'], ['Salarios', 'salarios.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -835,7 +835,8 @@ function premioRowClass(tipo) {
 }
 
 // Orden de importancia (menor índice = más importante, arriba). Concursos siempre al final.
-const PREMIO_ORDEN = ['mvp', 'dpoy', 'roy', 'all nba', 'all defense', 'all rookie', 'player of the month', 'rookie of the month', 'all star', 'rising stars'];
+// 'mvp' aquí = votos al MVP (no ganado), va en medio, no en cabeza
+const PREMIO_ORDEN = ['dpoy', 'roy', 'all nba', 'all defense', 'all rookie', 'mvp', 'player of the month', 'rookie of the month', 'all star', 'rising stars'];
 function premioPrio(tipo) {
   const t = drNorm(tipo).replace(/[^a-z0-9]+/g, ' ').trim();
   if (/concurso|triples?|mate|dunk|skill|habilidad/.test(t)) return 90;   // concursos: lo último
