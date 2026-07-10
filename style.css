@@ -969,62 +969,75 @@ tr.season-tot td { font-weight: 600; }
 #tl-table th, #tl-table td { padding: 0; }
 
 #tl-table thead th {
-  position: sticky; top: 56px; z-index: 6;
   background: var(--surface-2); color: var(--text-muted);
-  font-size: 0.62rem; font-weight: 700;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em;
   text-align: center; vertical-align: bottom;
   padding: var(--space-2) 2px;
   border-bottom: 2px solid var(--border); white-space: nowrap;
 }
-.tl-year { min-width: 40px; width: 40px; }
-th.tl-break, td.tl-break {
-  min-width: 12px; width: 12px;
-  background: var(--bg) !important; border-bottom-color: transparent !important;
-}
+.tl-year { min-width: 34px; width: 34px; font-variant-numeric: tabular-nums; }
 
+/* Columna de nombre + Debut (fijas a la izquierda) */
 .tl-name, .tl-name-h, .tl-name-f {
   position: sticky; left: 0; z-index: 5;
   background: var(--surface); text-align: left;
-  min-width: 152px; max-width: 200px;
-  padding: 0 var(--space-3) !important;
-  box-shadow: 1px 0 0 var(--border); white-space: nowrap;
+  width: 168px; min-width: 168px; max-width: 168px;
+  padding: 0 var(--space-3) !important; white-space: nowrap;
 }
-.tl-name-h { z-index: 8; background: var(--surface-2); }
-.tl-name a { color: var(--text); text-decoration: none; font-weight: 600; }
-.tl-name a:hover { color: var(--accent); }
-.tl-birth { color: var(--text-dim); font-size: var(--font-xs); margin-left: var(--space-2); font-variant-numeric: tabular-nums; }
+.tl-debut, .tl-debut-h {
+  position: sticky; left: 168px; z-index: 5;
+  background: var(--surface); text-align: center;
+  width: 50px; min-width: 50px;
+  font-size: var(--font-xs); font-weight: 600; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 1px 0 0 var(--border);
+}
+.tl-name-h, .tl-debut-h { z-index: 9; background: var(--surface-2); }
+.tl-namewrap { display: flex; align-items: center; gap: var(--space-2); }
+.tl-avatar.avatar { width: 22px; height: 22px; border-radius: 50%; flex: 0 0 auto; font-size: 0.56rem; }
+.tl-pname { color: var(--text); text-decoration: none; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-pname:hover { color: var(--accent); }
+
+/* Hueco de años sin jugadores (rayado) */
+th.tl-break, td.tl-break {
+  min-width: 44px; width: 44px;
+  background: repeating-linear-gradient(45deg, var(--accent-light) 0, var(--accent-light) 3px, transparent 3px, transparent 7px);
+  border-left: 1px solid var(--accent); border-right: 1px solid var(--accent);
+}
+th.tl-break { color: var(--accent); font-size: 0.55rem; }
 
 #tl-body tr { height: 30px; }
-#tl-body tr:nth-child(even) .tl-name { background: var(--surface-2); }
-#tl-body tr:hover .tl-name { background: var(--accent-light); }
+#tl-body tr:nth-child(even) .tl-name,
+#tl-body tr:nth-child(even) .tl-debut { background: var(--surface-2); }
+#tl-body tr:hover .tl-name,
+#tl-body tr:hover .tl-debut { background: var(--accent-light); }
 #tl-body td { border-bottom: 2px solid var(--bg); }
 
 .tl-cell {
   border-left: 2px solid var(--bg); border-right: 2px solid var(--bg);
-  text-align: center; overflow: hidden; vertical-align: middle;
+  border-radius: 3px; text-align: center; overflow: hidden; vertical-align: middle;
 }
 .tl-lbl {
-  display: block; color: #fff;
-  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em;
+  display: block; color: inherit;
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.02em;
   text-transform: uppercase; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
-  padding: 0 4px; text-shadow: 0 1px 1px rgba(0,0,0,0.35);
+  overflow: hidden; text-overflow: ellipsis; padding: 0 4px;
 }
 .tl-cell.tl-split { padding: 0; }
-.tl-segrow { display: flex; height: 26px; }
+.tl-segrow { display: flex; height: 26px; border-radius: 3px; overflow: hidden; }
 .tl-seg {
   flex: 1 1 0; min-width: 0;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 0.52rem; font-weight: 700;
-  overflow: hidden; text-shadow: 0 1px 1px rgba(0,0,0,0.35);
+  color: #fff; font-size: 0.5rem; font-weight: 700; overflow: hidden;
 }
 
 .tl-seas, .tl-seas-h {
-  min-width: 46px; text-align: center;
+  min-width: 44px; text-align: center;
   font-variant-numeric: tabular-nums; font-weight: 700;
   padding: 0 var(--space-2) !important; background: var(--surface);
 }
 .tl-seas-h { background: var(--surface-2); color: var(--text-muted); }
+#tl-body tr:nth-child(even) .tl-seas { background: var(--surface-2); }
 
 #tl-tfoot td {
   background: var(--surface-2); border-top: 2px solid var(--border);
@@ -1036,6 +1049,5 @@ th.tl-break, td.tl-break {
 .tl-seas-total { color: var(--dorado); }
 
 @media (max-width: 768px) {
-  #tl-table thead th { top: 48px; }
   .tl-wrap { padding: 0 var(--space-4) var(--space-12); }
 }
