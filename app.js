@@ -1329,6 +1329,14 @@ function trFechaDisplay(iso) {
 }
 function trYearOf(iso) { const m = String(iso || '').match(/^(\d{4})/); return m ? m[1] : ''; }
 
+// ID estable de una transacción (no depende del orden del volcado)
+function trMakeId(t) {
+  const base = [t.fecha, t.jugador, t.tipo, t.equipo1]
+    .map(x => drNorm(x)).join('-')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return base || 'tx';
+}
+
 function trTipoClass(t) {
   const s = (t || '').toLowerCase();
   if (s.includes('draft')) return 'tt-draft';
@@ -1350,7 +1358,13 @@ async function initTransaccionesPage() {
   }
 
   buildPlayerIds(data.jugadores);
-  trAll = (data.transacciones || []).filter(t => t.tipo).map((t, i) => ({ ...t, _id: 'tx' + (i + 1) }));
+  const seenIds = {};
+  trAll = (data.transacciones || []).filter(t => t.tipo).map(t => {
+    let id = trMakeId(t);
+    if (seenIds[id] != null) { seenIds[id]++; id = `${id}-${seenIds[id]}`; }
+    else seenIds[id] = 0;
+    return { ...t, _id: id };
+  });
 
   document.getElementById('hero-sub').textContent =
     trAll.length ? `${trAll.length} movimientos de mercado` : 'Aún no hay datos de transacciones';
