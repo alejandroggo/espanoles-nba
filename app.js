@@ -1291,13 +1291,34 @@ let trYear = '';
 const TR_COLS = [
   { key: 'rank',    label: '#',        sortable: false, cls: 'td-rank' },
   { key: 'fecha',   label: 'Fecha',    sortable: true,  cls: 'td-center' },
-  { key: 'jugador', label: 'Jugador',  sortable: true },
+  { key: 'jugador', label: 'Jugador',  sortable: true,  cls: 'td-nombre' },
   { key: 'tipo',    label: 'Tipo',     sortable: true },
   { key: 'equipo1', label: 'Equipo',   sortable: true,  cls: 'td-center' },
   { key: 'equipo2', label: 'Equipo 2', sortable: true,  cls: 'td-center' },
   { key: 'otros',   label: 'Otros jugadores', sortable: false },
-  { key: 'notas',   label: 'Notas',    sortable: false, cls: 'td-notas' },
+  { key: 'chevron', label: '',         sortable: false, cls: 'td-chevron' },
 ];
+
+// Nombre completo de franquicia → código de 3 letras (incluye históricas)
+const TEAM_ABBR = {
+  'atlanta hawks': 'ATL', 'boston celtics': 'BOS', 'brooklyn nets': 'BKN', 'new jersey nets': 'NJN',
+  'charlotte hornets': 'CHA', 'charlotte bobcats': 'CHA', 'chicago bulls': 'CHI', 'cleveland cavaliers': 'CLE',
+  'dallas mavericks': 'DAL', 'denver nuggets': 'DEN', 'detroit pistons': 'DET', 'golden state warriors': 'GSW',
+  'houston rockets': 'HOU', 'indiana pacers': 'IND', 'los angeles clippers': 'LAC', 'la clippers': 'LAC',
+  'san diego clippers': 'SDC', 'los angeles lakers': 'LAL', 'la lakers': 'LAL', 'memphis grizzlies': 'MEM',
+  'vancouver grizzlies': 'VAN', 'miami heat': 'MIA', 'milwaukee bucks': 'MIL', 'minnesota timberwolves': 'MIN',
+  'new orleans pelicans': 'NOP', 'new orleans hornets': 'NOH', 'new orleans/oklahoma city hornets': 'NOK',
+  'new york knicks': 'NYK', 'oklahoma city thunder': 'OKC', 'seattle supersonics': 'SEA', 'orlando magic': 'ORL',
+  'philadelphia 76ers': 'PHI', 'phoenix suns': 'PHX', 'portland trail blazers': 'POR', 'sacramento kings': 'SAC',
+  'kansas city kings': 'KCK', 'san antonio spurs': 'SAS', 'toronto raptors': 'TOR', 'utah jazz': 'UTA',
+  'washington wizards': 'WAS', 'washington bullets': 'WSB',
+};
+function teamAbbr(name) {
+  const s = String(name || '').trim();
+  if (!s) return '—';
+  if (s.length <= 4) return s.toUpperCase();          // ya es un código (MEM, POR…)
+  return TEAM_ABBR[drNorm(s)] || s;                    // desconocido → nombre completo
+}
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function trFechaDisplay(iso) {
@@ -1329,7 +1350,7 @@ async function initTransaccionesPage() {
   }
 
   buildPlayerIds(data.jugadores);
-  trAll = (data.transacciones || []).filter(t => t.tipo);
+  trAll = (data.transacciones || []).filter(t => t.tipo).map((t, i) => ({ ...t, _id: 'tx' + (i + 1) }));
 
   document.getElementById('hero-sub').textContent =
     trAll.length ? `${trAll.length} movimientos de mercado` : 'Aún no hay datos de transacciones';
@@ -1340,6 +1361,10 @@ async function initTransaccionesPage() {
   document.getElementById('tr-tipo').addEventListener('change', e => { trTipo = e.target.value; renderTrTable(); });
   document.getElementById('tr-year').addEventListener('change', e => { trYear = e.target.value; renderTrTable(); });
   renderTrTable();
+
+  // Abrir el detalle si la URL trae ?tx=ID
+  const tx = new URLSearchParams(location.search).get('tx');
+  if (tx) openTrDrawer(tx);
 }
 
 function renderTrKpis() {
@@ -1390,15 +1415,17 @@ function renderTrTable() {
   </tr>`;
 
   document.getElementById('tr-body').innerHTML = rows.map((t, i) => `
-    <tr>
+    <tr class="tr-row" tabindex="0" role="button" aria-label="Ver detalle de la transacción de ${t.jugador}"
+        onclick="openTrDrawer('${t._id}')"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
-      <td class="td-nombre">${plLink(t.jugador, t.jugador)}</td>
+      <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, t.jugador)}</td>
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
-      <td class="td-center">${t.equipo1 || '—'}</td>
-      <td class="td-center">${t.equipo2 || '—'}</td>
+      <td class="td-center">${teamAbbr(t.equipo1)}</td>
+      <td class="td-center">${teamAbbr(t.equipo2)}</td>
       <td class="td-muted">${t.otros || '—'}</td>
-      <td class="td-muted td-notas">${t.notas || '—'}</td>
+      <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -1406,6 +1433,55 @@ function sortTr(col) {
   if (trSortCol === col) trSortAsc = !trSortAsc;
   else { trSortCol = col; trSortAsc = (col === 'jugador' || col === 'tipo'); }
   renderTrTable();
+}
+
+// Nombre completo + código: "Los Angeles Lakers (LAL)"
+function teamFull(name) {
+  const s = String(name || '').trim();
+  if (!s) return '—';
+  const ab = teamAbbr(s);
+  return (ab !== s && ab !== '—') ? `${s} <span class="drawer-code">${ab}</span>` : s;
+}
+
+function openTrDrawer(id) {
+  const t = trAll.find(x => x._id === id);
+  if (!t) return;
+  const filas = [
+    ['Jugador', plLink(t.jugador, t.jugador)],
+    t.equipo1 ? ['Equipo', teamFull(t.equipo1)] : null,
+    t.equipo2 ? ['Segundo equipo', teamFull(t.equipo2)] : null,
+    t.otros ? ['Otros jugadores', t.otros] : null,
+  ].filter(Boolean);
+
+  document.getElementById('tr-drawer-content').innerHTML = `
+    <span class="tr-tipo ${trTipoClass(t.tipo)} drawer-tag">${t.tipo}</span>
+    <h2 class="drawer-title" id="tr-drawer-title">${t.jugador}</h2>
+    <p class="drawer-sub">${trFechaDisplay(t.fecha)}</p>
+    <dl class="drawer-dl">
+      ${filas.map(([k, v]) => `<div class="drawer-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+    </dl>
+    ${t.notas ? `<div class="drawer-notas"><h3>Notas</h3><p>${t.notas}</p></div>` : ''}`;
+
+  document.getElementById('tr-overlay').hidden = false;
+  const d = document.getElementById('tr-drawer');
+  d.hidden = false;
+  requestAnimationFrame(() => d.classList.add('open'));
+  document.body.classList.add('drawer-lock');
+  updateUrlParam('tx', id);
+  document.addEventListener('keydown', trDrawerEsc);
+}
+
+function trDrawerEsc(e) { if (e.key === 'Escape') closeTrDrawer(); }
+
+function closeTrDrawer() {
+  const d = document.getElementById('tr-drawer');
+  if (d) d.classList.remove('open');
+  const ov = document.getElementById('tr-overlay');
+  if (ov) ov.hidden = true;
+  document.body.classList.remove('drawer-lock');
+  updateUrlParam('tx', '');
+  document.removeEventListener('keydown', trDrawerEsc);
+  setTimeout(() => { if (d && !d.classList.contains('open')) d.hidden = true; }, 280);
 }
 
 // ══════════════════════════════════════════════

@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
 
@@ -61,6 +61,13 @@
   </section>
 </main>
 
+<!-- DRAWER DETALLE TRANSACCIÓN -->
+<div class="drawer-overlay" id="tr-overlay" hidden onclick="closeTrDrawer()"></div>
+<aside class="drawer" id="tr-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="tr-drawer-title">
+  <button class="drawer-close" aria-label="Cerrar detalle" onclick="closeTrDrawer()">✕</button>
+  <div id="tr-drawer-content"></div>
+</aside>
+
 <!-- FOOTER -->
 <footer class="ag-footer">
   <div class="ag-footer-brand">
@@ -84,7 +91,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=17"></script>
+<script src="app.js?v=18"></script>
 <script>initTheme(); initTransaccionesPage();</script>
 </body>
 </html>
