@@ -15,8 +15,8 @@ function initTheme() {
 const NAV_LINKS = [
   ['Inicio', 'index.html'], ['Jugadores', 'jugadores.html'], ['Draft', 'draft.html'],
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
-  ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Dorsales', 'dorsales.html'],
-  ['Summer League', 'summer-league.html'], ['Salarios', 'salarios.html'], ['Test', 'test.html'],
+  ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
+  ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
