@@ -913,7 +913,7 @@ const RK_COLS_PG = [
   { key: 'rank',      label: '#',   sortable: false, cls: 'td-rank' },
   { key: 'foto',      label: '',    sortable: false },
   { key: 'nombre',    label: 'Jugador', sortable: true, cls: 'td-nombre' },
-  { key: 'partidos',  label: 'PJ',  sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'partidos',  label: 'GP',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'min_g',     label: 'MIN', sortable: true, cls: 'td-num', fmt: fmtDec1 },
   { key: 'pts_g',     label: 'PTS', sortable: true, cls: 'td-num', fmt: fmtDec1 },
   { key: 'rbd_g',     label: 'REB', sortable: true, cls: 'td-num', fmt: fmtDec1 },
@@ -929,7 +929,7 @@ const RK_COLS_TOT = [
   { key: 'rank',        label: '#',    sortable: false, cls: 'td-rank' },
   { key: 'foto',        label: '',     sortable: false },
   { key: 'nombre',      label: 'Jugador', sortable: true, cls: 'td-nombre' },
-  { key: 'partidos',         label: 'PJ',   sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'partidos',         label: 'GP',   sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'partidos_titular', label: 'GS',   sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'pct_gs',           label: '%GS',  sortable: true, cls: 'td-num', fmt: fmtPct },
   { key: 'min_total',   label: 'MIN',  sortable: true, cls: 'td-num', fmt: fmtEnt },
@@ -939,7 +939,7 @@ const RK_COLS_TOT = [
   { key: 'stl_total',   label: 'ROB',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'blk_total',   label: 'TAP',  sortable: true, cls: 'td-num', fmt: fmtEnt },
   { key: 'tres_total',  label: '3PM',  sortable: true, cls: 'td-num', fmt: fmtEnt },
-  { key: 'tov_total',   label: 'PÉRD', sortable: true, cls: 'td-num', fmt: fmtEnt },
+  { key: 'tov_total',   label: 'TOV', sortable: true, cls: 'td-num', fmt: fmtEnt },
 ];
 
 function fmtEnt(n)  { return (n || n === 0) ? Math.round(n).toLocaleString('es-ES') : '—'; }
@@ -1564,15 +1564,15 @@ function jugHeader(j) {
 function jugStats(j) {
   if (!(j.partidos > 0)) return '';
   const pg = [
-    statBox('PJ', fmtEnt(j.partidos)), statBox('MIN', fmtDec1(j.min_g)), statBox('PTS', fmtDec1(j.pts_g)),
+    statBox('GP', fmtEnt(j.partidos)), statBox('MIN', fmtDec1(j.min_g)), statBox('PTS', fmtDec1(j.pts_g)),
     statBox('REB', fmtDec1(j.rbd_g)), statBox('AST', fmtDec1(j.ast_g)), statBox('ROB', fmtDec1(j.stl_g)),
     statBox('TAP', fmtDec1(j.blk_g)), statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
   ].join('');
   const tot = [
-    statBox('PJ', fmtEnt(j.partidos)),
+    statBox('GP', fmtEnt(j.partidos)),
     statBox('PTS', fmtEnt(j.pts_total)), statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)),
     statBox('ROB', fmtEnt(j.stl_total)), statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
-    statBox('MIN', fmtEnt(j.min_total)), statBox('PÉRD', fmtEnt(j.tov_total)),
+    statBox('MIN', fmtEnt(j.min_total)), statBox('TOV', fmtEnt(j.tov_total)),
   ].join('');
   return jugSection('Estadísticas de carrera',
     `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
@@ -1582,15 +1582,24 @@ function jugStats(j) {
 function jugTemporadas(j) {
   const s = (j.temporadas_data || []).filter(x => x.year);
   if (!s.length) return '';
-  const rows = [...s].sort((a, b) => (a.year || 0) - (b.year || 0)).map(t => `<tr>
-    <td class="td-center">${drSeason(t.year)}</td><td class="td-center">${t.team || '—'}</td>
+  const sorted = [...s].sort((a, b) => (a.year || 0) - (b.year || 0));
+  // años con más de una fila → temporadas multi-equipo (TOT + reparto por equipo)
+  const yearCount = {};
+  sorted.forEach(t => { yearCount[t.year] = (yearCount[t.year] || 0) + 1; });
+  const rows = sorted.map(t => {
+    const isTot = String(t.team || '').toUpperCase() === 'TOT';
+    const split = yearCount[t.year] > 1 && !isTot;   // reparto por equipo (no el total)
+    const teamCell = split ? `<span class="season-split-mark">↳</span> ${t.team || '—'}` : (t.team || '—');
+    return `<tr class="${split ? 'season-split' : (isTot ? 'season-tot' : '')}">
+    <td class="td-center">${drSeason(t.year)}</td><td class="td-center">${teamCell}</td>
     <td class="td-num">${fmtEnt(t.g)}</td><td class="td-num">${fmtDec1(t.min_g)}</td><td class="td-num">${fmtDec1(t.pts_g)}</td>
     <td class="td-num">${fmtDec1(t.rbd_g)}</td><td class="td-num">${fmtDec1(t.ast_g)}</td><td class="td-num">${fmtDec1(t.stl_g)}</td>
     <td class="td-num">${fmtDec1(t.blk_g)}</td><td class="td-num">${fmtPct(t.fg_pct)}</td><td class="td-num">${fmtPct(t.tres_pct)}</td><td class="td-num">${fmtPct(t.ft_pct)}</td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
   return jugSection('Temporada a temporada',
     `<div class="tabla-scroll"><table><thead><tr>
-      <th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">PJ</th><th class="td-num">MIN</th><th class="td-num">PTS</th>
+      <th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th><th class="td-num">MIN</th><th class="td-num">PTS</th>
       <th class="td-num">REB</th><th class="td-num">AST</th><th class="td-num">ROB</th><th class="td-num">TAP</th>
       <th class="td-num">FG%</th><th class="td-num">3P%</th><th class="td-num">FT%</th>
     </tr></thead><tbody>${rows}</tbody></table></div>`);
@@ -1602,7 +1611,7 @@ function jugPlayoffs(j) {
   const rows = [...p].sort((a, b) => (a.year || 0) - (b.year || 0)).map(t =>
     `<tr><td class="td-center">${t.year ? drSeason(t.year) : '—'}</td><td class="td-center">${t.team || '—'}</td><td class="td-num">${fmtEnt(t.g)}</td></tr>`).join('');
   return jugSection('Playoffs',
-    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">PJ</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th></tr></thead><tbody>${rows}</tbody></table></div>`);
 }
 
 function jugPremios(j) {

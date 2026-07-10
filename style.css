@@ -813,7 +813,14 @@ body.drawer-lock { overflow: hidden; }
 .jug-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
 .jug-photo--big { width: 120px; height: 120px; border-radius: var(--radius-lg); }
 .jug-name { font-family: var(--display); font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1; letter-spacing: 0.02em; }
-.jug-pills { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); margin-top: var(--space-3); }
+.jug-pills {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  justify-items: start;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 420px) { .jug-pills { grid-template-columns: minmax(0, max-content); } }
 .jug-pill {
   font-size: var(--font-xs); color: var(--text-muted);
   background: var(--surface-2); border: 1px solid var(--border);
@@ -833,6 +840,11 @@ body.drawer-lock { overflow: hidden; }
 .tabla-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
 .tabla-scroll table { margin: 0; }
 .tabla-scroll thead th { position: static; }
+
+/* Temporadas multi-equipo: filas de reparto (no la TOT) */
+tr.season-split td { color: var(--text-muted); font-size: var(--font-xs); }
+.season-split-mark { color: var(--text-dim); margin-right: 2px; }
+tr.season-tot td { font-weight: 600; }
 
 .jug-awards { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
 .jug-award { display: flex; align-items: baseline; gap: var(--space-3); }
