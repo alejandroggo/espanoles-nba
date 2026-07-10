@@ -1547,12 +1547,11 @@ async function initJugadorPage() {
 
 function jugHeader(j) {
   const pills = [];
-  if (j.posicion) pills.push(j.posicion);
-  if (j.nacimiento_fecha || j.nacimiento) pills.push('Nac. ' + (j.nacimiento_fecha || j.nacimiento));
+  const nac = j.nacimiento_fecha || j.nacimiento;
+  if (nac) pills.push('Nacido: ' + nac);
   pills.push(j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'} ${j.draft_equipo || ''}`.trim() : 'No drafteado');
-  if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut ' + j.primer_partido.fecha);
-  if (j.temporadas) pills.push(`${j.temporadas} temporadas`);
-  if (j.equipos_nba) pills.push(j.equipos_nba);
+  if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut: ' + j.primer_partido.fecha);
+  if (j.equipos_nba) pills.push('Equipos: ' + j.equipos_nba);
   return `<header class="jug-header">
     ${jugPhoto(j, 'jug-photo--big')}
     <div class="jug-headinfo">
@@ -1570,6 +1569,7 @@ function jugStats(j) {
     statBox('TAP', fmtDec1(j.blk_g)), statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
   ].join('');
   const tot = [
+    statBox('PJ', fmtEnt(j.partidos)),
     statBox('PTS', fmtEnt(j.pts_total)), statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)),
     statBox('ROB', fmtEnt(j.stl_total)), statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
     statBox('MIN', fmtEnt(j.min_total)), statBox('PÉRD', fmtEnt(j.tov_total)),
@@ -1631,7 +1631,7 @@ function jugSalario(j) {
   if (j.ganancias_ganado) parts.push(statBox('Cobrado', fmtDinero(j.ganancias_ganado)));
   if (j.ganancias_futuro) parts.push(statBox('Firmado', fmtDinero(j.ganancias_futuro)));
   if (j.partidos > 0 && j.ganancias_ganado) parts.push(statBox('$/partido', fmtDinero(j.ganancias_ganado / j.partidos)));
-  return jugSection('Salario', `<div class="stat-grid">${parts.join('')}</div>`);
+  return jugSection('Salario', `<div class="stat-grid stat-grid--money">${parts.join('')}</div>`);
 }
 
 function jugDorsalesSec(dorsales) {

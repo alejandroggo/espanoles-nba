@@ -813,7 +813,7 @@ body.drawer-lock { overflow: hidden; }
 .jug-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
 .jug-photo--big { width: 120px; height: 120px; border-radius: var(--radius-lg); }
 .jug-name { font-family: var(--display); font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1; letter-spacing: 0.02em; }
-.jug-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.jug-pills { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); margin-top: var(--space-3); }
 .jug-pill {
   font-size: var(--font-xs); color: var(--text-muted);
   background: var(--surface-2); border: 1px solid var(--border);
@@ -824,6 +824,8 @@ body.drawer-lock { overflow: hidden; }
 .jug-subh { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: var(--space-4) 0 var(--space-2); }
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-2); }
+.stat-grid--money { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+.stat-grid--money .stat-box-val { font-size: 1.6rem; white-space: nowrap; }
 .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; }
 .stat-box-val { font-family: var(--display); font-size: 1.5rem; line-height: 1; color: var(--text); }
 .stat-box-lbl { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
