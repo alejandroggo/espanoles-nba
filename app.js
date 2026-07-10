@@ -1972,7 +1972,7 @@ function renderDebutTable() {
       <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202106291/images/players/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : '<span class="player-thumb player-thumb--empty"></span>'}</a></td>
       <td class="td-nombre">${plLink(r.nombre, r.nombre)}</td>
       <td class="td-center">${r.fecha}</td>
-      <td class="td-num">${r.edad ?? '—'}</td>
+      <td class="td-num">${r.edad != null ? Math.floor(r.edad) : '—'}</td>
       <td class="td-center">${r.equipo || '—'}</td>
       <td class="td-center">${r.rival || '—'}</td>
       <td class="td-center">${debutResultado(r.resultado)}</td>
@@ -1986,11 +1986,15 @@ function renderDebutTable() {
 }
 
 function debutResultado(res) {
-  if (!res) return '—';
-  const s = String(res).trim();
-  if (/^[vw]/i.test(s)) return `<span class="tr-tipo tt-sign">${s}</span>`;   // victoria/win → verde
-  if (/^[dl]/i.test(s)) return `<span class="tr-tipo tt-waive">${s}</span>`;   // derrota/loss → rojo
-  return s;
+  if (res === '' || res == null) return '—';
+  const s = String(res).trim().toLowerCase();
+  // Columna W de la hoja: booleano de victoria (true = ganó, false = perdió)
+  if (s === 'true'  || s === 'v' || s === 'victoria') return `<span class="tr-tipo tt-sign">V</span>`;
+  if (s === 'false' || s === 'd' || s === 'derrota')  return `<span class="tr-tipo tt-waive">D</span>`;
+  const raw = String(res).trim();
+  if (/^[vw]/i.test(raw)) return `<span class="tr-tipo tt-sign">${raw}</span>`;   // victoria/win → verde
+  if (/^[dl]/i.test(raw)) return `<span class="tr-tipo tt-waive">${raw}</span>`;  // derrota/loss → rojo
+  return raw;
 }
 
 // ══════════════════════════════════════════════
