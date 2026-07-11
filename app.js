@@ -17,7 +17,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -2543,4 +2543,169 @@ function buildTlYearOptions(years) {
   from.value = String(tlYearFrom); to.value = String(tlYearTo);
   from.onchange = () => { tlYearFrom = +from.value; if (tlYearFrom > tlYearTo) { tlYearTo = tlYearFrom; to.value = String(tlYearTo); } renderTimeline(); };
   to.onchange = () => { tlYearTo = +to.value; if (tlYearTo < tlYearFrom) { tlYearFrom = tlYearTo; from.value = String(tlYearFrom); } renderTimeline(); };
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA COMPARADOR
+// ══════════════════════════════════════════════
+let cmpAll = [];
+
+function cmpNTeams(j) {
+  const s = new Set((j.temporadas_data || []).map(t => (t.team || '').toUpperCase()).filter(t => t && t !== 'TOT'));
+  if (s.size) return s.size;
+  const n = (j.equipos_nba || '').split(/[,/]/).map(x => x.trim()).filter(Boolean).length;
+  return n || null;
+}
+function cmpPremios(j, filter) {
+  const p = j.premios || [];
+  return (filter ? p.filter(filter).length : p.length) || null;
+}
+function cmpPoSeasons(j) { return (j.playoffs_temporadas || []).filter(t => t && (t.year || t.g)).length || null; }
+function cmpPoGames(j) { return (j.playoffs_temporadas || []).reduce((s, t) => s + (t.g || 0), 0) || null; }
+
+const CMP_SECTIONS = [
+  { title: 'Trayectoria', rows: [
+    { label: 'Temporadas',        get: j => j.temporadas != null ? j.temporadas : ((j.temporadas_data || []).filter(t => t.year).length || null), fmt: fmtEnt, dir: 'high' },
+    { label: 'Partidos',          get: j => j.partidos ?? null, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: '% titular',         get: j => j.partidos ? (j.partidos_titular || 0) / j.partidos : null, fmt: fmtPct, dir: 'high', bar: true },
+    { label: 'Equipos NBA',       get: j => cmpNTeams(j), fmt: fmtEnt, dir: 'high' },
+    { label: 'Año de draft',      get: j => j.draft_anio || null, fmt: v => String(v), dir: 'neutral' },
+    { label: 'Nº de draft',       get: j => j.draft ? (j.draft_pick || null) : 'undr', fmt: v => v === 'undr' ? 'No drafteado' : ('#' + v), dir: 'low' },
+  ]},
+  { title: 'Por partido', rows: [
+    { label: 'Minutos',      get: j => j.min_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Puntos',       get: j => j.pts_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Rebotes',      get: j => j.rbd_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Asistencias',  get: j => j.ast_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Robos',        get: j => j.stl_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Tapones',      get: j => j.blk_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Triples',      get: j => j.tres_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'FG%',          get: j => j.fg_pct, fmt: fmtPct, dir: 'high', bar: true },
+    { label: '3P%',          get: j => j.tres_pct, fmt: fmtPct, dir: 'high', bar: true },
+    { label: 'FT%',          get: j => j.ft_pct, fmt: fmtPct, dir: 'high', bar: true },
+  ]},
+  { title: 'Totales', rows: [
+    { label: 'Puntos',         get: j => j.pts_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Rebotes',        get: j => j.rbd_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Asistencias',    get: j => j.ast_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Robos',          get: j => j.stl_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Tapones',        get: j => j.blk_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Triples',        get: j => j.tres_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Minutos',        get: j => j.min_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Triples-dobles', get: j => j.td_total ?? null, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Pérdidas',       get: j => j.tov_total ?? null, fmt: fmtEnt, dir: 'low' },
+    { label: 'Faltas',         get: j => j.pf_total ?? null, fmt: fmtEnt, dir: 'low' },
+  ]},
+  { title: 'Máximos en un partido', when: (a, b) => a.game_highs || b.game_highs, rows: [
+    { label: 'Puntos',      get: j => j.game_highs && j.game_highs.pts, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Rebotes',     get: j => j.game_highs && j.game_highs.rbd, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Asistencias', get: j => j.game_highs && j.game_highs.ast, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Robos',       get: j => j.game_highs && j.game_highs.stl, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Tapones',     get: j => j.game_highs && j.game_highs.blk, fmt: fmtEnt, dir: 'high', bar: true },
+  ]},
+  { title: 'Premios', when: (a, b) => (a.premios || []).length || (b.premios || []).length, rows: [
+    { label: 'Premios (total)', get: j => (j.premios || []).length || null, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'All-Star',        get: j => cmpPremios(j, p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'All-NBA / Defense', get: j => cmpPremios(j, p => /all[\s-]?(nba|defense)/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+  ]},
+  { title: 'Dinero', when: (a, b) => a.ganancias || b.ganancias, rows: [
+    { label: 'Ganancias', get: j => j.ganancias || null, fmt: fmtDinero, dir: 'high', bar: true },
+    { label: '$ por partido', get: j => (j.ganancias_ganado && j.partidos) ? j.ganancias_ganado / j.partidos : ((j.ganancias && j.partidos) ? j.ganancias / j.partidos : null), fmt: fmtDinero, dir: 'high', bar: true },
+  ]},
+  { title: 'Playoffs', when: (a, b) => cmpPoSeasons(a) || cmpPoSeasons(b), rows: [
+    { label: 'Temporadas de playoffs', get: j => cmpPoSeasons(j), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Partidos de playoffs',   get: j => cmpPoGames(j), fmt: fmtEnt, dir: 'high', bar: true },
+  ]},
+];
+
+function cmpRow(row, A, B) {
+  const vA = row.get(A), vB = row.get(B);
+  const nA = typeof vA === 'number' ? vA : null;
+  const nB = typeof vB === 'number' ? vB : null;
+  let winA = false, winB = false;
+  if (row.dir !== 'neutral' && nA != null && nB != null && nA !== nB) {
+    if (row.dir === 'low') { winA = nA < nB; winB = nB < nA; }
+    else { winA = nA > nB; winB = nB > nA; }
+  }
+  const fA = vA == null ? '—' : row.fmt(vA);
+  const fB = vB == null ? '—' : row.fmt(vB);
+  let bars = '';
+  if (row.bar && nA != null && nB != null) {
+    const mx = Math.max(nA, nB) || 1;
+    bars = `<div class="cmp-track"><span class="cmp-fill${winA ? ' win' : ''}" style="width:${Math.round(nA / mx * 100)}%"></span><span class="cmp-fill${winB ? ' win' : ''}" style="width:${Math.round(nB / mx * 100)}%"></span></div>`;
+  }
+  return { winA, winB, html: `<div class="cmp-row">
+    <div class="cmp-val a${winA ? ' win' : ''}">${fA}</div>
+    <div class="cmp-center"><div class="cmp-metric">${row.label}</div>${bars}</div>
+    <div class="cmp-val b${winB ? ' win' : ''}">${fB}</div>
+  </div>` };
+}
+
+function cmpCard(j, side) {
+  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
+  const foto = src ? `<span class="cmp-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt="${j.nombre}"></span>` : `<span class="cmp-photo">${avatarHtml(j.nombre, 'cmp-avatar')}</span>`;
+  const draft = j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'}` : 'No drafteado';
+  return `<div class="cmp-card cmp-${side}">
+    ${foto}
+    <a class="cmp-name" href="${jugadorHref(j.id)}">${j.nombre}</a>
+    <span class="cmp-meta">${draft}</span>
+    <span class="cmp-meta">${j.equipos_nba || ''}</span>
+  </div>`;
+}
+
+function cmpRender(A, B) {
+  let scoreA = 0, scoreB = 0;
+  const sections = CMP_SECTIONS.filter(s => !s.when || s.when(A, B)).map(s => {
+    const rows = s.rows.map(r => cmpRow(r, A, B));
+    rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
+    return `<div class="cmp-section"><h2 class="cmp-sec-title">${s.title}</h2>${rows.map(r => r.html).join('')}</div>`;
+  }).join('');
+
+  const head = `<div class="cmp-head">
+    ${cmpCard(A, 'a')}
+    <div class="cmp-scoreboard">
+      <div class="cmp-score"><span class="cmp-sc a${scoreA > scoreB ? ' win' : ''}">${scoreA}</span><span class="cmp-sc-sep">–</span><span class="cmp-sc b${scoreB > scoreA ? ' win' : ''}">${scoreB}</span></div>
+      <div class="cmp-sc-lbl">categorías ganadas</div>
+    </div>
+    ${cmpCard(B, 'b')}
+  </div>`;
+  document.getElementById('cmp-out').innerHTML = head + sections;
+}
+
+async function initComparadorPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  cmpAll = (data.jugadores || []).slice().sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  document.getElementById('hero-sub').textContent = `Compara cara a cara a dos de los ${cmpAll.length} españoles de la NBA`;
+
+  const opts = cmpAll.map(j => `<option value="${j.id}">${j.nombre}</option>`).join('');
+  const selA = document.getElementById('cmp-a'), selB = document.getElementById('cmp-b');
+  selA.innerHTML = opts; selB.innerHTML = opts;
+
+  const params = new URLSearchParams(location.search);
+  const withStats = cmpAll.filter(j => (j.partidos || 0) > 0);
+  const pick = (frag, i) => (withStats.find(j => new RegExp(frag, 'i').test(j.nombre)) || withStats[i] || cmpAll[i] || cmpAll[0]).id;
+  const has = id => cmpAll.some(j => j.id === id);
+  const defA = params.get('a'), defB = params.get('b');
+  selA.value = has(defA) ? defA : pick('pau gasol', 0);
+  selB.value = has(defB) ? defB : pick('marc gasol', 1);
+  if (selA.value === selB.value) selB.value = (cmpAll.find(j => j.id !== selA.value) || cmpAll[0]).id;
+
+  selA.onchange = cmpUpdate; selB.onchange = cmpUpdate;
+  cmpUpdate();
+}
+
+function cmpUpdate() {
+  const idA = document.getElementById('cmp-a').value, idB = document.getElementById('cmp-b').value;
+  updateUrlParam('a', idA); updateUrlParam('b', idB);
+  const A = cmpAll.find(j => j.id === idA), B = cmpAll.find(j => j.id === idB);
+  if (A && B) cmpRender(A, B);
+}
+
+function cmpSwap() {
+  const a = document.getElementById('cmp-a'), b = document.getElementById('cmp-b');
+  const t = a.value; a.value = b.value; b.value = t; cmpUpdate();
 }

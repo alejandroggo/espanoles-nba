@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Draft · Españoles en la NBA</title>
-<meta name="description" content="Todos los jugadores españoles elegidos en el Draft de la NBA: año, pick, equipo y procedencia. Desde Fernando Martín (1985) hasta hoy.">
+<title>Comparador · Españoles en la NBA</title>
+<meta name="description" content="Compara cara a cara a dos jugadores españoles de la NBA: estadísticas de carrera, máximos, premios, dinero y playoffs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.basketball-reference.com">
@@ -32,44 +32,20 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">EL <em>Draft</em></h1>
+        <h1 class="hero-title ag-hero">El <em>Comparador</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
-      <div class="hero-kpis" id="draft-kpis"></div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Filtros">
-    <div class="search-wrap">
-      <input type="text" id="draft-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+  <section class="cmp-wrap" aria-label="Comparador de jugadores">
+    <div class="cmp-pick">
+      <label class="sel-wrap"><span class="sr-only">Jugador A</span><select id="cmp-a" class="sel"></select></label>
+      <span class="cmp-vs-lbl">VS</span>
+      <label class="sel-wrap"><span class="sr-only">Jugador B</span><select id="cmp-b" class="sel"></select></label>
+      <button type="button" id="cmp-swap" class="toggle-chip" title="Intercambiar" onclick="cmpSwap()">⇄</button>
     </div>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por franquicia</span>
-      <select id="draft-team" class="sel"></select>
-    </label>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por ronda</span>
-      <select id="draft-round" class="sel">
-        <option value="">Todas las rondas</option>
-        <option value="lottery">Lotería (1-14)</option>
-        <option value="first">1ª ronda (1-30)</option>
-        <option value="second">2ª ronda (31+)</option>
-      </select>
-    </label>
-    <span class="results-count" id="draft-count"></span>
-  </section>
-
-  <section class="tabla-wrap" aria-label="Jugadores drafteados">
-    <table id="draft-table">
-      <thead id="draft-thead"></thead>
-      <tbody id="draft-body"></tbody>
-    </table>
-  </section>
-
-  <section class="undrafted-wrap" aria-label="Jugadores no drafteados">
-    <h2 class="section-title">Undrafted</h2>
-    <p class="section-sub">Llegaron a la NBA sin pasar por el draft.</p>
-    <div class="undrafted-grid" id="undrafted-grid"></div>
+    <div id="cmp-out"></div>
   </section>
 </main>
 
@@ -97,6 +73,6 @@
 </footer>
 
 <script src="app.js?v=35"></script>
-<script>initTheme(); initDraftPage();</script>
+<script>initTheme(); initComparadorPage();</script>
 </body>
 </html>
