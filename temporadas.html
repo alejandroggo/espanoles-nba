@@ -5,7 +5,7 @@
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temporadas · Españoles en la NBA</title>
-<meta name="description" content="Desglose temporada a temporada de cada español en la NBA, en totales y por partido. Los años con traspaso se unen bajo la fila TOT.">
+<meta name="description" content="Todas las temporadas de todos los españoles en la NBA, en totales y por partido. Filtra por equipo o año y ordena por cualquier estadística. Las temporadas parciales (traspasos) van marcadas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.basketball-reference.com">
@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=39">
+<link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
 
@@ -38,19 +38,30 @@
     </div>
   </section>
 
-  <section class="controles" aria-label="Jugador y vista">
+  <section class="controles" aria-label="Filtros">
+    <div class="search-wrap">
+      <input type="text" id="tmp-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+    </div>
     <label class="sel-wrap">
-      <span class="sr-only">Jugador</span>
-      <select id="tmp-player" class="sel"></select>
+      <span class="sr-only">Filtrar por equipo</span>
+      <select id="tmp-team" class="sel"></select>
+    </label>
+    <label class="sel-wrap">
+      <span class="sr-only">Filtrar por temporada</span>
+      <select id="tmp-year" class="sel"></select>
     </label>
     <div class="mode-switch" role="group" aria-label="Totales o por partido">
       <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
       <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
     </div>
+    <span class="results-count" id="tmp-count"></span>
   </section>
 
-  <section class="cmp-wrap" aria-label="Temporada a temporada">
-    <div id="tmp-out"></div>
+  <section class="tabla-wrap" aria-label="Todas las temporadas">
+    <table id="tmp-table">
+      <thead id="tmp-thead"></thead>
+      <tbody id="tmp-tbody"></tbody>
+    </table>
   </section>
 </main>
 
@@ -77,7 +88,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=39"></script>
+<script src="app.js?v=40"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>

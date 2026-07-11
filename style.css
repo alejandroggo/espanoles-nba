@@ -846,9 +846,9 @@ tr.season-split td { color: var(--text-muted); font-size: var(--font-xs); }
 .season-split-mark { color: var(--text-dim); margin-right: 2px; }
 tr.season-tot td { font-weight: 600; }
 
-/* Página Temporadas: fila de carrera */
-.tmp-table tfoot tr.tmp-career td { font-weight: 700; border-top: 2px solid var(--border-strong); background: var(--surface-2); color: var(--text); }
-.tmp-table tfoot tr.tmp-career td:first-child { color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; font-size: var(--font-xs); }
+/* Página Temporadas: temporadas parciales (traspasos) */
+.tmp-parcial { display: inline-block; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); background: var(--accent-soft, rgba(185,28,28,0.10)); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 0 6px; margin-left: 4px; vertical-align: middle; }
+tr.tmp-partial td { background: var(--surface-2); }
 
 .jug-awards { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
 .jug-award { display: flex; align-items: baseline; gap: var(--space-3); }
