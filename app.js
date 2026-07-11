@@ -17,7 +17,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -2911,4 +2911,120 @@ function cmpSwap() {
   const tmp = cmpState.a; cmpState.a = cmpState.b; cmpState.b = tmp;
   cmpRender(cmpCur('a'), cmpCur('b'));
   cmpSyncUrl();
+}
+
+// ══════════════════════════════════════════════
+// TEMPORADAS — desglose por temporada (totales / por partido)
+// ══════════════════════════════════════════════
+let tmpJ = [], tmpMode = 'total';
+
+// Columnas comunes; en 'total' el valor por partido se multiplica por los
+// partidos jugados (salvo TD, que ya es un conteo de temporada).
+const TMP_COLS = [
+  { key: 'min_g', label: 'MIN' }, { key: 'pts_g', label: 'PTS' }, { key: 'rbd_g', label: 'REB' },
+  { key: 'ast_g', label: 'AST' }, { key: 'stl_g', label: 'ROB' }, { key: 'blk_g', label: 'TAP' },
+  { key: 'fgm_g', label: 'FGM' }, { key: 'tres_g', label: '3PM' }, { key: 'ftm_g', label: 'FTM' },
+  { key: 'tov_g', label: 'TOV' }, { key: 'pf_g', label: 'PF' },
+];
+const TMP_TD = { key: 'td', label: 'TD' };                              // solo en 'total'
+const TMP_PCT = [{ key: 'fg_pct', label: 'FG%' }, { key: 'tres_pct', label: '3P%' }, { key: 'ft_pct', label: 'FT%' }]; // solo en 'pg'
+const TMP_TOTKEY = { min_g: 'min', pts_g: 'pts', rbd_g: 'rbd', ast_g: 'ast', stl_g: 'stl', blk_g: 'blk', fgm_g: 'fgm', tres_g: 'tres', ftm_g: 'ftm', tov_g: 'tov', pf_g: 'pf' };
+
+function tmpColumns() { return tmpMode === 'total' ? [...TMP_COLS, TMP_TD] : [...TMP_COLS, ...TMP_PCT]; }
+
+// Suma de totales de carrera a partir de las filas TOT (una por año)
+function tmpCareer(j) {
+  const rows = Object.values(cmpYearRows(j));
+  const sum = k => rows.reduce((s, t) => s + ((t[k] || 0) * (t.g || 0)), 0);
+  const out = { g: j.partidos || rows.reduce((s, t) => s + (t.g || 0), 0), td: rows.reduce((s, t) => s + (t.td || 0), 0) };
+  Object.keys(TMP_TOTKEY).forEach(k => { out[TMP_TOTKEY[k]] = sum(k); });
+  return out;
+}
+
+// Celdas de estadística para una fila-temporada (t) del jugador
+function tmpCells(t) {
+  return tmpColumns().map(c => {
+    let v;
+    if (c.key === 'td') v = (t.td != null) ? fmtEnt(t.td) : '—';
+    else if (c.key.endsWith('_pct')) v = fmtPct(t[c.key]);
+    else if (tmpMode === 'total') v = (t[c.key] != null && t.g) ? fmtEnt(t[c.key] * t.g) : '—';
+    else v = fmtDec1(t[c.key]);
+    return `<td class="td-num">${v}</td>`;
+  }).join('');
+}
+
+function tmpDataRow(t, yearCell, teamLabel, cls) {
+  return `<tr class="${cls}"><td class="td-center">${yearCell}</td><td class="td-center">${teamLabel}</td><td class="td-num">${fmtEnt(t.g)}</td>${tmpCells(t)}</tr>`;
+}
+
+function tmpRender() {
+  const sel = document.getElementById('tmp-player');
+  const j = tmpJ.find(x => x.id === sel.value) || tmpJ[0];
+  document.getElementById('hero-sub').textContent = `${j.nombre} · temporada a temporada`;
+
+  const yr = cmpYearRows(j);
+  const years = Object.keys(yr).map(Number).sort((a, b) => a - b);
+
+  const body = years.map(y => {
+    const tot = yr[y];
+    const splits = (j.temporadas_data || []).filter(t => t.year === y && String(t.team || '').toUpperCase() !== 'TOT');
+    const traded = splits.length > 1;
+    const teamLabel = traded ? splits.map(s => s.team).join(' / ') : ((tot.team && tot.team.toUpperCase() !== 'TOT') ? tot.team : (splits[0] ? splits[0].team : '—'));
+    let html = tmpDataRow(tot, drSeason(y), teamLabel, traded ? 'season-tot' : '');
+    if (traded) {
+      splits.slice().sort((a, b) => (b.g || 0) - (a.g || 0)).forEach(s => {
+        html += tmpDataRow(s, '', `<span class="season-split-mark">↳</span> ${s.team}`, 'season-split');
+      });
+    }
+    return html;
+  }).join('');
+
+  // Fila de carrera (footer) con los totales/medias oficiales
+  const car = tmpCareer(j);
+  const footCells = tmpColumns().map(c => {
+    let v;
+    if (tmpMode === 'total') v = (c.key === 'td') ? fmtEnt(car.td) : fmtEnt(car[TMP_TOTKEY[c.key]]);
+    else v = c.key.endsWith('_pct') ? fmtPct(j[c.key]) : (car.g ? fmtDec1(car[TMP_TOTKEY[c.key]] / car.g) : '—');
+    return `<td class="td-num">${v}</td>`;
+  }).join('');
+  const foot = `<tr class="tmp-career"><td class="td-center">Carrera</td><td class="td-center">${cmpSeasons(j).length} temp.</td><td class="td-num">${fmtEnt(car.g)}</td>${footCells}</tr>`;
+
+  const head = `<tr><th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th>${tmpColumns().map(c => `<th class="td-num">${c.label}</th>`).join('')}</tr>`;
+
+  document.getElementById('tmp-out').innerHTML =
+    `<div class="tabla-scroll"><table class="tmp-table"><thead>${head}</thead><tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div>`;
+}
+
+function setTmpMode(m) {
+  if (tmpMode === m) return;
+  tmpMode = m;
+  ['total', 'pg'].forEach(x => {
+    const btn = document.getElementById('tmp-mode-' + x);
+    btn.classList.toggle('active', x === m);
+    btn.setAttribute('aria-pressed', String(x === m));
+  });
+  updateUrlParam('modo', m === 'total' ? '' : m);
+  tmpRender();
+}
+
+async function initTemporadasPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  tmpJ = (data.jugadores || []).filter(j => (j.temporadas_data || []).some(t => t.year))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+
+  const sel = document.getElementById('tmp-player');
+  sel.innerHTML = tmpJ.map(j => `<option value="${j.id}">${j.nombre}</option>`).join('');
+
+  const params = new URLSearchParams(location.search);
+  const jid = params.get('j');
+  const has = id => tmpJ.some(j => j.id === id);
+  sel.value = has(jid) ? jid : ((tmpJ.find(j => /pau gasol/i.test(j.nombre)) || tmpJ[0]).id);
+  const modo = params.get('modo');
+  if (modo === 'pg' || modo === 'total') setTmpMode(modo);
+
+  sel.onchange = () => { updateUrlParam('j', sel.value); tmpRender(); };
+  tmpRender();
 }

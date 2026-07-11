@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jugadores · Españoles en la NBA</title>
-<meta name="description" content="Directorio de todos los jugadores españoles en la NBA. Accede al perfil completo de cada uno.">
+<title>Temporadas · Españoles en la NBA</title>
+<meta name="description" content="Desglose temporada a temporada de cada español en la NBA, en totales y por partido. Los años con traspaso se unen bajo la fila TOT.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.basketball-reference.com">
@@ -32,21 +32,25 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">Los <em>Jugadores</em></h1>
-        <p class="hero-sub" id="hero-sub">Cargando…</p>
+        <h1 class="hero-title ag-hero">Las <em>Temporadas</em></h1>
+        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Buscar">
-    <div class="search-wrap">
-      <input type="text" id="jug-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+  <section class="controles" aria-label="Jugador y vista">
+    <label class="sel-wrap">
+      <span class="sr-only">Jugador</span>
+      <select id="tmp-player" class="sel"></select>
+    </label>
+    <div class="mode-switch" role="group" aria-label="Totales o por partido">
+      <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
+      <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
     </div>
-    <span class="results-count" id="jug-count"></span>
   </section>
 
-  <section class="jugs-wrap">
-    <div class="jugs-grid" id="jugs-grid"></div>
+  <section class="cmp-wrap" aria-label="Temporada a temporada">
+    <div id="tmp-out"></div>
   </section>
 </main>
 
@@ -74,6 +78,6 @@
 </footer>
 
 <script src="app.js?v=39"></script>
-<script>initTheme(); initJugadoresPage();</script>
+<script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
