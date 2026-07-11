@@ -96,9 +96,15 @@ const FOTO_OVERRIDES = {
 };
 
 async function loadData() {
-  const res = await fetch('data.json');
-  if (!res.ok) throw new Error('No se pudo cargar data.json');
-  const data = await res.json();
+  // Caché de sesión: solo se descarga data.json una vez por pestaña (navegación entre secciones instantánea)
+  let data = null;
+  try { const c = sessionStorage.getItem('ag-data'); if (c) data = JSON.parse(c); } catch (e) {}
+  if (!data) {
+    const res = await fetch('data.json');
+    if (!res.ok) throw new Error('No se pudo cargar data.json');
+    data = await res.json();
+    try { sessionStorage.setItem('ag-data', JSON.stringify(data)); } catch (e) {}
+  }
   (data.jugadores || []).forEach(j => {
     const ov = FOTO_OVERRIDES[drNorm(j.nombre)];
     if (ov) j.foto_url = ov;
@@ -289,7 +295,7 @@ function renderDraftTable() {
   document.getElementById('draft-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-pick${j.draft_pick === bestPick ? ' td-leader' : ''}">#${j.draft_pick}</td>
       <td class="td-num">${j.draft_equipo || '—'}</td>
@@ -425,7 +431,7 @@ function renderSalariosTable() {
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-dinero${maxGan && j.ganancias === maxGan ? ' td-leader' : ''}">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
@@ -1077,7 +1083,7 @@ function renderRkTable() {
     <tr>
       ${cols.map(c => {
         if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
-        if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
+        if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
         if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
         const val = c.fmt ? c.fmt(j[c.key]) : (j[c.key] ?? '—');
         const hl = rkSortCol === c.key ? ' td-hl' : '';
@@ -1145,7 +1151,7 @@ function drNorm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/
 function drPhoto(jugador) {
   const j = drMeta[drNorm(jugador)];
   const src = j && (j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : ''));
-  if (src) return `<span class="dp-photo"><img src="${src}" onerror="this.remove()" alt=""></span>`;
+  if (src) return `<span class="dp-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt=""></span>`;
   return avatarHtml(jugador, 'dp-photo');
 }
 
@@ -1553,7 +1559,7 @@ function jugadorHref(id) { return `jugador.html?id=${encodeURIComponent(id)}`; }
 
 function jugPhoto(j, cls) {
   const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
-  if (src) return `<span class="jug-photo ${cls || ''}"><img src="${src}" onerror="this.remove()" alt="${j.nombre}"></span>`;
+  if (src) return `<span class="jug-photo ${cls || ''}"><img loading="lazy" src="${src}" onerror="this.remove()" alt="${j.nombre}"></span>`;
   return avatarHtml(j.nombre, `jug-photo ${cls || ''}`);
 }
 
@@ -2045,7 +2051,7 @@ function renderHighs() {
     const j = r.j;
     const cells = cols.map(c => {
       if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
-      if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
+      if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
       if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
       const v = r.best[c.key];
       const lead = (v != null && v === colMax[c.key] && colMax[c.key] > 0) ? ' td-leader' : '';
@@ -2166,7 +2172,7 @@ function renderDebutTable() {
   document.getElementById('debut-body').innerHTML = rows.map((r, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(r.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img loading="lazy" class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(r.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(r.nombre, r.nombre)}</td>
       <td class="td-center">${r.fecha}</td>
       <td class="td-num">${r.edad != null ? Math.floor(r.edad) : '—'}</td>
@@ -2223,7 +2229,7 @@ function renderJugs() {
     const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
     const meta = j.posicion || (j.draft ? `Draft ${j.draft_anio || ''}` : '');
     return `<a class="jug-card" href="${jugadorHref(j.id)}">
-      ${src ? `<span class="jug-card-photo"><img src="${src}" onerror="this.remove()" alt=""></span>` : avatarHtml(j.nombre, 'jug-card-photo')}
+      ${src ? `<span class="jug-card-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt=""></span>` : avatarHtml(j.nombre, 'jug-card-photo')}
       <span class="jug-card-info">
         <span class="jug-card-name">${j.nombre}</span>
         <span class="jug-card-meta">${meta}</span>
@@ -2332,7 +2338,7 @@ const TL_ORDEN = {
 function tlFace(p) {
   const j = p.j || {};
   const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
-  return `<span class="tl-facewrap">${avatarHtml(j.nombre, 'tl-avatar')}${src ? `<img class="tl-face" src="${src}" onerror="this.remove()" alt="">` : ''}</span>`;
+  return `<span class="tl-facewrap">${avatarHtml(j.nombre, 'tl-avatar')}${src ? `<img loading="lazy" class="tl-face" src="${src}" onerror="this.remove()" alt="">` : ''}</span>`;
 }
 
 // Celda de un año con estado especial (cortado / two-way). fc = clases de conexión (fl/fr)
