@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-10T15:05:18.239Z",
+  "actualizado": "2026-07-11T01:37:25.087Z",
   "summer_league": [
     {
       "year": 1985,
@@ -627,21 +627,57 @@
   "transacciones": [
     {
       "jugador": "Albert Miralles",
-      "fecha": "2004-06-25",
+      "fecha": "2004-06-24",
       "tipo": "Drafteado",
       "equipo1": "Toronto Raptors",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 10 segunda ronda, derechos traspasados a Miami"
+      "notas": "Pick #40"
     },
     {
       "jugador": "Albert Miralles",
-      "fecha": "2025-06-24",
+      "fecha": "2004-06-24",
       "tipo": "Traspasado",
       "equipo1": "Toronto Raptors",
       "equipo2": "Miami Heat",
-      "otros": "",
+      "otros": "Pape Sow",
       "notas": "Traspaso de derechos la noche del draft"
+    },
+    {
+      "jugador": "Albert Miralles",
+      "fecha": "2005-08-02",
+      "tipo": "Traspasado",
+      "equipo1": "Miami Heat",
+      "equipo2": "Boston Celtics",
+      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Roberto Dueñas y Raul Lopez",
+      "notas": "Traspaso entre cinco equipos."
+    },
+    {
+      "jugador": "Albert Miralles",
+      "fecha": "2011-12-09",
+      "tipo": "Traspasado",
+      "equipo1": "Boston Celtics",
+      "equipo2": "Milwaukee Bucks",
+      "otros": "Keyon Dooling",
+      "notas": ""
+    },
+    {
+      "jugador": "Albert Miralles",
+      "fecha": "2016-07-07",
+      "tipo": "Traspasado",
+      "equipo1": "Milwaukee Bucks",
+      "equipo2": "Cleveland Cavaliers",
+      "otros": "Matthew Dellavedova",
+      "notas": ""
+    },
+    {
+      "jugador": "Albert Miralles",
+      "fecha": "2016-07-07",
+      "tipo": "Traspasado",
+      "equipo1": "Cleveland Cavaliers",
+      "equipo2": "Chicago Bulls",
+      "otros": "Mike Dunleavy",
+      "notas": ""
     },
     {
       "jugador": "Alex Abrines",
@@ -650,7 +686,7 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 32 del Draft"
+      "notas": "Pick #32 del Draft"
     },
     {
       "jugador": "Alex Abrines",
@@ -659,7 +695,7 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma primer contrato NBA tras draft 2013"
+      "notas": "$17,2M x 3"
     },
     {
       "jugador": "Alex Abrines",
@@ -668,16 +704,43 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": "Waived / liberado por el equipo"
+      "notas": "Waived / liberado por el equipo (perdona dinero)"
     },
     {
       "jugador": "Dani Díez",
-      "fecha": "2025-06-25",
+      "fecha": "2024-06-27",
+      "tipo": "Traspasado",
+      "equipo1": "New York Knicks",
+      "equipo2": "Portland Trail Blazers",
+      "otros": "Tyler Kolek",
+      "notas": ""
+    },
+    {
+      "jugador": "Dani Díez",
+      "fecha": "2023-02-09",
+      "tipo": "Traspasado",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "New York Knicks",
+      "otros": "Josh Hart, Matisse Thybulle, derechos de Bojan Dubljevic y Ante Tomic",
+      "notas": "Traspaso a cuatro bandas."
+    },
+    {
+      "jugador": "Dani Díez",
+      "fecha": "2015-06-26",
+      "tipo": "Traspasado",
+      "equipo1": "Utah Jazz",
+      "equipo2": "Portland Trail Blazers",
+      "otros": "",
+      "notas": "Traspasado la noche del draft."
+    },
+    {
+      "jugador": "Dani Díez",
+      "fecha": "2015-06-25",
       "tipo": "Drafteado",
       "equipo1": "Utah Jazz",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 24 segunda ronda, derechos sin contrato NBA"
+      "notas": "Pick #54 segunda ronda, derechos sin contrato NBA"
     },
     {
       "jugador": "Fernando Martín",
@@ -686,20 +749,20 @@
       "equipo1": "New Jersey Nets",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 38 del Draft, 2ª ronda"
+      "notas": "Pick #38 del Draft"
     },
     {
       "jugador": "Fernando Martín",
-      "fecha": "1986-08-13",
+      "fecha": "1986-06-11",
       "tipo": "Agente libre",
       "equipo1": "Portland Trail Blazers",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato NBA pionero"
+      "notas": "Firma contrato NBA pionero ($300K x 2)"
     },
     {
       "jugador": "Fran Vázquez",
-      "fecha": "2024-07-06",
+      "fecha": "2024-07-07",
       "tipo": "Renuncia de derechos",
       "equipo1": "Orlando Magic",
       "equipo2": "",
@@ -708,12 +771,21 @@
     },
     {
       "jugador": "Fran Vázquez",
-      "fecha": "2025-06-27",
+      "fecha": "2005-06-27",
       "tipo": "Drafteado",
       "equipo1": "Orlando Magic",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 11 Draft, derechos retenidos"
+      "notas": "Pick #11 Draft, derechos retenidos"
+    },
+    {
+      "jugador": "Fernando Martín",
+      "fecha": "1987-09-01",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "Hugo González",
@@ -722,7 +794,7 @@
       "equipo1": "Boston Celtics",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 28 del Draft"
+      "notas": "Pick #28 del Draft"
     },
     {
       "jugador": "Hugo González",
@@ -731,7 +803,7 @@
       "equipo1": "Boston Celtics",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "$14,3M x 4"
     },
     {
       "jugador": "Jorge Garbajosa",
@@ -740,7 +812,7 @@
       "equipo1": "Toronto Raptors",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma para debutar en la NBA"
+      "notas": "Firma para debutar en la NBA. Contrato de $9M x 3"
     },
     {
       "jugador": "Jorge Garbajosa",
@@ -749,20 +821,11 @@
       "equipo1": "Toronto Raptors",
       "equipo2": "",
       "otros": "",
-      "notas": "Tras grave lesión de tobillo"
-    },
-    {
-      "jugador": "Jorge Garbajosa",
-      "fecha": "2008-08-18",
-      "tipo": "Agente libre",
-      "equipo1": "Toronto Raptors",
-      "equipo2": "",
-      "otros": "",
-      "notas": "Firma renovación tras recuperarse"
+      "notas": "Pendiente $4,35 millones por cobrar"
     },
     {
       "jugador": "José A. Montero",
-      "fecha": "2025-06-17",
+      "fecha": "1987-06-17",
       "tipo": "Drafteado",
       "equipo1": "Atlanta Hawks",
       "equipo2": "",
@@ -884,20 +947,11 @@
       "equipo1": "Washington Wizards",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 40 del Draft"
+      "notas": "Pick #40 del draft"
     },
     {
       "jugador": "Juan Carlos Navarro",
-      "fecha": "2002-08-06",
-      "tipo": "Traspasado",
-      "equipo1": "Washington Wizards",
-      "equipo2": "Phoenix Suns",
-      "otros": "",
-      "notas": "Traspaso de derechos en la noche del draft"
-    },
-    {
-      "jugador": "Juan Carlos Navarro",
-      "fecha": "2007-07-06",
+      "fecha": "2007-08-16",
       "tipo": "Agente libre",
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
@@ -906,16 +960,25 @@
     },
     {
       "jugador": "Juan Carlos Navarro",
-      "fecha": "2007-08-11",
+      "fecha": "2007-08-16",
       "tipo": "Traspasado",
-      "equipo1": "Phoenix Suns",
+      "equipo1": "Washington Wizards",
       "equipo2": "Memphis Grizzlies",
       "otros": "",
       "notas": "Traspaso de derechos"
     },
     {
       "jugador": "Juan Carlos Navarro",
-      "fecha": "2008-07-03",
+      "fecha": "2009-09-09",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Memphis Grizzlies",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Juan Carlos Navarro",
+      "fecha": "2008-07-01",
       "tipo": "Cortado",
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
@@ -929,7 +992,7 @@
       "equipo1": "Indiana Pacers",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 36 del Draft, segunda ronda"
+      "notas": "Pick #36 del Draft, segunda ronda"
     },
     {
       "jugador": "Juan Nuñez",
@@ -937,7 +1000,7 @@
       "tipo": "Traspasado",
       "equipo1": "Indiana Pacers",
       "equipo2": "Indiana Pacers",
-      "otros": "",
+      "otros": "Johnny Furpy",
       "notas": "Traspaso de derechos la noche del draft"
     },
     {
@@ -1298,7 +1361,7 @@
       "equipo1": "Utah Jazz",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 24 del Draft"
+      "notas": "Pick #24 del Draft"
     },
     {
       "jugador": "Raül Lopez",
@@ -1307,7 +1370,7 @@
       "equipo1": "Utah Jazz",
       "equipo2": "",
       "otros": "",
-      "notas": "Debut NBA, contrato rookie"
+      "notas": ""
     },
     {
       "jugador": "Raül Lopez",
@@ -1315,8 +1378,8 @@
       "tipo": "Traspasado",
       "equipo1": "Utah Jazz",
       "equipo2": "Memphis Grizzlies",
-      "otros": "",
-      "notas": "Traspaso a cinco bandas con Albert Miralles, Roberto Dueñas y leyendas ACB como Andre Emmet, Curtis Borchardt o Greg Ostertag."
+      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Albert Miralles y Roberto Dueñas",
+      "notas": "Traspaso a cinco bandas con leyendas ACB como Andre Emmet, Curtis Borchardt o Greg Ostertag."
     },
     {
       "jugador": "Raül Lopez",
@@ -1415,7 +1478,7 @@
       "equipo1": "Chicago Bulls",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 58, derechos históricos, nunca debutó"
+      "notas": "Pick #58. Nunca debutó"
     },
     {
       "jugador": "Roberto Dueñas",
@@ -1442,7 +1505,7 @@
       "equipo1": "Phoenix Suns",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 24 del Draft"
+      "notas": "Pick #24 del Draft"
     },
     {
       "jugador": "Rudy Fernández",
@@ -1460,7 +1523,7 @@
       "equipo1": "Portland Trail Blazers",
       "equipo2": "",
       "otros": "",
-      "notas": "Rudy Fernandez signed a multi-year contract with the Portland Trail Blazers."
+      "notas": "$5,6M x 4"
     },
     {
       "jugador": "Rudy Fernández",
@@ -1468,7 +1531,7 @@
       "tipo": "Traspasado",
       "equipo1": "Portland Trail Blazers",
       "equipo2": "Dallas Mavericks",
-      "otros": "Derechos de Petteri Koponen y Jordan Hamilton",
+      "otros": "Andre Miller, Raymond Felton, derechos de Petteri Koponen y Jordan Hamilton",
       "notas": "Rudy Fernandez was acquired by the Dallas Mavericks, along with the draft rights to Petteri Koponen, from the Portland Trail Blazers in exchange for the draft rights to Jordan Hamilton, the draft rights to Tanguy Ngombo and a TPE."
     },
     {
@@ -1482,7 +1545,7 @@
     },
     {
       "jugador": "Rudy Fernández",
-      "fecha": "2015-07-11",
+      "fecha": "2015-07-12",
       "tipo": "Renuncia de derechos",
       "equipo1": "Denver Nuggets",
       "equipo2": "",
@@ -1631,7 +1694,7 @@
       "equipo1": "Denver Nuggets",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 34 Draft, derechos traspasados/retained por franquicias"
+      "notas": "Pick #34"
     },
     {
       "jugador": "Sergio Llull",
@@ -1640,7 +1703,7 @@
       "equipo1": "Denver Nuggets",
       "equipo2": "Houston Rockets",
       "otros": "",
-      "notas": "Traspaso de derechos de draft"
+      "notas": "Traspaso de derechos de draft. Vendido por dinero."
     },
     {
       "jugador": "Sergio Llull",
@@ -1648,7 +1711,7 @@
       "tipo": "Traspasado",
       "equipo1": "Houston Rockets",
       "equipo2": "New York Knicks",
-      "otros": "Austin Reaves, derechos Axel Hervelle",
+      "otros": "Austin Rivers, derechos Axel Hervelle",
       "notas": ""
     },
     {
@@ -1658,7 +1721,7 @@
       "equipo1": "Phoenix Suns",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 27 del Draft"
+      "notas": "Pick #27 del Draft"
     },
     {
       "jugador": "Sergio Rodríguez",
@@ -1676,7 +1739,7 @@
       "equipo1": "Portland Trail Blazers",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "$4,66M x 4"
     },
     {
       "jugador": "Sergio Rodríguez",
@@ -1707,7 +1770,16 @@
     },
     {
       "jugador": "Sergio Rodríguez",
-      "fecha": "2016-07-09",
+      "fecha": "2016-07-12",
+      "tipo": "Agente libre",
+      "equipo1": "Philadelphia 76ers",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$8M x 1"
+    },
+    {
+      "jugador": "Sergio Rodríguez",
+      "fecha": "2017-07-09",
       "tipo": "Renuncia de derechos",
       "equipo1": "Philadelphia 76ers",
       "equipo2": "",
@@ -1715,13 +1787,40 @@
       "notas": ""
     },
     {
-      "jugador": "Sergio Rodríguez",
-      "fecha": "2016-07-12",
-      "tipo": "Agente libre",
-      "equipo1": "Philadelphia 76ers",
+      "jugador": "Víctor Claver",
+      "fecha": "2009-06-25",
+      "tipo": "Drafteado",
+      "equipo1": "Portland Trail Blazers",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato 1 temporada NBA de regreso"
+      "notas": "Nº 22 del Draft"
+    },
+    {
+      "jugador": "Víctor Claver",
+      "fecha": "2012-07-11",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$4M x 3"
+    },
+    {
+      "jugador": "Víctor Claver",
+      "fecha": "2015-02-19",
+      "tipo": "Traspasado",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "Denver Nuggets",
+      "otros": "Will Barton, Thomas Robinson, Arron Afflalo y Alonzo Gee",
+      "notas": "Traspasado por Arron Afflalo y Alonzo Gee junto con Will Barton, Thomas Robinson y una primera ronda."
+    },
+    {
+      "jugador": "Víctor Claver",
+      "fecha": "2015-02-22",
+      "tipo": "Cortado",
+      "equipo1": "Denver Nuggets",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "Usman Garuba",
@@ -1730,7 +1829,16 @@
       "equipo1": "Houston Rockets",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 23 del Draft"
+      "notas": "Pick #23 del Draft"
+    },
+    {
+      "jugador": "Usman Garuba",
+      "fecha": "2021-08-15",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Houston Rockets",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$11,8M x 4"
     },
     {
       "jugador": "Usman Garuba",
@@ -1738,7 +1846,7 @@
       "tipo": "Traspasado",
       "equipo1": "Houston Rockets",
       "equipo2": "Atlanta Hawks",
-      "otros": "",
+      "otros": "TyTy Washington",
       "notas": "Incluido con TyTy Washington Jr en traspaso que llevó a Atlanta pick futuro de segunda ronda y cash por nada relevante para Rockets."
     },
     {
@@ -1747,7 +1855,7 @@
       "tipo": "Traspasado",
       "equipo1": "Atlanta Hawks",
       "equipo2": "Oklahoma City Thunder",
-      "otros": "",
+      "otros": "TyTy Washington, Rudy Gay, Patty Mills",
       "notas": "Con TyTy Washington Jr y Rudy Gay a cambio de Patty Mills."
     },
     {
@@ -1778,37 +1886,64 @@
       "notas": "Convertido a contrato estándar NBA"
     },
     {
-      "jugador": "Víctor Claver",
-      "fecha": "2009-06-25",
+      "jugador": "Sergio De Larrea",
+      "fecha": "2026-06-23",
       "tipo": "Drafteado",
-      "equipo1": "Portland Trail Blazers",
+      "equipo1": "Los Angeles Lakers",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 22 del Draft"
+      "notas": "Pick #25"
     },
     {
-      "jugador": "Víctor Claver",
-      "fecha": "2012-07-11",
-      "tipo": "Firma contrato rookie",
-      "equipo1": "Portland Trail Blazers",
-      "equipo2": "",
-      "otros": "",
-      "notas": "Firma contrato NBA tras años en Europa"
-    },
-    {
-      "jugador": "Víctor Claver",
-      "fecha": "2015-02-19",
+      "jugador": "Sergio De Larrea",
+      "fecha": "2026-06-24",
       "tipo": "Traspasado",
-      "equipo1": "Portland Trail Blazers",
-      "equipo2": "Denver Nuggets",
+      "equipo1": "Los Angeles Lakers",
+      "equipo2": "Dallas Mavericks",
       "otros": "",
-      "notas": "Traspasado por Arron Afflalo y Alonzo Gee junto con Will Barton, Thomas Robinson y una primera ronda."
+      "notas": "Traspaso a cuatro bandas con todo picks de draft y derechos de jugadores."
     },
     {
-      "jugador": "Víctor Claver",
-      "fecha": "2015-02-22",
-      "tipo": "Cortado",
-      "equipo1": "Denver Nuggets",
+      "jugador": "Sergio De Larrea",
+      "fecha": "2026-07-03",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Dallas Mavericks",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$16,3M x 4"
+    },
+    {
+      "jugador": "Aday Mara",
+      "fecha": "2026-06-23",
+      "tipo": "Drafteado",
+      "equipo1": "Oklahoma City Thunder",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Aday Mara",
+      "fecha": "2026-07-03",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Oklahoma City Thunder",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$27M x 4"
+    },
+    {
+      "jugador": "Baba Miller",
+      "fecha": "2026-07-10",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Los Angeles Clippers",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$9,6M x 4"
+    },
+    {
+      "jugador": "Baba Miller",
+      "fecha": "2026-06-24",
+      "tipo": "Drafteado",
+      "equipo1": "Los Angeles Clippers",
       "equipo2": "",
       "otros": "",
       "notas": ""
