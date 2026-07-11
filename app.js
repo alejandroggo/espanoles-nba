@@ -2629,7 +2629,7 @@ function cmpPoGames(j) { return (j.playoffs_temporadas || []).reduce((s, t) => s
 
 const CMP_SECTIONS = [
   { title: 'Trayectoria', rows: [
-    { label: 'Temporadas',        get: j => j.temporadas != null ? j.temporadas : ((j.temporadas_data || []).filter(t => t.year).length || null), fmt: fmtEnt, dir: 'high' },
+    { label: 'Temporadas',        get: j => cmpSeasons(j).length || j.temporadas || null, fmt: fmtEnt, dir: 'high' },
     { label: 'Partidos',          get: j => j.partidos ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: '% titular',         get: j => j.partidos ? (j.partidos_titular || 0) / j.partidos : null, fmt: fmtPct, dir: 'high', bar: true },
