@@ -1345,7 +1345,6 @@ const TR_COLS = [
   { key: 'tipo',    label: 'Tipo',     sortable: true },
   { key: 'equipo1', label: 'Equipo',   sortable: true,  cls: 'td-center' },
   { key: 'equipo2', label: 'Equipo 2', sortable: true,  cls: 'td-center' },
-  { key: 'otros',   label: 'Otros jugadores', sortable: false },
   { key: 'chevron', label: '',         sortable: false, cls: 'td-chevron' },
 ];
 
@@ -1488,7 +1487,6 @@ function renderTrTable() {
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
       <td class="td-center">${teamAbbr(t.equipo1)}</td>
       <td class="td-center">${teamAbbr(t.equipo2)}</td>
-      <td class="td-muted">${t.otros || '—'}</td>
       <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
