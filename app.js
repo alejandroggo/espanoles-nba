@@ -2549,7 +2549,16 @@ function buildTlYearOptions(years) {
 // PÁGINA COMPARADOR
 // ══════════════════════════════════════════════
 let cmpAll = [];
+// Modo de comparación: 'career' (toda la carrera), 'same' (una misma temporada
+// para los dos) o 'diff' (rangos distintos para cada jugador).
+let cmpMode = 'career';
+let cmpSame = null;                                   // año elegido en modo 'same'
 let cmpState = { a: { id: null, from: null, to: null }, b: { id: null, from: null, to: null } };
+// Temporadas que ambos jugadores disputaron (para 'misma temporada')
+function cmpCommon(A, B) {
+  const sb = new Set(cmpSeasons(B));
+  return cmpSeasons(A).filter(y => sb.has(y));
+}
 
 // Una fila por temporada (prefiere TOT en años con traspaso)
 function cmpYearRows(j) {
@@ -2710,34 +2719,70 @@ function cmpCard(j, side) {
 }
 
 // Selector de rango de temporadas por jugador (afecta a Por partido y Totales)
+// Agrega según el modo activo
+function cmpAggFor(side, j) {
+  if (cmpMode === 'same') return cmpSame ? cmpAgg(j, cmpSame, cmpSame) : { partidos: 0, _n: 0, _from: null, _to: null, _full: false, _empty: true };
+  if (cmpMode === 'diff') return cmpAgg(j, cmpState[side].from, cmpState[side].to);
+  return cmpAgg(j, null, null);
+}
+
+// Barra de modos + control asociado (una temporada, o rangos por jugador)
+function cmpModeBar(A, B) {
+  const common = cmpCommon(A, B);
+  const chip = (m, label, on) => `<button type="button" class="toggle-chip${cmpMode === m ? ' active' : ''}" aria-pressed="${cmpMode === m}"${on === false ? ' disabled' : ''} onclick="cmpSetMode('${m}')">${label}</button>`;
+  let extra = '';
+  if (cmpMode === 'same') {
+    if (!common.length) {
+      extra = `<p class="cmp-mode-note">No coinciden en ninguna temporada NBA. Prueba «Diferentes años».</p>`;
+    } else {
+      const opts = common.slice().reverse().map(y => `<option value="${y}"${y === cmpSame ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
+      extra = `<label class="sel-wrap cmp-mode-season"><span class="tl-range-lbl">Temporada</span><select class="sel" aria-label="Temporada" onchange="cmpSetSame(this.value)">${opts}</select></label>`;
+    }
+  } else if (cmpMode === 'diff') {
+    extra = `<p class="cmp-mode-note">Elige el tramo de cada jugador bajo su foto.</p>`;
+  }
+  return `<div class="cmp-mode">
+    <div class="mode-switch" role="group" aria-label="Qué comparar">
+      ${chip('career', 'Toda la carrera')}
+      ${chip('same', 'Misma temporada', common.length > 0)}
+      ${chip('diff', 'Diferentes años')}
+    </div>
+    ${extra}
+  </div>`;
+}
+
+// Selector Desde/Hasta bajo la foto (solo en modo 'diff')
 function cmpRangeUI(side, j, agg) {
+  if (cmpMode !== 'diff') {
+    if (cmpMode === 'same' && cmpSame) return `<div class="cmp-range cmp-range--one">${drSeason(cmpSame)}</div>`;
+    return '';
+  }
   const seasons = cmpSeasons(j);
   if (!seasons.length) return '';
   if (seasons.length === 1) return `<div class="cmp-range cmp-range--one">${drSeason(seasons[0])}</div>`;
   const optFrom = seasons.map(y => `<option value="${y}"${y === agg._from ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
   const optTo = seasons.map(y => `<option value="${y}"${y === agg._to ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
   const lbl = agg._full ? 'Toda la carrera' : `${agg._n} temp. · ${fmtEnt(agg.partidos)} GP`;
-  const reset = agg._full ? '' : ` · <button type="button" class="cmp-range-reset" onclick="cmpResetRange('${side}')">toda la carrera</button>`;
   return `<div class="cmp-range">
     <div class="cmp-range-sel">
       <select class="sel cmp-rsel" aria-label="Desde" onchange="cmpSetRange('${side}','from',this.value)">${optFrom}</select>
       <span class="cmp-range-dash">–</span>
       <select class="sel cmp-rsel" aria-label="Hasta" onchange="cmpSetRange('${side}','to',this.value)">${optTo}</select>
     </div>
-    <div class="cmp-range-lbl">${lbl}${reset}</div>
+    <div class="cmp-range-lbl">${lbl}</div>
   </div>`;
 }
 
 function cmpRender(A, B) {
-  const aggA = cmpAgg(A, cmpState.a.from, cmpState.a.to);
-  const aggB = cmpAgg(B, cmpState.b.from, cmpState.b.to);
+  const aggA = cmpAggFor('a', A), aggB = cmpAggFor('b', B);
   let scoreA = 0, scoreB = 0;
-  const ranged = !aggA._full || !aggB._full;
+  const ranged = cmpMode !== 'career';
+  const noteLbl = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : 'sin datos') : 'rango elegido';
   const sections = CMP_SECTIONS.filter(s => !s.when || s.when(A, B)).map(s => {
     const dA = s.ranged ? aggA : A, dB = s.ranged ? aggB : B;
     const rows = s.rows.map(r => cmpRow(r, dA, dB));
     rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
-    const note = (s.ranged && ranged) ? '<span class="cmp-sec-note">rango elegido</span>' : '';
+    const note = (s.ranged && ranged) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
     return `<div class="cmp-section"><h2 class="cmp-sec-title">${s.title}${note}</h2>${rows.map(r => r.html).join('')}</div>`;
   }).join('');
 
@@ -2749,7 +2794,7 @@ function cmpRender(A, B) {
     </div>
     <div class="cmp-side">${cmpCard(B, 'b')}${cmpRangeUI('b', B, aggB)}</div>
   </div>`;
-  document.getElementById('cmp-out').innerHTML = head + sections;
+  document.getElementById('cmp-out').innerHTML = cmpModeBar(A, B) + head + sections;
 }
 
 function cmpCur(side) {
@@ -2759,10 +2804,13 @@ function cmpCur(side) {
 function cmpSyncUrl() {
   updateUrlParam('a', document.getElementById('cmp-a').value);
   updateUrlParam('b', document.getElementById('cmp-b').value);
-  updateUrlParam('af', cmpState.a.from || '');
-  updateUrlParam('at', cmpState.a.to || '');
-  updateUrlParam('bf', cmpState.b.from || '');
-  updateUrlParam('bt', cmpState.b.to || '');
+  updateUrlParam('modo', cmpMode === 'career' ? '' : cmpMode);
+  updateUrlParam('se', cmpMode === 'same' ? (cmpSame || '') : '');
+  const diff = cmpMode === 'diff';
+  updateUrlParam('af', diff ? (cmpState.a.from || '') : '');
+  updateUrlParam('at', diff ? (cmpState.a.to || '') : '');
+  updateUrlParam('bf', diff ? (cmpState.b.from || '') : '');
+  updateUrlParam('bt', diff ? (cmpState.b.to || '') : '');
 }
 
 async function initComparadorPage() {
@@ -2788,8 +2836,19 @@ async function initComparadorPage() {
 
   cmpState.a = { id: selA.value, from: null, to: null };
   cmpState.b = { id: selB.value, from: null, to: null };
-  cmpInitRange('a', params.get('af'), params.get('at'));
-  cmpInitRange('b', params.get('bf'), params.get('bt'));
+
+  // Restaurar modo desde la URL
+  const m = params.get('modo');
+  if (m === 'same' || m === 'diff') cmpMode = m;
+  if (cmpMode === 'diff') {
+    cmpInitRange('a', params.get('af'), params.get('at'));
+    cmpInitRange('b', params.get('bf'), params.get('bt'));
+  } else if (cmpMode === 'same') {
+    const common = cmpCommon(cmpCur('a'), cmpCur('b'));
+    const se = Number(params.get('se'));
+    cmpSame = common.includes(se) ? se : (common.length ? common[common.length - 1] : null);
+    if (!common.length) cmpMode = 'career';
+  }
 
   selA.onchange = cmpUpdate; selB.onchange = cmpUpdate;
   cmpRender(cmpCur('a'), cmpCur('b'));
@@ -2807,12 +2866,34 @@ function cmpInitRange(side, from, to) {
   cmpState[side].from = f; cmpState[side].to = t;
 }
 
+// Al cambiar de jugador, revalida las selecciones del modo activo
 function cmpUpdate() {
   const idA = document.getElementById('cmp-a').value, idB = document.getElementById('cmp-b').value;
   if (cmpState.a.id !== idA) cmpState.a = { id: idA, from: null, to: null };
   if (cmpState.b.id !== idB) cmpState.b = { id: idB, from: null, to: null };
   const A = cmpAll.find(j => j.id === idA), B = cmpAll.find(j => j.id === idB);
-  if (A && B) { cmpRender(A, B); cmpSyncUrl(); }
+  if (!A || !B) return;
+  if (cmpMode === 'same') {
+    const common = cmpCommon(A, B);
+    if (!common.length) { cmpMode = 'career'; cmpSame = null; }
+    else if (!common.includes(cmpSame)) cmpSame = common[common.length - 1];
+  }
+  cmpRender(A, B); cmpSyncUrl();
+}
+
+function cmpSetMode(m) {
+  cmpMode = m;
+  if (m === 'same') {
+    const common = cmpCommon(cmpCur('a'), cmpCur('b'));
+    if (!common.includes(cmpSame)) cmpSame = common.length ? common[common.length - 1] : null;
+  }
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
+}
+function cmpSetSame(value) {
+  cmpSame = Number(value);
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
 }
 
 function cmpSetRange(side, which, value) {
@@ -2820,11 +2901,6 @@ function cmpSetRange(side, which, value) {
   const st = cmpState[side];
   if (which === 'from') { st.from = v; if (st.to != null && st.to < v) st.to = v; }
   else { st.to = v; if (st.from != null && st.from > v) st.from = v; }
-  cmpRender(cmpCur('a'), cmpCur('b'));
-  cmpSyncUrl();
-}
-function cmpResetRange(side) {
-  cmpState[side].from = null; cmpState[side].to = null;
   cmpRender(cmpCur('a'), cmpCur('b'));
   cmpSyncUrl();
 }
