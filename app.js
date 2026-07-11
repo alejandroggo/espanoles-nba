@@ -2549,6 +2549,61 @@ function buildTlYearOptions(years) {
 // PÁGINA COMPARADOR
 // ══════════════════════════════════════════════
 let cmpAll = [];
+let cmpState = { a: { id: null, from: null, to: null }, b: { id: null, from: null, to: null } };
+
+// Una fila por temporada (prefiere TOT en años con traspaso)
+function cmpYearRows(j) {
+  const by = {};
+  (j.temporadas_data || []).forEach(t => {
+    const y = t.year;
+    if (!y) return;
+    if (!(y in by) || t.team === 'TOT') by[y] = t;
+  });
+  return by;
+}
+function cmpSeasons(j) { return Object.keys(cmpYearRows(j)).map(Number).sort((a, b) => a - b); }
+
+// Agrega estadísticas (por partido y totales) en un rango de temporadas [from, to].
+// Rango completo → usa los totales oficiales del jugador (máxima precisión).
+function cmpAgg(j, from, to) {
+  const seasons = cmpSeasons(j);
+  if (!seasons.length) return { partidos: 0, _n: 0, _from: null, _to: null, _full: true };
+  const first = seasons[0], last = seasons[seasons.length - 1];
+  const lo = from || first, hi = to || last;
+  const full = lo <= first && hi >= last;
+  if (full) {
+    return {
+      partidos: j.partidos, _n: seasons.length, _from: first, _to: last, _full: true,
+      min_g: j.min_g, pts_g: j.pts_g, rbd_g: j.rbd_g, ast_g: j.ast_g, stl_g: j.stl_g, blk_g: j.blk_g, tres_g: j.tres_g,
+      fg_pct: j.fg_pct, tres_pct: j.tres_pct, ft_pct: j.ft_pct,
+      pts_total: j.pts_total, rbd_total: j.rbd_total, ast_total: j.ast_total, stl_total: j.stl_total,
+      blk_total: j.blk_total, tres_total: j.tres_total, min_total: j.min_total,
+      td_total: j.td_total, tov_total: j.tov_total, pf_total: j.pf_total,
+    };
+  }
+  const yr = cmpYearRows(j);
+  const rows = seasons.filter(y => y >= lo && y <= hi).map(y => yr[y]);
+  const G = rows.reduce((s, t) => s + (t.g || 0), 0);
+  const tot = k => rows.reduce((s, t) => s + (t[k] || 0) * (t.g || 0), 0);
+  const per = k => G ? tot(k) / G : null;
+  const madeAtt = (mk, pk) => {
+    let m = 0, a = 0;
+    rows.forEach(t => { const mm = (t[mk] || 0) * (t.g || 0); m += mm; const p = t[pk]; if (p) a += mm / p; });
+    return [m, a];
+  };
+  const [fgm, fga] = madeAtt('fgm_g', 'fg_pct');
+  const [t3m, t3a] = madeAtt('tres_g', 'tres_pct');
+  const [ftm, fta] = madeAtt('ftm_g', 'ft_pct');
+  return {
+    partidos: G, _n: rows.length, _from: lo, _to: hi, _full: false,
+    min_g: per('min_g'), pts_g: per('pts_g'), rbd_g: per('rbd_g'), ast_g: per('ast_g'),
+    stl_g: per('stl_g'), blk_g: per('blk_g'), tres_g: per('tres_g'),
+    fg_pct: fga ? fgm / fga : null, tres_pct: t3a ? t3m / t3a : null, ft_pct: fta ? ftm / fta : null,
+    pts_total: tot('pts_g'), rbd_total: tot('rbd_g'), ast_total: tot('ast_g'), stl_total: tot('stl_g'),
+    blk_total: tot('blk_g'), tres_total: tot('tres_g'), min_total: tot('min_g'),
+    td_total: rows.reduce((s, t) => s + (t.td || 0), 0), tov_total: tot('tov_g'), pf_total: tot('pf_g'),
+  };
+}
 
 function cmpNTeams(j) {
   const s = new Set((j.temporadas_data || []).map(t => (t.team || '').toUpperCase()).filter(t => t && t !== 'TOT'));
@@ -2573,7 +2628,7 @@ const CMP_SECTIONS = [
     { label: 'Año de draft',      get: j => j.draft_anio || null, fmt: v => String(v), dir: 'neutral' },
     { label: 'Nº de draft',       get: j => j.draft ? (j.draft_pick || null) : 'undr', fmt: v => v === 'undr' ? 'No drafteado' : ('#' + v), dir: 'low' },
   ]},
-  { title: 'Por partido', rows: [
+  { title: 'Por partido', ranged: true, rows: [
     { label: 'Minutos',      get: j => j.min_g, fmt: fmtDec1, dir: 'high', bar: true },
     { label: 'Puntos',       get: j => j.pts_g, fmt: fmtDec1, dir: 'high', bar: true },
     { label: 'Rebotes',      get: j => j.rbd_g, fmt: fmtDec1, dir: 'high', bar: true },
@@ -2585,7 +2640,7 @@ const CMP_SECTIONS = [
     { label: '3P%',          get: j => j.tres_pct, fmt: fmtPct, dir: 'high', bar: true },
     { label: 'FT%',          get: j => j.ft_pct, fmt: fmtPct, dir: 'high', bar: true },
   ]},
-  { title: 'Totales', rows: [
+  { title: 'Totales', ranged: true, rows: [
     { label: 'Puntos',         get: j => j.pts_total, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Rebotes',        get: j => j.rbd_total, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Asistencias',    get: j => j.ast_total, fmt: fmtEnt, dir: 'high', bar: true },
@@ -2654,23 +2709,60 @@ function cmpCard(j, side) {
   </div>`;
 }
 
+// Selector de rango de temporadas por jugador (afecta a Por partido y Totales)
+function cmpRangeUI(side, j, agg) {
+  const seasons = cmpSeasons(j);
+  if (!seasons.length) return '';
+  if (seasons.length === 1) return `<div class="cmp-range cmp-range--one">${drSeason(seasons[0])}</div>`;
+  const optFrom = seasons.map(y => `<option value="${y}"${y === agg._from ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
+  const optTo = seasons.map(y => `<option value="${y}"${y === agg._to ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
+  const lbl = agg._full ? 'Toda la carrera' : `${agg._n} temp. · ${fmtEnt(agg.partidos)} GP`;
+  const reset = agg._full ? '' : ` · <button type="button" class="cmp-range-reset" onclick="cmpResetRange('${side}')">toda la carrera</button>`;
+  return `<div class="cmp-range">
+    <div class="cmp-range-sel">
+      <select class="sel cmp-rsel" aria-label="Desde" onchange="cmpSetRange('${side}','from',this.value)">${optFrom}</select>
+      <span class="cmp-range-dash">–</span>
+      <select class="sel cmp-rsel" aria-label="Hasta" onchange="cmpSetRange('${side}','to',this.value)">${optTo}</select>
+    </div>
+    <div class="cmp-range-lbl">${lbl}${reset}</div>
+  </div>`;
+}
+
 function cmpRender(A, B) {
+  const aggA = cmpAgg(A, cmpState.a.from, cmpState.a.to);
+  const aggB = cmpAgg(B, cmpState.b.from, cmpState.b.to);
   let scoreA = 0, scoreB = 0;
+  const ranged = !aggA._full || !aggB._full;
   const sections = CMP_SECTIONS.filter(s => !s.when || s.when(A, B)).map(s => {
-    const rows = s.rows.map(r => cmpRow(r, A, B));
+    const dA = s.ranged ? aggA : A, dB = s.ranged ? aggB : B;
+    const rows = s.rows.map(r => cmpRow(r, dA, dB));
     rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
-    return `<div class="cmp-section"><h2 class="cmp-sec-title">${s.title}</h2>${rows.map(r => r.html).join('')}</div>`;
+    const note = (s.ranged && ranged) ? '<span class="cmp-sec-note">rango elegido</span>' : '';
+    return `<div class="cmp-section"><h2 class="cmp-sec-title">${s.title}${note}</h2>${rows.map(r => r.html).join('')}</div>`;
   }).join('');
 
   const head = `<div class="cmp-head">
-    ${cmpCard(A, 'a')}
+    <div class="cmp-side">${cmpCard(A, 'a')}${cmpRangeUI('a', A, aggA)}</div>
     <div class="cmp-scoreboard">
       <div class="cmp-score"><span class="cmp-sc a${scoreA > scoreB ? ' win' : ''}">${scoreA}</span><span class="cmp-sc-sep">–</span><span class="cmp-sc b${scoreB > scoreA ? ' win' : ''}">${scoreB}</span></div>
       <div class="cmp-sc-lbl">categorías ganadas</div>
     </div>
-    ${cmpCard(B, 'b')}
+    <div class="cmp-side">${cmpCard(B, 'b')}${cmpRangeUI('b', B, aggB)}</div>
   </div>`;
   document.getElementById('cmp-out').innerHTML = head + sections;
+}
+
+function cmpCur(side) {
+  const sel = document.getElementById('cmp-' + side);
+  return cmpAll.find(j => j.id === sel.value);
+}
+function cmpSyncUrl() {
+  updateUrlParam('a', document.getElementById('cmp-a').value);
+  updateUrlParam('b', document.getElementById('cmp-b').value);
+  updateUrlParam('af', cmpState.a.from || '');
+  updateUrlParam('at', cmpState.a.to || '');
+  updateUrlParam('bf', cmpState.b.from || '');
+  updateUrlParam('bt', cmpState.b.to || '');
 }
 
 async function initComparadorPage() {
@@ -2694,18 +2786,53 @@ async function initComparadorPage() {
   selB.value = has(defB) ? defB : pick('marc gasol', 1);
   if (selA.value === selB.value) selB.value = (cmpAll.find(j => j.id !== selA.value) || cmpAll[0]).id;
 
+  cmpState.a = { id: selA.value, from: null, to: null };
+  cmpState.b = { id: selB.value, from: null, to: null };
+  cmpInitRange('a', params.get('af'), params.get('at'));
+  cmpInitRange('b', params.get('bf'), params.get('bt'));
+
   selA.onchange = cmpUpdate; selB.onchange = cmpUpdate;
-  cmpUpdate();
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
+}
+
+// Valida y aplica un rango de la URL a un jugador
+function cmpInitRange(side, from, to) {
+  const j = cmpCur(side);
+  const seasons = cmpSeasons(j);
+  if (seasons.length < 2) return;
+  const inRange = v => { const n = Number(v); return v && seasons.includes(n) ? n : null; };
+  let f = inRange(from), t = inRange(to);
+  if (f && t && f > t) { const tmp = f; f = t; t = tmp; }
+  cmpState[side].from = f; cmpState[side].to = t;
 }
 
 function cmpUpdate() {
   const idA = document.getElementById('cmp-a').value, idB = document.getElementById('cmp-b').value;
-  updateUrlParam('a', idA); updateUrlParam('b', idB);
+  if (cmpState.a.id !== idA) cmpState.a = { id: idA, from: null, to: null };
+  if (cmpState.b.id !== idB) cmpState.b = { id: idB, from: null, to: null };
   const A = cmpAll.find(j => j.id === idA), B = cmpAll.find(j => j.id === idB);
-  if (A && B) cmpRender(A, B);
+  if (A && B) { cmpRender(A, B); cmpSyncUrl(); }
+}
+
+function cmpSetRange(side, which, value) {
+  const v = Number(value);
+  const st = cmpState[side];
+  if (which === 'from') { st.from = v; if (st.to != null && st.to < v) st.to = v; }
+  else { st.to = v; if (st.from != null && st.from > v) st.from = v; }
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
+}
+function cmpResetRange(side) {
+  cmpState[side].from = null; cmpState[side].to = null;
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
 }
 
 function cmpSwap() {
   const a = document.getElementById('cmp-a'), b = document.getElementById('cmp-b');
-  const t = a.value; a.value = b.value; b.value = t; cmpUpdate();
+  const t = a.value; a.value = b.value; b.value = t;
+  const tmp = cmpState.a; cmpState.a = cmpState.b; cmpState.b = tmp;
+  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpSyncUrl();
 }
