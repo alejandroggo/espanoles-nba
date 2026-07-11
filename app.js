@@ -2943,20 +2943,21 @@ function tmpStatCols() {
   return cols;
 }
 
-// Aplana todas las temporadas (una fila por equipo y año, sin filas TOT).
-// Marca como parcial cualquier temporada en la que el jugador jugó en >1 equipo.
+// Aplana todas las temporadas. En un año con traspaso muestra la fila TOT
+// (total de la temporada) y, debajo, cada tramo parcial por equipo. Marca la
+// fila total y las parciales; teamCode solo lo llevan los tramos reales.
 function tmpBuild(jugadores) {
   const rows = [];
   (jugadores || []).forEach(j => {
     const byYear = {};
-    (j.temporadas_data || []).forEach(t => {
-      if (t.year && String(t.team || '').toUpperCase() !== 'TOT') (byYear[t.year] = byYear[t.year] || []).push(t);
-    });
+    (j.temporadas_data || []).forEach(t => { if (t.year) (byYear[t.year] = byYear[t.year] || []).push(t); });
     Object.keys(byYear).forEach(y => {
-      const arr = byYear[y], partial = arr.length > 1;
-      arr.slice().sort((a, b) => (b.g || 0) - (a.g || 0)).forEach((t, i) => {
-        rows.push({ id: j.id, jugador: j.nombre, year: +y, team: t.team || '—', g: t.g || 0, t, partial, orden: partial ? i + 1 : 0, nEq: arr.length });
-      });
+      const arr = byYear[y];
+      const tot = arr.find(t => String(t.team || '').toUpperCase() === 'TOT');
+      const teams = arr.filter(t => String(t.team || '').toUpperCase() !== 'TOT').sort((a, b) => (b.g || 0) - (a.g || 0));
+      const traded = !!tot;
+      if (tot) rows.push({ id: j.id, jugador: j.nombre, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0 });
+      teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1 }));
     });
   });
   return rows;
@@ -2981,9 +2982,10 @@ function renderTmpTable() {
     ...stat.map(c => ({ key: c.key, label: c.label, cls: 'td-num' })),
   ];
 
+  // Al filtrar por un equipo concreto, las filas TOT (sin equipo propio) se ocultan
   let rows = tmpRows.filter(r =>
     (!tmpSearch || r.jugador.toLowerCase().includes(tmpSearch)) &&
-    (!tmpFilterTeam || r.team === tmpFilterTeam) &&
+    (!tmpFilterTeam || r.teamCode === tmpFilterTeam) &&
     (!tmpFilterYear || r.year === +tmpFilterYear));
 
   const dir = tmpSortAsc ? 1 : -1;
@@ -2993,10 +2995,10 @@ function renderTmpTable() {
     if (typeof va === 'string' || typeof vb === 'string') cmp = String(va).localeCompare(String(vb), 'es');
     else cmp = (va == null ? -Infinity : va) - (vb == null ? -Infinity : vb);
     if (cmp !== 0) return cmp * dir;
-    return (b.year - a.year) || a.jugador.localeCompare(b.jugador, 'es'); // desempate estable
+    return (b.year - a.year) || a.jugador.localeCompare(b.jugador, 'es') || (a.seq - b.seq); // desempate: total antes que parciales
   });
 
-  document.getElementById('tmp-count').textContent = `${rows.length} temporada${rows.length === 1 ? '' : 's'}`;
+  document.getElementById('tmp-count').textContent = `${rows.length} fila${rows.length === 1 ? '' : 's'}`;
 
   document.getElementById('tmp-thead').innerHTML = `<tr>${cols.map(c => {
     const active = tmpSortCol === c.key;
@@ -3010,10 +3012,10 @@ function renderTmpTable() {
       const hl = tmpSortCol === c.key ? ' td-hl' : '';
       return `<td class="td-num${hl}">${v == null ? '—' : c.fmt(v)}</td>`;
     }).join('');
-    const teamCell = r.partial
-      ? `${r.team} <span class="tmp-parcial" title="Temporada parcial: jugó en ${r.nEq} equipos ese año">parcial</span>`
-      : r.team;
-    return `<tr class="${r.partial ? 'tmp-partial' : ''}">
+    let teamCell = r.team, cls = '';
+    if (r.kind === 'total') { teamCell = `${r.team} <span class="tmp-total-badge" title="Total de la temporada (${r.nEq} equipos)">total</span>`; cls = 'tmp-total'; }
+    else if (r.kind === 'partial') { teamCell = `${r.team} <span class="tmp-parcial" title="Temporada parcial: jugó en ${r.nEq} equipos ese año">parcial</span>`; cls = 'tmp-partial'; }
+    return `<tr class="${cls}">
       <td class="td-nombre">${plLink(r.jugador, r.jugador)}</td>
       <td class="td-center">${drSeason(r.year)}</td>
       <td class="td-center">${teamCell}</td>
@@ -3055,11 +3057,12 @@ async function initTemporadasPage() {
   tmpRows = tmpBuild(data.jugadores);
 
   const players = new Set(tmpRows.map(r => r.id));
-  const partials = tmpRows.filter(r => r.partial).length;
-  document.getElementById('hero-sub').textContent = `${tmpRows.length} temporadas de ${players.size} españoles · ${partials} parciales (traspasos)`;
+  const seasons = new Set(tmpRows.map(r => r.id + ':' + r.year));  // una temporada-jugador (el traspaso cuenta como 1)
+  const traded = tmpRows.filter(r => r.kind === 'total').length;
+  document.getElementById('hero-sub').textContent = `${seasons.size} temporadas de ${players.size} españoles · ${traded} con traspaso (con su total y sus parciales)`;
 
-  // Poblar filtros
-  const teams = [...new Set(tmpRows.map(r => r.team))].sort();
+  // Poblar filtros (equipos: solo códigos reales, no las filas TOT)
+  const teams = [...new Set(tmpRows.filter(r => r.teamCode).map(r => r.teamCode))].sort();
   const years = [...new Set(tmpRows.map(r => r.year))].sort((a, b) => b - a);
   const teamSel = document.getElementById('tmp-team'), yearSel = document.getElementById('tmp-year');
   teamSel.innerHTML = `<option value="">Todos los equipos</option>` + teams.map(t => `<option value="${t}">${t}</option>`).join('');
