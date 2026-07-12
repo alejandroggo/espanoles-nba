@@ -984,9 +984,7 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .tl-wrap {
   max-width: 1400px; margin: 0 auto var(--space-16);
   padding: 0 var(--space-6);
-  position: sticky; top: 56px;
-  max-height: calc(100vh - 72px);
-  overflow: auto; overscroll-behavior: contain;
+  overflow-x: auto;
 }
 #tl-table { border-collapse: separate; border-spacing: 0; width: auto; }
 #tl-table th, #tl-table td { padding: 0; }
@@ -1005,11 +1003,11 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .tl-name, .tl-name-h, .tl-name-f {
   position: sticky; left: 0; z-index: 5;
   background: var(--surface); text-align: left;
-  width: 168px; min-width: 168px; max-width: 168px;
+  width: 232px; min-width: 232px; max-width: 232px;
   padding: 0 var(--space-3) !important; white-space: nowrap;
 }
 .tl-debut, .tl-debut-h {
-  position: sticky; left: 168px; z-index: 5;
+  position: sticky; left: 232px; z-index: 5;
   background: var(--surface); text-align: center;
   width: 50px; min-width: 50px;
   font-size: var(--font-xs); font-weight: 600; color: var(--text-muted);
@@ -1026,8 +1024,14 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 }
 .tl-facewrap .tl-avatar.avatar { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .tl-face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.tl-pname { color: var(--text); text-decoration: none; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-pname { color: var(--text); text-decoration: none; font-weight: 600; white-space: nowrap; }
 .tl-pname:hover { color: var(--accent); }
+
+/* Resaltado de columna al pasar por el año */
+.tl-year.tl-colhl { color: var(--accent); background: var(--accent-light); }
+td.tl-colhl { position: relative; }
+td.tl-colhl::after { content: ''; position: absolute; inset: 0; background: rgba(90,90,90,0.14); pointer-events: none; z-index: 2; }
+td.tl-empty.tl-colhl::after { background: rgba(90,90,90,0.10); }
 
 /* Hueco de años sin jugadores (rayado) */
 th.tl-break, td.tl-break {
@@ -1120,7 +1124,7 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .tl-seas-total { color: var(--dorado); }
 
 @media (max-width: 768px) {
-  .tl-wrap { padding: 0 var(--space-4); top: 48px; max-height: calc(100vh - 60px); }
+  .tl-wrap { padding: 0 var(--space-4); }
 }
 
 /* ── COMPARADOR ──────────────────────────────── */

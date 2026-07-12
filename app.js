@@ -2371,16 +2371,33 @@ function tlFace(p) {
 }
 
 // Celda de un año con estado especial (cortado / two-way). fc = clases de conexión (fl/fr)
-function tlSpecialCell(tm, est, year, fc) {
+function tlSpecialCell(tm, est, year, fc, idx) {
   const info = teamInfo(tm);
   const st = `background-color:${info.color};color:${info.text || '#fff'}`;
   const per = drSeason(year);
   fc = fc || '';
+  const dc = `data-c0="${idx}" data-c1="${idx}"`;
   if (est === 'tw')
-    return `<td class="tl-cell tl-tw${fc}" data-team="${tm}" style="${st}" title="${info.name} · contrato two-way · ${per}"><span class="tl-lbl">${tm}</span></td>`;
+    return `<td class="tl-cell tl-tw${fc}" data-team="${tm}" ${dc} style="${st}" title="${info.name} · contrato two-way · ${per}"><span class="tl-lbl">${tm}</span></td>`;
   if (est === 'cut')
-    return `<td class="tl-cell tl-split${fc}" title="${info.name} · cortado a mitad de temporada · ${per}"><div class="tl-segrow"><span class="tl-seg" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
-  return `<td class="tl-cell tl-split${fc}" title="${info.name} · two-way, cortado · ${per}"><div class="tl-segrow"><span class="tl-seg tl-tw" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
+    return `<td class="tl-cell tl-split${fc}" ${dc} title="${info.name} · cortado a mitad de temporada · ${per}"><div class="tl-segrow"><span class="tl-seg" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
+  return `<td class="tl-cell tl-split${fc}" ${dc} title="${info.name} · two-way, cortado · ${per}"><div class="tl-segrow"><span class="tl-seg tl-tw" data-team="${tm}" style="${st}">${tm}</span><span class="tl-seg tl-cut-half">–</span></div></td>`;
+}
+
+// Resalta la columna de un año al pasar el ratón por su cabecera
+function tlHighlightCol(idx) {
+  tlClearCol();
+  const t = document.getElementById('tl-table');
+  if (!t) return;
+  t.querySelectorAll(`.tl-year[data-idx="${idx}"]`).forEach(el => el.classList.add('tl-colhl'));
+  t.querySelectorAll('#tl-body [data-c0], #tl-tfoot [data-c0]').forEach(td => {
+    const a = +td.dataset.c0, b = +td.dataset.c1;
+    if (idx >= a && idx <= b) td.classList.add('tl-colhl');
+  });
+}
+function tlClearCol() {
+  const t = document.getElementById('tl-table');
+  if (t) t.querySelectorAll('.tl-colhl').forEach(el => el.classList.remove('tl-colhl'));
 }
 
 let tlPlayers = [];
@@ -2483,9 +2500,9 @@ function renderTimeline() {
   players.forEach(p => years.forEach(y => { if (p.seasons[y]) activeBy[y] = (activeBy[y] || 0) + 1; }));
 
   // Cabecera
-  const headCells = axis.map(c => (typeof c === 'object')
+  const headCells = axis.map((c, idx) => (typeof c === 'object')
     ? `<th class="tl-break">${tlYY(c.brk[0])}–${tlYY(c.brk[1])}</th>`
-    : `<th class="tl-year">${tlYY(c)}</th>`).join('');
+    : `<th class="tl-year" data-idx="${idx}" onmouseenter="tlHighlightCol(${idx})" onmouseleave="tlClearCol()">${tlYY(c)}</th>`).join('');
   document.getElementById('tl-thead').innerHTML =
     `<tr><th class="tl-name-h" scope="col">Jugador</th><th class="tl-debut-h" scope="col">Debut</th>${headCells}<th class="tl-seas-h" scope="col">Total</th></tr>`;
 
@@ -2502,21 +2519,21 @@ function renderTimeline() {
     let i = 0;
     while (i < axis.length) {
       const c = axis[i];
-      if (typeof c === 'object') { cells.push(`<td class="tl-break"></td>`); i++; continue; }
+      if (typeof c === 'object') { cells.push(`<td class="tl-break" data-c0="${i}" data-c1="${i}"></td>`); i++; continue; }
       const teams = p.seasons[c];
-      if (!teams || !teams.length) { cells.push(`<td class="tl-empty"></td>`); i++; continue; }
+      if (!teams || !teams.length) { cells.push(`<td class="tl-empty" data-c0="${i}" data-c1="${i}"></td>`); i++; continue; }
       if (teams.length > 1) {
         const segs = teams.map(tm => {
           const info = teamInfo(tm);
           return `<span class="tl-seg" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}">${tm}</span>`;
         }).join('');
-        const rIdx = p.rings[c] ? teams.indexOf(p.rings[c]) : -1;
-        const ringHtml = rIdx >= 0 ? `<span class="tl-ring" style="left:${((rIdx + 0.5) / teams.length * 100).toFixed(1)}%">🏆</span>` : '';
-        cells.push(`<td class="tl-cell tl-split${flush(connL(c), connR(c))}" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div>${ringHtml}</td>`);
+        // El anillo se centra en el año (no en el segmento) para alinearlo con otros campeones del mismo año
+        const ringHtml = p.rings[c] ? `<span class="tl-ring" style="left:50%">🏆</span>` : '';
+        cells.push(`<td class="tl-cell tl-split${flush(connL(c), connR(c))}" data-c0="${i}" data-c1="${i}" title="${teams.map(t => teamInfo(t).name).join(' → ')} · ${drSeason(c)}"><div class="tl-segrow">${segs}</div>${ringHtml}</td>`);
         i++; continue;
       }
       const tm = teams[0];
-      if (p.estado[c]) { cells.push(tlSpecialCell(tm, p.estado[c], c, flush(connL(c), connR(c)))); i++; continue; }
+      if (p.estado[c]) { cells.push(tlSpecialCell(tm, p.estado[c], c, flush(connL(c), connR(c)), i)); i++; continue; }
       let span = 1, j = i + 1;
       while (j < axis.length && typeof axis[j] !== 'object') {
         const ts = p.seasons[axis[j]];
@@ -2530,7 +2547,7 @@ function renderTimeline() {
       const ringHtml = ringOffs.map(off => `<span class="tl-ring" style="left:${((off + 0.5) / span * 100).toFixed(1)}%">🏆</span>`).join('');
       const label = span >= 4 ? info.label : tm;
       const per = y1 !== y0 ? `${drSeason(y0)}–${drSeason(y1)}` : drSeason(y0);
-      cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
+      cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" data-c0="${i}" data-c1="${i + span - 1}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
       i += span;
     }
     const nTeams = new Set(Object.values(p.seasons).flat()).size;
@@ -2543,9 +2560,9 @@ function renderTimeline() {
   }).join('');
 
   // Fila de conteo (españoles activos por temporada)
-  const footCells = axis.map(c => (typeof c === 'object')
-    ? `<td class="tl-break"></td>`
-    : `<td class="tl-count">${activeBy[c] || ''}</td>`).join('');
+  const footCells = axis.map((c, idx) => (typeof c === 'object')
+    ? `<td class="tl-break" data-c0="${idx}" data-c1="${idx}"></td>`
+    : `<td class="tl-count" data-c0="${idx}" data-c1="${idx}">${activeBy[c] || ''}</td>`).join('');
   const totalSeas = players.reduce((s, p) => s + p.total, 0);
   document.getElementById('tl-tfoot').innerHTML =
     `<tr><td class="tl-name-f">Españoles activos</td><td class="tl-debut"></td>${footCells}<td class="tl-seas tl-seas-total">${tlFmtSeas(totalSeas)}</td></tr>`;
