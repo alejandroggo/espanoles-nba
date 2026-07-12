@@ -619,7 +619,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 }
 .dorsales-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: var(--space-2);
 }
 .jersey {
@@ -627,7 +627,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   transition: transform var(--transition);
 }
 .jersey:hover { transform: translateY(-3px); }
-.jersey.sel { outline: 2.5px solid var(--dorado); outline-offset: 2px; border-radius: 8px; background: var(--accent-light); }
+.jersey.jersey-sel { box-shadow: 0 0 0 2.5px var(--dorado); border-radius: 8px; background: var(--accent-light); }
 .jersey-svg { width: 100%; height: auto; display: block; }
 .jersey-shape {
   fill: var(--surface);
@@ -651,7 +651,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .jersey.j2 .jersey-num { fill: #fff; stroke: #1e3a8a; }
 .jersey.j3 .jersey-num { fill: #0c4a6e; stroke: #fff; }
 .jersey.j4 .jersey-num { fill: #fff; stroke: #c2410c; }
-.jersey.sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
+.jersey.jersey-sel .jersey-shape { stroke: var(--dorado); stroke-width: 2.5; }
 
 .dorsal-side { position: sticky; top: 72px; display: flex; flex-direction: column; gap: var(--space-4); }
 .dorsal-detail {
@@ -991,6 +991,9 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
   padding: 0 var(--space-6);
   overflow-x: auto;
 }
+/* Scroll horizontal superior sincronizado */
+.tl-topscroll { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6); overflow-x: auto; overflow-y: hidden; }
+#tl-topscroll-inner { height: 1px; }
 #tl-table { border-collapse: separate; border-spacing: 0; width: auto; }
 #tl-table th, #tl-table td { padding: 0; }
 
@@ -1032,11 +1035,18 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .tl-pname { color: var(--text); text-decoration: none; font-weight: 600; white-space: nowrap; }
 .tl-pname:hover { color: var(--accent); }
 
-/* Resaltado de columna al pasar por el año */
-.tl-year.tl-colhl { color: var(--accent); background: var(--accent-light); }
+/* Cabecera Jugador centrada verticalmente */
+#tl-table thead th.tl-name-h, #tl-table thead th.tl-seas-h { vertical-align: middle; }
+
+/* Resaltar solo la fila al pasar el ratón por el jugador */
+#tl-body tr:hover > * { box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+
+/* Resaltado de columna al pasar por el año (marcado) */
+.tl-year.tl-colhl { color: var(--accent-contrast); background: var(--accent); }
 td.tl-colhl { position: relative; }
-td.tl-colhl::after { content: ''; position: absolute; inset: 0; background: rgba(90,90,90,0.14); pointer-events: none; z-index: 2; }
-td.tl-empty.tl-colhl::after { background: rgba(90,90,90,0.10); }
+td.tl-colhl::after { content: ''; position: absolute; inset: 0; background: rgba(80,80,80,0.26); pointer-events: none; z-index: 2; }
+td.tl-empty.tl-colhl::after { background: rgba(80,80,80,0.18); }
+.tl-count.tl-colhl { color: var(--accent); font-weight: 700; }
 
 /* Hueco de años sin jugadores (rayado) */
 th.tl-break, td.tl-break {

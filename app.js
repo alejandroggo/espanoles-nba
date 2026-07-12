@@ -1287,7 +1287,7 @@ function toggleDorsal(n) { showDorsal(drSel === n ? null : n); }
 
 function showDorsal(n) {
   const btns = document.querySelectorAll('.jersey');
-  btns.forEach(b => b.classList.remove('sel'));
+  btns.forEach(b => b.classList.remove('jersey-sel'));
   const panel = document.getElementById('dr-detail');
 
   if (n === null || n === undefined) {
@@ -1296,7 +1296,7 @@ function showDorsal(n) {
     return;
   }
   drSel = n;
-  if (btns[n]) btns[n].classList.add('sel');
+  if (btns[n]) btns[n].classList.add('jersey-sel');
 
   const entries = drByNum[n] || [];
   const players = drPlayers(entries);
@@ -2526,7 +2526,25 @@ async function initLineaTemporalPage() {
   body.addEventListener('mouseover', e => { const el = e.target.closest('[data-team]'); tlFocusTeam(el ? el.getAttribute('data-team') : null); });
   body.addEventListener('mouseleave', () => tlFocusTeam(null));
 
+  // Barra de scroll horizontal también arriba, sincronizada con la tabla
+  const wrap = document.getElementById('tl-wrap'), top = document.getElementById('tl-topscroll');
+  if (wrap && top) {
+    let lock = false;
+    wrap.addEventListener('scroll', () => { if (lock) return; lock = true; top.scrollLeft = wrap.scrollLeft; lock = false; });
+    top.addEventListener('scroll', () => { if (lock) return; lock = true; wrap.scrollLeft = top.scrollLeft; lock = false; });
+    window.addEventListener('resize', tlSyncTopScroll);
+  }
+
   renderTimeline();
+}
+
+// Iguala el ancho del scroll superior al de la tabla
+function tlSyncTopScroll() {
+  const wrap = document.getElementById('tl-wrap'), inner = document.getElementById('tl-topscroll-inner'), top = document.getElementById('tl-topscroll');
+  const table = document.getElementById('tl-table');
+  if (!wrap || !inner || !table || !top) return;
+  inner.style.width = table.scrollWidth + 'px';
+  top.style.display = table.scrollWidth > wrap.clientWidth ? 'block' : 'none';
 }
 
 function setTlSort(mode) {
@@ -2610,12 +2628,11 @@ function renderTimeline() {
       cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" data-c0="${i}" data-c1="${i + span - 1}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
       i += span;
     }
-    const nTeams = new Set(Object.values(p.seasons).flat()).size;
     return `<tr>
       <th scope="row" class="tl-name"><span class="tl-namewrap">${tlFace(p)}${p.j.id ? `<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>` : `<span class="tl-pname">${p.j.nombre}</span>`}</span></th>
       <td class="tl-debut">${p._debut || tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
-      <td class="tl-seas">${tlFmtSeas(p.total)}<span class="tl-nteams">${nTeams} eq.</span></td>
+      <td class="tl-seas">${tlFmtSeas(p.total)}</td>
     </tr>`;
   }).join('');
 
@@ -2626,6 +2643,8 @@ function renderTimeline() {
   const totalSeas = players.reduce((s, p) => s + p.total, 0);
   document.getElementById('tl-tfoot').innerHTML =
     `<tr><td class="tl-name-f">Españoles activos</td><td class="tl-debut"></td>${footCells}<td class="tl-seas tl-seas-total">${tlFmtSeas(totalSeas)}</td></tr>`;
+
+  tlSyncTopScroll();
 }
 
 // Resaltar todas las etapas de un equipo al pasar el ratón
