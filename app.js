@@ -2985,6 +2985,7 @@ function tmpIsCut(nombre, year) {
 function tmpBuild(jugadores) {
   const rows = [];
   (jugadores || []).forEach(j => {
+    const foto = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
     const byYear = {};
     (j.temporadas_data || []).forEach(t => { if (t.year) (byYear[t.year] = byYear[t.year] || []).push(t); });
     Object.keys(byYear).forEach(y => {
@@ -2992,8 +2993,8 @@ function tmpBuild(jugadores) {
       const tot = arr.find(t => String(t.team || '').toUpperCase() === 'TOT');
       const teams = arr.filter(t => String(t.team || '').toUpperCase() !== 'TOT').sort((a, b) => (b.g || 0) - (a.g || 0));
       const traded = !!tot, cut = tmpIsCut(j.nombre, +y);
-      if (tot) rows.push({ id: j.id, jugador: j.nombre, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0, cut: false });
-      teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1, cut }));
+      if (tot) rows.push({ id: j.id, jugador: j.nombre, foto, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0, cut: false });
+      teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, foto, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1, cut }));
     });
   });
   return rows;
@@ -3057,15 +3058,18 @@ function renderTmpTable() {
     const statCells = stat.map(c => {
       const v = c.val(r);
       const hl = tmpSortCol === c.key ? ' td-hl' : '';
-      const lead = (r.kind !== 'partial' && v != null && maxByKey[c.key] != null && v === maxByKey[c.key]) ? ' td-leader' : '';
+      const lead = (r.kind !== 'partial' && v != null && maxByKey[c.key] > 0 && v === maxByKey[c.key]) ? ' td-leader' : '';
       return `<td class="td-num${hl}${lead}">${v == null ? '—' : c.fmt(v)}</td>`;
     }).join('');
-    let teamCell = r.team, cls = '';
-    if (r.kind === 'total') { teamCell = `<span class="tmp-total-badge" title="Total de la temporada · ${r.team} (${r.nEq} equipos)">Total</span>`; cls = 'tmp-total'; }
-    else if (r.kind === 'partial') { teamCell = `${r.team} <span class="tmp-parcial" title="Temporada parcial: jugó en ${r.nEq} equipos ese año">parcial</span>`; cls = 'tmp-partial'; }
-    if (r.cut) { teamCell += ` <span class="tmp-cortado" title="Cortado (waived) a mitad de temporada — cuenta como media">cortado · ½</span>`; cls += ' tmp-cut'; }
-    return `<tr class="${cls.trim()}">
-      <td class="td-nombre">${plLink(r.jugador, r.jugador)}</td>
+    let teamCell = r.team, cls = '', title = '';
+    if (r.kind === 'total') { teamCell = `<span class="tmp-total-lbl" title="Total de la temporada · ${r.team} (${r.nEq} equipos)">Total</span>`; cls = 'tmp-total'; }
+    else if (r.kind === 'partial') { cls = 'tmp-partial'; title = `title="Temporada parcial: jugó en ${r.nEq} equipos ese año"`; }
+    if (r.cut) { cls += ' tmp-cut'; title = `title="Cortado (waived) a mitad de temporada — cuenta como media"`; }
+    const thumb = r.foto
+      ? `<img loading="lazy" class="player-thumb" src="${r.foto}" onerror="this.style.visibility='hidden'" alt="">`
+      : avatarHtml(r.jugador, 'player-thumb');
+    return `<tr class="${cls.trim()}" ${title}>
+      <td class="td-nombre"><span class="tmp-player">${thumb}${plLink(r.jugador, r.jugador)}</span></td>
       <td class="td-center">${drSeason(r.year)}</td>
       <td class="td-center">${teamCell}</td>
       <td class="td-num">${fmtEnt(r.g)}</td>
