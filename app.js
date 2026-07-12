@@ -765,6 +765,13 @@ async function initPremiosPage() {
       jugador: j.nombre,
     }))).filter(p => p.tipo);
 
+  // Anillos NBA (no vienen en los premios del volcado): se añaden desde el mapa de campeones
+  (data.jugadores || []).forEach(j => {
+    const rings = TL_ANILLOS[drNorm(j.nombre)];
+    if (rings) Object.keys(rings).forEach(y =>
+      prAll.push({ tipo: 'Campeón NBA', year: +y, team: rings[y], notas: 'Anillo NBA', jugador: j.nombre }));
+  });
+
   const laureados = new Set(prAll.map(p => p.jugador)).size;
   document.getElementById('hero-sub').textContent =
     prAll.length ? `${prAll.length} reconocimientos individuales · ${laureados} jugadores premiados` : 'Aún no hay datos de premios';
@@ -865,6 +872,7 @@ function renderPrFlat(rows) {
 
 function premioRowClass(tipo) {
   const t = (tipo || '').toLowerCase();
+  if (t.includes('campe')) return 'row-oro';
   if (t === 'roy' || t === 'dpoy') return 'row-oro';
   if (t === 'all nba' || t === 'all defense') return 'row-verde';
   return '';
@@ -872,7 +880,7 @@ function premioRowClass(tipo) {
 
 // Orden de importancia (menor índice = más importante, arriba). Concursos siempre al final.
 // 'mvp' aquí = votos al MVP (no ganado), va en medio, no en cabeza
-const PREMIO_ORDEN = ['dpoy', 'roy', 'all nba', 'all defense', 'all rookie', 'mvp', 'player of the month', 'rookie of the month', 'all star', 'rising stars'];
+const PREMIO_ORDEN = ['campeon', 'dpoy', 'roy', 'all nba', 'all defense', 'all rookie', 'mvp', 'player of the month', 'rookie of the month', 'all star', 'rising stars'];
 function premioPrio(tipo) {
   const t = drNorm(tipo).replace(/[^a-z0-9]+/g, ' ').trim();
   if (/concurso|triples?|mate|dunk|skill|habilidad/.test(t)) return 90;   // concursos: lo último
