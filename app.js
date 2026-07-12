@@ -1834,6 +1834,50 @@ function qOptions(correct, pool, n = 3) {
 }
 function qFourPlayers(D) { return qSample(D.stat, 4).map(x => x.nombre); }
 
+// 4 jugadores con cifras PARECIDAS en una estadística (ventana consecutiva al ordenar)
+function qCloseFour(pool, k, n = 4) {
+  const val = j => (typeof k === 'function' ? k(j) : j[k]) || 0;
+  const arr = pool.filter(j => val(j) > 0).sort((a, b) => val(a) - val(b));
+  if (arr.length < n) return null;
+  const start = Math.floor(Math.random() * (arr.length - n + 1));
+  const win = arr.slice(start, start + n);
+  if (val(win[n - 1]) === val(win[n - 2])) return null;   // máximo ambiguo → descarta
+  return win;
+}
+function qDebutYear(j) { const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/); return m ? +m[1] : null; }
+function qNumTeams(j) { return (j.equipos_nba || '').split(/[,/]/).map(s => s.trim()).filter(Boolean).length; }
+
+// «¿Quién tiene más…?» — se eligen 4 jugadores con cifras parecidas para que no sea obvio
+const QSTAT = [
+  ['pts_g', '¿Quién promedió más <b>puntos por partido</b> en su carrera?'],
+  ['rbd_g', '¿Quién promedió más <b>rebotes por partido</b>?'],
+  ['ast_g', '¿Quién promedió más <b>asistencias por partido</b>?'],
+  ['min_g', '¿Quién promedió más <b>minutos por partido</b>?'],
+  ['pts_total', '¿Quién ha anotado más <b>puntos totales</b> en la NBA?'],
+  ['rbd_total', '¿Quién ha capturado más <b>rebotes totales</b>?'],
+  ['ast_total', '¿Quién ha dado más <b>asistencias totales</b>?'],
+  ['stl_total', '¿Quién ha sumado más <b>robos totales</b>?'],
+  ['blk_total', '¿Quién ha puesto más <b>tapones totales</b>?'],
+  ['tres_total', '¿Quién ha anotado más <b>triples</b> (total)?'],
+  ['min_total', '¿Quién ha jugado más <b>minutos totales</b>?'],
+  ['partidos', '¿Quién ha disputado más <b>partidos</b>?'],
+  ['td_total', '¿Quién ha firmado más <b>triples-dobles</b>?'],
+  ['ganancias', '¿Quién ha <b>ganado más dinero</b> en la NBA?'],
+  ['_seasons', '¿Quién ha disputado <b>más temporadas</b>?'],
+];
+// Récords en un solo partido (game highs)
+const QREC = [
+  ['pts', '¿Quién tiene el <b>récord de puntos</b> en un partido?'],
+  ['rbd', '¿Quién tiene el <b>récord de rebotes</b> en un partido?'],
+  ['ast', '¿Quién tiene el <b>récord de asistencias</b> en un partido?'],
+];
+// Porcentajes de tiro de carrera (mín. 200 partidos, cifras parecidas)
+const QPCT = [
+  ['fg_pct', '¿Quién tiene mejor <b>tiro de campo (FG%)</b> de carrera?'],
+  ['ft_pct', '¿Quién tiene mejor <b>tiro libre (FT%)</b> de carrera?'],
+  ['tres_pct', '¿Quién tiene mejor <b>triple (3P%)</b> de carrera?'],
+];
+
 const QUIZ_GENS = [
   D => { // año de draft
     const pool = D.drafted; const years = [...new Set(pool.map(x => x.draft_anio))];
@@ -1853,30 +1897,24 @@ const QUIZ_GENS = [
     const j = qPick(pool);
     return { q: `¿Con qué número fue elegido <b>${j.nombre}</b> (${j.draft_anio})?`, correct: '#' + j.draft_pick, options: qOptions('#' + j.draft_pick, picks) };
   },
-  D => { // máximo anotador PPG entre 4
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Cuál de estos jugadores promedió más <b>puntos por partido</b> en su carrera?', correct: qMax(four, 'pts_g').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más puntos totales entre 4
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Quién ha anotado más <b>puntos totales</b> en la NBA?', correct: qMax(four, 'pts_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más rebotes totales
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Quién ha capturado más <b>rebotes totales</b> en la NBA?', correct: qMax(four, 'rbd_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más asistencias totales
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Quién ha dado más <b>asistencias totales</b> en la NBA?', correct: qMax(four, 'ast_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más partidos
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Cuál de estos jugadores ha disputado más <b>partidos</b> en la NBA?', correct: qMax(four, 'partidos').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // mejor pagado
-    const pool = D.J.filter(j => j.ganancias > 0); if (pool.length < 4) return null; const four = qSample(pool, 4);
-    return { q: '¿Cuál de estos jugadores ha <b>ganado más dinero</b> en la NBA?', correct: qMax(four, 'ganancias').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
+  // Estadísticas «quién más» con 4 jugadores de cifras parecidas
+  ...QSTAT.map(([key, q]) => D => {
+    const four = qCloseFour(D.stat, key);
+    if (!four) return null;
+    return { q, correct: four[four.length - 1].nombre, options: qShuffle(four.map(x => x.nombre)) };
+  }),
+  // Récords en un partido
+  ...QREC.map(([key, q]) => D => {
+    const four = qCloseFour(D.highs, j => j.game_highs[key]);
+    if (!four) return null;
+    return { q, correct: four[four.length - 1].nombre, options: qShuffle(four.map(x => x.nombre)) };
+  }),
+  // Porcentajes de carrera
+  ...QPCT.map(([key, q]) => D => {
+    const four = qCloseFour(D.stat.filter(j => (j.partidos || 0) >= 200), key);
+    if (!four) return null;
+    return { q, correct: four[four.length - 1].nombre, options: qShuffle(four.map(x => x.nombre)) };
+  }),
   D => { // premio único (ROY, DPOY, MVP...)
     const unis = ['DPOY', 'ROY', 'MVP', 'All Defense'].filter(t => D.premios.some(p => p.tipo === t));
     if (!unis.length || D.J.length < 4) return null;
@@ -1888,23 +1926,6 @@ const QUIZ_GENS = [
     if (pool.length < 4 || nums.length < 4) return null;
     const d = qPick(pool);
     return { q: `¿Qué <b>dorsal</b> llevó ${d.jugador} en ${d.team}?`, correct: String(d.numero), options: qOptions(String(d.numero), nums) };
-  },
-  D => { // más tapones totales
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Quién ha puesto más <b>tapones totales</b> en la NBA?', correct: qMax(four, 'blk_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más triples-dobles
-    const pool = D.stat.filter(j => (j.td_total || 0) > 0); if (pool.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Quién ha firmado más <b>triples-dobles</b> en su carrera NBA?', correct: qMax(four, 'td_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // más temporadas
-    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
-    return { q: '¿Cuál de estos jugadores ha disputado <b>más temporadas</b> en la NBA?', correct: qMax(four, '_seasons').nombre, options: qShuffle(four.map(x => x.nombre)) };
-  },
-  D => { // récord de puntos en un partido
-    if (D.highs.length < 4) return null; const four = qSample(D.highs, 4);
-    const win = four.reduce((a, b) => (b.game_highs.pts || 0) > (a.game_highs.pts || 0) ? b : a);
-    return { q: '¿Quién tiene el <b>récord de puntos en un solo partido</b>?', correct: win.nombre, options: qShuffle(four.map(x => x.nombre)) };
   },
   D => { // cuántos anillos
     if (!D.champs.length) return null;
@@ -1922,6 +1943,59 @@ const QUIZ_GENS = [
     const und = D.J.filter(j => !j.draft && (j.partidos || 0) > 0); if (und.length < 1 || D.drafted.length < 3) return null;
     const u = qPick(und); const three = qSample(D.drafted, 3).map(x => x.nombre);
     return { q: '¿Cuál de estos jugadores <b>NO fue drafteado</b>?', correct: u.nombre, options: qShuffle([u.nombre, ...three]) };
+  },
+  D => { // contra qué equipo debutó
+    const pool = D.J.filter(j => j.primer_partido && j.primer_partido.rival);
+    const rivals = [...new Set(pool.map(x => x.primer_partido.rival))];
+    if (pool.length < 4 || rivals.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿Contra qué equipo <b>debutó ${j.nombre}</b> en la NBA?`, correct: j.primer_partido.rival, options: qOptions(j.primer_partido.rival, rivals) };
+  },
+  D => { // con qué equipo debutó
+    const pool = D.J.filter(j => j.primer_partido && j.primer_partido.equipo);
+    const teams = [...new Set(pool.map(x => x.primer_partido.equipo))];
+    if (pool.length < 4 || teams.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿Con qué equipo <b>debutó ${j.nombre}</b> en la NBA?`, correct: j.primer_partido.equipo, options: qOptions(j.primer_partido.equipo, teams) };
+  },
+  D => { // año de debut
+    const pool = D.J.filter(j => qDebutYear(j)); const years = [...new Set(pool.map(qDebutYear))];
+    if (pool.length < 4 || years.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿En qué año <b>debutó ${j.nombre}</b> en la NBA?`, correct: qDebutYear(j), options: qOptions(qDebutYear(j), years) };
+  },
+  D => { // puntos en el debut
+    const pool = D.J.filter(j => j.primer_partido && j.primer_partido.pts != null);
+    const nums = [...new Set(pool.map(x => String(x.primer_partido.pts)))];
+    if (pool.length < 4 || nums.length < 4) return null;
+    const j = qPick(pool);
+    return { q: `¿Cuántos <b>puntos anotó ${j.nombre}</b> en su debut NBA?`, correct: String(j.primer_partido.pts), options: qOptions(String(j.primer_partido.pts), nums) };
+  },
+  D => { // quién debutó antes
+    const pool = D.J.filter(j => qDebutYear(j)); if (pool.length < 4) return null;
+    const four = qSample(pool, 4);
+    const win = four.reduce((a, b) => qDebutYear(b) < qDebutYear(a) ? b : a);
+    if (four.filter(x => qDebutYear(x) === qDebutYear(win)).length > 1) return null;   // empate → descarta
+    return { q: '¿Cuál de estos jugadores <b>debutó antes</b> en la NBA?', correct: win.nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // con cuántos equipos NBA jugó
+    const pool = D.stat.filter(j => qNumTeams(j) > 0); if (pool.length < 4) return null;
+    const j = qPick(pool); const n = qNumTeams(j);
+    return { q: `¿Con cuántos <b>equipos NBA</b> jugó ${j.nombre}?`, correct: String(n), options: qOptions(String(n), ['1', '2', '3', '4', '5', '6']) };
+  },
+  D => { // con qué equipo firmó en X año
+    const firmas = D.trans.filter(t => /agente libre|firma contrato rookie|renovaci/i.test(t.tipo) && t.equipo1 && /\d{4}/.test(t.fecha || ''));
+    const teams = [...new Set(D.trans.map(t => t.equipo1).filter(Boolean))];
+    if (firmas.length < 4 || teams.length < 4) return null;
+    const t = qPick(firmas); const year = String(t.fecha).match(/(\d{4})/)[1];
+    return { q: `¿Con qué equipo <b>firmó ${t.jugador}</b> en ${year}?`, correct: t.equipo1, options: qOptions(t.equipo1, teams) };
+  },
+  D => { // a qué equipo fue traspasado en X año
+    const trades = D.trans.filter(t => /traspas/i.test(t.tipo) && t.equipo2 && /\d{4}/.test(t.fecha || ''));
+    const teams = [...new Set(D.trans.map(t => t.equipo2).filter(Boolean))];
+    if (trades.length < 4 || teams.length < 4) return null;
+    const t = qPick(trades); const year = String(t.fecha).match(/(\d{4})/)[1];
+    return { q: `¿A qué equipo fue <b>traspasado ${t.jugador}</b> en ${year}?`, correct: t.equipo2, options: qOptions(t.equipo2, teams) };
   },
   D => { // equipo con el que jugó la Summer League
     const teams = [...new Set(D.sl.map(x => x.equipo))];
@@ -1947,6 +2021,7 @@ async function initTestPage() {
     dorsales: (data.dorsales || []).filter(d => d.numero != null),
     premios: J.flatMap(j => (j.premios || []).map(p => ({ ...p, jugador: j.nombre }))),
     sl: (data.summer_league || []).filter(s => s.equipo && s.jugador),
+    trans: (data.transacciones || []),
   };
   quizNext();
 }
