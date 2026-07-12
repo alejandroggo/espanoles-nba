@@ -8,7 +8,68 @@ function initTheme() {
     if ((localStorage.getItem('ag-theme') || 'auto') === 'auto') renderTheme('auto');
   });
   buildNav();
+  buildHeaderSearch();
   showLoadBar();
+}
+
+// ── BUSCADOR GLOBAL (cabecera, en todas las páginas) ──
+let hsAll = null, hsList = [], hsIdx = -1;
+
+function buildHeaderSearch() {
+  const right = document.querySelector('.header-right');
+  if (!right || document.getElementById('hsearch')) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'hsearch';
+  wrap.id = 'hsearch';
+  wrap.innerHTML = `
+    <input id="hsearch-input" class="hsearch-input" type="search" autocomplete="off" placeholder="Buscar jugador…"
+      aria-label="Buscar jugador" role="combobox" aria-expanded="false" aria-controls="hsearch-panel">
+    <div class="hsearch-panel" id="hsearch-panel" role="listbox" hidden></div>`;
+  right.insertBefore(wrap, right.firstChild);
+  const input = wrap.querySelector('#hsearch-input');
+  input.addEventListener('focus', hsEnsureData);
+  input.addEventListener('input', () => { hsIdx = -1; hsRender(input.value); });
+  input.addEventListener('keydown', hsKey);
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) hsClose(); });
+}
+
+async function hsEnsureData() {
+  if (hsAll) return;
+  try { const d = await loadData(); hsAll = d.jugadores || []; buildPlayerIds(hsAll); }
+  catch (e) { hsAll = []; }
+}
+
+function hsMatches(q) {
+  const nq = drNorm(q.trim());
+  if (!nq) return [];
+  return (hsAll || []).filter(j => drNorm(j.nombre).includes(nq)).slice(0, 8);
+}
+
+function hsRender(q) {
+  const panel = document.getElementById('hsearch-panel'), input = document.getElementById('hsearch-input');
+  hsList = hsMatches(q);
+  if (!hsList.length) { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
+  panel.innerHTML = hsList.map((j, i) => {
+    const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
+    const thumb = src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'hsearch-avatar');
+    return `<a class="hsearch-item${i === hsIdx ? ' active' : ''}" role="option" href="${jugadorHref(j.id)}"><span class="hsearch-thumb">${thumb}</span>${j.nombre}</a>`;
+  }).join('');
+  panel.hidden = false;
+  input.setAttribute('aria-expanded', 'true');
+}
+
+function hsKey(e) {
+  if (e.key === 'Escape') { hsClose(); e.target.blur(); return; }
+  if (!hsList.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); hsIdx = Math.min(hsIdx + 1, hsList.length - 1); hsRender(e.target.value); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); hsIdx = Math.max(hsIdx - 1, 0); hsRender(e.target.value); }
+  else if (e.key === 'Enter') { const j = hsList[hsIdx >= 0 ? hsIdx : 0]; if (j) location.href = jugadorHref(j.id); }
+}
+
+function hsClose() {
+  const panel = document.getElementById('hsearch-panel'), input = document.getElementById('hsearch-input');
+  if (panel) panel.hidden = true;
+  if (input) input.setAttribute('aria-expanded', 'false');
 }
 
 // ── NAVEGACIÓN GLOBAL ─────────────────────────
