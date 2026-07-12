@@ -2722,6 +2722,13 @@ async function initLineaTemporalPage() {
   body.addEventListener('mouseover', e => { const el = e.target.closest('[data-team]'); tlFocusTeam(el ? el.getAttribute('data-team') : null); });
   body.addEventListener('mouseleave', () => tlFocusTeam(null));
 
+  // Clic en una fila → fija/quita el resaltado del jugador (sin robar el clic a su enlace)
+  body.addEventListener('click', e => {
+    if (e.target.closest('a, button')) return;
+    const row = e.target.closest('tr[data-pid]');
+    if (row && row.dataset.pid) row.classList.toggle('tl-focusrow');
+  });
+
   // Resaltar la fila de un jugador si se llega con ?focus=<id>
   const focus = new URLSearchParams(location.search).get('focus');
   if (focus) requestAnimationFrame(() => tlFocusRow(focus));
