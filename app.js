@@ -3008,6 +3008,16 @@ function renderTmpTable() {
 
   document.getElementById('tmp-count').textContent = `${rows.length} fila${rows.length === 1 ? '' : 's'}`;
 
+  // Mejor valor de cada estadística entre las temporadas completas visibles
+  // (se excluyen los tramos parciales para no comparar fragmentos con años enteros)
+  const leaderRows = rows.filter(r => r.kind !== 'partial');
+  const maxByKey = {};
+  stat.forEach(c => {
+    let mx = null;
+    leaderRows.forEach(r => { const v = c.val(r); if (v != null && (mx == null || v > mx)) mx = v; });
+    maxByKey[c.key] = mx;
+  });
+
   document.getElementById('tmp-thead').innerHTML = `<tr>${cols.map(c => {
     const active = tmpSortCol === c.key;
     const ariaSort = active ? (tmpSortAsc ? 'ascending' : 'descending') : 'none';
@@ -3018,7 +3028,8 @@ function renderTmpTable() {
     const statCells = stat.map(c => {
       const v = c.val(r);
       const hl = tmpSortCol === c.key ? ' td-hl' : '';
-      return `<td class="td-num${hl}">${v == null ? '—' : c.fmt(v)}</td>`;
+      const lead = (r.kind !== 'partial' && v != null && maxByKey[c.key] != null && v === maxByKey[c.key]) ? ' td-leader' : '';
+      return `<td class="td-num${hl}${lead}">${v == null ? '—' : c.fmt(v)}</td>`;
     }).join('');
     let teamCell = r.team, cls = '';
     if (r.kind === 'total') { teamCell = `<span class="tmp-total-badge" title="Total de la temporada · ${r.team} (${r.nEq} equipos)">Total</span>`; cls = 'tmp-total'; }
