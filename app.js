@@ -1834,11 +1834,34 @@ const QUIZ_GENS = [
     const d = qPick(pool);
     return { q: `¿Qué <b>dorsal</b> llevó ${d.jugador} en ${d.team}?`, correct: String(d.numero), options: qOptions(String(d.numero), nums) };
   },
-  D => { // posición
-    const pool = D.J.filter(j => j.posicion); const pos = [...new Set(pool.map(x => x.posicion))];
-    if (pool.length < 4 || pos.length < 4) return null;
-    const j = qPick(pool);
-    return { q: `¿En qué <b>posición</b> jugaba ${j.nombre}?`, correct: j.posicion, options: qOptions(j.posicion, pos) };
+  D => { // más tapones totales
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Quién ha puesto más <b>tapones totales</b> en la NBA?', correct: qMax(four, 'blk_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más triples-dobles
+    const pool = D.stat.filter(j => (j.td_total || 0) > 0); if (pool.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Quién ha firmado más <b>triples-dobles</b> en su carrera NBA?', correct: qMax(four, 'td_total').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // más temporadas
+    if (D.stat.length < 4) return null; const four = qSample(D.stat, 4);
+    return { q: '¿Cuál de estos jugadores ha disputado <b>más temporadas</b> en la NBA?', correct: qMax(four, '_seasons').nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // récord de puntos en un partido
+    if (D.highs.length < 4) return null; const four = qSample(D.highs, 4);
+    const win = four.reduce((a, b) => (b.game_highs.pts || 0) > (a.game_highs.pts || 0) ? b : a);
+    return { q: '¿Quién tiene el <b>récord de puntos en un solo partido</b>?', correct: win.nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // cuántos anillos
+    if (!D.champs.length) return null;
+    const c = qPick(D.champs);
+    return { q: `¿Cuántos <b>anillos NBA</b> ganó ${c.nombre}?`, correct: String(c.rings), options: qOptions(String(c.rings), ['1', '2', '3', '4']) };
+  },
+  D => { // qué español NO ganó anillo
+    if (D.champs.length < 3) return null;
+    const noRing = D.stat.filter(j => !D.champs.some(c => c.nombre === j.nombre));
+    if (!noRing.length) return null;
+    const u = qPick(noRing); const three = qSample(D.champs, 3).map(x => x.nombre);
+    return { q: '¿Cuál de estos jugadores <b>NO ganó el anillo</b> de la NBA?', correct: u.nombre, options: qShuffle([u.nombre, ...three]) };
   },
   D => { // cuál NO fue drafteado
     const und = D.J.filter(j => !j.draft && (j.partidos || 0) > 0); if (und.length < 1 || D.drafted.length < 3) return null;
@@ -1858,10 +1881,14 @@ async function initTestPage() {
   try { data = await loadData(); }
   catch (e) { document.getElementById('quiz-q').textContent = 'Error al cargar los datos'; return; }
   const J = data.jugadores || [];
+  J.forEach(j => { j._seasons = new Set((j.temporadas_data || []).map(t => t.year).filter(Boolean)).size; });
   quizData = {
     J,
     drafted: J.filter(j => j.draft && j.draft_anio),
     stat: J.filter(j => (j.partidos || 0) > 0),
+    highs: J.filter(j => j.game_highs && j.game_highs.pts),
+    champs: J.map(j => ({ nombre: j.nombre, rings: Object.keys(TL_ANILLOS[drNorm(j.nombre)] || {}).length }))
+             .filter(x => x.rings > 0),
     dorsales: (data.dorsales || []).filter(d => d.numero != null),
     premios: J.flatMap(j => (j.premios || []).map(p => ({ ...p, jugador: j.nombre }))),
     sl: (data.summer_league || []).filter(s => s.equipo && s.jugador),
