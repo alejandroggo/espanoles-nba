@@ -867,10 +867,11 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .tmp-sw-parcial { background: rgba(59,130,246,0.35); border-color: rgba(59,130,246,0.5); }
 .tmp-sw-cut { background: rgba(217,119,6,0.35); border-color: rgba(217,119,6,0.5); }
 
-.jug-awards { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.jug-awards { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-2) var(--space-6); }
 .jug-award { display: flex; align-items: baseline; gap: var(--space-3); }
-.jug-award-tipo { font-weight: 700; min-width: 130px; }
+.jug-award-tipo { font-weight: 700; min-width: 120px; }
 .jug-award-hito { color: var(--dorado); }
+.jug-seas-switch { margin-bottom: var(--space-3); }
 .jug-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-sm); }
 
 .jug-dorsals { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3); }

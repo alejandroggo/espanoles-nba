@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
 
@@ -34,6 +34,13 @@
     <div id="jug-content"><p class="td-muted" style="padding:2rem">Cargando…</p></div>
   </div>
 </main>
+
+<!-- DRAWER DETALLE TRANSACCIÓN -->
+<div class="drawer-overlay" id="tr-overlay" hidden onclick="closeTrDrawer()"></div>
+<aside class="drawer" id="tr-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="tr-drawer-title">
+  <button class="drawer-close" aria-label="Cerrar detalle" onclick="closeTrDrawer()">✕</button>
+  <div id="tr-drawer-content"></div>
+</aside>
 
 <!-- FOOTER -->
 <footer class="ag-footer">
@@ -58,7 +65,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=54"></script>
+<script src="app.js?v=55"></script>
 <script>initTheme(); initJugadorPage();</script>
 </body>
 </html>

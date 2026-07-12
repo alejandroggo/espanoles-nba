@@ -1618,6 +1618,8 @@ async function initJugadorPage() {
   const dorsales = (data.dorsales || []).filter(d => drNorm(d.jugador) === n);
   const sl = (data.summer_league || []).filter(s => drNorm(s.jugador) === n);
   const trans = (data.transacciones || []).filter(t => drNorm(t.jugador) === n);
+  trans.forEach(t => { t._id = t._id || trMakeId(t); });
+  trAll = trans;   // para que el drawer (openTrDrawer) encuentre la transacción
 
   el.innerHTML = [
     jugHeader(j),
@@ -1685,30 +1687,58 @@ function jugGameHighs(j) {
   return jugSection('Máximos en un partido', `<div class="stat-grid">${boxes}</div>`);
 }
 
+let jugSeasonJ = null, jugSeasonMode = 'pg';
+const JUG_SEASON_BASE = [['MIN', 'min_g'], ['PTS', 'pts_g'], ['REB', 'rbd_g'], ['AST', 'ast_g'], ['ROB', 'stl_g'], ['TAP', 'blk_g'], ['FGM', 'fgm_g'], ['3PM', 'tres_g'], ['FTM', 'ftm_g'], ['TOV', 'tov_g'], ['PF', 'pf_g']];
+
+function jugSeasonTableHtml() {
+  const j = jugSeasonJ, mode = jugSeasonMode;
+  const sorted = (j.temporadas_data || []).filter(x => x.year).sort((a, b) => (a.year || 0) - (b.year || 0));
+  const yearCount = {};
+  sorted.forEach(t => { yearCount[t.year] = (yearCount[t.year] || 0) + 1; });
+  const head = `<th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th>`
+    + JUG_SEASON_BASE.map(([l]) => `<th class="td-num">${l}</th>`).join('')
+    + (mode === 'pg' ? `<th class="td-num">FG%</th><th class="td-num">3P%</th><th class="td-num">FT%</th>` : `<th class="td-num">TD</th>`);
+  const rows = sorted.map(t => {
+    const isTot = String(t.team || '').toUpperCase() === 'TOT';
+    const split = yearCount[t.year] > 1 && !isTot;
+    const teamCell = split ? `<span class="season-split-mark">↳</span> ${t.team || '—'}` : (t.team || '—');
+    const cells = JUG_SEASON_BASE.map(([, k]) => mode === 'pg'
+      ? `<td class="td-num">${fmtDec1(t[k])}</td>`
+      : `<td class="td-num">${(t[k] != null && t.g) ? fmtEnt(t[k] * t.g) : '—'}</td>`).join('');
+    const extra = mode === 'pg'
+      ? `<td class="td-num">${fmtPct(t.fg_pct)}</td><td class="td-num">${fmtPct(t.tres_pct)}</td><td class="td-num">${fmtPct(t.ft_pct)}</td>`
+      : `<td class="td-num">${t.td != null ? fmtEnt(t.td) : '—'}</td>`;
+    return `<tr class="${split ? 'season-split' : (isTot ? 'season-tot' : '')}">
+      <td class="td-center">${drSeason(t.year)}</td><td class="td-center">${teamCell}</td><td class="td-num">${fmtEnt(t.g)}</td>${cells}${extra}
+    </tr>`;
+  }).join('');
+  return `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderJugSeasons() {
+  const el = document.getElementById('jug-seasons-table');
+  if (el) el.innerHTML = jugSeasonTableHtml();
+}
+
+function setJugSeasonMode(m) {
+  jugSeasonMode = m;
+  ['pg', 'tot'].forEach(x => {
+    const btn = document.getElementById('jug-seas-' + x);
+    if (btn) { btn.classList.toggle('active', x === m); btn.setAttribute('aria-pressed', String(x === m)); }
+  });
+  renderJugSeasons();
+}
+
 function jugTemporadas(j) {
   const s = (j.temporadas_data || []).filter(x => x.year);
   if (!s.length) return '';
-  const sorted = [...s].sort((a, b) => (a.year || 0) - (b.year || 0));
-  // años con más de una fila → temporadas multi-equipo (TOT + reparto por equipo)
-  const yearCount = {};
-  sorted.forEach(t => { yearCount[t.year] = (yearCount[t.year] || 0) + 1; });
-  const rows = sorted.map(t => {
-    const isTot = String(t.team || '').toUpperCase() === 'TOT';
-    const split = yearCount[t.year] > 1 && !isTot;   // reparto por equipo (no el total)
-    const teamCell = split ? `<span class="season-split-mark">↳</span> ${t.team || '—'}` : (t.team || '—');
-    return `<tr class="${split ? 'season-split' : (isTot ? 'season-tot' : '')}">
-    <td class="td-center">${drSeason(t.year)}</td><td class="td-center">${teamCell}</td>
-    <td class="td-num">${fmtEnt(t.g)}</td><td class="td-num">${fmtDec1(t.min_g)}</td><td class="td-num">${fmtDec1(t.pts_g)}</td>
-    <td class="td-num">${fmtDec1(t.rbd_g)}</td><td class="td-num">${fmtDec1(t.ast_g)}</td><td class="td-num">${fmtDec1(t.stl_g)}</td>
-    <td class="td-num">${fmtDec1(t.blk_g)}</td><td class="td-num">${fmtPct(t.fg_pct)}</td><td class="td-num">${fmtPct(t.tres_pct)}</td><td class="td-num">${fmtPct(t.ft_pct)}</td>
-  </tr>`;
-  }).join('');
+  jugSeasonJ = j; jugSeasonMode = 'pg';
   return jugSection('Temporada a temporada',
-    `<div class="tabla-scroll"><table><thead><tr>
-      <th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th><th class="td-num">MIN</th><th class="td-num">PTS</th>
-      <th class="td-num">REB</th><th class="td-num">AST</th><th class="td-num">ROB</th><th class="td-num">TAP</th>
-      <th class="td-num">FG%</th><th class="td-num">3P%</th><th class="td-num">FT%</th>
-    </tr></thead><tbody>${rows}</tbody></table></div>`);
+    `<div class="mode-switch jug-seas-switch" role="group" aria-label="Por partido o totales">
+       <button type="button" id="jug-seas-pg" class="toggle-chip active" aria-pressed="true" onclick="setJugSeasonMode('pg')">Por partido</button>
+       <button type="button" id="jug-seas-tot" class="toggle-chip" aria-pressed="false" onclick="setJugSeasonMode('tot')">Totales</button>
+     </div>
+     <div class="tabla-scroll" id="jug-seasons-table">${jugSeasonTableHtml()}</div>`);
 }
 
 function jugPlayoffs(j) {
@@ -1772,13 +1802,15 @@ function jugSummer(sl) {
 
 function jugTransSec(trans) {
   if (!trans.length) return '';
-  const rows = [...trans].sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || ''))).map(t => `<tr>
+  const rows = [...trans].sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || ''))).map(t => `<tr class="tr-row" tabindex="0" role="button" aria-label="Ver detalle de la transacción"
+      onclick="openTrDrawer('${t._id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
     <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
     <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
     <td class="td-center">${t.equipo1 || '—'}</td><td class="td-center">${t.equipo2 || '—'}</td>
+    <td class="td-chevron" aria-hidden="true">›</td>
   </tr>`).join('');
   return jugSection('Transacciones',
-    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th><th class="td-chevron"></th></tr></thead><tbody>${rows}</tbody></table></div>`);
 }
 
 // ══════════════════════════════════════════════
