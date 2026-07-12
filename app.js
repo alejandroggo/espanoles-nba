@@ -9,7 +9,33 @@ function initTheme() {
   });
   buildNav();
   buildHeaderSearch();
+  buildShareButton();
   showLoadBar();
+}
+
+// ── BOTÓN COMPARTIR (cabecera, todas las páginas) ──
+function buildShareButton() {
+  const right = document.querySelector('.header-right');
+  if (!right || document.getElementById('share-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'share-btn';
+  btn.className = 'theme-toggle';
+  btn.setAttribute('aria-label', 'Compartir esta página');
+  btn.textContent = 'Compartir';
+  btn.onclick = sharePage;
+  right.appendChild(btn);
+}
+
+async function sharePage() {
+  const btn = document.getElementById('share-btn');
+  const data = { title: document.title, url: location.href };
+  if (navigator.share) {
+    try { await navigator.share(data); return; } catch (e) { /* cancelado → fallback */ }
+  }
+  try {
+    await navigator.clipboard.writeText(location.href);
+    if (btn) { const t = btn.textContent; btn.textContent = '¡Copiado!'; setTimeout(() => { btn.textContent = t; }, 1600); }
+  } catch (e) { /* sin permisos de portapapeles */ }
 }
 
 // ── BUSCADOR GLOBAL (cabecera, en todas las páginas) ──
