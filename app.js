@@ -1547,8 +1547,12 @@ function teamFull(name) {
 function openTrDrawer(id) {
   const t = trAll.find(x => x._id === id);
   if (!t) return;
+  // Campo CONTRATO del sheet (solo aplica a firmas: agente libre, rookie, renovación/extensión)
+  const contrato = t.contrato ?? t.CONTRATO ?? t.Contrato ?? '';
+  const esFirma = /agente libre|firma contrato rookie|renovaci|extensi/i.test(t.tipo || '');
   const filas = [
     ['Jugador', plLink(t.jugador, t.jugador)],
+    (contrato && esFirma) ? ['Contrato', contrato] : null,
     t.equipo1 ? ['Equipo', teamFull(t.equipo1)] : null,
     t.equipo2 ? ['Segundo equipo', teamFull(t.equipo2)] : null,
     t.otros ? ['Otros jugadores', t.otros] : null,
