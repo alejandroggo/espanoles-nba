@@ -876,6 +876,11 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .jug-dorsals { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .jug-dorsal { display: flex; align-items: center; gap: var(--space-3); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); }
 .jug-dorsal-num { font-family: var(--display); font-size: 1.8rem; color: var(--accent); line-height: 1; }
+.jug-jersey { width: 46px; flex: 0 0 auto; display: block; }
+.jug-jersey .jersey-svg { width: 100%; height: auto; display: block; }
+.jug-jersey .jersey-shape { fill: var(--accent); stroke: var(--accent); }
+.jug-jersey .jersey-trim { stroke: rgba(255,255,255,0.7); }
+.jug-jersey .jersey-num { fill: #fff; stroke: var(--accent); }
 
 /* enlaces de jugador clicables en las tablas */
 .pl-link { color: inherit; text-decoration: none; }

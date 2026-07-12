@@ -1622,6 +1622,7 @@ async function initJugadorPage() {
   el.innerHTML = [
     jugHeader(j),
     jugStats(j),
+    jugGameHighs(j),
     jugTemporadas(j),
     jugPlayoffs(j),
     jugPremios(j),
@@ -1651,20 +1652,37 @@ function jugHeader(j) {
 
 function jugStats(j) {
   if (!(j.partidos > 0)) return '';
+  const gp = j.partidos || 0;
+  const perg = (total) => gp ? total / gp : null;
   const pg = [
     statBox('GP', fmtEnt(j.partidos)), statBox('MIN', fmtDec1(j.min_g)), statBox('PTS', fmtDec1(j.pts_g)),
     statBox('REB', fmtDec1(j.rbd_g)), statBox('AST', fmtDec1(j.ast_g)), statBox('ROB', fmtDec1(j.stl_g)),
-    statBox('TAP', fmtDec1(j.blk_g)), statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
+    statBox('TAP', fmtDec1(j.blk_g)), statBox('3PM', fmtDec1(j.tres_g)),
+    statBox('TOV', fmtDec1(perg(j.tov_total))), statBox('PF', fmtDec1(perg(j.pf_total))),
+    statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
   ].join('');
   const tot = [
     statBox('GP', fmtEnt(j.partidos)),
     statBox('PTS', fmtEnt(j.pts_total)), statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)),
     statBox('ROB', fmtEnt(j.stl_total)), statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
-    statBox('MIN', fmtEnt(j.min_total)), statBox('TOV', fmtEnt(j.tov_total)),
+    statBox('TD', fmtEnt(j.td_total)), statBox('MIN', fmtEnt(j.min_total)),
+    statBox('TOV', fmtEnt(j.tov_total)), statBox('PF', fmtEnt(j.pf_total)),
   ].join('');
   return jugSection('Estadísticas de carrera',
     `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
      <h3 class="jug-subh">Totales</h3><div class="stat-grid">${tot}</div>`);
+}
+
+// Máximos en un solo partido (career highs)
+function jugGameHighs(j) {
+  const g = j.game_highs;
+  if (!g) return '';
+  const boxes = [
+    ['PTS', g.pts], ['REB', g.rbd], ['AST', g.ast], ['ROB', g.stl], ['TAP', g.blk],
+    ['MIN', g.min], ['FGM', g.fgm], ['3PM', g.tres_m], ['FTM', g.ftm], ['TOV', g.tov], ['PF', g.pf],
+  ].filter(([, v]) => v != null).map(([l, v]) => statBox(l, fmtEnt(v))).join('');
+  if (!boxes) return '';
+  return jugSection('Máximos en un partido', `<div class="stat-grid">${boxes}</div>`);
 }
 
 function jugTemporadas(j) {
@@ -1703,10 +1721,12 @@ function jugPlayoffs(j) {
 }
 
 function jugPremios(j) {
-  const p = j.premios || [];
+  const rings = TL_ANILLOS[drNorm(j.nombre)] || {};
+  const champs = Object.keys(rings).map(y => ({ tipo: 'Campeón NBA', year: +y, team: rings[y], notas: 'Anillo NBA' }));
+  const p = [...champs, ...(j.premios || [])];
   if (!p.length) return '';
   const items = [...p].sort((a, b) => (b.year || 0) - (a.year || 0)).map(a => {
-    const hito = a.tipo === 'ROY' || a.tipo === 'DPOY';
+    const hito = a.tipo === 'ROY' || a.tipo === 'DPOY' || /campe/i.test(a.tipo);
     return `<li class="jug-award">
       <span class="jug-award-tipo${hito ? ' jug-award-hito' : ''}">${a.tipo}</span>
       <span class="td-muted">${[a.year, a.team, a.notas].filter(Boolean).join(' · ')}</span>
@@ -1738,7 +1758,7 @@ function jugDorsalesSec(dorsales) {
   const items = Object.keys(byNum).sort((a, b) => a - b).map(num => {
     const stints = byNum[num].sort((a, b) => (a.desde || 0) - (b.desde || 0))
       .map(d => `<span class="dp-team"><span class="dp-team-code">${d.team || '—'}</span><span class="dp-team-yrs">${drPeriodo(d.desde, d.hasta)}</span></span>`).join('');
-    return `<li class="jug-dorsal"><span class="jug-dorsal-num">${num}</span><div class="dp-teams">${stints}</div></li>`;
+    return `<li class="jug-dorsal"><span class="jug-jersey">${jerseySvg(num)}</span><div class="dp-teams">${stints}</div></li>`;
   }).join('');
   return jugSection('Dorsales', `<ul class="jug-dorsals">${items}</ul>`);
 }
@@ -1756,10 +1776,9 @@ function jugTransSec(trans) {
     <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
     <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
     <td class="td-center">${t.equipo1 || '—'}</td><td class="td-center">${t.equipo2 || '—'}</td>
-    <td class="td-muted">${t.otros || '—'}</td><td class="td-muted">${t.notas || '—'}</td>
   </tr>`).join('');
   return jugSection('Transacciones',
-    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th><th>Otros</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Fecha</th><th>Tipo</th><th class="td-center">Equipo</th><th class="td-center">Equipo 2</th></tr></thead><tbody>${rows}</tbody></table></div>`);
 }
 
 // ══════════════════════════════════════════════
