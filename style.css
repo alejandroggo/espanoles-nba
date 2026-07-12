@@ -860,7 +860,7 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 :root[data-theme="dark"] tr.tmp-cut td { background: rgba(217,119,6,0.16); }
 
 /* Leyenda */
-.tmp-legend { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; max-width: var(--maxw); margin: 0 auto var(--space-3); padding: 0 var(--space-6); font-size: var(--font-xs); color: var(--text-muted); }
+.tmp-legend { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; justify-content: flex-start; max-width: 1400px; margin: 0 auto var(--space-3); padding: 0 var(--space-6); font-size: var(--font-xs); color: var(--text-muted); }
 .tmp-lg { display: inline-flex; align-items: center; gap: 6px; }
 .tmp-sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: inline-block; }
 .tmp-sw-total { background: var(--surface-2); }
@@ -1178,7 +1178,7 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .cmp-cell.b { align-items: flex-start; }
 .cmp-val { font-variant-numeric: tabular-nums; font-weight: 700; font-size: var(--font-md); color: var(--text-muted); }
 .cmp-val.win { color: var(--text); }
-.cmp-metric { text-align: center; font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.cmp-metric { text-align: center; font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--text); }
 .cmp-bar { width: 100%; max-width: 170px; height: 6px; display: flex; }
 .cmp-bar.a { justify-content: flex-end; }
 .cmp-bar.b { justify-content: flex-start; }

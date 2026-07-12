@@ -2749,11 +2749,24 @@ function cmpPremios(j, filter) {
   const p = j.premios || [];
   return (filter ? p.filter(filter).length : p.length) || null;
 }
+
+// Lista de premios del jugador (incluye anillos), filtrada al periodo activo del lado
+function cmpPremiosList(j, side) {
+  const rings = TL_ANILLOS[drNorm(j.nombre)] || {};
+  const champs = Object.keys(rings).map(y => ({ tipo: 'Campeón NBA', year: +y }));
+  let list = [...champs, ...(j.premios || [])];
+  if (cmpMode === 'same') list = list.filter(p => p.year === cmpSame);
+  else if (cmpMode === 'diff') {
+    const st = cmpState[side], lo = st.from, hi = st.to;
+    if (lo || hi) list = list.filter(p => p.year && (!lo || p.year >= lo) && (!hi || p.year <= hi));
+  }
+  return list;
+}
 function cmpPoSeasons(j) { return (j.playoffs_temporadas || []).filter(t => t && (t.year || t.g)).length || null; }
 function cmpPoGames(j) { return (j.playoffs_temporadas || []).reduce((s, t) => s + (t.g || 0), 0) || null; }
 
 const CMP_SECTIONS = [
-  { title: 'Trayectoria', rows: [
+  { title: 'Trayectoria', career: true, rows: [
     { label: 'Temporadas',        get: j => cmpSeasons(j).length || j.temporadas || null, fmt: fmtEnt, dir: 'high' },
     { label: 'Partidos',          get: j => j.partidos ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
@@ -2786,23 +2799,32 @@ const CMP_SECTIONS = [
     { label: 'Pérdidas',       get: j => j.tov_total ?? null, fmt: fmtEnt, dir: 'low', bar: true },
     { label: 'Faltas',         get: j => j.pf_total ?? null, fmt: fmtEnt, dir: 'low', bar: true },
   ]},
-  { title: 'Máximos en un partido', when: (a, b) => a.game_highs || b.game_highs, rows: [
+  { title: 'Máximos en un partido', career: true, when: (a, b) => a.game_highs || b.game_highs, rows: [
     { label: 'Puntos',      get: j => j.game_highs && j.game_highs.pts, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Rebotes',     get: j => j.game_highs && j.game_highs.rbd, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Asistencias', get: j => j.game_highs && j.game_highs.ast, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Robos',       get: j => j.game_highs && j.game_highs.stl, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Tapones',     get: j => j.game_highs && j.game_highs.blk, fmt: fmtEnt, dir: 'high', bar: true },
   ]},
-  { title: 'Premios', when: (a, b) => (a.premios || []).length || (b.premios || []).length, rows: [
+  { title: 'Premios', premios: true, when: (a, b) => (a.premios || []).length || (b.premios || []).length || TL_ANILLOS[drNorm(a.nombre)] || TL_ANILLOS[drNorm(b.nombre)], rows: [
+    { label: 'Anillos NBA',     get: j => cmpPremios(j, p => /campe/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Premios (total)', get: j => (j.premios || []).length || null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'All-Star',        get: j => cmpPremios(j, p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'All-NBA / Defense', get: j => cmpPremios(j, p => /all[\s-]?(nba|defense)/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'All-NBA',         get: j => cmpPremios(j, p => /all[\s-]?nba/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'All-Defense',     get: j => cmpPremios(j, p => /all[\s-]?defense|defensiv/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'MVP (votos)',     get: j => cmpPremios(j, p => /mvp/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'ROY',             get: j => cmpPremios(j, p => /\broy\b|rookie of the year/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'DPOY',            get: j => cmpPremios(j, p => /dpoy|defensive player/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'All-Rookie',      get: j => cmpPremios(j, p => /all[\s-]?rookie/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'Jugador del Mes', get: j => cmpPremios(j, p => /player of the month/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'Rookie del Mes',  get: j => cmpPremios(j, p => /rookie of the month/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'Rising Stars',    get: j => cmpPremios(j, p => /rising stars/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
   ]},
-  { title: 'Dinero', when: (a, b) => a.ganancias || b.ganancias, rows: [
+  { title: 'Dinero', career: true, when: (a, b) => a.ganancias || b.ganancias, rows: [
     { label: 'Ganancias', get: j => j.ganancias || null, fmt: fmtDinero, dir: 'high', bar: true },
     { label: '$ por partido', get: j => (j.ganancias_ganado && j.partidos) ? j.ganancias_ganado / j.partidos : ((j.ganancias && j.partidos) ? j.ganancias / j.partidos : null), fmt: fmtDinero, dir: 'high', bar: true },
   ]},
-  { title: 'Playoffs', when: (a, b) => cmpPoSeasons(a) || cmpPoSeasons(b), rows: [
+  { title: 'Playoffs', career: true, when: (a, b) => cmpPoSeasons(a) || cmpPoSeasons(b), rows: [
     { label: 'Temporadas de playoffs', get: j => cmpPoSeasons(j), fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Partidos de playoffs',   get: j => cmpPoGames(j), fmt: fmtEnt, dir: 'high', bar: true },
   ]},
@@ -2825,7 +2847,7 @@ function cmpRow(row, A, B) {
     barA = `<div class="cmp-bar a"><span class="cmp-fill${winA ? ' win' : ''}" style="width:${Math.round(Math.abs(nA) / mx * 100)}%"></span></div>`;
     barB = `<div class="cmp-bar b"><span class="cmp-fill${winB ? ' win' : ''}" style="width:${Math.round(Math.abs(nB) / mx * 100)}%"></span></div>`;
   }
-  return { winA, winB, html: `<div class="cmp-row">
+  return { winA, winB, empty: (vA == null && vB == null), html: `<div class="cmp-row">
     <div class="cmp-cell a"><div class="cmp-val a${winA ? ' win' : ''}">${fA}</div>${barA}</div>
     <div class="cmp-metric">${row.label}</div>
     <div class="cmp-cell b"><div class="cmp-val b${winB ? ' win' : ''}">${fB}</div>${barB}</div>
@@ -2901,16 +2923,24 @@ function cmpRangeUI(side, j, agg) {
 
 function cmpRender(A, B) {
   const aggA = cmpAggFor('a', A), aggB = cmpAggFor('b', B);
+  const premA = { nombre: A.nombre, premios: cmpPremiosList(A, 'a') };
+  const premB = { nombre: B.nombre, premios: cmpPremiosList(B, 'b') };
   let scoreA = 0, scoreB = 0;
-  const ranged = cmpMode !== 'career';
+  const partial = cmpMode !== 'career';
   const noteLbl = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : 'sin datos') : 'rango elegido';
-  const sections = CMP_SECTIONS.filter(s => !s.when || s.when(A, B)).map(s => {
-    const dA = s.ranged ? aggA : A, dB = s.ranged ? aggB : B;
-    const rows = s.rows.map(r => cmpRow(r, dA, dB));
-    rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
-    const note = (s.ranged && ranged) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
-    return `<details class="cmp-section" open><summary class="cmp-sec-title">${s.title}${note}</summary>${rows.map(r => r.html).join('')}</details>`;
-  }).join('');
+  const sections = CMP_SECTIONS
+    .filter(s => !s.when || s.when(A, B))
+    .filter(s => !(partial && s.career))          // en modo parcial se ocultan las secciones de carrera
+    .map(s => {
+      const dA = s.premios ? premA : (s.ranged ? aggA : A);
+      const dB = s.premios ? premB : (s.ranged ? aggB : B);
+      let rows = s.rows.map(r => cmpRow(r, dA, dB));
+      if (s.premios) rows = rows.filter(r => !r.empty);   // ocultar premios sin datos en ninguno
+      if (!rows.length) return '';
+      rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
+      const note = ((s.ranged || s.premios) && partial) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
+      return `<details class="cmp-section" open><summary class="cmp-sec-title">${s.title}${note}</summary>${rows.map(r => r.html).join('')}</details>`;
+    }).join('');
 
   const head = `<div class="cmp-head">
     <div class="cmp-side">${cmpCard(A, 'a')}${cmpRangeUI('a', A, aggA)}</div>
