@@ -1343,6 +1343,7 @@ let trSortAsc = false;
 let trSearch = '';
 let trTipo = '';
 let trYear = '';
+let trNatural = false;   // ordenar por fecha del año natural (ignora el año)
 
 const TR_COLS = [
   { key: 'rank',    label: '#',        sortable: false, cls: 'td-rank' },
@@ -1466,10 +1467,16 @@ function renderTrTable() {
     return true;
   });
 
-  rows.sort((a, b) => {
-    const va = String(a[trSortCol] || ''), vb = String(b[trSortCol] || '');
-    return trSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-  });
+  if (trNatural) {
+    // De 1 de enero a 31 de diciembre, ignorando el año (desempate por año)
+    const md = iso => String(iso || '').slice(5, 10);      // "MM-DD"
+    rows.sort((a, b) => md(a.fecha).localeCompare(md(b.fecha)) || String(a.fecha).localeCompare(String(b.fecha)));
+  } else {
+    rows.sort((a, b) => {
+      const va = String(a[trSortCol] || ''), vb = String(b[trSortCol] || '');
+      return trSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
 
   document.getElementById('tr-count').textContent = `${rows.length} movimiento${rows.length === 1 ? '' : 's'}`;
 
@@ -1491,15 +1498,26 @@ function renderTrTable() {
       <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
       <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, t.jugador)}</td>
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
-      <td class="td-center">${teamAbbr(t.equipo1)}</td>
-      <td class="td-center">${teamAbbr(t.equipo2)}</td>
+      <td class="td-center">${t.equipo1 || '—'}</td>
+      <td class="td-center">${t.equipo2 || '—'}</td>
       <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
 function sortTr(col) {
+  trNatural = false;                                        // volver al orden por columna
+  const nb = document.getElementById('tr-natural');
+  if (nb) { nb.classList.remove('active'); nb.setAttribute('aria-pressed', 'false'); }
   if (trSortCol === col) trSortAsc = !trSortAsc;
   else { trSortCol = col; trSortAsc = (col === 'jugador' || col === 'tipo'); }
+  renderTrTable();
+}
+
+function toggleTrNatural() {
+  trNatural = !trNatural;
+  const nb = document.getElementById('tr-natural');
+  nb.classList.toggle('active', trNatural);
+  nb.setAttribute('aria-pressed', String(trNatural));
   renderTrTable();
 }
 
