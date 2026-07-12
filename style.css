@@ -907,6 +907,10 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .jug-award-hito { color: var(--dorado); }
 .jug-seas-switch { margin-bottom: var(--space-3); }
 
+/* Enlace externo a Basketball Reference */
+.jug-bref { display: inline-block; margin-top: var(--space-3); font-size: var(--font-sm); font-weight: 600; color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+.jug-bref:hover { border-bottom-color: var(--accent); }
+
 /* Enlaces cruzados del perfil */
 .jug-xlinks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 auto var(--space-8); max-width: 1400px; padding: 0 var(--space-6); }
 .jug-xlinks-lbl { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: var(--space-1); }

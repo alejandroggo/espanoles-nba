@@ -1728,11 +1728,15 @@ function jugHeader(j) {
   pills.push(j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'} ${j.draft_equipo || ''}`.trim() : 'No drafteado');
   if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut: ' + j.primer_partido.fecha);
   if (j.equipos_nba) pills.push('Equipos: ' + j.equipos_nba);
+  const bref = j.bref_id
+    ? `<a class="jug-bref" href="https://www.basketball-reference.com/players/${j.bref_id[0]}/${j.bref_id}.html" target="_blank" rel="noopener noreferrer">Ver perfil en Basketball Reference<span aria-hidden="true"> ↗</span></a>`
+    : '';
   return `<header class="jug-header">
     ${jugPhoto(j, 'jug-photo--big')}
     <div class="jug-headinfo">
       <h1 class="jug-name">${j.nombre}</h1>
       <div class="jug-pills">${pills.map(p => `<span class="jug-pill">${p}</span>`).join('')}</div>
+      ${bref}
     </div>
   </header>`;
 }
