@@ -1096,6 +1096,8 @@ async function initRankingPage() {
 
   renderRkKpis();
   document.getElementById('rk-search').addEventListener('input', e => { rkSearch = e.target.value.trim().toLowerCase(); renderRkTable(); });
+  const rkQ = new URLSearchParams(location.search).get('q');
+  if (rkQ) { rkSearch = rkQ.trim().toLowerCase(); document.getElementById('rk-search').value = rkQ; }
   renderRkTable();
 }
 
@@ -1506,6 +1508,8 @@ async function initTransaccionesPage() {
   document.getElementById('tr-search').addEventListener('input', e => { trSearch = e.target.value.trim().toLowerCase(); renderTrTable(); });
   document.getElementById('tr-tipo').addEventListener('change', e => { trTipo = e.target.value; renderTrTable(); });
   document.getElementById('tr-year').addEventListener('change', e => { trYear = e.target.value; renderTrTable(); });
+  const trQ = new URLSearchParams(location.search).get('q');
+  if (trQ) { trSearch = trQ.trim().toLowerCase(); document.getElementById('tr-search').value = trQ; }
   renderTrTable();
 
   // Abrir el detalle si la URL trae ?tx=ID
@@ -1664,6 +1668,21 @@ function jugPhoto(j, cls) {
 function jugSection(title, body) {
   return `<section class="jug-section"><h2 class="section-title">${title}</h2>${body}</section>`;
 }
+
+// Enlaces cruzados: ver a este jugador en las demás secciones (con su fila ya filtrada/resaltada)
+function jugCrossLinks(j, trans) {
+  const enc = encodeURIComponent(j.nombre);
+  const links = [];
+  if ((j.partidos || 0) > 0) links.push(['Carrera', `ranking.html?q=${enc}`]);
+  if ((j.temporadas_data || []).some(t => t.year)) {
+    links.push(['Temporadas', `temporadas.html?q=${enc}`]);
+    links.push(['Línea temporal', `linea-temporal.html?focus=${j.id}`]);
+  }
+  if ((trans || []).length) links.push(['Transacciones', `transacciones.html?q=${enc}`]);
+  links.push(['Comparar', `comparador.html?a=${j.id}`]);
+  const items = links.map(([l, h]) => `<a class="jug-xlink" href="${h}">${l}</a>`).join('');
+  return `<nav class="jug-xlinks" aria-label="Ver en otras secciones"><span class="jug-xlinks-lbl">Ver también en</span>${items}</nav>`;
+}
 function statBox(label, val) {
   return `<div class="stat-box"><div class="stat-box-val">${val}</div><div class="stat-box-lbl">${label}</div></div>`;
 }
@@ -1688,6 +1707,7 @@ async function initJugadorPage() {
 
   el.innerHTML = [
     jugHeader(j),
+    jugCrossLinks(j, trans),
     jugStats(j),
     jugGameHighs(j),
     jugTemporadas(j),
@@ -2698,6 +2718,10 @@ async function initLineaTemporalPage() {
   body.addEventListener('mouseover', e => { const el = e.target.closest('[data-team]'); tlFocusTeam(el ? el.getAttribute('data-team') : null); });
   body.addEventListener('mouseleave', () => tlFocusTeam(null));
 
+  // Resaltar la fila de un jugador si se llega con ?focus=<id>
+  const focus = new URLSearchParams(location.search).get('focus');
+  if (focus) requestAnimationFrame(() => tlFocusRow(focus));
+
   // Barra de scroll horizontal también arriba, sincronizada con la tabla
   const wrap = document.getElementById('tl-wrap'), top = document.getElementById('tl-topscroll');
   if (wrap && top) {
@@ -2708,6 +2732,15 @@ async function initLineaTemporalPage() {
   }
 
   renderTimeline();
+}
+
+// Resalta y centra la fila de un jugador (llegada desde su ficha)
+function tlFocusRow(id) {
+  document.querySelectorAll('#tl-body tr.tl-focusrow').forEach(r => r.classList.remove('tl-focusrow'));
+  const row = document.querySelector(`#tl-body tr[data-pid="${id}"]`);
+  if (!row) return;
+  row.classList.add('tl-focusrow');
+  row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // Iguala el ancho del scroll superior al de la tabla
@@ -2800,7 +2833,7 @@ function renderTimeline() {
       cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" data-c0="${i}" data-c1="${i + span - 1}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
       i += span;
     }
-    return `<tr>
+    return `<tr data-pid="${p.j.id || ''}">
       <th scope="row" class="tl-name"><span class="tl-namewrap">${tlFace(p)}${p.j.id ? `<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>` : `<span class="tl-pname">${p.j.nombre}</span>`}</span></th>
       <td class="tl-debut">${p._debut || tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
@@ -3444,6 +3477,8 @@ async function initTemporadasPage() {
   document.getElementById('tmp-search').addEventListener('input', e => { tmpSearch = e.target.value.trim().toLowerCase(); renderTmpTable(); });
   teamSel.addEventListener('change', e => { tmpFilterTeam = e.target.value; updateUrlParam('equipo', tmpFilterTeam); renderTmpTable(); });
   yearSel.addEventListener('change', e => { tmpFilterYear = e.target.value; updateUrlParam('anio', tmpFilterYear); renderTmpTable(); });
+  const tmpQ = new URLSearchParams(location.search).get('q');
+  if (tmpQ) { tmpSearch = tmpQ.trim().toLowerCase(); document.getElementById('tmp-search').value = tmpQ; }
 
   renderTmpTable();
 }

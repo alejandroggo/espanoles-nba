@@ -906,6 +906,16 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .jug-award-tipo { font-weight: 700; min-width: 120px; }
 .jug-award-hito { color: var(--dorado); }
 .jug-seas-switch { margin-bottom: var(--space-3); }
+
+/* Enlaces cruzados del perfil */
+.jug-xlinks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 auto var(--space-8); max-width: 1400px; padding: 0 var(--space-6); }
+.jug-xlinks-lbl { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: var(--space-1); }
+.jug-xlink { font-size: var(--font-sm); padding: var(--space-1) var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-full); color: var(--text); text-decoration: none; transition: border-color var(--transition), color var(--transition), background var(--transition); }
+.jug-xlink:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+/* Fila resaltada al llegar desde la ficha (?focus=) */
+#tl-body tr.tl-focusrow > * { box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+#tl-body tr.tl-focusrow .tl-name { background: var(--accent-light); }
 .jug-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-sm); }
 
 .jug-dorsals { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3); }
