@@ -849,6 +849,8 @@ tr.season-tot td { font-weight: 600; }
 /* Página Temporadas: traspasos (fila total + tramos parciales) */
 .tmp-parcial { display: inline-block; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); background: var(--accent-soft, rgba(185,28,28,0.10)); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 0 6px; margin-left: 4px; vertical-align: middle; }
 .tmp-total-badge { display: inline-block; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: transparent; border: 1px solid var(--border-strong); border-radius: var(--radius-full); padding: 0 6px; margin-left: 4px; vertical-align: middle; }
+.tmp-cortado { display: inline-block; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #92400e; background: rgba(217,119,6,0.14); border: 1px solid rgba(217,119,6,0.35); border-radius: var(--radius-full); padding: 0 6px; margin-left: 4px; vertical-align: middle; white-space: nowrap; }
+:root[data-theme="dark"] .tmp-cortado { color: #fbbf24; background: rgba(217,119,6,0.18); border-color: rgba(217,119,6,0.45); }
 tr.tmp-total td { font-weight: 600; }
 tr.tmp-partial td { background: var(--surface-2); }
 

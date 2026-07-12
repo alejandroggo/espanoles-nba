@@ -2918,7 +2918,7 @@ function cmpSwap() {
 // ══════════════════════════════════════════════
 let tmpRows = [], tmpMode = 'total';
 let tmpSortCol = 'year', tmpSortAsc = false;
-let tmpFilterTeam = '', tmpFilterYear = '', tmpSearch = '';
+let tmpFilterTeam = '', tmpFilterYear = '', tmpSearch = '', tmpHidePartials = false;
 
 // Estadísticas por partido; en 'total' se multiplican por los partidos (salvo
 // TD, que ya es un conteo de temporada). Los porcentajes solo en 'por partido'.
@@ -2943,9 +2943,16 @@ function tmpStatCols() {
   return cols;
 }
 
+// ¿El jugador fue cortado (waived) a mitad de esa temporada? (lista de la Línea temporal)
+function tmpIsCut(nombre, year) {
+  const e = TL_ESTADO[drNorm(nombre)];
+  const v = e && e[year];
+  return v === 'cut' || v === 'tw-cut';
+}
+
 // Aplana todas las temporadas. En un año con traspaso muestra la fila TOT
 // (total de la temporada) y, debajo, cada tramo parcial por equipo. Marca la
-// fila total y las parciales; teamCode solo lo llevan los tramos reales.
+// fila total, las parciales y las temporadas cortadas (waived → media).
 function tmpBuild(jugadores) {
   const rows = [];
   (jugadores || []).forEach(j => {
@@ -2955,9 +2962,9 @@ function tmpBuild(jugadores) {
       const arr = byYear[y];
       const tot = arr.find(t => String(t.team || '').toUpperCase() === 'TOT');
       const teams = arr.filter(t => String(t.team || '').toUpperCase() !== 'TOT').sort((a, b) => (b.g || 0) - (a.g || 0));
-      const traded = !!tot;
-      if (tot) rows.push({ id: j.id, jugador: j.nombre, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0 });
-      teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1 }));
+      const traded = !!tot, cut = tmpIsCut(j.nombre, +y);
+      if (tot) rows.push({ id: j.id, jugador: j.nombre, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0, cut: false });
+      teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1, cut }));
     });
   });
   return rows;
@@ -2986,7 +2993,8 @@ function renderTmpTable() {
   let rows = tmpRows.filter(r =>
     (!tmpSearch || r.jugador.toLowerCase().includes(tmpSearch)) &&
     (!tmpFilterTeam || r.teamCode === tmpFilterTeam) &&
-    (!tmpFilterYear || r.year === +tmpFilterYear));
+    (!tmpFilterYear || r.year === +tmpFilterYear) &&
+    !(tmpHidePartials && r.kind === 'partial'));
 
   const dir = tmpSortAsc ? 1 : -1;
   rows.sort((a, b) => {
@@ -3013,9 +3021,10 @@ function renderTmpTable() {
       return `<td class="td-num${hl}">${v == null ? '—' : c.fmt(v)}</td>`;
     }).join('');
     let teamCell = r.team, cls = '';
-    if (r.kind === 'total') { teamCell = `${r.team} <span class="tmp-total-badge" title="Total de la temporada (${r.nEq} equipos)">total</span>`; cls = 'tmp-total'; }
+    if (r.kind === 'total') { teamCell = `<span class="tmp-total-badge" title="Total de la temporada · ${r.team} (${r.nEq} equipos)">Total</span>`; cls = 'tmp-total'; }
     else if (r.kind === 'partial') { teamCell = `${r.team} <span class="tmp-parcial" title="Temporada parcial: jugó en ${r.nEq} equipos ese año">parcial</span>`; cls = 'tmp-partial'; }
-    return `<tr class="${cls}">
+    if (r.cut) { teamCell += ` <span class="tmp-cortado" title="Cortado (waived) a mitad de temporada — cuenta como media">cortado · ½</span>`; cls += ' tmp-cut'; }
+    return `<tr class="${cls.trim()}">
       <td class="td-nombre">${plLink(r.jugador, r.jugador)}</td>
       <td class="td-center">${drSeason(r.year)}</td>
       <td class="td-center">${teamCell}</td>
@@ -3023,6 +3032,16 @@ function renderTmpTable() {
       ${statCells}
     </tr>`;
   }).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
+}
+
+function toggleTmpPartials() {
+  tmpHidePartials = !tmpHidePartials;
+  const btn = document.getElementById('tmp-hide');
+  btn.classList.toggle('active', tmpHidePartials);
+  btn.setAttribute('aria-pressed', String(tmpHidePartials));
+  btn.textContent = tmpHidePartials ? 'Mostrar parciales' : 'Ocultar parciales';
+  updateUrlParam('parciales', tmpHidePartials ? 'off' : '');
+  renderTmpTable();
 }
 
 function sortTmp(col) {
@@ -3058,8 +3077,9 @@ async function initTemporadasPage() {
 
   const players = new Set(tmpRows.map(r => r.id));
   const seasons = new Set(tmpRows.map(r => r.id + ':' + r.year));  // una temporada-jugador (el traspaso cuenta como 1)
-  const traded = tmpRows.filter(r => r.kind === 'total').length;
-  document.getElementById('hero-sub').textContent = `${seasons.size} temporadas de ${players.size} españoles · ${traded} con traspaso (con su total y sus parciales)`;
+  const cutSeasons = new Set(tmpRows.filter(r => r.cut).map(r => r.id + ':' + r.year));  // cortes = media
+  const efec = (seasons.size - 0.5 * cutSeasons.size).toLocaleString('es-ES');
+  document.getElementById('hero-sub').textContent = `${efec} temporadas de ${players.size} españoles · los traspasos cuentan 1 y los cortes ½ (${cutSeasons.size})`;
 
   // Poblar filtros (equipos: solo códigos reales, no las filas TOT)
   const teams = [...new Set(tmpRows.filter(r => r.teamCode).map(r => r.teamCode))].sort();
@@ -3072,6 +3092,11 @@ async function initTemporadasPage() {
   if (params.get('modo') === 'pg') { tmpMode = 'pg'; tmpSortCol = 'pts_g'; tmpSyncModeButtons(); }
   if (params.get('equipo') && teams.includes(params.get('equipo'))) { tmpFilterTeam = params.get('equipo'); teamSel.value = tmpFilterTeam; }
   if (params.get('anio') && years.includes(+params.get('anio'))) { tmpFilterYear = params.get('anio'); yearSel.value = tmpFilterYear; }
+  if (params.get('parciales') === 'off') {
+    tmpHidePartials = true;
+    const hb = document.getElementById('tmp-hide');
+    hb.classList.add('active'); hb.setAttribute('aria-pressed', 'true'); hb.textContent = 'Mostrar parciales';
+  }
 
   document.getElementById('tmp-search').addEventListener('input', e => { tmpSearch = e.target.value.trim().toLowerCase(); renderTmpTable(); });
   teamSel.addEventListener('change', e => { tmpFilterTeam = e.target.value; updateUrlParam('equipo', tmpFilterTeam); renderTmpTable(); });
