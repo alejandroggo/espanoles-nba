@@ -1721,10 +1721,47 @@ async function initJugadorPage() {
   ].filter(Boolean).join('');
 }
 
+// Datos biográficos (mantenidos a mano — corregir aquí). Clave: nombre normalizado (drNorm)
+const BIO = {
+  'pau gasol':            { altura: '2,16 m', peso: '109 kg', origen: 'Barcelona' },
+  'marc gasol':           { altura: '2,11 m', peso: '116 kg', origen: 'Barcelona' },
+  'nikola mirotic':       { altura: '2,08 m', peso: '101 kg', origen: 'Podgorica (Montenegro)' },
+  'serge ibaka':          { altura: '2,08 m', peso: '107 kg', origen: 'Brazzaville (Rep. del Congo)' },
+  'juan carlos navarro':  { altura: '1,93 m', peso: '80 kg',  origen: 'Sant Feliu de Llobregat (Barcelona)' },
+  'ricky rubio':          { altura: '1,88 m', peso: '86 kg',  origen: 'El Masnou (Barcelona)' },
+  'santi aldama':         { altura: '2,13 m', peso: '98 kg',  origen: 'Las Palmas de Gran Canaria' },
+  'rudy fernandez':       { altura: '1,96 m', peso: '82 kg',  origen: 'Palma de Mallorca' },
+  'jose m. calderon':     { altura: '1,91 m', peso: '91 kg',  origen: 'Villanueva de la Serena (Badajoz)' },
+  'jorge garbajosa':      { altura: '2,06 m', peso: '104 kg', origen: 'Torrejón de Ardoz (Madrid)' },
+  'willy hernangomez':    { altura: '2,11 m', peso: '113 kg', origen: 'Madrid' },
+  'raul lopez':           { altura: '1,83 m', peso: '75 kg',  origen: 'Vic (Barcelona)' },
+  'alex abrines':         { altura: '1,98 m', peso: '91 kg',  origen: 'Palma de Mallorca' },
+  'juancho hernangomez':  { altura: '2,06 m', peso: '97 kg',  origen: 'Madrid' },
+  'sergio rodriguez':     { altura: '1,91 m', peso: '80 kg',  origen: 'San Cristóbal de La Laguna (Tenerife)' },
+  'hugo gonzalez':        { altura: '1,98 m', peso: '93 kg',  origen: 'Madrid' },
+  'victor claver':        { altura: '2,06 m', peso: '102 kg', origen: 'Valencia' },
+  'usman garuba':         { altura: '2,03 m', peso: '104 kg', origen: 'Azuqueca de Henares (Guadalajara)' },
+  'fernando martin':      { altura: '2,05 m', peso: '104 kg', origen: 'Madrid' },
+  'baba miller':          { altura: '2,11 m', peso: '98 kg',  origen: 'Palma de Mallorca' },
+  'sergio de larrea':     { altura: '1,98 m', peso: '87 kg',  origen: 'Valladolid' },
+  'aday mara':            { altura: '2,21 m', peso: '111 kg', origen: 'Zaragoza' },
+  'jose a. montero':      { altura: '1,88 m',                 origen: 'Barcelona' },
+  'roberto duenas':       { altura: '2,21 m', peso: '137 kg', origen: 'Madrid' },
+  'albert miralles':      { altura: '2,08 m', peso: '105 kg', origen: 'Barcelona' },
+  'fran vazquez':         { altura: '2,07 m', peso: '98 kg',  origen: 'Chantada (Lugo)' },
+  'sergio llull':         { altura: '1,90 m', peso: '86 kg',  origen: 'Mahón (Menorca)' },
+  'dani diez':            { altura: '2,02 m', peso: '96 kg',  origen: 'Madrid' },
+  'juan nunez':           { altura: '1,93 m', peso: '91 kg',  origen: 'Madrid' },
+};
+
 function jugHeader(j) {
   const pills = [];
   const nac = j.nacimiento_fecha || j.nacimiento;
+  const bio = BIO[drNorm(j.nombre)] || {};
   if (nac) pills.push('Nacido: ' + nac);
+  const fisico = [bio.altura, bio.peso].filter(Boolean).join(' · ');
+  if (fisico) pills.push(fisico);
+  if (bio.origen) pills.push('Origen: ' + bio.origen);
   pills.push(j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'} ${j.draft_equipo || ''}`.trim() : 'No drafteado');
   if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut: ' + j.primer_partido.fecha);
   if (j.equipos_nba) pills.push('Equipos: ' + j.equipos_nba);
@@ -2722,6 +2759,13 @@ async function initLineaTemporalPage() {
   body.addEventListener('mouseover', e => { const el = e.target.closest('[data-team]'); tlFocusTeam(el ? el.getAttribute('data-team') : null); });
   body.addEventListener('mouseleave', () => tlFocusTeam(null));
 
+  // Clic en una fila → fijar/desfijar el resaltado de ese jugador (los enlaces siguen funcionando)
+  body.addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    const row = e.target.closest('tr');
+    if (row) row.classList.toggle('tl-focusrow');
+  });
+
   // Clic en una fila → fija/quita el resaltado del jugador (sin robar el clic a su enlace)
   body.addEventListener('click', e => {
     if (e.target.closest('a, button')) return;
@@ -2894,11 +2938,20 @@ let cmpAll = [];
 // para los dos) o 'diff' (rangos distintos para cada jugador).
 let cmpMode = 'career';
 let cmpSame = null;                                   // año elegido en modo 'same'
-let cmpState = { a: { id: null, from: null, to: null }, b: { id: null, from: null, to: null } };
-// Temporadas que ambos jugadores disputaron (para 'misma temporada')
-function cmpCommon(A, B) {
-  const sb = new Set(cmpSeasons(B));
-  return cmpSeasons(A).filter(y => sb.has(y));
+let cmpState = { a: { id: null, from: null, to: null }, b: { id: null, from: null, to: null }, c: { id: null, from: null, to: null } };
+
+// Lados activos: A y B siempre; C solo si hay tercer jugador elegido
+function cmpSides() {
+  const c = document.getElementById('cmp-c');
+  return (c && c.value) ? ['a', 'b', 'c'] : ['a', 'b'];
+}
+function cmpPlayers() { return cmpSides().map(s => cmpCur(s)).filter(Boolean); }
+
+// Temporadas que TODOS los jugadores activos disputaron (para 'misma temporada')
+function cmpCommon(players) {
+  const list = players.filter(Boolean);
+  if (!list.length) return [];
+  return list.map(cmpSeasons).reduce((acc, ys) => { const s = new Set(ys); return acc.filter(y => s.has(y)); });
 }
 
 // Una fila por temporada (prefiere TOT en años con traspaso)
@@ -3046,28 +3099,35 @@ const CMP_SECTIONS = [
   ]},
 ];
 
-function cmpRow(row, A, B) {
-  const vA = row.get(A), vB = row.get(B);
-  const nA = typeof vA === 'number' ? vA : null;
-  const nB = typeof vB === 'number' ? vB : null;
-  let winA = false, winB = false;
-  if (row.dir !== 'neutral' && nA != null && nB != null && nA !== nB) {
-    if (row.dir === 'low') { winA = nA < nB; winB = nB < nA; }
-    else { winA = nA > nB; winB = nB > nA; }
+// Compara una fila entre N jugadores (2 o 3). Gana el mejor si es único.
+function cmpRow(row, datas) {
+  const vals = datas.map(d => row.get(d));
+  const nums = vals.map(v => (typeof v === 'number' ? v : null));
+  let wins = datas.map(() => false);
+  const present = nums.filter(n => n != null);
+  if (row.dir !== 'neutral' && present.length >= 2) {
+    const best = row.dir === 'low' ? Math.min(...present) : Math.max(...present);
+    if (present.filter(n => n === best).length === 1) wins = nums.map(n => n === best);
   }
-  const fA = vA == null ? '—' : row.fmt(vA);
-  const fB = vB == null ? '—' : row.fmt(vB);
-  let barA = '', barB = '';
-  if (row.bar && nA != null && nB != null) {
-    const mx = Math.max(Math.abs(nA), Math.abs(nB)) || 1;
-    barA = `<div class="cmp-bar a"><span class="cmp-fill${winA ? ' win' : ''}" style="width:${Math.round(Math.abs(nA) / mx * 100)}%"></span></div>`;
-    barB = `<div class="cmp-bar b"><span class="cmp-fill${winB ? ' win' : ''}" style="width:${Math.round(Math.abs(nB) / mx * 100)}%"></span></div>`;
+  const fmts = vals.map(v => (v == null ? '—' : row.fmt(v)));
+  const mx = Math.max(...present.map(Math.abs), 0) || 1;
+  const bar = i => (row.bar && nums[i] != null && present.length >= 2)
+    ? `<div class="cmp-bar"><span class="cmp-fill${wins[i] ? ' win' : ''}" style="width:${Math.round(Math.abs(nums[i]) / mx * 100)}%"></span></div>` : '';
+
+  let html;
+  if (datas.length === 2) {
+    html = `<div class="cmp-row">
+      <div class="cmp-cell a"><div class="cmp-val a${wins[0] ? ' win' : ''}">${fmts[0]}</div>${bar(0)}</div>
+      <div class="cmp-metric">${row.label}</div>
+      <div class="cmp-cell b"><div class="cmp-val b${wins[1] ? ' win' : ''}">${fmts[1]}</div>${bar(1)}</div>
+    </div>`;
+  } else {
+    html = `<div class="cmp-row3">
+      <div class="cmp-metric cmp-metric--left">${row.label}</div>
+      ${datas.map((_, i) => `<div class="cmp-cell3"><div class="cmp-val${wins[i] ? ' win' : ''}">${fmts[i]}</div>${bar(i)}</div>`).join('')}
+    </div>`;
   }
-  return { winA, winB, empty: (vA == null && vB == null), html: `<div class="cmp-row">
-    <div class="cmp-cell a"><div class="cmp-val a${winA ? ' win' : ''}">${fA}</div>${barA}</div>
-    <div class="cmp-metric">${row.label}</div>
-    <div class="cmp-cell b"><div class="cmp-val b${winB ? ' win' : ''}">${fB}</div>${barB}</div>
-  </div>` };
+  return { wins, empty: vals.every(v => v == null), html };
 }
 
 function cmpCard(j, side) {
@@ -3091,8 +3151,8 @@ function cmpAggFor(side, j) {
 }
 
 // Barra de modos + control asociado (una temporada, o rangos por jugador)
-function cmpModeBar(A, B) {
-  const common = cmpCommon(A, B);
+function cmpModeBar(players) {
+  const common = cmpCommon(players);
   const chip = (m, label, on) => `<button type="button" class="toggle-chip${cmpMode === m ? ' active' : ''}" aria-pressed="${cmpMode === m}"${on === false ? ' disabled' : ''} onclick="cmpSetMode('${m}')">${label}</button>`;
   let extra = '';
   if (cmpMode === 'same') {
@@ -3137,45 +3197,52 @@ function cmpRangeUI(side, j, agg) {
   </div>`;
 }
 
-function cmpRender(A, B) {
-  const aggA = cmpAggFor('a', A), aggB = cmpAggFor('b', B);
-  const premA = { nombre: A.nombre, premios: cmpPremiosList(A, 'a') };
-  const premB = { nombre: B.nombre, premios: cmpPremiosList(B, 'b') };
-  let scoreA = 0, scoreB = 0;
+function cmpRender() {
+  const sides = cmpSides();
+  const players = sides.map(s => cmpCur(s));
+  if (players.some(p => !p)) return;
+  const aggs = sides.map((s, i) => cmpAggFor(s, players[i]));
+  const prems = sides.map((s, i) => ({ nombre: players[i].nombre, premios: cmpPremiosList(players[i], s) }));
+  const scores = sides.map(() => 0);
   const partial = cmpMode !== 'career';
   const noteLbl = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : 'sin datos') : 'rango elegido';
   const sections = CMP_SECTIONS
-    .filter(s => !s.when || s.when(A, B))
+    .filter(s => !s.when || players.some(p => s.when(p, p)))
     .filter(s => !(partial && s.career))          // en modo parcial se ocultan las secciones de carrera
     .map(s => {
-      const dA = s.premios ? premA : (s.ranged ? aggA : A);
-      const dB = s.premios ? premB : (s.ranged ? aggB : B);
-      let rows = s.rows.map(r => cmpRow(r, dA, dB));
+      const datas = sides.map((_, i) => (s.premios ? prems[i] : (s.ranged ? aggs[i] : players[i])));
+      let rows = s.rows.map(r => cmpRow(r, datas));
       if (s.premios) rows = rows.filter(r => !r.empty);   // ocultar premios sin datos en ninguno
       if (!rows.length) return '';
-      rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
+      rows.forEach(r => r.wins.forEach((w, i) => { if (w) scores[i]++; }));
       const note = ((s.ranged || s.premios) && partial) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
       return `<details class="cmp-section" open><summary class="cmp-sec-title">${s.title}${note}</summary>${rows.map(r => r.html).join('')}</details>`;
     }).join('');
 
-  const head = `<div class="cmp-head">
-    <div class="cmp-side">${cmpCard(A, 'a')}${cmpRangeUI('a', A, aggA)}</div>
-    <div class="cmp-scoreboard">
-      <div class="cmp-score"><span class="cmp-sc a${scoreA > scoreB ? ' win' : ''}">${scoreA}</span><span class="cmp-sc-sep">–</span><span class="cmp-sc b${scoreB > scoreA ? ' win' : ''}">${scoreB}</span></div>
+  const mxScore = Math.max(...scores);
+  const uniqueTop = scores.filter(s => s === mxScore).length === 1;
+  const scoreHtml = scores.map(s => `<span class="cmp-sc${(uniqueTop && s === mxScore) ? ' win' : ''}">${s}</span>`).join('<span class="cmp-sc-sep">–</span>');
+  const scoreboard = `<div class="cmp-scoreboard${sides.length === 3 ? ' cmp-scoreboard--top' : ''}">
+      <div class="cmp-score">${scoreHtml}</div>
       <div class="cmp-sc-lbl">categorías ganadas</div>
-    </div>
-    <div class="cmp-side">${cmpCard(B, 'b')}${cmpRangeUI('b', B, aggB)}</div>
-  </div>`;
-  document.getElementById('cmp-out').innerHTML = cmpModeBar(A, B) + head + sections;
+    </div>`;
+  const sideHtml = sides.map((s, i) => `<div class="cmp-side">${cmpCard(players[i], s)}${cmpRangeUI(s, players[i], aggs[i])}</div>`);
+
+  const head = sides.length === 3
+    ? `${scoreboard}<div class="cmp-head cmp-head--3">${sideHtml.join('')}</div>`
+    : `<div class="cmp-head">${sideHtml[0]}${scoreboard}${sideHtml[1]}</div>`;
+  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + sections;
 }
 
 function cmpCur(side) {
   const sel = document.getElementById('cmp-' + side);
-  return cmpAll.find(j => j.id === sel.value);
+  return sel && sel.value ? cmpAll.find(j => j.id === sel.value) : null;
 }
 function cmpSyncUrl() {
   updateUrlParam('a', document.getElementById('cmp-a').value);
   updateUrlParam('b', document.getElementById('cmp-b').value);
+  const selC = document.getElementById('cmp-c');
+  updateUrlParam('c', selC ? selC.value : '');
   updateUrlParam('modo', cmpMode === 'career' ? '' : cmpMode);
   updateUrlParam('se', cmpMode === 'same' ? (cmpSame || '') : '');
   const diff = cmpMode === 'diff';
@@ -3183,6 +3250,8 @@ function cmpSyncUrl() {
   updateUrlParam('at', diff ? (cmpState.a.to || '') : '');
   updateUrlParam('bf', diff ? (cmpState.b.from || '') : '');
   updateUrlParam('bt', diff ? (cmpState.b.to || '') : '');
+  updateUrlParam('cf', (diff && selC && selC.value) ? (cmpState.c.from || '') : '');
+  updateUrlParam('ct', (diff && selC && selC.value) ? (cmpState.c.to || '') : '');
 }
 
 async function initComparadorPage() {
@@ -3191,23 +3260,26 @@ async function initComparadorPage() {
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   buildPlayerIds(data.jugadores);
   cmpAll = (data.jugadores || []).slice().sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  document.getElementById('hero-sub').textContent = `Compara cara a cara a dos de los ${cmpAll.length} españoles de la NBA`;
+  document.getElementById('hero-sub').textContent = `Compara cara a cara a dos (o tres) de los ${cmpAll.length} españoles de la NBA`;
 
   const opts = cmpAll.map(j => `<option value="${j.id}">${j.nombre}</option>`).join('');
-  const selA = document.getElementById('cmp-a'), selB = document.getElementById('cmp-b');
+  const selA = document.getElementById('cmp-a'), selB = document.getElementById('cmp-b'), selC = document.getElementById('cmp-c');
   selA.innerHTML = opts; selB.innerHTML = opts;
+  if (selC) selC.innerHTML = `<option value="">3º jugador (opcional)</option>` + opts;
 
   const params = new URLSearchParams(location.search);
   const withStats = cmpAll.filter(j => (j.partidos || 0) > 0);
   const pick = (frag, i) => (withStats.find(j => new RegExp(frag, 'i').test(j.nombre)) || withStats[i] || cmpAll[i] || cmpAll[0]).id;
   const has = id => cmpAll.some(j => j.id === id);
-  const defA = params.get('a'), defB = params.get('b');
+  const defA = params.get('a'), defB = params.get('b'), defC = params.get('c');
   selA.value = has(defA) ? defA : pick('pau gasol', 0);
   selB.value = has(defB) ? defB : pick('marc gasol', 1);
   if (selA.value === selB.value) selB.value = (cmpAll.find(j => j.id !== selA.value) || cmpAll[0]).id;
+  if (selC && has(defC)) selC.value = defC;
 
   cmpState.a = { id: selA.value, from: null, to: null };
   cmpState.b = { id: selB.value, from: null, to: null };
+  cmpState.c = { id: selC ? selC.value : null, from: null, to: null };
 
   // Restaurar modo desde la URL
   const m = params.get('modo');
@@ -3215,21 +3287,24 @@ async function initComparadorPage() {
   if (cmpMode === 'diff') {
     cmpInitRange('a', params.get('af'), params.get('at'));
     cmpInitRange('b', params.get('bf'), params.get('bt'));
+    if (selC && selC.value) cmpInitRange('c', params.get('cf'), params.get('ct'));
   } else if (cmpMode === 'same') {
-    const common = cmpCommon(cmpCur('a'), cmpCur('b'));
+    const common = cmpCommon(cmpPlayers());
     const se = Number(params.get('se'));
     cmpSame = common.includes(se) ? se : (common.length ? common[common.length - 1] : null);
     if (!common.length) cmpMode = 'career';
   }
 
   selA.onchange = cmpUpdate; selB.onchange = cmpUpdate;
-  cmpRender(cmpCur('a'), cmpCur('b'));
+  if (selC) selC.onchange = cmpUpdate;
+  cmpRender();
   cmpSyncUrl();
 }
 
 // Valida y aplica un rango de la URL a un jugador
 function cmpInitRange(side, from, to) {
   const j = cmpCur(side);
+  if (!j) return;
   const seasons = cmpSeasons(j);
   if (seasons.length < 2) return;
   const inRange = v => { const n = Number(v); return v && seasons.includes(n) ? n : null; };
@@ -3240,31 +3315,32 @@ function cmpInitRange(side, from, to) {
 
 // Al cambiar de jugador, revalida las selecciones del modo activo
 function cmpUpdate() {
-  const idA = document.getElementById('cmp-a').value, idB = document.getElementById('cmp-b').value;
-  if (cmpState.a.id !== idA) cmpState.a = { id: idA, from: null, to: null };
-  if (cmpState.b.id !== idB) cmpState.b = { id: idB, from: null, to: null };
-  const A = cmpAll.find(j => j.id === idA), B = cmpAll.find(j => j.id === idB);
-  if (!A || !B) return;
+  cmpSides().forEach(s => {
+    const id = document.getElementById('cmp-' + s).value;
+    if (cmpState[s].id !== id) cmpState[s] = { id, from: null, to: null };
+  });
+  const players = cmpPlayers();
+  if (players.length < 2) return;
   if (cmpMode === 'same') {
-    const common = cmpCommon(A, B);
+    const common = cmpCommon(players);
     if (!common.length) { cmpMode = 'career'; cmpSame = null; }
     else if (!common.includes(cmpSame)) cmpSame = common[common.length - 1];
   }
-  cmpRender(A, B); cmpSyncUrl();
+  cmpRender(); cmpSyncUrl();
 }
 
 function cmpSetMode(m) {
   cmpMode = m;
   if (m === 'same') {
-    const common = cmpCommon(cmpCur('a'), cmpCur('b'));
+    const common = cmpCommon(cmpPlayers());
     if (!common.includes(cmpSame)) cmpSame = common.length ? common[common.length - 1] : null;
   }
-  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpRender();
   cmpSyncUrl();
 }
 function cmpSetSame(value) {
   cmpSame = Number(value);
-  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpRender();
   cmpSyncUrl();
 }
 
@@ -3273,7 +3349,7 @@ function cmpSetRange(side, which, value) {
   const st = cmpState[side];
   if (which === 'from') { st.from = v; if (st.to != null && st.to < v) st.to = v; }
   else { st.to = v; if (st.from != null && st.from > v) st.from = v; }
-  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpRender();
   cmpSyncUrl();
 }
 
@@ -3281,7 +3357,7 @@ function cmpSwap() {
   const a = document.getElementById('cmp-a'), b = document.getElementById('cmp-b');
   const t = a.value; a.value = b.value; b.value = t;
   const tmp = cmpState.a; cmpState.a = cmpState.b; cmpState.b = tmp;
-  cmpRender(cmpCur('a'), cmpCur('b'));
+  cmpRender();
   cmpSyncUrl();
 }
 

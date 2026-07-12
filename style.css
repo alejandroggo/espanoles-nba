@@ -1235,6 +1235,19 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .cmp-fill { height: 100%; border-radius: var(--radius-full); background: var(--border-strong); min-width: 2px; }
 .cmp-fill.win { background: var(--dorado); }
 
+/* Comparador a 3 */
+.cmp-sel-c { color: var(--text-muted); }
+.cmp-scoreboard--top { margin-bottom: var(--space-4); }
+.cmp-head--3 { grid-template-columns: 1fr 1fr 1fr; align-items: start; }
+.cmp-row3 { display: grid; grid-template-columns: minmax(84px, 0.9fr) 1fr 1fr 1fr; gap: var(--space-3); align-items: center; padding: var(--space-1) 0; }
+.cmp-row3:hover { background: var(--surface-2); border-radius: var(--radius-sm); }
+.cmp-metric--left { text-align: left; }
+.cmp-cell3 { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.cmp-cell3 .cmp-bar { justify-content: center; max-width: 120px; }
+@media (max-width: 560px) {
+  .cmp-row3 { grid-template-columns: minmax(64px, 0.9fr) 1fr 1fr 1fr; gap: var(--space-2); }
+}
+
 .cmp-mode { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); margin-bottom: var(--space-6); }
 .cmp-mode .mode-switch { flex-wrap: wrap; justify-content: center; }
 .cmp-mode .toggle-chip:disabled { opacity: 0.4; cursor: not-allowed; }
