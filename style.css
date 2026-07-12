@@ -627,7 +627,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   transition: transform var(--transition);
 }
 .jersey:hover { transform: translateY(-3px); }
-.jersey.sel { transform: translateY(-3px); }
+.jersey.sel { outline: 2.5px solid var(--dorado); outline-offset: 2px; border-radius: 8px; background: var(--accent-light); }
 .jersey-svg { width: 100%; height: auto; display: block; }
 .jersey-shape {
   fill: var(--surface);

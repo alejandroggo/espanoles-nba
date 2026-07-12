@@ -1146,6 +1146,7 @@ function sortRk(col) {
 let drByNum = {};
 let drAll = [];
 let drMeta = {};  // nombre normalizado → jugador (para la foto)
+let drSel = null; // dorsal seleccionado (para poder deseleccionar)
 
 function drNorm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
 
@@ -1254,7 +1255,7 @@ function renderDrGrid() {
   let html = '';
   for (let n = 0; n <= 99; n++) {
     const c = drCount(n);
-    html += `<button class="jersey ${jerseyClass(c)}" role="listitem" onclick="showDorsal(${n})"
+    html += `<button class="jersey ${jerseyClass(c)}" role="listitem" onclick="toggleDorsal(${n})"
       aria-label="Dorsal ${n}, ${c} jugador${c === 1 ? '' : 'es'}">${jerseySvg(n)}</button>`;
   }
   document.getElementById('dr-grid').innerHTML = html;
@@ -1273,15 +1274,20 @@ function drPeriodo(desde, hasta) {
   return d === h ? d : `${d} → ${h}`;
 }
 
+// Un clic selecciona; otro clic sobre el mismo lo deselecciona
+function toggleDorsal(n) { showDorsal(drSel === n ? null : n); }
+
 function showDorsal(n) {
   const btns = document.querySelectorAll('.jersey');
   btns.forEach(b => b.classList.remove('sel'));
   const panel = document.getElementById('dr-detail');
 
   if (n === null || n === undefined) {
+    drSel = null;
     panel.innerHTML = `<p class="dorsal-hint">Elige un dorsal para ver qué españoles lo han llevado.</p>`;
     return;
   }
+  drSel = n;
   if (btns[n]) btns[n].classList.add('sel');
 
   const entries = drByNum[n] || [];
