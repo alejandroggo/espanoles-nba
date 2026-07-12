@@ -2687,8 +2687,8 @@ const CMP_SECTIONS = [
     { label: 'Triples',        get: j => j.tres_total, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Minutos',        get: j => j.min_total, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Triples-dobles', get: j => j.td_total ?? null, fmt: fmtEnt, dir: 'high', bar: true },
-    { label: 'Pérdidas',       get: j => j.tov_total ?? null, fmt: fmtEnt, dir: 'low' },
-    { label: 'Faltas',         get: j => j.pf_total ?? null, fmt: fmtEnt, dir: 'low' },
+    { label: 'Pérdidas',       get: j => j.tov_total ?? null, fmt: fmtEnt, dir: 'low', bar: true },
+    { label: 'Faltas',         get: j => j.pf_total ?? null, fmt: fmtEnt, dir: 'low', bar: true },
   ]},
   { title: 'Máximos en un partido', when: (a, b) => a.game_highs || b.game_highs, rows: [
     { label: 'Puntos',      get: j => j.game_highs && j.game_highs.pts, fmt: fmtEnt, dir: 'high', bar: true },
@@ -2723,15 +2723,16 @@ function cmpRow(row, A, B) {
   }
   const fA = vA == null ? '—' : row.fmt(vA);
   const fB = vB == null ? '—' : row.fmt(vB);
-  let bars = '';
+  let barA = '', barB = '';
   if (row.bar && nA != null && nB != null) {
-    const mx = Math.max(nA, nB) || 1;
-    bars = `<div class="cmp-track"><span class="cmp-fill${winA ? ' win' : ''}" style="width:${Math.round(nA / mx * 100)}%"></span><span class="cmp-fill${winB ? ' win' : ''}" style="width:${Math.round(nB / mx * 100)}%"></span></div>`;
+    const mx = Math.max(Math.abs(nA), Math.abs(nB)) || 1;
+    barA = `<div class="cmp-bar a"><span class="cmp-fill${winA ? ' win' : ''}" style="width:${Math.round(Math.abs(nA) / mx * 100)}%"></span></div>`;
+    barB = `<div class="cmp-bar b"><span class="cmp-fill${winB ? ' win' : ''}" style="width:${Math.round(Math.abs(nB) / mx * 100)}%"></span></div>`;
   }
   return { winA, winB, html: `<div class="cmp-row">
-    <div class="cmp-val a${winA ? ' win' : ''}">${fA}</div>
-    <div class="cmp-center"><div class="cmp-metric">${row.label}</div>${bars}</div>
-    <div class="cmp-val b${winB ? ' win' : ''}">${fB}</div>
+    <div class="cmp-cell a"><div class="cmp-val a${winA ? ' win' : ''}">${fA}</div>${barA}</div>
+    <div class="cmp-metric">${row.label}</div>
+    <div class="cmp-cell b"><div class="cmp-val b${winB ? ' win' : ''}">${fB}</div>${barB}</div>
   </div>` };
 }
 
@@ -2812,7 +2813,7 @@ function cmpRender(A, B) {
     const rows = s.rows.map(r => cmpRow(r, dA, dB));
     rows.forEach(r => { if (r.winA) scoreA++; if (r.winB) scoreB++; });
     const note = (s.ranged && ranged) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
-    return `<div class="cmp-section"><h2 class="cmp-sec-title">${s.title}${note}</h2>${rows.map(r => r.html).join('')}</div>`;
+    return `<details class="cmp-section" open><summary class="cmp-sec-title">${s.title}${note}</summary>${rows.map(r => r.html).join('')}</details>`;
   }).join('');
 
   const head = `<div class="cmp-head">
