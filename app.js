@@ -336,7 +336,7 @@ const SAL_COLS = [
   { key: 'ganancias',        label: 'Total',     sortable: true,  cls: 'td-num' },
   { key: 'ganancias_ganado', label: 'Cobrado',   sortable: true,  cls: 'td-num' },
   { key: 'ganancias_futuro', label: 'Firmado',   sortable: true,  cls: 'td-num' },
-  { key: 'sueldo_pj',        label: '$/PJ',      sortable: true,  cls: 'td-num' },
+  { key: 'sueldo_pj',        label: '$/PAR',     sortable: true,  cls: 'td-num' },
   { key: 'pct',              label: '% del total', sortable: true,  cls: 'td-num' },
   { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
@@ -427,6 +427,7 @@ function renderSalariosTable() {
   // barra escalada respecto a la mayor cuota (el líder llena la barra)
   const maxPct = Math.max(...salRows.map(j => j.pct || 0), 0);
   const maxGan = Math.max(...salRows.map(j => j.ganancias || 0), 0);
+  const maxSpj = Math.max(...salRows.map(j => j.sueldo_pj || 0), 0);
 
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
@@ -436,7 +437,7 @@ function renderSalariosTable() {
       <td class="td-num td-dinero${maxGan && j.ganancias === maxGan ? ' td-leader' : ''}">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
-      <td class="td-num">${fmtDinero(j.sueldo_pj)}</td>
+      <td class="td-num${maxSpj && j.sueldo_pj === maxSpj ? ' td-leader' : ''}">${fmtDinero(j.sueldo_pj)}</td>
       <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
       <td class="td-muted">${j.equipos_nba || '—'}</td>
     </tr>`).join('');
@@ -677,13 +678,13 @@ function renderSlGroupedYear(entries) {
   entries.forEach(s => {
     if (!s.year) return;
     const g = map[s.year] || (map[s.year] = { year: s.year, jugadores: [] });
-    g.jugadores.push(s.jugador);
+    g.jugadores.push({ nombre: s.jugador, equipo: s.equipo });
   });
 
   let rows = Object.values(map).map(g => ({
     year: g.year,
     count: g.jugadores.length,
-    jugadores: [...new Set(g.jugadores)],
+    jugadores: g.jugadores,
   }));
 
   rows.sort((a, b) => {
@@ -700,7 +701,7 @@ function renderSlGroupedYear(entries) {
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-num">${g.year}</td>
       <td class="td-num">${g.count}</td>
-      <td>${g.jugadores.map(j => plLink(j, j)).join(', ')}</td>
+      <td>${g.jugadores.map(j => `${plLink(j.nombre, j.nombre)}${j.equipo ? ` (${j.equipo})` : ''}`).join(', ')}</td>
     </tr>`).join('') || `<tr><td colspan="4" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -2239,13 +2240,23 @@ async function initJugadoresPage() {
   renderJugs();
 }
 
+// Año de draft, o de debut si no fue drafteado (sin posición)
+function jugMeta(j) {
+  if (j.draft && j.draft_anio) return `Draft ${j.draft_anio}`;
+  const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/);
+  if (m) return `Debut ${m[1]}`;
+  const ys = (j.temporadas_data || []).map(t => t.year).filter(Boolean);
+  if (ys.length) return `Debut ${Math.min(...ys) - 1}`;
+  return '—';
+}
+
 function renderJugs() {
   const rows = jugsAll.filter(j => !jugsSearch || j.nombre.toLowerCase().includes(jugsSearch));
   document.getElementById('jug-count').textContent = `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
 
   document.getElementById('jugs-grid').innerHTML = rows.map(j => {
     const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
-    const meta = j.posicion || (j.draft ? `Draft ${j.draft_anio || ''}` : '');
+    const meta = jugMeta(j);
     return `<a class="jug-card" href="${jugadorHref(j.id)}">
       ${src ? `<span class="jug-card-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt=""></span>` : avatarHtml(j.nombre, 'jug-card-photo')}
       <span class="jug-card-info">
