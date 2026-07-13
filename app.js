@@ -4030,7 +4030,33 @@ function botRankList(stat, dim, asc, perGame) {
   return pool.slice(0, 5);
 }
 
-// Respuesta a una pregunta. Devuelve HTML o null (no entendido).
+// Posición de un jugador en el ranking español de una estadística
+function botRankOf(j, field, dim, minGames) {
+  const mg = minGames || 0;
+  const pool = botPlayers.map(p => {
+    const src = dim === 'po' ? p.playoffs_totales : p;
+    const games = dim === 'po' ? (p.playoffs_totales ? p.playoffs_totales.partidos : 0) : p.partidos;
+    return { id: p.id, v: src ? src[field] : null, games: games || 0 };
+  }).filter(x => x.games > mg && x.v != null).sort((a, b) => b.v - a.v);
+  const i = pool.findIndex(x => x.id === j.id);
+  return i >= 0 ? { rank: i + 1, total: pool.length } : null;
+}
+// Partidos por equipo (temporada regular)
+function botTeamGames(j) {
+  const m = {};
+  (j.temporadas_data || []).forEach(t => { const tm = (t.team || '').toUpperCase(); if (tm && tm !== 'TOT') m[tm] = (m[tm] || 0) + (t.g || 0); });
+  return m;
+}
+function botDebutYear(j) { const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/); return m ? +m[1] : null; }
+function botRankSentence(j, field, dim, label, minGames) {
+  const r = botRankOf(j, field, dim, minGames);
+  if (!r) return '';
+  const poTxt = dim === 'po' ? ' en playoffs' : '';
+  if (r.rank === 1) return ` Es el <b>máximo</b> de todos los españoles en ${label}${poTxt}.`;
+  return ` Ocupa el <b>${r.rank}º</b> puesto entre los españoles en ${label}${poTxt}.`;
+}
+
+// Respuesta a una pregunta. Devuelve HTML o null (no entendido). Se explaya con contexto.
 function botAnswer(raw) {
   const text = raw.trim();
   if (!text) return null;
@@ -4046,43 +4072,53 @@ function botAnswer(raw) {
 
   // 1) ANILLOS
   if (/anillo|campeon|titulo nba|campeonato/.test(q)) {
+    const champs = botPlayers.map(j => ({ j, r: botRings(j), n: Object.keys(botRings(j)).length })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
     if (superl && !players.length) {
-      const list = botPlayers.map(j => ({ j, n: Object.keys(botRings(j)).length })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
-      if (!list.length) return null;
-      const top = list[0];
-      return `Con más anillos NBA: <b>${top.j.nombre}</b> con <b>${top.n}</b>. ${botPlayerChip(top.j)}
-        <div class="bot-sub">${list.map(x => `${x.j.nombre}: ${x.n}`).join(' · ')}</div>`;
+      if (!champs.length) return null;
+      const top = champs[0];
+      const totAnillos = champs.reduce((s, x) => s + x.n, 0);
+      return `El español con más anillos de la NBA es <b>${top.j.nombre}</b>, con <b>${top.n}</b> (${Object.entries(top.r).map(([y, t]) => `${y}, ${teamInfo(t).name}`).join('; ')}). En total, solo <b>${champs.length}</b> españoles han sido campeones de la NBA, sumando <b>${totAnillos}</b> anillos entre todos. ${botPlayerChip(top.j)}
+        <div class="bot-sub">${champs.map(x => `${x.j.nombre}: ${x.n}`).join(' · ')}</div>`;
     }
     if (players.length) {
       return players.map(j => {
         const r = botRings(j), n = Object.keys(r).length;
-        if (!n) return `<b>${j.nombre}</b> no ganó ningún anillo NBA. ${botPlayerChip(j)}`;
-        const det = Object.entries(r).map(([y, t]) => `${y} (${teamInfo(t).label})`).join(' y ');
-        return `<b>${j.nombre}</b> ganó <b>${n}</b> anillo${n > 1 ? 's' : ''} NBA: ${det}. ${botPlayerChip(j)}`;
+        if (!n) return `<b>${j.nombre}</b> <b>no ganó</b> ningún anillo de la NBA a lo largo de su carrera. ${botPlayerChip(j)}`;
+        const det = Object.entries(r).map(([y, t]) => `<b>${y}</b> con ${teamInfo(t).name}`).join(' y ');
+        const otros = champs.filter(x => x.j.id !== j.id).map(x => x.j.nombre);
+        const ctx = champs.length > 1 ? ` Es uno de los <b>${champs.length}</b> únicos españoles campeones de la NBA${otros.length ? `, junto a ${otros.join(' y ')}` : ''}.` : '';
+        return `<b>${j.nombre}</b> ganó <b>${n}</b> anillo${n > 1 ? 's' : ''} de la NBA: ${det}.${ctx} ${botPlayerChip(j)}`;
       }).join('<hr class="bot-hr">');
     }
   }
 
   // 2) DINERO / SALARIO
   if (/dinero|cuanto (ha )?gan|ganad|salario|sueldo|cobr|euros|dolar|\$/.test(q) && !stat) {
+    const ranked = botPlayers.filter(j => j.ganancias).sort((a, b) => b.ganancias - a.ganancias);
     if (superl && !players.length) {
-      const list = botPlayers.filter(j => j.ganancias).sort((a, b) => b.ganancias - a.ganancias).slice(0, 5);
-      if (!list.length) return null;
-      return `Quien más ha ganado: <b>${list[0].nombre}</b> con <b>${fmtDinero(list[0].ganancias)}</b>. ${botPlayerChip(list[0])}
-        <div class="bot-sub">${list.map(j => `${j.nombre}: ${fmtDinero(j.ganancias)}`).join(' · ')}</div>`;
+      if (!ranked.length) return null;
+      const top3 = ranked.slice(0, 3);
+      return `El español que más dinero ha ganado en la NBA es <b>${ranked[0].nombre}</b>, con <b>${fmtDinero(ranked[0].ganancias)}</b> brutos en toda su carrera. Le siguen <b>${top3[1] ? top3[1].nombre : ''}</b> (${top3[1] ? fmtDinero(top3[1].ganancias) : ''})${top3[2] ? ` y <b>${top3[2].nombre}</b> (${fmtDinero(top3[2].ganancias)})` : ''}. ${botPlayerChip(ranked[0])}
+        <ol class="bot-rank">${ranked.slice(0, 5).map(j => `<li><span>${j.nombre}</span><b>${fmtDinero(j.ganancias)}</b></li>`).join('')}</ol>`;
     }
     if (players.length) {
-      return players.map(j => j.ganancias
-        ? `<b>${j.nombre}</b> ha ganado <b>${fmtDinero(j.ganancias)}</b> en la NBA. ${botPlayerChip(j)}`
-        : `No tengo datos de salario de <b>${j.nombre}</b>. ${botPlayerChip(j)}`).join('<hr class="bot-hr">');
+      return players.map(j => {
+        if (!j.ganancias) return `No tengo datos de salario de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+        const pos = ranked.findIndex(x => x.id === j.id) + 1;
+        const posTxt = pos ? ` Eso le convierte en el <b>${pos}º</b> español que más ha ganado en la liga.` : '';
+        return `<b>${j.nombre}</b> ha ganado <b>${fmtDinero(j.ganancias)}</b> brutos a lo largo de su carrera en la NBA.${posTxt} ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
     }
   }
 
   // 3) DRAFT
   if (/draft|drafte|elegid|pick|seleccionad/.test(q) && players.length) {
     return players.map(j => {
-      if (!j.draft) return `<b>${j.nombre}</b> no fue drafteado (entró a la NBA como agente libre). ${botPlayerChip(j)}`;
-      return `<b>${j.nombre}</b> fue elegido en el <b>draft de ${j.draft_anio || '?'}</b> con el <b>pick #${j.draft_pick || '?'}</b>${j.draft_equipo ? ` por ${teamInfo(j.draft_equipo).name}` : ''}. ${botPlayerChip(j)}`;
+      const deb = (j.primer_partido && j.primer_partido.fecha) ? ` Debutó en la NBA el <b>${j.primer_partido.fecha}</b>.` : '';
+      if (!j.draft) return `<b>${j.nombre}</b> <b>no fue drafteado</b>: llegó a la NBA como agente libre no seleccionado.${deb} ${botPlayerChip(j)}`;
+      const ronda = j.draft_pick ? (j.draft_pick <= 30 ? ' en primera ronda' : ' en segunda ronda') : '';
+      const notas = j.draft_notas ? ` ${j.draft_notas}.` : '';
+      return `A <b>${j.nombre}</b> lo eligió <b>${j.draft_equipo ? teamInfo(j.draft_equipo).name : '—'}</b> con el <b>número ${j.draft_pick || '?'}</b> del <b>draft de ${j.draft_anio || '?'}</b>${ronda}.${notas}${deb} ${botPlayerChip(j)}`;
     }).join('<hr class="bot-hr">');
   }
 
@@ -4091,7 +4127,13 @@ function botAnswer(raw) {
     return players.map(j => {
       const p = j.primer_partido;
       if (!p || !p.fecha) return `No tengo la fecha de debut de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
-      return `<b>${j.nombre}</b> debutó en la NBA el <b>${p.fecha}</b>${p.equipo ? ` con ${teamInfo(p.equipo).name}` : ''}. ${botPlayerChip(j)}`;
+      const edadN = parseInt(p.edad, 10);
+      const edad = edadN ? `, con <b>${edadN} años</b>,` : '';
+      const rival = p.rival ? ` frente a ${p.rival}` : '';
+      const plz = (n, s, pl) => `${n} ${n === 1 ? s : pl}`;
+      const linea = [p.pts != null ? plz(p.pts, 'punto', 'puntos') : null, p.rbd != null ? plz(p.rbd, 'rebote', 'rebotes') : null, p.ast != null ? plz(p.ast, 'asistencia', 'asistencias') : null].filter(Boolean);
+      const stats = linea.length ? ` En su estreno firmó <b>${linea.join(', ')}</b>${p.min ? ` en ${p.min} minutos` : ''}.` : '';
+      return `<b>${j.nombre}</b> debutó en la NBA el <b>${p.fecha}</b>${edad} con <b>${p.equipo ? teamInfo(p.equipo).name : '—'}</b>${rival}.${stats} ${botPlayerChip(j)}`;
     }).join('<hr class="bot-hr">');
   }
 
@@ -4100,33 +4142,48 @@ function botAnswer(raw) {
     return players.map(j => {
       const ts = botTeamsOf(j);
       if (!ts.length) return `No tengo trayectoria por equipos de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
-      return `<b>${j.nombre}</b> jugó en <b>${ts.length}</b> equipo${ts.length > 1 ? 's' : ''}: ${ts.map(t => teamInfo(t).name).join(', ')}. ${botPlayerChip(j)}`;
+      const g = botTeamGames(j);
+      const top = Object.entries(g).sort((a, b) => b[1] - a[1])[0];
+      const donde = top ? ` Donde más tiempo pasó fue en <b>${teamInfo(top[0]).name}</b> (${fmtEnt(top[1])} partidos).` : '';
+      return `<b>${j.nombre}</b> jugó en <b>${ts.length}</b> equipo${ts.length > 1 ? 's' : ''} de la NBA a lo largo de su carrera: ${ts.map(t => teamInfo(t).name).join(', ')}.${donde} ${botPlayerChip(j)}`;
     }).join('<hr class="bot-hr">');
   }
 
   // 6) COMPARACIÓN (dos jugadores)
   if ((players.length === 2 && (/vs|versus|compar|contra|o /.test(q) || stat)) || (/vs|versus|compar/.test(q) && players.length === 2)) {
     const [a, b] = players;
+    let winA = 0, winB = 0;
     const rows = [['Puntos', 'pts_g'], ['Rebotes', 'rbd_g'], ['Asistencias', 'ast_g']].map(([l, k]) => {
       const va = a[k], vb = b[k];
       const wa = (va != null && vb != null && va > vb), wb = (va != null && vb != null && vb > va);
+      if (wa) winA++; if (wb) winB++;
       return `<tr><td class="${wa ? 'bot-win' : ''}">${fmtDec1(va)}</td><th>${l} (por partido)</th><td class="${wb ? 'bot-win' : ''}">${fmtDec1(vb)}</td></tr>`;
     }).join('');
     const ra = Object.keys(botRings(a)).length, rb = Object.keys(botRings(b)).length;
+    if (ra > rb) winA++; else if (rb > ra) winB++;
     const ringRow = `<tr><td class="${ra > rb ? 'bot-win' : ''}">${ra}</td><th>Anillos NBA</th><td class="${rb > ra ? 'bot-win' : ''}">${rb}</td></tr>`;
+    const veredicto = winA === winB ? `Están muy igualados: empatan a <b>${winA}</b> categorías.` : `En estas categorías, <b>${winA > winB ? a.nombre : b.nombre}</b> se impone (<b>${Math.max(winA, winB)}</b> a ${Math.min(winA, winB)}).`;
     return `<div class="bot-cmp-head"><b>${a.nombre}</b><span>vs</span><b>${b.nombre}</b></div>
       <table class="bot-cmp">${rows}${ringRow}</table>
-      <div class="bot-sub"><a href="comparador.html?a=${encodeURIComponent(a.id)}&b=${encodeURIComponent(b.id)}">Ver comparación completa →</a></div>`;
+      <div class="bot-sub">${veredicto} <a href="comparador.html?a=${encodeURIComponent(a.id)}&b=${encodeURIComponent(b.id)}">Ver comparación completa →</a></div>`;
   }
 
   // 7) RANKING por estadística (superlativo sin jugador concreto)
   if (stat && (superl || !players.length) && !players.length) {
-    const list = botRankList(stat, dim, asc, perGame || stat.kind === 'pct');
-    if (!list.length) return null;
     const pg = perGame || stat.kind === 'pct';
-    const top = list[0];
+    const list = botRankList(stat, dim, asc, pg);
+    if (!list.length) return null;
+    const top = list[0], second = list[1], third = list[2];
     const verbo = asc ? 'menos' : 'más';
-    return `Quien ${verbo} <b>${stat.label}</b>${pg && stat.kind === 'num' ? ' por partido' : ''}${dimTxt}: <b>${top.j.nombre}</b> con <b>${botFmt(stat, top.v, pg)}</b>. ${botPlayerChip(top.j)}
+    const pgTxt = pg && stat.kind === 'num' ? ' por partido' : '';
+    // dato secundario del líder: si mostramos media, añadimos su total (y viceversa)
+    let extra = '';
+    if (stat.kind === 'num') {
+      const tj = top.j, tot = (dim === 'po' ? (tj.playoffs_totales || {}) : tj)[stat.total], g = (dim === 'po' ? (tj.playoffs_totales || {}).partidos : tj.partidos);
+      extra = pg ? ` (${fmtEnt(tot)} en total)` : ` (${fmtDec1((dim === 'po' ? (tj.playoffs_totales || {}) : tj)[stat.pg])} por partido en ${fmtEnt(g)} partidos)`;
+    }
+    const cola = second ? ` Le siguen <b>${second.j.nombre}</b> (${botFmt(stat, second.v, pg)})${third ? ` y <b>${third.j.nombre}</b> (${botFmt(stat, third.v, pg)})` : ''}.` : '';
+    return `El español con ${verbo} <b>${stat.label}</b>${pgTxt}${dimTxt} es <b>${top.j.nombre}</b>, con <b>${botFmt(stat, top.v, pg)}</b>${extra}.${cola} ${botPlayerChip(top.j)}
       <ol class="bot-rank">${list.map(x => `<li><span>${x.j.nombre}</span><b>${botFmt(stat, x.v, pg)}</b></li>`).join('')}</ol>`;
   }
 
@@ -4134,53 +4191,76 @@ function botAnswer(raw) {
   if (players.length && stat) {
     return players.map(j => {
       const src = dim === 'po' ? j.playoffs_totales : j;
-      if (!src || (dim === 'po' && !(src.partidos > 0))) return `No tengo datos${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
-      const pg = perGame || stat.kind === 'pct';
-      const v = src[pg ? stat.pg : stat.total];
-      if (v == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
-      const suf = stat.kind === 'pct' ? '' : (pg ? ` ${stat.label} por partido` : ` ${stat.label}`);
-      const pre = stat.kind === 'pct' ? ` de ${stat.label}` : '';
-      return `<b>${j.nombre}</b>: <b>${botFmt(stat, v, pg)}</b>${suf}${pre}${dimTxt}. ${botPlayerChip(j)}`;
+      if (!src || (dim === 'po' && !(src.partidos > 0))) return `No tengo datos${dimTxt} de <b>${j.nombre}</b>${dim === 'po' ? ' (no disputó playoffs o no hay registro)' : ''}. ${botPlayerChip(j)}`;
+      const games = src.partidos;
+      if (stat.kind === 'pct') {
+        const v = src[stat.pg];
+        if (v == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+        return `<b>${j.nombre}</b> promedia un <b>${fmtPct(v)}</b> en ${stat.label}${dimTxt} a lo largo de su carrera (${fmtEnt(games)} partidos).${botRankSentence(j, stat.pg, dim, stat.label, dim === 'po' ? 20 : 50)} ${botPlayerChip(j)}`;
+      }
+      if (stat.kind === 'count') {
+        const v = src[stat.total];
+        if (v == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+        const verbo = stat.total === 'partidos' ? 'ha disputado' : 'ha firmado';
+        return `<b>${j.nombre}</b> ${verbo} <b>${fmtEnt(v)} ${stat.label}</b>${dimTxt} en la NBA.${botRankSentence(j, stat.total, dim, stat.label)} ${botPlayerChip(j)}`;
+      }
+      // num: total + media + puesto
+      const tot = src[stat.total], avg = src[stat.pg];
+      if (tot == null && avg == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+      return `<b>${j.nombre}</b> suma <b>${fmtEnt(tot)} ${stat.label}</b>${dimTxt} en su carrera, a una media de <b>${fmtDec1(avg)} por partido</b> en ${fmtEnt(games)} partidos.${botRankSentence(j, stat.total, dim, stat.label)} ${botPlayerChip(j)}`;
     }).join('<hr class="bot-hr">');
   }
 
   // 9) JUGADORES DE UN EQUIPO
   if (team) {
-    const list = botPlayers.filter(j => botTeamsOf(j).includes(team));
     const name = teamInfo(team).name;
-    if (!list.length) return `Ningún español ha jugado en <b>${name}</b> (con datos registrados).`;
-    return `En <b>${name}</b> ${list.length === 1 ? 'ha jugado' : 'han jugado'} <b>${list.length}</b> español${list.length > 1 ? 'es' : ''}: ${list.map(j => j.nombre).join(', ')}.
-      <div class="bot-chips">${list.map(botPlayerChip).join('')}</div>`;
+    const list = botPlayers.filter(j => botTeamsOf(j).includes(team))
+      .map(j => ({ j, g: botTeamGames(j)[team] || 0 })).sort((a, b) => b.g - a.g);
+    if (!list.length) return `No me consta ningún español que haya jugado en <b>${name}</b>. <div class="bot-sub"><a href="por-equipo.html">Ver la matriz por equipo →</a></div>`;
+    const detalle = list.map(x => `${x.j.nombre} (${fmtEnt(x.g)} partidos)`).join(', ');
+    return `Por <b>${name}</b> ${list.length === 1 ? 'ha pasado' : 'han pasado'} <b>${list.length}</b> español${list.length > 1 ? 'es' : ''}: ${detalle}. El que más partidos jugó allí fue <b>${list[0].j.nombre}</b>.
+      <div class="bot-chips">${list.map(x => botPlayerChip(x.j)).join('')}</div>`;
   }
 
   // 10) CUÁNTOS ESPAÑOLES / RECUENTO GLOBAL
   if (/cuantos espanoles|cuantos jugadores|cuantos han jugado|numero de espanoles/.test(q)) {
-    const conNba = botPlayers.filter(j => (j.partidos || 0) > 0).length;
-    return `Han jugado en la NBA <b>${conNba}</b> españoles con minutos en partido oficial (${botPlayers.length} en la base de datos). <div class="bot-sub"><a href="jugadores.html">Ver todos →</a></div>`;
+    const conNba = botPlayers.filter(j => (j.partidos || 0) > 0);
+    const primero = conNba.filter(botDebutYear).sort((a, b) => botDebutYear(a) - botDebutYear(b))[0];
+    const anotador = [...conNba].sort((a, b) => (b.pts_total || 0) - (a.pts_total || 0))[0];
+    return `Han jugado en la NBA <b>${conNba.length}</b> españoles con minutos en partido oficial (de ${botPlayers.length} en la base de datos, contando drafteados que no llegaron a debutar).${primero ? ` El pionero fue <b>${primero.nombre}</b> (${botDebutYear(primero)})` : ''}${anotador ? ` y el máximo anotador de todos es <b>${anotador.nombre}</b> con ${fmtEnt(anotador.pts_total)} puntos` : ''}. <div class="bot-sub"><a href="jugadores.html">Ver el directorio completo →</a></div>`;
   }
 
   // 11) PREMIOS de un jugador (genérico)
   if (/premio|galardon|mvp|dpoy|\broy\b|all[- ]?star|all[- ]?nba/.test(q) && players.length) {
     return players.map(j => {
       const p = j.premios || [];
-      if (!p.length) return `<b>${j.nombre}</b> no tiene premios individuales registrados. ${botPlayerChip(j)}`;
+      const rings = Object.keys(botRings(j)).length;
+      if (!p.length && !rings) return `<b>${j.nombre}</b> no tiene premios individuales registrados. ${botPlayerChip(j)}`;
       const top = p.slice(0, 8).map(a => `${a.tipo}${a.year ? ` (${a.year})` : ''}`).join(', ');
-      return `<b>${j.nombre}</b> tiene <b>${p.length}</b> premio${p.length > 1 ? 's' : ''}: ${top}${p.length > 8 ? '…' : ''}. ${botPlayerChip(j)}`;
+      const anillos = rings ? ` Además, ha ganado <b>${rings}</b> anillo${rings > 1 ? 's' : ''} de la NBA.` : '';
+      const lista = p.length ? ` Entre ellos: ${top}${p.length > 8 ? '…' : ''}.` : '';
+      return `<b>${j.nombre}</b> acumula <b>${p.length}</b> reconocimiento${p.length === 1 ? '' : 's'} individual${p.length === 1 ? '' : 'es'} en la NBA.${lista}${anillos} ${botPlayerChip(j)}
+        <div class="bot-sub"><a href="premios.html">Ver todos los premios →</a></div>`;
     }).join('<hr class="bot-hr">');
   }
 
-  // 12) JUGADOR SUELTO → ficha resumen
+  // 12) JUGADOR SUELTO → ficha resumen extendida
   if (players.length === 1) {
     const j = players[0];
-    const bits = [];
-    if (j.partidos) bits.push(`${fmtEnt(j.partidos)} partidos`);
-    if (j.pts_g != null) bits.push(`${fmtDec1(j.pts_g)} pts`);
-    if (j.rbd_g != null) bits.push(`${fmtDec1(j.rbd_g)} reb`);
-    if (j.ast_g != null) bits.push(`${fmtDec1(j.ast_g)} ast`);
+    const frases = [];
+    if (j.partidos) {
+      const medias = [j.pts_g != null ? `${fmtDec1(j.pts_g)} puntos` : null, j.rbd_g != null ? `${fmtDec1(j.rbd_g)} rebotes` : null, j.ast_g != null ? `${fmtDec1(j.ast_g)} asistencias` : null].filter(Boolean);
+      frases.push(`<b>${j.nombre}</b> ha disputado <b>${fmtEnt(j.partidos)} partidos</b> en la NBA${medias.length ? ` con promedios de <b>${medias.join(', ')}</b>` : ''}.`);
+    } else {
+      frases.push(`<b>${j.nombre}</b> figura en la base de datos de españoles en la NBA.`);
+    }
+    if (j.draft) frases.push(`Llegó a la liga en el <b>draft de ${j.draft_anio || '?'}</b> (#${j.draft_pick || '?'}${j.draft_equipo ? `, ${teamInfo(j.draft_equipo).name}` : ''}).`);
+    const nteams = botTeamsOf(j).length;
+    if (nteams) frases.push(`Vistió la camiseta de <b>${nteams}</b> equipo${nteams > 1 ? 's' : ''}.`);
     const rings = Object.keys(botRings(j)).length;
-    if (rings) bits.push(`${rings} anillo${rings > 1 ? 's' : ''}`);
-    return `<b>${j.nombre}</b> — ${bits.join(' · ') || 'sin estadísticas de carrera'}. ${botPlayerChip(j)}
-      <div class="bot-sub">Pregúntame por una estadística concreta (puntos, triples, asistencias…), su salario o en qué equipos jugó.</div>`;
+    if (rings) frases.push(`Ganó <b>${rings}</b> anillo${rings > 1 ? 's' : ''} de la NBA.`);
+    return `${frases.join(' ')} ${botPlayerChip(j)}
+      <div class="bot-sub">Puedes preguntarme por una estadística concreta (puntos, triples, asistencias…), su salario, su draft, su debut o en qué equipos jugó.</div>`;
   }
 
   return null;
