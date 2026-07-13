@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-11T01:37:25.087Z",
+  "actualizado": "2026-07-13T17:22:28.899Z",
   "summer_league": [
     {
       "year": 1985,
@@ -635,6 +635,24 @@
       "notas": "Pick #40"
     },
     {
+      "jugador": "Roberto Dueñas",
+      "fecha": "2001-06-14",
+      "tipo": "Traspasado",
+      "equipo1": "Chicago Bulls",
+      "equipo2": "Charlotte Hornets",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2001-07-18",
+      "tipo": "Traspasado",
+      "equipo1": "Atlanta Hawks",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "Shareef Abdur-Rahim",
+      "notas": "El traspaso se anunció el mismo 27 de junio, pero no se hizo oficial hasta mitad de julio. Traspaso junto a Brevin Knight y Lorenzen Wright por Shareef Abdur-Rahim y derechos de Jamaal Tinsley"
+    },
+    {
       "jugador": "Albert Miralles",
       "fecha": "2004-06-24",
       "tipo": "Traspasado",
@@ -653,31 +671,13 @@
       "notas": "Traspaso entre cinco equipos."
     },
     {
-      "jugador": "Albert Miralles",
-      "fecha": "2011-12-09",
+      "jugador": "Raül Lopez",
+      "fecha": "2005-08-02",
       "tipo": "Traspasado",
-      "equipo1": "Boston Celtics",
-      "equipo2": "Milwaukee Bucks",
-      "otros": "Keyon Dooling",
-      "notas": ""
-    },
-    {
-      "jugador": "Albert Miralles",
-      "fecha": "2016-07-07",
-      "tipo": "Traspasado",
-      "equipo1": "Milwaukee Bucks",
-      "equipo2": "Cleveland Cavaliers",
-      "otros": "Matthew Dellavedova",
-      "notas": ""
-    },
-    {
-      "jugador": "Albert Miralles",
-      "fecha": "2016-07-07",
-      "tipo": "Traspasado",
-      "equipo1": "Cleveland Cavaliers",
-      "equipo2": "Chicago Bulls",
-      "otros": "Mike Dunleavy",
-      "notas": ""
+      "equipo1": "Utah Jazz",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Albert Miralles y Roberto Dueñas",
+      "notas": "Traspaso a cinco bandas con leyendas ACB como Andre Emmet, Curtis Borchardt o Greg Ostertag."
     },
     {
       "jugador": "Alex Abrines",
@@ -707,31 +707,31 @@
       "notas": "Waived / liberado por el equipo (perdona dinero)"
     },
     {
-      "jugador": "Dani Díez",
-      "fecha": "2024-06-27",
+      "jugador": "Roberto Dueñas",
+      "fecha": "2005-08-02",
       "tipo": "Traspasado",
-      "equipo1": "New York Knicks",
-      "equipo2": "Portland Trail Blazers",
-      "otros": "Tyler Kolek",
+      "equipo1": "Charlotte Hornets",
+      "equipo2": "Miami Heat",
+      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Albert Miralles y Raul Lopez",
       "notas": ""
     },
     {
-      "jugador": "Dani Díez",
-      "fecha": "2023-02-09",
+      "jugador": "Sergio Rodríguez",
+      "fecha": "2006-06-28",
       "tipo": "Traspasado",
-      "equipo1": "Portland Trail Blazers",
-      "equipo2": "New York Knicks",
-      "otros": "Josh Hart, Matisse Thybulle, derechos de Bojan Dubljevic y Ante Tomic",
-      "notas": "Traspaso a cuatro bandas."
-    },
-    {
-      "jugador": "Dani Díez",
-      "fecha": "2015-06-26",
-      "tipo": "Traspasado",
-      "equipo1": "Utah Jazz",
+      "equipo1": "Phoenix Suns",
       "equipo2": "Portland Trail Blazers",
       "otros": "",
-      "notas": "Traspasado la noche del draft."
+      "notas": "Derechos traspasados por cash"
+    },
+    {
+      "jugador": "Rudy Fernández",
+      "fecha": "2007-07-11",
+      "tipo": "Traspasado",
+      "equipo1": "Phoenix Suns",
+      "equipo2": "Portland Trail Blazers",
+      "otros": "James Jones",
+      "notas": "Traspasado por cash"
     },
     {
       "jugador": "Dani Díez",
@@ -830,7 +830,7 @@
       "equipo1": "Atlanta Hawks",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 113, derechos históricos"
+      "notas": "Pick #113, derechos históricos"
     },
     {
       "jugador": "José M. Calderón",
@@ -843,12 +843,30 @@
     },
     {
       "jugador": "José M. Calderón",
-      "fecha": "2013-01-30",
-      "tipo": "Traspasado",
+      "fecha": "2008-07-09",
+      "tipo": "Renovación",
       "equipo1": "Toronto Raptors",
-      "equipo2": "Detroit Pistons",
-      "otros": "Rudy Gay",
-      "notas": "Intercambio en traspaso a 3 equipos"
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Juan Carlos Navarro",
+      "fecha": "2007-08-16",
+      "tipo": "Traspasado",
+      "equipo1": "Washington Wizards",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "",
+      "notas": "Traspaso de derechos"
+    },
+    {
+      "jugador": "José M. Calderón",
+      "fecha": "2013-07-10",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Detroit Pistons",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "José M. Calderón",
@@ -860,31 +878,31 @@
       "notas": "Firma como agente libre tras salir de Detroit"
     },
     {
-      "jugador": "José M. Calderón",
-      "fecha": "2014-06-25",
+      "jugador": "Marc Gasol",
+      "fecha": "2008-02-01",
       "tipo": "Traspasado",
-      "equipo1": "Dallas Mavericks",
-      "equipo2": "New York Knicks",
-      "otros": "",
-      "notas": "Traspasado junto a varios jugadores por Tyson Chandler y Raymond Felton."
+      "equipo1": "Los Angeles Lakers",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "Pau Gasol",
+      "notas": "Incluido en el traspaso de Pau Gasol junto a Kwame Brown, Javaris Crittenton, Aaron McKie y dos primeras rondas"
     },
     {
-      "jugador": "José M. Calderón",
-      "fecha": "2016-06-22",
+      "jugador": "Pau Gasol",
+      "fecha": "2008-02-01",
       "tipo": "Traspasado",
-      "equipo1": "New York Knicks",
-      "equipo2": "Chicago Bulls",
-      "otros": "",
-      "notas": "Parte de traspaso con Derrick Rose y Justin Holiday"
-    },
-    {
-      "jugador": "José M. Calderón",
-      "fecha": "2016-07-07",
-      "tipo": "Traspasado",
-      "equipo1": "Chicago Bulls",
+      "equipo1": "Memphis Grizzlies",
       "equipo2": "Los Angeles Lakers",
+      "otros": "Kwame Brown, Javaris Crittenton, Aaron McKie, derechos de Marc Gasol",
+      "notas": ""
+    },
+    {
+      "jugador": "Sergio Llull",
+      "fecha": "2009-06-25",
+      "tipo": "Traspasado",
+      "equipo1": "Denver Nuggets",
+      "equipo2": "Houston Rockets",
       "otros": "",
-      "notas": "Traspasado junto a dos segundas rondas por Ater Majok."
+      "notas": "Traspaso de derechos de draft. Vendido por dinero."
     },
     {
       "jugador": "José M. Calderón",
@@ -920,6 +938,15 @@
       "equipo1": "Atlanta Hawks",
       "equipo2": "",
       "otros": "",
+      "notas": "Reclamado de la lista de jugadores cortados."
+    },
+    {
+      "jugador": "José M. Calderón",
+      "fecha": "2017-07-06",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Atlanta Hawks",
+      "equipo2": "",
+      "otros": "",
       "notas": ""
     },
     {
@@ -929,7 +956,7 @@
       "equipo1": "Cleveland Cavaliers",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato con Cavs tras salir de Lakers vía waivers (ShamSports)"
+      "notas": "Mínimo de veterano."
     },
     {
       "jugador": "José M. Calderón",
@@ -939,6 +966,15 @@
       "equipo2": "",
       "otros": "",
       "notas": "Firma con Pistons tras finalizar contrato Cavs (Wikipedia)"
+    },
+    {
+      "jugador": "José M. Calderón",
+      "fecha": "2020-11-19",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Detroit Pistons",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "Juan Carlos Navarro",
@@ -959,13 +995,13 @@
       "notas": "Firma para debutar en la NBA"
     },
     {
-      "jugador": "Juan Carlos Navarro",
-      "fecha": "2007-08-16",
+      "jugador": "Sergio Rodríguez",
+      "fecha": "2009-06-25",
       "tipo": "Traspasado",
-      "equipo1": "Washington Wizards",
-      "equipo2": "Memphis Grizzlies",
-      "otros": "",
-      "notas": "Traspaso de derechos"
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "Sacramento Kings",
+      "otros": "Jeff Ayres",
+      "notas": "Traspasado por Jeff Ayres"
     },
     {
       "jugador": "Juan Carlos Navarro",
@@ -995,13 +1031,13 @@
       "notas": "Pick #36 del Draft, segunda ronda"
     },
     {
-      "jugador": "Juan Nuñez",
-      "fecha": "2024-06-27",
+      "jugador": "Sergio Rodríguez",
+      "fecha": "2010-02-18",
       "tipo": "Traspasado",
-      "equipo1": "Indiana Pacers",
-      "equipo2": "Indiana Pacers",
-      "otros": "Johnny Furpy",
-      "notas": "Traspaso de derechos la noche del draft"
+      "equipo1": "Sacramento Kings",
+      "equipo2": "New York Knicks",
+      "otros": "Tracy McGrady, Jordan Hill, Larry Hughes",
+      "notas": "Traspasado en un movimiento a tres bandas (con Tracy McGrady, Carl Landry o Kevin Martin)"
     },
     {
       "jugador": "Juancho Hernangómez",
@@ -1010,70 +1046,70 @@
       "equipo1": "Denver Nuggets",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 15 del Draft"
+      "notas": "Pick #15 del Draft"
     },
     {
       "jugador": "Juancho Hernangómez",
-      "fecha": "2016-07-28",
+      "fecha": "2016-08-09",
       "tipo": "Firma contrato rookie",
       "equipo1": "Denver Nuggets",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "$9,55M x 4"
     },
     {
-      "jugador": "Juancho Hernangómez",
-      "fecha": "2020-02-05",
+      "jugador": "Nikola Mirotic",
+      "fecha": "2011-06-23",
       "tipo": "Traspasado",
-      "equipo1": "Denver Nuggets",
-      "equipo2": "Minnesota Timberwolves",
-      "otros": "",
-      "notas": "Traspaso múltiple de 4 equipos que incluyó a varios jugadores"
+      "equipo1": "Houston Rockets",
+      "equipo2": "Chicago Bulls",
+      "otros": "Chandler Parsons, Norris Cole",
+      "notas": "Traspasados los derechos del draft en un movimiento a tres bandas con Chandler Parsons o Donatas Motiejunas"
     },
     {
       "jugador": "Juancho Hernangómez",
-      "fecha": "2020-11-27",
+      "fecha": "2020-11-28",
       "tipo": "Renovación",
       "equipo1": "Minnesota Timberwolves",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato multianual tras ser agente restringido (Hoops Rumors)"
+      "notas": "$21M x 3"
     },
     {
-      "jugador": "Juancho Hernangómez",
-      "fecha": "2021-08-25",
+      "jugador": "Rudy Fernández",
+      "fecha": "2011-06-23",
       "tipo": "Traspasado",
-      "equipo1": "Minnesota Timberwolves",
-      "equipo2": "Memphis Grizzlies",
-      "otros": "",
-      "notas": "Incluido con Jarrett Culver a cambio de Patrick Beverley (Panathinaikos B.C.)"
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "Dallas Mavericks",
+      "otros": "Andre Miller, Raymond Felton, derechos de Petteri Koponen y Jordan Hamilton",
+      "notas": "Rudy Fernandez was acquired by the Dallas Mavericks, along with the draft rights to Petteri Koponen, from the Portland Trail Blazers in exchange for the draft rights to Jordan Hamilton, the draft rights to Tanguy Ngombo and a TPE."
     },
     {
-      "jugador": "Juancho Hernangómez",
-      "fecha": "2021-09-15",
-      "tipo": "Traspasado",
-      "equipo1": "Memphis Grizzlies",
-      "equipo2": "Boston Celtics",
-      "otros": "",
-      "notas": "A cambio de Kris Dunn, Carsen Edwards y opción de swap 2ª ronda 2026 (Eurohoops)"
-    },
-    {
-      "jugador": "Juancho Hernangómez",
-      "fecha": "2022-01-19",
+      "jugador": "Albert Miralles",
+      "fecha": "2011-12-09",
       "tipo": "Traspasado",
       "equipo1": "Boston Celtics",
-      "equipo2": "San Antonio Spurs",
-      "otros": "",
-      "notas": "Acuerdo de tres equipos (Wikipedia)"
+      "equipo2": "Milwaukee Bucks",
+      "otros": "Keyon Dooling",
+      "notas": ""
     },
     {
-      "jugador": "Juancho Hernangómez",
-      "fecha": "2022-02-09",
+      "jugador": "Rudy Fernández",
+      "fecha": "2011-12-13",
       "tipo": "Traspasado",
-      "equipo1": "San Antonio Spurs",
-      "equipo2": "Utah Jazz",
-      "otros": "",
-      "notas": "Acuerdo de tres equipos (Wikipedia)"
+      "equipo1": "Dallas Mavericks",
+      "equipo2": "Denver Nuggets",
+      "otros": "Corey Brewer",
+      "notas": "Rudy Fernandez was acquired by the Denver Nuggets, along with Corey Brewer, from the Dallas Mavericks in exchange for a conditional 2016 2nd round pick (MEM own) and a TPE."
+    },
+    {
+      "jugador": "José M. Calderón",
+      "fecha": "2013-01-30",
+      "tipo": "Traspasado",
+      "equipo1": "Toronto Raptors",
+      "equipo2": "Detroit Pistons",
+      "otros": "Rudy Gay, Ed Davis y Hamed Haddadi",
+      "notas": "Intercambio en traspaso a 3 equipos"
     },
     {
       "jugador": "Juancho Hernangómez",
@@ -1086,12 +1122,12 @@
     },
     {
       "jugador": "Juancho Hernangómez",
-      "fecha": "2022-07-27",
+      "fecha": "2022-07-28",
       "tipo": "Agente libre",
       "equipo1": "Toronto Raptors",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato por una temporada (Basketball Forever)"
+      "notas": "$2,3M x 1"
     },
     {
       "jugador": "Juancho Hernangómez",
@@ -1109,16 +1145,16 @@
       "equipo1": "Los Angeles Lakers",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 48 del Draft"
+      "notas": "Pick #48 del Draft"
     },
     {
-      "jugador": "Marc Gasol",
-      "fecha": "2008-02-01",
+      "jugador": "José M. Calderón",
+      "fecha": "2014-06-25",
       "tipo": "Traspasado",
-      "equipo1": "Los Angeles Lakers",
-      "equipo2": "Memphis Grizzlies",
-      "otros": "",
-      "notas": "Incluido en el traspaso de Pau Gasol junto a Kwame Brown, Javaris Crittenton, Aaron McKie y dos primeras rondas"
+      "equipo1": "Dallas Mavericks",
+      "equipo2": "New York Knicks",
+      "otros": "Tyson Chandler, Raymond Felton, Samuel Dalembert, Shane Larkin",
+      "notas": "Traspasado junto a varios jugadores por Tyson Chandler y Raymond Felton."
     },
     {
       "jugador": "Marc Gasol",
@@ -1131,7 +1167,7 @@
     },
     {
       "jugador": "Marc Gasol",
-      "fecha": "2011-10-31",
+      "fecha": "2011-12-12",
       "tipo": "Renovación",
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
@@ -1140,7 +1176,7 @@
     },
     {
       "jugador": "Marc Gasol",
-      "fecha": "2015-07-10",
+      "fecha": "2015-07-13",
       "tipo": "Renovación",
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
@@ -1148,26 +1184,17 @@
       "notas": "Renovación máxima"
     },
     {
-      "jugador": "Marc Gasol",
-      "fecha": "2019-02-07",
+      "jugador": "Víctor Claver",
+      "fecha": "2015-02-19",
       "tipo": "Traspasado",
-      "equipo1": "Memphis Grizzlies",
-      "equipo2": "Toronto Raptors",
-      "otros": "",
-      "notas": "Traspasado por Jonas Valanciunas, Delon Wright, C.J. Miles y una segunda ronda"
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "Denver Nuggets",
+      "otros": "Will Barton, Thomas Robinson, Arron Afflalo y Alonzo Gee",
+      "notas": "Traspasado por Arron Afflalo y Alonzo Gee junto con Will Barton, Thomas Robinson y una primera ronda."
     },
     {
       "jugador": "Marc Gasol",
-      "fecha": "2019-06-30",
-      "tipo": "Renovación",
-      "equipo1": "Toronto Raptors",
-      "equipo2": "",
-      "otros": "",
-      "notas": "Renovación tras ganar el anillo"
-    },
-    {
-      "jugador": "Marc Gasol",
-      "fecha": "2020-11-22",
+      "fecha": "2020-11-24",
       "tipo": "Agente libre",
       "equipo1": "Los Angeles Lakers",
       "equipo2": "",
@@ -1175,8 +1202,17 @@
       "notas": "Firma como agente libre"
     },
     {
+      "jugador": "Dani Díez",
+      "fecha": "2015-06-26",
+      "tipo": "Traspasado",
+      "equipo1": "Utah Jazz",
+      "equipo2": "Portland Trail Blazers",
+      "otros": "",
+      "notas": "Traspasado la noche del draft."
+    },
+    {
       "jugador": "Marc Gasol",
-      "fecha": "2021-09-10",
+      "fecha": "2021-09-15",
       "tipo": "Cortado",
       "equipo1": "Los Angeles Lakers",
       "equipo2": "",
@@ -1190,16 +1226,16 @@
       "equipo1": "Houston Rockets",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 23 del Draft"
+      "notas": "Pick #23 del Draft"
     },
     {
-      "jugador": "Nikola Mirotic",
-      "fecha": "2011-06-23",
+      "jugador": "Willy Hernangómez",
+      "fecha": "2015-06-26",
       "tipo": "Traspasado",
-      "equipo1": "Houston Rockets",
-      "equipo2": "Chicago Bulls",
+      "equipo1": "Philadelphia 76ers",
+      "equipo2": "New York Knicks",
       "otros": "",
-      "notas": "Traspasados los derechos del draft en un movimiento a tres bandas con Chandler Parsons o Donatas Motiejunas"
+      "notas": "Derechos intercambiados por dos elecciones de segunda ronda y dinero (Basketball Reference)"
     },
     {
       "jugador": "Nikola Mirotic",
@@ -1208,25 +1244,43 @@
       "equipo1": "Chicago Bulls",
       "equipo2": "",
       "otros": "",
+      "notas": "$16,6M x 3"
+    },
+    {
+      "jugador": "Nikola Mirotic",
+      "fecha": "2017-09-25",
+      "tipo": "Extensión",
+      "equipo1": "Chicago Bulls",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$15M x 2"
+    },
+    {
+      "jugador": "José M. Calderón",
+      "fecha": "2016-06-22",
+      "tipo": "Traspasado",
+      "equipo1": "New York Knicks",
+      "equipo2": "Chicago Bulls",
+      "otros": "Derrick Rose, Robin Lopez, Justin Holiday",
+      "notas": "Parte de traspaso con Derrick Rose y Justin Holiday"
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "fecha": "2016-06-24",
+      "tipo": "Traspasado",
+      "equipo1": "Oklahoma City Thunder",
+      "equipo2": "Orlando Magic",
+      "otros": "Victor Oladipo, Ersan Ilyasova y los derechos de Domantas Sabonis",
       "notas": ""
     },
     {
       "jugador": "Nikola Mirotic",
-      "fecha": "2018-02-01",
-      "tipo": "Traspasado",
-      "equipo1": "Chicago Bulls",
-      "equipo2": "New Orleans Pelicans",
+      "fecha": "2019-07-06",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Milwaukee Bucks",
+      "equipo2": "",
       "otros": "",
-      "notas": "Traspaso por Ömer Aşık, Jameer Nelson y Tony Allen"
-    },
-    {
-      "jugador": "Nikola Mirotic",
-      "fecha": "2019-02-07",
-      "tipo": "Traspasado",
-      "equipo1": "New Orleans Pelicans",
-      "equipo2": "Milwaukee Bucks",
-      "otros": "",
-      "notas": "Traspaso en un movimiento a tres bandas con Thon Maker, Stanley Johsnon y varias segundas rondas."
+      "notas": ""
     },
     {
       "jugador": "Pau Gasol",
@@ -1235,16 +1289,16 @@
       "equipo1": "Atlanta Hawks",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 3 del Draft"
+      "notas": "Pick #3 del Draft"
     },
     {
-      "jugador": "Pau Gasol",
-      "fecha": "2001-07-19",
+      "jugador": "Albert Miralles",
+      "fecha": "2016-07-07",
       "tipo": "Traspasado",
-      "equipo1": "Atlanta Hawks",
-      "equipo2": "Memphis Grizzlies",
-      "otros": "",
-      "notas": "Traspaso junto a Brevin Knight y Lorenzen Wright por Shareef Abdur-Rahim y derechos de Jamaal Tinsley"
+      "equipo1": "Milwaukee Bucks",
+      "equipo2": "Cleveland Cavaliers",
+      "otros": "Matthew Dellavedova",
+      "notas": ""
     },
     {
       "jugador": "Pau Gasol",
@@ -1253,16 +1307,7 @@
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
       "otros": "",
-      "notas": ""
-    },
-    {
-      "jugador": "Pau Gasol",
-      "fecha": "2003-10-05",
-      "tipo": "Renovación",
-      "equipo1": "Memphis Grizzlies",
-      "equipo2": "",
-      "otros": "",
-      "notas": "Opción de equipo ejercida"
+      "notas": "Firma por cuatro años con opción de equipo los dos últimos. Antes de acabar el contrato firman uno nuevo."
     },
     {
       "jugador": "Pau Gasol",
@@ -1271,15 +1316,15 @@
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
       "otros": "",
-      "notas": "Extensión multianual"
+      "notas": "Rookie extension."
     },
     {
-      "jugador": "Pau Gasol",
-      "fecha": "2008-02-01",
+      "jugador": "Albert Miralles",
+      "fecha": "2016-07-07",
       "tipo": "Traspasado",
-      "equipo1": "Memphis Grizzlies",
-      "equipo2": "Los Angeles Lakers",
-      "otros": "Kwame Brown, Javaris Crittenton, Aaron McKie, derechos de Marc Gasol",
+      "equipo1": "Cleveland Cavaliers",
+      "equipo2": "Chicago Bulls",
+      "otros": "Mike Dunleavy",
       "notas": ""
     },
     {
@@ -1294,6 +1339,15 @@
     {
       "jugador": "Pau Gasol",
       "fecha": "2014-07-13",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Los Angeles Lakers",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2014-07-18",
       "tipo": "Agente libre",
       "equipo1": "Chicago Bulls",
       "equipo2": "",
@@ -1304,6 +1358,15 @@
       "jugador": "Pau Gasol",
       "fecha": "2016-06-27",
       "tipo": "Rechaza opción (jugador)",
+      "equipo1": "Chicago Bulls",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2016-07-07",
+      "tipo": "Renuncia de derechos",
       "equipo1": "Chicago Bulls",
       "equipo2": "",
       "otros": "",
@@ -1333,7 +1396,7 @@
       "tipo": "Renovación",
       "equipo1": "San Antonio Spurs",
       "equipo2": "",
-      "otros": "",
+      "otros": "Solo 39,5M garantizados.",
       "notas": ""
     },
     {
@@ -1351,8 +1414,35 @@
       "tipo": "Agente libre",
       "equipo1": "Milwaukee Bucks",
       "equipo2": "",
-      "otros": "",
+      "otros": "Contrato para acabar la temporada.",
       "notas": "Firma hasta final de temporada"
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2019-07-06",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Milwaukee Bucks",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2019-07-24",
+      "tipo": "Agente libre",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "",
+      "otros": "Mínimo de veterano.",
+      "notas": ""
+    },
+    {
+      "jugador": "Pau Gasol",
+      "fecha": "2019-11-20",
+      "tipo": "Cortado",
+      "equipo1": "Portland Trail Blazers",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "Raül Lopez",
@@ -1373,13 +1463,13 @@
       "notas": ""
     },
     {
-      "jugador": "Raül Lopez",
-      "fecha": "2005-08-02",
+      "jugador": "José M. Calderón",
+      "fecha": "2016-07-07",
       "tipo": "Traspasado",
-      "equipo1": "Utah Jazz",
-      "equipo2": "Memphis Grizzlies",
-      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Albert Miralles y Roberto Dueñas",
-      "notas": "Traspaso a cinco bandas con leyendas ACB como Andre Emmet, Curtis Borchardt o Greg Ostertag."
+      "equipo1": "Chicago Bulls",
+      "equipo2": "Los Angeles Lakers",
+      "otros": "",
+      "notas": "Traspasado junto a dos segundas rondas por Ater Majok."
     },
     {
       "jugador": "Raül Lopez",
@@ -1397,16 +1487,43 @@
       "equipo1": "Minnesota Timberwolves",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 5 del Draft"
+      "notas": "Pick #5 del Draft"
     },
     {
       "jugador": "Ricky Rubio",
-      "fecha": "2017-07-05",
-      "tipo": "Traspasado",
+      "fecha": "2011-05-30",
+      "tipo": "Firma contrato rookie",
       "equipo1": "Minnesota Timberwolves",
-      "equipo2": "Utah Jazz",
+      "equipo2": "",
       "otros": "",
-      "notas": "Traspasado por una primera ronda protegida 2018"
+      "notas": ""
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "fecha": "2014-10-31",
+      "tipo": "Extensión",
+      "equipo1": "Minnesota Timberwolves",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
+    },
+    {
+      "jugador": "Serge Ibaka",
+      "fecha": "2017-02-14",
+      "tipo": "Traspasado",
+      "equipo1": "Orlando Magic",
+      "equipo2": "Toronto Raptors",
+      "otros": "Terrence Ross",
+      "notas": "Traspaso por Terrence Ross y 1ª ronda 2017"
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "fecha": "2019-07-06",
+      "tipo": "Renuncia de derechos",
+      "equipo1": "Utah Jazz",
+      "equipo2": "",
+      "otros": "",
+      "notas": ""
     },
     {
       "jugador": "Ricky Rubio",
@@ -1419,39 +1536,39 @@
     },
     {
       "jugador": "Ricky Rubio",
-      "fecha": "2020-11-16",
-      "tipo": "Traspasado",
-      "equipo1": "Phoenix Suns",
-      "equipo2": "Oklahoma City Thunder",
-      "otros": "",
-      "notas": "Traspasado con Ty Jerome, Jalen Lecque, Kelly Oubre y una primera ronda por Chris Paul y Abdel Nader"
-    },
-    {
-      "jugador": "Ricky Rubio",
-      "fecha": "2020-11-20",
-      "tipo": "Traspasado",
-      "equipo1": "Oklahoma City Thunder",
-      "equipo2": "Minnesota Timberwolves",
-      "otros": "",
-      "notas": "Traspasado en un movimiento a tres bandas con los Knicks también involucrados. James Nnaji, Poku, Bolmaro y Quickley involucrados."
-    },
-    {
-      "jugador": "Ricky Rubio",
-      "fecha": "2021-08-02",
+      "fecha": "2017-07-05",
       "tipo": "Traspasado",
       "equipo1": "Minnesota Timberwolves",
-      "equipo2": "Cleveland Cavaliers",
+      "equipo2": "Utah Jazz",
       "otros": "",
-      "notas": "Traspasado por Taurean Prince y una segunda ronda."
+      "notas": "Traspasado por una primera ronda protegida 2018"
     },
     {
-      "jugador": "Ricky Rubio",
-      "fecha": "2022-02-07",
+      "jugador": "Nikola Mirotic",
+      "fecha": "2018-02-01",
       "tipo": "Traspasado",
-      "equipo1": "Cleveland Cavaliers",
-      "equipo2": "Indiana Pacers",
-      "otros": "",
-      "notas": "Traspasado por Caris LeVert, una primera ronda y una segunda ronda"
+      "equipo1": "Chicago Bulls",
+      "equipo2": "New Orleans Pelicans",
+      "otros": "Ömer Aşık, Jameer Nelson y Tony Allen",
+      "notas": "Traspaso por Ömer Aşık, Jameer Nelson y Tony Allen"
+    },
+    {
+      "jugador": "Willy Hernangómez",
+      "fecha": "2018-02-07",
+      "tipo": "Traspasado",
+      "equipo1": "New York Knicks",
+      "equipo2": "Charlotte Hornets",
+      "otros": "Johnny O'Bryant",
+      "notas": ""
+    },
+    {
+      "jugador": "Marc Gasol",
+      "fecha": "2019-02-07",
+      "tipo": "Traspasado",
+      "equipo1": "Memphis Grizzlies",
+      "equipo2": "Toronto Raptors",
+      "otros": "Jonas Valanciunas, Delon Wright, CJ Miles",
+      "notas": "Traspasado por Jonas Valanciunas, Delon Wright, C.J. Miles y una segunda ronda"
     },
     {
       "jugador": "Ricky Rubio",
@@ -1465,7 +1582,7 @@
     {
       "jugador": "Ricky Rubio",
       "fecha": "2024-01-04",
-      "tipo": "Retirada NBA",
+      "tipo": "Cortado",
       "equipo1": "Cleveland Cavaliers",
       "equipo2": "",
       "otros": "",
@@ -1481,22 +1598,22 @@
       "notas": "Pick #58. Nunca debutó"
     },
     {
-      "jugador": "Roberto Dueñas",
-      "fecha": "2001-06-14",
+      "jugador": "Nikola Mirotic",
+      "fecha": "2019-02-07",
       "tipo": "Traspasado",
-      "equipo1": "Chicago Bulls",
-      "equipo2": "Charlotte Hornets",
-      "otros": "",
-      "notas": ""
+      "equipo1": "New Orleans Pelicans",
+      "equipo2": "Milwaukee Bucks",
+      "otros": "Thon Maker, Stanley Johsnon y Jason Smith",
+      "notas": "Traspaso en un movimiento a tres bandas con Thon Maker, Stanley Johsnon y varias segundas rondas."
     },
     {
-      "jugador": "Roberto Dueñas",
-      "fecha": "2005-08-02",
+      "jugador": "Juancho Hernangómez",
+      "fecha": "2020-02-05",
       "tipo": "Traspasado",
-      "equipo1": "Charlotte Hornets",
-      "equipo2": "Miami Heat",
-      "otros": "Antoine Walker, James Posey, Jason Williams, derechos de Albert Miralles y Raul Lopez",
-      "notas": ""
+      "equipo1": "Denver Nuggets",
+      "equipo2": "Minnesota Timberwolves",
+      "otros": "Evan Turner, Malik Beasley, Clint Capela, Robert Covington",
+      "notas": "Traspaso múltiple de 4 equipos que incluyó a varios jugadores"
     },
     {
       "jugador": "Rudy Fernández",
@@ -1508,13 +1625,13 @@
       "notas": "Pick #24 del Draft"
     },
     {
-      "jugador": "Rudy Fernández",
-      "fecha": "2007-07-11",
+      "jugador": "Ricky Rubio",
+      "fecha": "2020-11-16",
       "tipo": "Traspasado",
       "equipo1": "Phoenix Suns",
-      "equipo2": "Portland Trail Blazers",
-      "otros": "James Jones",
-      "notas": "Traspasado por cash"
+      "equipo2": "Oklahoma City Thunder",
+      "otros": "Chris Paul, Kelly Oubre, Ty Jerome",
+      "notas": "Traspasado con Ty Jerome, Jalen Lecque, Kelly Oubre y una primera ronda por Chris Paul y Abdel Nader"
     },
     {
       "jugador": "Rudy Fernández",
@@ -1526,22 +1643,22 @@
       "notas": "$5,6M x 4"
     },
     {
-      "jugador": "Rudy Fernández",
-      "fecha": "2011-06-23",
+      "jugador": "Ricky Rubio",
+      "fecha": "2020-11-20",
       "tipo": "Traspasado",
-      "equipo1": "Portland Trail Blazers",
-      "equipo2": "Dallas Mavericks",
-      "otros": "Andre Miller, Raymond Felton, derechos de Petteri Koponen y Jordan Hamilton",
-      "notas": "Rudy Fernandez was acquired by the Dallas Mavericks, along with the draft rights to Petteri Koponen, from the Portland Trail Blazers in exchange for the draft rights to Jordan Hamilton, the draft rights to Tanguy Ngombo and a TPE."
+      "equipo1": "Oklahoma City Thunder",
+      "equipo2": "Minnesota Timberwolves",
+      "otros": "Aleksej Pokusevski",
+      "notas": "Traspasado en un movimiento a tres bandas con los Knicks también involucrados. James Nnaji, Poku, Bolmaro y Quickley involucrados."
     },
     {
-      "jugador": "Rudy Fernández",
-      "fecha": "2011-12-13",
+      "jugador": "Sergio Llull",
+      "fecha": "2020-11-27",
       "tipo": "Traspasado",
-      "equipo1": "Dallas Mavericks",
-      "equipo2": "Denver Nuggets",
-      "otros": "Corey Brewer",
-      "notas": "Rudy Fernandez was acquired by the Denver Nuggets, along with Corey Brewer, from the Dallas Mavericks in exchange for a conditional 2016 2nd round pick (MEM own) and a TPE."
+      "equipo1": "Houston Rockets",
+      "equipo2": "New York Knicks",
+      "otros": "Austin Rivers, derechos Axel Hervelle",
+      "notas": ""
     },
     {
       "jugador": "Rudy Fernández",
@@ -1559,7 +1676,25 @@
       "equipo1": "Utah Jazz",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 30 del Draft"
+      "notas": "Pick #30 del Draft"
+    },
+    {
+      "jugador": "Ricky Rubio",
+      "fecha": "2021-08-02",
+      "tipo": "Traspasado",
+      "equipo1": "Minnesota Timberwolves",
+      "equipo2": "Cleveland Cavaliers",
+      "otros": "Taurean Prince",
+      "notas": "Traspasado por Taurean Prince y una segunda ronda."
+    },
+    {
+      "jugador": "Santi Aldama",
+      "fecha": "2021-08-08",
+      "tipo": "Firma contrato rookie",
+      "equipo1": "Memphis Grizzlies",
+      "equipo2": "",
+      "otros": "",
+      "notas": "$10,2M x 4"
     },
     {
       "jugador": "Santi Aldama",
@@ -1572,21 +1707,12 @@
     },
     {
       "jugador": "Santi Aldama",
-      "fecha": "2021-08-08",
-      "tipo": "Firma contrato rookie",
-      "equipo1": "Memphis Grizzlies",
-      "equipo2": "",
-      "otros": "",
-      "notas": ""
-    },
-    {
-      "jugador": "Santi Aldama",
       "fecha": "2025-07-15",
       "tipo": "Renovación",
       "equipo1": "Memphis Grizzlies",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "$52,5M x 3 (con opción de equipo)"
     },
     {
       "jugador": "Serge Ibaka",
@@ -1595,7 +1721,7 @@
       "equipo1": "Seatle Super Sonics",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 24 del Draft"
+      "notas": "Pick #24 del Draft"
     },
     {
       "jugador": "Serge Ibaka",
@@ -1604,7 +1730,7 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato NBA primera temporada"
+      "notas": "$5,8M x 4"
     },
     {
       "jugador": "Serge Ibaka",
@@ -1613,25 +1739,25 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": "Extensión de contrato rookie scale"
+      "notas": "$49M x 4. Extensión de contrato rookie scale"
     },
     {
-      "jugador": "Serge Ibaka",
-      "fecha": "2016-06-23",
+      "jugador": "Juancho Hernangómez",
+      "fecha": "2021-08-25",
       "tipo": "Traspasado",
-      "equipo1": "Oklahoma City Thunder",
-      "equipo2": "Orlando Magic",
-      "otros": "Victor Oladipo, Ersan Ilyasova y los derechos de Domantas Sabonis",
-      "notas": ""
+      "equipo1": "Minnesota Timberwolves",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "Pat Beverley",
+      "notas": "Incluido con Jarrett Culver a cambio de Patrick Beverley (Panathinaikos B.C.)"
     },
     {
-      "jugador": "Serge Ibaka",
-      "fecha": "2017-02-14",
+      "jugador": "Marc Gasol",
+      "fecha": "2021-09-10",
       "tipo": "Traspasado",
-      "equipo1": "Orlando Magic",
-      "equipo2": "Toronto Raptors",
-      "otros": "Terrence Ross",
-      "notas": "Traspaso por Terrence Ross y 1ª ronda 2017"
+      "equipo1": "Los Angeles Lakers",
+      "equipo2": "Memphis Grizzlies",
+      "otros": "",
+      "notas": "Traspaso honorifico para poder restirarse como Grizzlie."
     },
     {
       "jugador": "Serge Ibaka",
@@ -1644,21 +1770,21 @@
     },
     {
       "jugador": "Serge Ibaka",
-      "fecha": "2020-11-25",
+      "fecha": "2020-11-27",
       "tipo": "Agente libre",
       "equipo1": "Los Angeles Clippers",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato como agente libre"
+      "notas": "Firma contrato como agente libre con player option."
     },
     {
-      "jugador": "Serge Ibaka",
-      "fecha": "2022-02-10",
+      "jugador": "Juancho Hernangómez",
+      "fecha": "2021-09-15",
       "tipo": "Traspasado",
-      "equipo1": "Los Angeles Clippers",
-      "equipo2": "Milwaukee Bucks",
-      "otros": "Donte DiVincenzo, Rodney Hood, Semi Ojeleye",
-      "notas": "Acuerdo de 4 equipos, Bucks adquieren a Ibaka"
+      "equipo1": "Memphis Grizzlies",
+      "equipo2": "Boston Celtics",
+      "otros": "Kris Dunn, Carsen Edwards",
+      "notas": "A cambio de Kris Dunn, Carsen Edwards y opción de swap 2ª ronda 2026 (Eurohoops)"
     },
     {
       "jugador": "Serge Ibaka",
@@ -1667,16 +1793,16 @@
       "equipo1": "Milwaukee Bucks",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato con Bucks"
+      "notas": "Firma contrato con Bucks un minimo."
     },
     {
-      "jugador": "Serge Ibaka",
-      "fecha": "2023-02-09",
+      "jugador": "Juancho Hernangómez",
+      "fecha": "2022-01-19",
       "tipo": "Traspasado",
-      "equipo1": "Milwaukee Bucks",
-      "equipo2": "Indiana Pacers",
-      "otros": "George Hill, Jordan Nwora",
-      "notas": "Acuerdo de 4 equipos"
+      "equipo1": "Boston Celtics",
+      "equipo2": "San Antonio Spurs",
+      "otros": "Bryn Forbes, Bol Bol",
+      "notas": "Acuerdo de tres equipos (Wikipedia)"
     },
     {
       "jugador": "Serge Ibaka",
@@ -1697,22 +1823,22 @@
       "notas": "Pick #34"
     },
     {
-      "jugador": "Sergio Llull",
-      "fecha": "2009-06-25",
+      "jugador": "Ricky Rubio",
+      "fecha": "2022-02-07",
       "tipo": "Traspasado",
-      "equipo1": "Denver Nuggets",
-      "equipo2": "Houston Rockets",
-      "otros": "",
-      "notas": "Traspaso de derechos de draft. Vendido por dinero."
+      "equipo1": "Cleveland Cavaliers",
+      "equipo2": "Indiana Pacers",
+      "otros": "Caris LeVert",
+      "notas": "Traspasado por Caris LeVert, una primera ronda y una segunda ronda"
     },
     {
-      "jugador": "Sergio Llull",
-      "fecha": "2020-11-27",
+      "jugador": "Juancho Hernangómez",
+      "fecha": "2022-02-09",
       "tipo": "Traspasado",
-      "equipo1": "Houston Rockets",
-      "equipo2": "New York Knicks",
-      "otros": "Austin Rivers, derechos Axel Hervelle",
-      "notas": ""
+      "equipo1": "San Antonio Spurs",
+      "equipo2": "Utah Jazz",
+      "otros": "Nickeil Alexander-Walker, Joe Ingles, Tomas Satoransky",
+      "notas": "Acuerdo de tres equipos (Wikipedia)"
     },
     {
       "jugador": "Sergio Rodríguez",
@@ -1724,13 +1850,13 @@
       "notas": "Pick #27 del Draft"
     },
     {
-      "jugador": "Sergio Rodríguez",
-      "fecha": "2006-06-28",
+      "jugador": "Serge Ibaka",
+      "fecha": "2022-02-10",
       "tipo": "Traspasado",
-      "equipo1": "Phoenix Suns",
-      "equipo2": "Portland Trail Blazers",
-      "otros": "",
-      "notas": "Derechos traspasados por cash"
+      "equipo1": "Los Angeles Clippers",
+      "equipo2": "Milwaukee Bucks",
+      "otros": "Donte DiVincenzo, Rodney Hood, Semi Ojeleye",
+      "notas": "Acuerdo de 4 equipos, Bucks adquieren a Ibaka"
     },
     {
       "jugador": "Sergio Rodríguez",
@@ -1742,22 +1868,22 @@
       "notas": "$4,66M x 4"
     },
     {
-      "jugador": "Sergio Rodríguez",
-      "fecha": "2009-06-25",
+      "jugador": "Dani Díez",
+      "fecha": "2023-02-09",
       "tipo": "Traspasado",
       "equipo1": "Portland Trail Blazers",
-      "equipo2": "Sacramento Kings",
-      "otros": "Jeff Ayres",
-      "notas": "Traspasado por Jeff Ayres"
+      "equipo2": "New York Knicks",
+      "otros": "Josh Hart, Matisse Thybulle, derechos de Bojan Dubljevic y Ante Tomic",
+      "notas": "Traspaso a cuatro bandas."
     },
     {
-      "jugador": "Sergio Rodríguez",
-      "fecha": "2010-02-18",
+      "jugador": "Serge Ibaka",
+      "fecha": "2023-02-09",
       "tipo": "Traspasado",
-      "equipo1": "Sacramento Kings",
-      "equipo2": "New York Knicks",
-      "otros": "Tracy McGrady, Jordan Hill, Larry Hughes",
-      "notas": "Traspasado en un movimiento a tres bandas (con Tracy McGrady, Carl Landry o Kevin Martin)"
+      "equipo1": "Milwaukee Bucks",
+      "equipo2": "Indiana Pacers",
+      "otros": "Kevin Durant, Mikal Bridges, Cam Johnson, George Hill, Jordan Nwora",
+      "notas": "Acuerdo de 4 equipos"
     },
     {
       "jugador": "Sergio Rodríguez",
@@ -1793,7 +1919,7 @@
       "equipo1": "Portland Trail Blazers",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 22 del Draft"
+      "notas": "Pick #22 del Draft"
     },
     {
       "jugador": "Víctor Claver",
@@ -1805,13 +1931,13 @@
       "notas": "$4M x 3"
     },
     {
-      "jugador": "Víctor Claver",
-      "fecha": "2015-02-19",
+      "jugador": "Usman Garuba",
+      "fecha": "2023-07-08",
       "tipo": "Traspasado",
-      "equipo1": "Portland Trail Blazers",
-      "equipo2": "Denver Nuggets",
-      "otros": "Will Barton, Thomas Robinson, Arron Afflalo y Alonzo Gee",
-      "notas": "Traspasado por Arron Afflalo y Alonzo Gee junto con Will Barton, Thomas Robinson y una primera ronda."
+      "equipo1": "Houston Rockets",
+      "equipo2": "Atlanta Hawks",
+      "otros": "TyTy Washington",
+      "notas": "Incluido con TyTy Washington Jr en traspaso que llevó a Atlanta pick futuro de segunda ronda y cash por nada relevante para Rockets."
     },
     {
       "jugador": "Víctor Claver",
@@ -1842,21 +1968,21 @@
     },
     {
       "jugador": "Usman Garuba",
-      "fecha": "2023-07-08",
-      "tipo": "Traspasado",
-      "equipo1": "Houston Rockets",
-      "equipo2": "Atlanta Hawks",
-      "otros": "TyTy Washington",
-      "notas": "Incluido con TyTy Washington Jr en traspaso que llevó a Atlanta pick futuro de segunda ronda y cash por nada relevante para Rockets."
-    },
-    {
-      "jugador": "Usman Garuba",
       "fecha": "2023-07-12",
       "tipo": "Traspasado",
       "equipo1": "Atlanta Hawks",
       "equipo2": "Oklahoma City Thunder",
       "otros": "TyTy Washington, Rudy Gay, Patty Mills",
       "notas": "Con TyTy Washington Jr y Rudy Gay a cambio de Patty Mills."
+    },
+    {
+      "jugador": "Dani Díez",
+      "fecha": "2024-06-27",
+      "tipo": "Traspasado",
+      "equipo1": "New York Knicks",
+      "equipo2": "Portland Trail Blazers",
+      "otros": "Tyler Kolek",
+      "notas": ""
     },
     {
       "jugador": "Usman Garuba",
@@ -1895,13 +2021,13 @@
       "notas": "Pick #25"
     },
     {
-      "jugador": "Sergio De Larrea",
-      "fecha": "2026-06-24",
+      "jugador": "Juan Nuñez",
+      "fecha": "2024-06-27",
       "tipo": "Traspasado",
-      "equipo1": "Los Angeles Lakers",
-      "equipo2": "Dallas Mavericks",
-      "otros": "",
-      "notas": "Traspaso a cuatro bandas con todo picks de draft y derechos de jugadores."
+      "equipo1": "Indiana Pacers",
+      "equipo2": "Indiana Pacers",
+      "otros": "Johnny Furpy",
+      "notas": "Traspaso de derechos la noche del draft"
     },
     {
       "jugador": "Sergio De Larrea",
@@ -1919,7 +2045,7 @@
       "equipo1": "Oklahoma City Thunder",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "Pick #12"
     },
     {
       "jugador": "Aday Mara",
@@ -1946,7 +2072,7 @@
       "equipo1": "Los Angeles Clippers",
       "equipo2": "",
       "otros": "",
-      "notas": ""
+      "notas": "Pick #35 del Draft"
     },
     {
       "jugador": "Willy Hernangómez",
@@ -1955,16 +2081,16 @@
       "equipo1": "Philadelphia 76ers",
       "equipo2": "",
       "otros": "",
-      "notas": "Nº 35 del Draft, derechos seleccionados por Philly"
+      "notas": "Pick #35 del Draft, derechos seleccionados por Philly"
     },
     {
-      "jugador": "Willy Hernangómez",
-      "fecha": "2015-06-25",
+      "jugador": "Sergio De Larrea",
+      "fecha": "2026-06-24",
       "tipo": "Traspasado",
-      "equipo1": "Philadelphia 76ers",
-      "equipo2": "New York Knicks",
+      "equipo1": "Los Angeles Lakers",
+      "equipo2": "Dallas Mavericks",
       "otros": "",
-      "notas": "Derechos intercambiados por dos elecciones de segunda ronda y dinero (Basketball Reference)"
+      "notas": "Traspaso a cuatro bandas con todo picks de draft y derechos de jugadores."
     },
     {
       "jugador": "Willy Hernangómez",
@@ -1973,34 +2099,34 @@
       "equipo1": "New York Knicks",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato NBA y debuta en liga (Wikipedia)"
+      "notas": "$5,8M x 4"
     },
     {
-      "jugador": "Willy Hernangómez",
-      "fecha": "2018-02-07",
+      "jugador": "Santi Aldama",
+      "fecha": "2026-07-08",
       "tipo": "Traspasado",
-      "equipo1": "New York Knicks",
-      "equipo2": "Charlotte Hornets",
-      "otros": "",
-      "notas": "Canje por Johnny O’Bryant III y dos futuras segundas rondas (Wikipedia)"
+      "equipo1": "Memphis Grizzlies",
+      "equipo2": "Dallas Mavericks",
+      "otros": "Khris Middleton, John Collins, D'Angelo Russell, Isaiah Stewart",
+      "notas": "Traspaso a seis bandas con varios sign and trades."
     },
     {
       "jugador": "Willy Hernangómez",
-      "fecha": "2020-11-30",
+      "fecha": "2020-11-22",
       "tipo": "Agente libre",
       "equipo1": "New Orleans Pelicans",
       "equipo2": "",
       "otros": "",
-      "notas": "Firma contrato con Pelicans tras pasar por Hornets (Wikipedia)"
+      "notas": "$1,73M x 1"
     },
     {
       "jugador": "Willy Hernangómez",
-      "fecha": "2021-08-06",
-      "tipo": "Renovación",
+      "fecha": "2021-08-16",
+      "tipo": "Agente libre",
       "equipo1": "New Orleans Pelicans",
       "equipo2": "",
       "otros": "",
-      "notas": "Renovación de contrato por 3 años con Pelicans (Crescent City Sports)"
+      "notas": "$7,33M x 3"
     },
     {
       "jugador": "Willy Hernangómez",
@@ -2009,7 +2135,7 @@
       "equipo1": "New Orleans Pelicans",
       "equipo2": "",
       "otros": "",
-      "notas": "Pelicans no ejercen la opción y queda agente libre (Blogdebasket)"
+      "notas": "Pelicans no ejercen la opción y queda agente libre. Vuelve a Europa."
     }
   ],
   "jugadores": [
