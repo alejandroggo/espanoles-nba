@@ -1481,6 +1481,7 @@ function teamAbbr(name) {
 }
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESES_LARGOS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 function trFechaDisplay(iso) {
   if (!iso) return '—';
   const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -2025,9 +2026,9 @@ const QSTAT = [
 ];
 // Récords en un solo partido (game highs)
 const QREC = [
-  ['pts', '¿Quién tiene el <b>récord de puntos</b> en un partido?'],
-  ['rbd', '¿Quién tiene el <b>récord de rebotes</b> en un partido?'],
-  ['ast', '¿Quién tiene el <b>récord de asistencias</b> en un partido?'],
+  ['pts', '¿Quién tiene el <b>récord de puntos</b> en un partido?', '¿Quién anotó más <b>puntos</b> en un partido, de estos jugadores?'],
+  ['rbd', '¿Quién tiene el <b>récord de rebotes</b> en un partido?', '¿Quién capturó más <b>rebotes</b> en un partido, de estos jugadores?'],
+  ['ast', '¿Quién tiene el <b>récord de asistencias</b> en un partido?', '¿Quién dio más <b>asistencias</b> en un partido, de estos jugadores?'],
 ];
 // Porcentajes de tiro de carrera (mín. 200 partidos, cifras parecidas)
 const QPCT = [
@@ -2061,11 +2062,16 @@ const QUIZ_GENS = [
     if (!four) return null;
     return { q, correct: four[four.length - 1].nombre, options: qShuffle(four.map(x => x.nombre)) };
   }),
-  // Récords en un partido
-  ...QREC.map(([key, q]) => D => {
-    const four = qCloseFour(D.highs, j => j.game_highs[key]);
+  // Récords en un partido: solo se dice «récord» si el correcto tiene de verdad el career-high más alto;
+  // si no, se pregunta «¿quién… de estos jugadores?» para no dar por récord a quien no lo es.
+  ...QREC.map(([key, qRec, qEntre]) => D => {
+    const val = j => (j.game_highs[key]) || 0;
+    const four = qCloseFour(D.highs, val);
     if (!four) return null;
-    return { q, correct: four[four.length - 1].nombre, options: qShuffle(four.map(x => x.nombre)) };
+    const winner = four[four.length - 1];
+    const globalMax = Math.max(...D.highs.map(val));
+    const esRecord = val(winner) === globalMax;
+    return { q: esRecord ? qRec : qEntre, correct: winner.nombre, options: qShuffle(four.map(x => x.nombre)) };
   }),
   // Porcentajes de carrera
   ...QPCT.map(([key, q]) => D => {
@@ -2148,12 +2154,13 @@ const QUIZ_GENS = [
     const t = qPick(firmas); const year = String(t.fecha).match(/(\d{4})/)[1];
     return { q: `¿Con qué equipo <b>firmó ${t.jugador}</b> en ${year}?`, correct: t.equipo1, options: qOptions(t.equipo1, teams) };
   },
-  D => { // a qué equipo fue traspasado en X año
-    const trades = D.trans.filter(t => /traspas/i.test(t.tipo) && t.equipo2 && /\d{4}/.test(t.fecha || ''));
+  D => { // a qué equipo fue traspasado en X mes/año (con mes, porque hay varios trades el mismo año)
+    const trades = D.trans.filter(t => /traspas/i.test(t.tipo) && t.equipo2 && /^\d{4}-\d{2}/.test(t.fecha || ''));
     const teams = [...new Set(D.trans.map(t => t.equipo2).filter(Boolean))];
     if (trades.length < 4 || teams.length < 4) return null;
-    const t = qPick(trades); const year = String(t.fecha).match(/(\d{4})/)[1];
-    return { q: `¿A qué equipo fue <b>traspasado ${t.jugador}</b> en ${year}?`, correct: t.equipo2, options: qOptions(t.equipo2, teams) };
+    const t = qPick(trades); const m = String(t.fecha).match(/^(\d{4})-(\d{2})/);
+    const cuando = `${MESES_LARGOS[parseInt(m[2]) - 1]} de ${m[1]}`;
+    return { q: `¿A qué equipo fue <b>traspasado ${t.jugador}</b> en ${cuando}?`, correct: t.equipo2, options: qOptions(t.equipo2, teams) };
   },
   D => { // equipo con el que jugó la Summer League
     const teams = [...new Set(D.sl.map(x => x.equipo))];
