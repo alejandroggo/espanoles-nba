@@ -1843,9 +1843,11 @@ function jugGameHighs(j) {
 let jugSeasonJ = null, jugSeasonMode = 'pg';
 const JUG_SEASON_BASE = [['MIN', 'min_g'], ['PTS', 'pts_g'], ['REB', 'rbd_g'], ['AST', 'ast_g'], ['ROB', 'stl_g'], ['TAP', 'blk_g'], ['FGM', 'fgm_g'], ['3PM', 'tres_g'], ['FTM', 'ftm_g'], ['TOV', 'tov_g'], ['PF', 'pf_g']];
 
-function jugSeasonTableHtml() {
-  const j = jugSeasonJ, mode = jugSeasonMode;
-  const sorted = (j.temporadas_data || []).filter(x => x.year).sort((a, b) => (a.year || 0) - (b.year || 0));
+function jugSeasonTableHtml() { return seasonRowsHtml(jugSeasonJ.temporadas_data, jugSeasonMode); }
+
+// Tabla temporada a temporada (reutilizable: temporada regular o playoffs)
+function seasonRowsHtml(seasons, mode) {
+  const sorted = (seasons || []).filter(x => x.year).sort((a, b) => (a.year || 0) - (b.year || 0));
   const yearCount = {};
   sorted.forEach(t => { yearCount[t.year] = (yearCount[t.year] || 0) + 1; });
   const head = `<th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th>`
@@ -1894,13 +1896,57 @@ function jugTemporadas(j) {
      <div class="tabla-scroll" id="jug-seasons-table">${jugSeasonTableHtml()}</div>`);
 }
 
+let jugPoJ = null, jugPoMode = 'pg';
+function jugPoSeasonTableHtml() { return seasonRowsHtml((jugPoJ.playoffs_temporadas || []), jugPoMode); }
+function renderJugPo() { const el = document.getElementById('jug-po-table'); if (el) el.innerHTML = jugPoSeasonTableHtml(); }
+function setJugPoMode(m) {
+  jugPoMode = m;
+  ['pg', 'tot'].forEach(x => {
+    const btn = document.getElementById('jug-po-' + x);
+    if (btn) { btn.classList.toggle('active', x === m); btn.setAttribute('aria-pressed', String(x === m)); }
+  });
+  renderJugPo();
+}
+
 function jugPlayoffs(j) {
-  const p = (j.playoffs_temporadas || []).filter(x => x && (x.year || x.g));
-  if (!p.length) return '';
-  const rows = [...p].sort((a, b) => (a.year || 0) - (b.year || 0)).map(t =>
-    `<tr><td class="td-center">${t.year ? drSeason(t.year) : '—'}</td><td class="td-center">${t.team || '—'}</td><td class="td-num">${fmtEnt(t.g)}</td></tr>`).join('');
-  return jugSection('Playoffs',
-    `<div class="tabla-scroll"><table><thead><tr><th class="td-center">Año</th><th class="td-center">Equipo</th><th class="td-num">GP</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  const pt = j.playoffs_totales;
+  const seasons = (j.playoffs_temporadas || []).filter(x => x && (x.year || x.g));
+  if (!(pt && pt.partidos > 0) && !seasons.length) return '';
+  let html = '';
+
+  // Estadísticas de carrera en playoffs (por partido + totales), igual que la sección regular
+  if (pt && pt.partidos > 0) {
+    const gp = pt.partidos || 0;
+    const perg = (total) => gp ? total / gp : null;
+    const pg = [
+      statBox('GP', fmtEnt(pt.partidos)), statBox('MIN', fmtDec1(pt.min_g)), statBox('PTS', fmtDec1(pt.pts_g)),
+      statBox('REB', fmtDec1(pt.rbd_g)), statBox('AST', fmtDec1(pt.ast_g)), statBox('ROB', fmtDec1(pt.stl_g)),
+      statBox('TAP', fmtDec1(pt.blk_g)), statBox('3PM', fmtDec1(pt.tres_g)),
+      statBox('TOV', fmtDec1(perg(pt.tov_total))), statBox('PF', fmtDec1(perg(pt.pf_total))),
+      statBox('FG%', fmtPct(pt.fg_pct)), statBox('3P%', fmtPct(pt.tres_pct)), statBox('FT%', fmtPct(pt.ft_pct)),
+    ].join('');
+    const tot = [
+      statBox('GP', fmtEnt(pt.partidos)),
+      statBox('PTS', fmtEnt(pt.pts_total)), statBox('REB', fmtEnt(pt.rbd_total)), statBox('AST', fmtEnt(pt.ast_total)),
+      statBox('ROB', fmtEnt(pt.stl_total)), statBox('TAP', fmtEnt(pt.blk_total)), statBox('3PM', fmtEnt(pt.tres_total)),
+      statBox('TD', fmtEnt(pt.td_total)), statBox('MIN', fmtEnt(pt.min_total)),
+      statBox('TOV', fmtEnt(pt.tov_total)), statBox('PF', fmtEnt(pt.pf_total)),
+    ].join('');
+    html += `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
+             <h3 class="jug-subh">Totales</h3><div class="stat-grid">${tot}</div>`;
+  }
+
+  // Playoffs temporada a temporada, con toggle Por partido / Totales
+  if (seasons.length) {
+    jugPoJ = j; jugPoMode = 'pg';
+    html += `<h3 class="jug-subh">Temporada a temporada</h3>
+      <div class="mode-switch jug-seas-switch" role="group" aria-label="Por partido o totales">
+        <button type="button" id="jug-po-pg" class="toggle-chip active" aria-pressed="true" onclick="setJugPoMode('pg')">Por partido</button>
+        <button type="button" id="jug-po-tot" class="toggle-chip" aria-pressed="false" onclick="setJugPoMode('tot')">Totales</button>
+      </div>
+      <div class="tabla-scroll" id="jug-po-table">${jugPoSeasonTableHtml()}</div>`;
+  }
+  return jugSection('Playoffs', html);
 }
 
 function jugPremios(j) {
@@ -3159,9 +3205,16 @@ const CMP_SECTIONS = [
     { label: 'Ganancias', get: j => j.ganancias || null, fmt: fmtDinero, dir: 'high', bar: true },
     { label: '$ por partido', get: j => (j.ganancias_ganado && j.partidos) ? j.ganancias_ganado / j.partidos : ((j.ganancias && j.partidos) ? j.ganancias / j.partidos : null), fmt: fmtDinero, dir: 'high', bar: true },
   ]},
-  { title: 'Playoffs', career: true, when: (a, b) => cmpPoSeasons(a) || cmpPoSeasons(b), rows: [
-    { label: 'Temporadas de playoffs', get: j => cmpPoSeasons(j), fmt: fmtEnt, dir: 'high', bar: true },
-    { label: 'Partidos de playoffs',   get: j => cmpPoGames(j), fmt: fmtEnt, dir: 'high', bar: true },
+  { title: 'Playoffs', career: true, when: (a, b) => cmpPoSeasons(a) || cmpPoSeasons(b) || a.playoffs_totales || b.playoffs_totales, rows: [
+    { label: 'Temporadas de playoffs',  get: j => cmpPoSeasons(j), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Partidos de playoffs',    get: j => (j.playoffs_totales && j.playoffs_totales.partidos) || cmpPoGames(j), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Puntos por partido',      get: j => j.playoffs_totales && j.playoffs_totales.pts_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Rebotes por partido',     get: j => j.playoffs_totales && j.playoffs_totales.rbd_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'Asistencias por partido', get: j => j.playoffs_totales && j.playoffs_totales.ast_g, fmt: fmtDec1, dir: 'high', bar: true },
+    { label: 'FG%',                     get: j => j.playoffs_totales && j.playoffs_totales.fg_pct, fmt: fmtPct, dir: 'high', bar: true },
+    { label: 'Puntos totales',          get: j => j.playoffs_totales && j.playoffs_totales.pts_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Rebotes totales',         get: j => j.playoffs_totales && j.playoffs_totales.rbd_total, fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'Asistencias totales',     get: j => j.playoffs_totales && j.playoffs_totales.ast_total, fmt: fmtEnt, dir: 'high', bar: true },
   ]},
 ];
 
@@ -3430,7 +3483,8 @@ function cmpSwap() {
 // ══════════════════════════════════════════════
 // TEMPORADAS — todas las temporadas de todos los españoles (filtrable)
 // ══════════════════════════════════════════════
-let tmpRows = [], tmpMode = 'total';
+let tmpRows = [], tmpMode = 'total', tmpDim = 'reg';
+let tmpRowsReg = [], tmpRowsPo = [];
 let tmpSortCol = 'year', tmpSortAsc = false;
 let tmpFilterTeam = '', tmpFilterYear = '', tmpSearch = '', tmpHidePartials = false;
 
@@ -3480,6 +3534,19 @@ function tmpBuild(jugadores) {
       const traded = !!tot, cut = tmpIsCut(j.nombre, +y);
       if (tot) rows.push({ id: j.id, jugador: j.nombre, foto, year: +y, team: teams.map(t => t.team).join(' / ') || 'TOT', teamCode: null, g: tot.g || 0, t: tot, kind: 'total', nEq: teams.length, seq: 0, cut: false });
       teams.forEach((t, i) => rows.push({ id: j.id, jugador: j.nombre, foto, year: +y, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: traded ? 'partial' : 'normal', nEq: teams.length, seq: i + 1, cut }));
+    });
+  });
+  return rows;
+}
+
+// Filas de playoffs: una por temporada-equipo. Sin traspasos ni cortes (no aplican en playoffs).
+function tmpBuildPo(jugadores) {
+  const rows = [];
+  (jugadores || []).forEach(j => {
+    const foto = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
+    (j.playoffs_temporadas || []).forEach(t => {
+      if (!t || !t.year || String(t.team || '').toUpperCase() === 'TOT') return;
+      rows.push({ id: j.id, jugador: j.nombre, foto, year: +t.year, team: t.team || '—', teamCode: t.team || '', g: t.g || 0, t, kind: 'normal', nEq: 1, seq: 0, cut: false });
     });
   });
   return rows;
@@ -3597,27 +3664,75 @@ function setTmpMode(m) {
   renderTmpTable();
 }
 
-async function initTemporadasPage() {
-  let data;
-  try { data = await loadData(); }
-  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
-  buildPlayerIds(data.jugadores);
-  tmpRows = tmpBuild(data.jugadores);
-
-  const players = new Set(tmpRows.map(r => r.id));
-  const seasons = new Set(tmpRows.map(r => r.id + ':' + r.year));  // una temporada-jugador (el traspaso cuenta como 1)
-  const cutSeasons = new Set(tmpRows.filter(r => r.cut).map(r => r.id + ':' + r.year));  // cortes = media
-  const efec = (seasons.size - 0.5 * cutSeasons.size).toLocaleString('es-ES');
-  document.getElementById('hero-sub').textContent = `${efec} temporadas de ${players.size} españoles · los traspasos cuentan 1 y los cortes ½ (${cutSeasons.size})`;
-
-  // Poblar filtros (equipos: solo códigos reales, no las filas TOT)
+function tmpPopulateFilters() {
   const teams = [...new Set(tmpRows.filter(r => r.teamCode).map(r => r.teamCode))].sort();
   const years = [...new Set(tmpRows.map(r => r.year))].sort((a, b) => b - a);
   const teamSel = document.getElementById('tmp-team'), yearSel = document.getElementById('tmp-year');
   teamSel.innerHTML = `<option value="">Todos los equipos</option>` + teams.map(t => `<option value="${t}">${t}</option>`).join('');
   yearSel.innerHTML = `<option value="">Todas las temporadas</option>` + years.map(y => `<option value="${y}">${drSeason(y)}</option>`).join('');
+  teamSel.value = tmpFilterTeam; yearSel.value = tmpFilterYear;
+}
+
+function tmpUpdateHero() {
+  const src = tmpDim === 'po' ? tmpRowsPo : tmpRowsReg;
+  const players = new Set(src.map(r => r.id));
+  const seasons = new Set(src.map(r => r.id + ':' + r.year));
+  if (tmpDim === 'po') {
+    document.getElementById('hero-sub').textContent = `${seasons.size} temporadas de playoffs de ${players.size} españoles`;
+  } else {
+    const cutSeasons = new Set(src.filter(r => r.cut).map(r => r.id + ':' + r.year));
+    const efec = (seasons.size - 0.5 * cutSeasons.size).toLocaleString('es-ES');
+    document.getElementById('hero-sub').textContent = `${efec} temporadas de ${players.size} españoles · los traspasos cuentan 1 y los cortes ½ (${cutSeasons.size})`;
+  }
+}
+
+function setTmpDim(d) {
+  if (tmpDim === d) return;
+  tmpDim = d;
+  tmpRows = d === 'po' ? tmpRowsPo : tmpRowsReg;
+  ['reg', 'po'].forEach(x => {
+    const btn = document.getElementById('tmp-dim-' + x);
+    if (btn) { btn.classList.toggle('active', x === d); btn.setAttribute('aria-pressed', String(x === d)); }
+  });
+  // Equipos y años difieren entre dimensiones → se reinician los filtros
+  tmpFilterTeam = ''; tmpFilterYear = '';
+  updateUrlParam('equipo', ''); updateUrlParam('anio', '');
+  updateUrlParam('tipo', d === 'po' ? 'po' : '');
+  tmpPopulateFilters();
+  // Parciales y leyenda solo aplican a temporada regular
+  const legend = document.querySelector('.tmp-legend'); if (legend) legend.style.display = d === 'po' ? 'none' : '';
+  const hideBtn = document.getElementById('tmp-hide'); if (hideBtn) hideBtn.style.display = d === 'po' ? 'none' : '';
+  tmpUpdateHero();
+  renderTmpTable();
+}
+
+async function initTemporadasPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  tmpRowsReg = tmpBuild(data.jugadores);
+  tmpRowsPo = tmpBuildPo(data.jugadores);
 
   const params = new URLSearchParams(location.search);
+  if (params.get('tipo') === 'po' && tmpRowsPo.length) {
+    tmpDim = 'po';
+    ['reg', 'po'].forEach(x => {
+      const btn = document.getElementById('tmp-dim-' + x);
+      if (btn) { btn.classList.toggle('active', x === 'po'); btn.setAttribute('aria-pressed', String(x === 'po')); }
+    });
+    const legend = document.querySelector('.tmp-legend'); if (legend) legend.style.display = 'none';
+    const hideBtn = document.getElementById('tmp-hide'); if (hideBtn) hideBtn.style.display = 'none';
+  }
+  tmpRows = tmpDim === 'po' ? tmpRowsPo : tmpRowsReg;
+  tmpUpdateHero();
+
+  // Poblar filtros (equipos: solo códigos reales, no las filas TOT)
+  tmpPopulateFilters();
+  const teams = [...new Set(tmpRows.filter(r => r.teamCode).map(r => r.teamCode))].sort();
+  const years = [...new Set(tmpRows.map(r => r.year))].sort((a, b) => b - a);
+  const teamSel = document.getElementById('tmp-team'), yearSel = document.getElementById('tmp-year');
+
   if (params.get('modo') === 'pg') { tmpMode = 'pg'; tmpSortCol = 'pts_g'; tmpSyncModeButtons(); }
   if (params.get('equipo') && teams.includes(params.get('equipo'))) { tmpFilterTeam = params.get('equipo'); teamSel.value = tmpFilterTeam; }
   if (params.get('anio') && years.includes(+params.get('anio'))) { tmpFilterYear = params.get('anio'); yearSel.value = tmpFilterYear; }
@@ -3639,27 +3754,6 @@ async function initTemporadasPage() {
 // ══════════════════════════════════════════════
 // PARTIDOS POR EQUIPO (matriz jugador × equipo)
 // ══════════════════════════════════════════════
-// Playoffs: no vienen en data.json. Mapa mantenido a mano (partidos de playoffs
-// por equipo). Cada dato encaja en un equipo real del jugador. Si el bot exporta
-// playoffs_temporadas con {team, g}, esos datos tienen prioridad sobre este mapa.
-const POEQ_PLAYOFFS = {
-  'serge-ibaka':          { OKC: 89, TOR: 55, LAC: 2, MIL: 6 },
-  'pau-gasol':            { LAL: 93, MEM: 12, CHI: 10, SAS: 21 },
-  'marc-gasol':           { MEM: 59, TOR: 35, LAL: 5 },
-  'jose-m-calderon':      { CLE: 13, TOR: 11, DAL: 7, ATL: 6, DET: 3 },
-  'nikola-mirotic':       { CHI: 17, MIL: 14, NOL: 9 },
-  'rudy-fernandez':       { POR: 18 },
-  'ricky-rubio':          { UTA: 11, CLE: 3 },
-  'juancho-hernangomez':  { UTA: 6, DEN: 5 },
-  'alex-abrines':         { OKC: 11 },
-  'santi-aldama':         { MEM: 10 },
-  'sergio-rodriguez':     { POR: 5 },
-  'victor-claver':        { POR: 2 },
-  'hugo-gonzalez':        { BOS: 2 },
-  'willy-hernangomez':    { NOL: 1 },
-  'fernando-martin':      { POR: 1 },
-};
-
 // Jugadores en activo en la NBA → equipo actual (mantener a mano)
 const POEQ_ACTIVE = {
   'santi-aldama': 'DAL',
@@ -3683,15 +3777,14 @@ function poeqRegByTeam(j) {
   });
   return m;
 }
-// {team: partidos} en playoffs (bot si existe, si no el mapa a mano)
+// {team: partidos} en playoffs (desde playoffs_temporadas del data.json)
 function poeqPoByTeam(j) {
-  const po = (j.playoffs_temporadas || []).filter(t => (t.team || '').toUpperCase() !== 'TOT');
-  if (po.length) {
-    const m = {};
-    po.forEach(t => { const tm = (t.team || '').toUpperCase(); if (tm) m[tm] = (m[tm] || 0) + (t.g || 0); });
-    return m;
-  }
-  return POEQ_PLAYOFFS[j.id] || {};
+  const m = {};
+  (j.playoffs_temporadas || []).forEach(t => {
+    const tm = (t.team || '').toUpperCase();
+    if (tm && tm !== 'TOT') m[tm] = (m[tm] || 0) + (t.g || 0);
+  });
+  return m;
 }
 
 async function initPorEquipoPage() {
@@ -3753,7 +3846,7 @@ function renderPorEquipo() {
     `${rows.length} españoles · ${grand.toLocaleString('es-ES')} partidos ${poeqMode === 'reg' ? 'de temporada regular' : 'de playoffs'} repartidos por ${teams.length} franquicias`;
   document.getElementById('poeq-count').innerHTML = poeqMode === 'reg'
     ? '<b>En negrita</b>, jugadores en activo · • equipo actual'
-    : '⚠ Playoffs añadidos a mano (revisables)';
+    : 'Partidos de playoffs por franquicia';
 
   const head = `<tr><th class="poeq-name-h">Jugador</th>${teams.map(t => {
     const info = teamInfo(t);

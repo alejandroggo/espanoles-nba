@@ -26,7 +26,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=70">
+<link rel="stylesheet" href="style.css?v=71">
 </head>
 <body>
 
@@ -63,6 +63,10 @@
       <span class="sr-only">Filtrar por temporada</span>
       <select id="tmp-year" class="sel"></select>
     </label>
+    <div class="mode-switch" role="group" aria-label="Temporada regular o playoffs">
+      <button type="button" id="tmp-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setTmpDim('reg')">Temporada regular</button>
+      <button type="button" id="tmp-dim-po" class="toggle-chip" aria-pressed="false" onclick="setTmpDim('po')">Playoffs</button>
+    </div>
     <div class="mode-switch" role="group" aria-label="Totales o por partido">
       <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
       <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
@@ -107,7 +111,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=70"></script>
+<script src="app.js?v=71"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
