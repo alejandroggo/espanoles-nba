@@ -3622,7 +3622,7 @@ const POEQ_PLAYOFFS = {
 
 // Jugadores en activo en la NBA → equipo actual (mantener a mano)
 const POEQ_ACTIVE = {
-  'santi-aldama': 'MEM',
+  'santi-aldama': 'DAL',
   'hugo-gonzalez': 'BOS',
   'sergio-de-larrea': 'MEM',
   'baba-miller': 'LAC',
