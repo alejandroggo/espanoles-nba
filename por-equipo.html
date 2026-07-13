@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Línea temporal · Españoles en la NBA</title>
-<meta name="description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
+<title>Partidos por equipo · Españoles en la NBA</title>
+<meta name="description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Línea temporal · Españoles en la NBA">
-<meta property="og:description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
-<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/linea-temporal.html">
+<meta property="og:title" content="Partidos por equipo · Españoles en la NBA">
+<meta property="og:description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
+<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/por-equipo.html">
 <meta property="og:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Línea temporal · Españoles en la NBA">
-<meta name="twitter:description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
+<meta name="twitter:title" content="Partidos por equipo · Españoles en la NBA">
+<meta name="twitter:description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
 <meta name="twitter:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,34 +45,26 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">La <em>Línea temporal</em></h1>
+        <h1 class="hero-title ag-hero">Partidos por <em>equipo</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Orden y filtros">
-    <div class="mode-switch" role="group" aria-label="Ordenar por">
-      <button type="button" id="tl-sort-debut" class="toggle-chip active" aria-pressed="true" onclick="setTlSort('debut')">Por debut</button>
-      <button type="button" id="tl-sort-seas" class="toggle-chip" aria-pressed="false" onclick="setTlSort('seas')">Por temporadas</button>
-      <button type="button" id="tl-sort-alpha" class="toggle-chip" aria-pressed="false" onclick="setTlSort('alpha')">Alfabético</button>
+  <section class="controles" aria-label="Temporada regular o playoffs">
+    <div class="mode-switch" role="group" aria-label="Competición">
+      <button type="button" id="poeq-reg" class="toggle-chip active" aria-pressed="true" onclick="setPoeqMode('reg')">Temporada regular</button>
+      <button type="button" id="poeq-po" class="toggle-chip" aria-pressed="false" onclick="setPoeqMode('po')">Playoffs</button>
     </div>
-    <label class="sel-wrap tl-range">
-      <span class="tl-range-lbl">Desde</span>
-      <select id="tl-from" class="sel" aria-label="Año de inicio"></select>
-    </label>
-    <label class="sel-wrap tl-range">
-      <span class="tl-range-lbl">Hasta</span>
-      <select id="tl-to" class="sel" aria-label="Año final"></select>
-    </label>
+    <span class="results-count" id="poeq-count"></span>
   </section>
 
-  <div class="tl-topscroll" id="tl-topscroll" aria-hidden="true"><div id="tl-topscroll-inner"></div></div>
-  <section class="tl-wrap" id="tl-wrap" aria-label="Línea temporal de trayectorias">
-    <table id="tl-table">
-      <thead id="tl-thead"></thead>
-      <tbody id="tl-body"></tbody>
-      <tfoot id="tl-tfoot"></tfoot>
+  <div class="poeq-topscroll" id="poeq-topscroll" aria-hidden="true"><div id="poeq-topscroll-inner"></div></div>
+  <section class="poeq-wrap" id="poeq-wrap" aria-label="Matriz de partidos por equipo">
+    <table id="poeq-table">
+      <thead id="poeq-thead"></thead>
+      <tbody id="poeq-tbody"></tbody>
+      <tfoot id="poeq-tfoot"></tfoot>
     </table>
   </section>
 </main>
@@ -101,6 +93,6 @@
 </footer>
 
 <script src="app.js?v=63"></script>
-<script>initTheme(); initLineaTemporalPage();</script>
+<script>initTheme(); initPorEquipoPage();</script>
 </body>
 </html>

@@ -104,7 +104,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -3594,4 +3594,142 @@ async function initTemporadasPage() {
   if (tmpQ) { tmpSearch = tmpQ.trim().toLowerCase(); document.getElementById('tmp-search').value = tmpQ; }
 
   renderTmpTable();
+}
+
+// ══════════════════════════════════════════════
+// PARTIDOS POR EQUIPO (matriz jugador × equipo)
+// ══════════════════════════════════════════════
+// Playoffs: no vienen en data.json. Mapa mantenido a mano (partidos de playoffs
+// por equipo). Cada dato encaja en un equipo real del jugador. Si el bot exporta
+// playoffs_temporadas con {team, g}, esos datos tienen prioridad sobre este mapa.
+const POEQ_PLAYOFFS = {
+  'serge-ibaka':          { OKC: 89, TOR: 55, LAC: 2, MIL: 6 },
+  'pau-gasol':            { LAL: 93, MEM: 12, CHI: 10, SAS: 21 },
+  'marc-gasol':           { MEM: 59, TOR: 35, LAL: 5 },
+  'jose-m-calderon':      { CLE: 13, TOR: 11, DAL: 7, ATL: 6, DET: 3 },
+  'nikola-mirotic':       { CHI: 17, MIL: 14, NOL: 9 },
+  'rudy-fernandez':       { POR: 18 },
+  'ricky-rubio':          { UTA: 11, CLE: 3 },
+  'juancho-hernangomez':  { UTA: 6, DEN: 5 },
+  'alex-abrines':         { OKC: 11 },
+  'santi-aldama':         { MEM: 10 },
+  'sergio-rodriguez':     { POR: 5 },
+  'victor-claver':        { POR: 2 },
+  'hugo-gonzalez':        { BOS: 2 },
+  'willy-hernangomez':    { NOL: 1 },
+  'fernando-martin':      { POR: 1 },
+};
+
+let poeqJ = [], poeqMode = 'reg';
+
+// {team: partidos} en temporada regular (desde temporadas_data, sin TOT)
+function poeqRegByTeam(j) {
+  const m = {};
+  (j.temporadas_data || []).forEach(t => {
+    const tm = (t.team || '').toUpperCase();
+    if (tm && tm !== 'TOT') m[tm] = (m[tm] || 0) + (t.g || 0);
+  });
+  return m;
+}
+// {team: partidos} en playoffs (bot si existe, si no el mapa a mano)
+function poeqPoByTeam(j) {
+  const po = (j.playoffs_temporadas || []).filter(t => (t.team || '').toUpperCase() !== 'TOT');
+  if (po.length) {
+    const m = {};
+    po.forEach(t => { const tm = (t.team || '').toUpperCase(); if (tm) m[tm] = (m[tm] || 0) + (t.g || 0); });
+    return m;
+  }
+  return POEQ_PLAYOFFS[j.id] || {};
+}
+
+async function initPorEquipoPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  poeqJ = data.jugadores || [];
+  if (new URLSearchParams(location.search).get('modo') === 'po') { poeqMode = 'po'; poeqSyncButtons(); }
+
+  const wrap = document.getElementById('poeq-wrap'), top = document.getElementById('poeq-topscroll');
+  if (wrap && top) {
+    let lock = false;
+    wrap.addEventListener('scroll', () => { if (lock) return; lock = true; top.scrollLeft = wrap.scrollLeft; lock = false; });
+    top.addEventListener('scroll', () => { if (lock) return; lock = true; wrap.scrollLeft = top.scrollLeft; lock = false; });
+  }
+  renderPorEquipo();
+}
+
+function poeqSyncButtons() {
+  [['reg', 'poeq-reg'], ['po', 'poeq-po']].forEach(([m, id]) => {
+    const b = document.getElementById(id);
+    if (b) { b.classList.toggle('active', poeqMode === m); b.setAttribute('aria-pressed', String(poeqMode === m)); }
+  });
+}
+function setPoeqMode(m) {
+  if (poeqMode === m) return;
+  poeqMode = m; poeqSyncButtons();
+  updateUrlParam('modo', m === 'reg' ? '' : m);
+  renderPorEquipo();
+}
+
+// Verde de mapa de calor según intensidad (0..1)
+function poeqHeat(v, max) {
+  if (!v || !max) return '';
+  const a = 0.10 + 0.55 * (v / max);
+  return `background: rgba(22,163,74,${a.toFixed(3)});`;
+}
+
+function renderPorEquipo() {
+  const byTeam = poeqMode === 'reg' ? poeqRegByTeam : poeqPoByTeam;
+  const rows = poeqJ.map(j => {
+    const bt = byTeam(j);
+    const total = Object.values(bt).reduce((s, n) => s + n, 0);
+    const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
+    return { id: j.id, nombre: j.nombre, foto: src, bt, total };
+  }).filter(r => r.total > 0).sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre, 'es'));
+
+  // Equipos que aparecen, ordenados alfabéticamente
+  const teams = [...new Set(rows.flatMap(r => Object.keys(r.bt)))].sort();
+  const grand = rows.reduce((s, r) => s + r.total, 0);
+  const maxCell = Math.max(1, ...rows.flatMap(r => Object.values(r.bt)));
+  const teamTot = {}, teamPl = {};
+  teams.forEach(t => { teamTot[t] = 0; teamPl[t] = 0; });
+  rows.forEach(r => teams.forEach(t => { if (r.bt[t]) { teamTot[t] += r.bt[t]; teamPl[t]++; } }));
+
+  document.getElementById('hero-sub').textContent =
+    `${rows.length} españoles · ${grand.toLocaleString('es-ES')} partidos ${poeqMode === 'reg' ? 'de temporada regular' : 'de playoffs'} repartidos por ${teams.length} franquicias`;
+  document.getElementById('poeq-count').textContent = poeqMode === 'reg' ? '' : '⚠ Playoffs añadidos a mano (revisables)';
+
+  const head = `<tr><th class="poeq-name-h">Jugador</th>${teams.map(t => {
+    const info = teamInfo(t);
+    return `<th class="poeq-th" title="${info.name}" style="box-shadow: inset 0 -3px 0 ${info.color}">${t}</th>`;
+  }).join('')}<th class="poeq-tot-h">TOTAL</th><th class="poeq-pct-h">%</th></tr>`;
+  document.getElementById('poeq-thead').innerHTML = head;
+
+  document.getElementById('poeq-tbody').innerHTML = rows.map(r => {
+    const thumb = r.foto
+      ? `<img loading="lazy" class="player-thumb" src="${r.foto}" onerror="this.style.visibility='hidden'" alt="">`
+      : avatarHtml(r.nombre, 'player-thumb');
+    const cells = teams.map(t => {
+      const v = r.bt[t];
+      return v ? `<td class="poeq-cell" style="${poeqHeat(v, maxCell)}">${v}</td>` : `<td class="poeq-cell poeq-zero"></td>`;
+    }).join('');
+    return `<tr>
+      <th scope="row" class="poeq-name"><span class="poeq-player">${thumb}${plLink(r.nombre, r.nombre)}</span></th>
+      ${cells}
+      <td class="poeq-tot">${r.total}</td>
+      <td class="poeq-pct">${grand ? (r.total / grand * 100).toFixed(1) + '%' : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const footTot = teams.map(t => `<td class="poeq-foot-num">${teamTot[t]}</td>`).join('');
+  const footPct = teams.map(t => `<td class="poeq-foot-sub">${grand ? (teamTot[t] / grand * 100).toFixed(1) + '%' : ''}</td>`).join('');
+  const footPl = teams.map(t => `<td class="poeq-foot-sub">${teamPl[t] || ''}</td>`).join('');
+  document.getElementById('poeq-tfoot').innerHTML =
+    `<tr class="poeq-foot"><th class="poeq-name">Total partidos</th>${footTot}<td class="poeq-tot">${grand}</td><td class="poeq-pct">100%</td></tr>
+     <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">% del total</th>${footPct}<td></td><td></td></tr>
+     <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">Jugadores</th>${footPl}<td class="poeq-tot">${rows.length}</td><td></td></tr>`;
+
+  const table = document.getElementById('poeq-table'), inner = document.getElementById('poeq-topscroll-inner'), wrap = document.getElementById('poeq-wrap'), top = document.getElementById('poeq-topscroll');
+  if (table && inner) { inner.style.width = table.scrollWidth + 'px'; if (top) top.style.display = table.scrollWidth > wrap.clientWidth ? 'block' : 'none'; }
 }

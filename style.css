@@ -1044,6 +1044,35 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 /* Scroll horizontal superior sincronizado */
 .tl-topscroll { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6); overflow-x: auto; overflow-y: hidden; }
 #tl-topscroll-inner { height: 1px; }
+
+/* ── PARTIDOS POR EQUIPO (matriz) ── */
+.poeq-wrap { max-width: 1400px; margin: 0 auto var(--space-16); padding: 0 var(--space-6); overflow-x: auto; }
+.poeq-topscroll { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6); overflow-x: auto; overflow-y: hidden; }
+#poeq-topscroll-inner { height: 1px; }
+#poeq-table { border-collapse: separate; border-spacing: 0; width: auto; font-variant-numeric: tabular-nums; }
+#poeq-table th, #poeq-table td { padding: 0; }
+#poeq-table thead th { position: sticky; top: 0; z-index: 6; background: var(--surface-2); color: var(--text-muted); font-size: 0.62rem; font-weight: 700; text-align: center; white-space: nowrap; border-bottom: 2px solid var(--border); }
+.poeq-th { min-width: 34px; width: 34px; padding: var(--space-2) 0 !important; }
+.poeq-tot-h, .poeq-pct-h { padding: var(--space-2) var(--space-2) !important; }
+.poeq-name, .poeq-name-h { position: sticky; left: 0; z-index: 5; background: var(--surface); text-align: left; width: 210px; min-width: 210px; max-width: 210px; padding: 0 var(--space-3) !important; box-shadow: 1px 0 0 var(--border); }
+.poeq-name-h { z-index: 9; background: var(--surface-2); }
+.poeq-player { display: inline-flex; align-items: center; gap: var(--space-2); }
+#poeq-tbody tr { height: 40px; }
+#poeq-tbody tr:nth-child(even) .poeq-name { background: var(--surface-2); }
+#poeq-tbody tr:hover td, #poeq-tbody tr:hover .poeq-name { outline: 1px solid var(--accent); outline-offset: -1px; }
+.poeq-cell { text-align: center; font-size: var(--font-sm); color: var(--text); border-right: 1px solid var(--border); }
+.poeq-cell.poeq-zero { background: transparent; }
+.poeq-tot { text-align: center; font-weight: 700; padding: 0 var(--space-2) !important; background: var(--surface-2); }
+.poeq-pct { text-align: center; color: var(--text-muted); font-size: var(--font-xs); padding: 0 var(--space-2) !important; }
+#poeq-tbody th.poeq-name { font-weight: 600; }
+.poeq-foot th, .poeq-foot td { position: sticky; bottom: 0; background: var(--surface-2); font-size: var(--font-xs); text-align: center; border-top: 2px solid var(--border); padding: var(--space-1) 0; }
+.poeq-foot th.poeq-name { text-align: left; font-weight: 700; z-index: 7; }
+.poeq-foot-num { font-weight: 700; }
+.poeq-foot--sub th, .poeq-foot--sub td { color: var(--text-muted); font-weight: 500; border-top: 0; }
+.poeq-count-warn { color: var(--warning); }
+@media (max-width: 560px) {
+  .poeq-name, .poeq-name-h { width: 150px; min-width: 150px; max-width: 150px; }
+}
 #tl-table { border-collapse: separate; border-spacing: 0; width: auto; }
 #tl-table th, #tl-table td { padding: 0; }
 
