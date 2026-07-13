@@ -104,7 +104,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -3923,4 +3923,305 @@ function renderPorEquipo() {
 
   const table = document.getElementById('poeq-table'), inner = document.getElementById('poeq-topscroll-inner'), wrap = document.getElementById('poeq-wrap'), top = document.getElementById('poeq-topscroll');
   if (table && inner) { inner.style.width = table.scrollWidth + 'px'; if (top) top.style.display = table.scrollWidth > wrap.clientWidth ? 'block' : 'none'; }
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA PREGÚNTAME (buscador Q&A local sobre los datos)
+// Motor determinista: interpreta la pregunta y responde leyendo data.json.
+// No usa IA ni servidor; nunca inventa: si no lo entiende, lo dice.
+// ══════════════════════════════════════════════
+let botPlayers = [];
+
+const BOT_EXAMPLES = [
+  '¿Quién ha metido más puntos?',
+  '¿Cuántos anillos tiene Pau Gasol?',
+  '¿En qué equipos jugó Ibaka?',
+  'Pau Gasol vs Marc Gasol',
+  '¿Quién promedia más asistencias?',
+  '¿Cuánto ha ganado Ricky Rubio?',
+  '¿Quién ha jugado en los Lakers?',
+  'Triples de Sergio Rodríguez en playoffs',
+];
+
+// Diccionario de estadísticas. El orden importa (triple-doble antes que triples).
+const BOT_STATS = [
+  { re: /triples?\s*dobles?|triple[- ]?doble/, total: 'td_total', pg: 'td_total', label: 'triples dobles', kind: 'count' },
+  { re: /\bpunto|anota|anotad|maximo anotador|max anotador|scorer|\bpts?\b/, total: 'pts_total', pg: 'pts_g', label: 'puntos', kind: 'num' },
+  { re: /rebote|\brbd\b|\breb\b/, total: 'rbd_total', pg: 'rbd_g', label: 'rebotes', kind: 'num' },
+  { re: /asist|\bast\b/, total: 'ast_total', pg: 'ast_g', label: 'asistencias', kind: 'num' },
+  { re: /\brobo|\bstl\b|steal/, total: 'stl_total', pg: 'stl_g', label: 'robos', kind: 'num' },
+  { re: /tapon|bloqueo|\bblk\b/, total: 'blk_total', pg: 'blk_g', label: 'tapones', kind: 'num' },
+  { re: /porcentaje de (tiro|campo)|tiro de campo|\bfg%|efectividad/, total: 'fg_pct', pg: 'fg_pct', label: 'FG% (tiro de campo)', kind: 'pct' },
+  { re: /porcentaje de triple|triple%|\b3p%/, total: 'tres_pct', pg: 'tres_pct', label: '3P% (triples)', kind: 'pct' },
+  { re: /tiro libre|libres|\bft%/, total: 'ft_pct', pg: 'ft_pct', label: 'FT% (tiros libres)', kind: 'pct' },
+  { re: /triples?|\b3pm?\b/, total: 'tres_total', pg: 'tres_g', label: 'triples', kind: 'num' },
+  { re: /minuto|\bmin\b/, total: 'min_total', pg: 'min_g', label: 'minutos', kind: 'num' },
+  { re: /partido|juego|\bgp\b/, total: 'partidos', pg: 'partidos', label: 'partidos', kind: 'count' },
+];
+
+function botNorm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function botHref(page) { return page; }
+function botPlayerChip(j) {
+  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
+  const thumb = src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'bot-avatar');
+  return `<a class="bot-chip" href="${jugadorHref(j.id)}"><span class="bot-chip-thumb">${thumb}</span>${j.nombre}</a>`;
+}
+
+// Detecta a los jugadores mencionados (por nombre, apellido o nombre completo)
+function botFindPlayers(raw) {
+  const q = ' ' + botNorm(raw).replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+  const scored = botPlayers.map(j => {
+    const full = botNorm(j.nombre).replace(/[^a-z0-9]+/g, ' ').trim();
+    const toks = full.split(' ').filter(t => t.length >= 3);
+    let hits = 0;
+    toks.forEach(t => { if (q.includes(' ' + t + ' ')) hits++; });
+    let score = hits;
+    if (full && q.includes(' ' + full + ' ')) score += 10;
+    return { j, score };
+  }).filter(x => x.score > 0);
+  if (!scored.length) return [];
+  const max = Math.max(...scored.map(x => x.score));
+  return scored.filter(x => x.score === max).map(x => x.j);
+}
+
+function botFindStat(q) { return BOT_STATS.find(s => s.re.test(q)) || null; }
+
+// Detecta un equipo por nombre, ciudad o código
+function botFindTeam(q) {
+  const nq = ' ' + q.replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  for (const [code, info] of Object.entries(TEAM_INFO)) {
+    const cand = [botNorm(info.name), botNorm(info.label), code.toLowerCase()];
+    // apodos/última palabra (lakers, celtics, spurs…)
+    const last = botNorm(info.name).split(' ').pop();
+    if (last.length >= 4) cand.push(last);
+    if (cand.some(c => nq.includes(' ' + c + ' '))) return code;
+  }
+  return null;
+}
+
+function botRings(j) { return TL_ANILLOS[drNorm(j.nombre)] || {}; }
+function botTeamsOf(j) {
+  const seen = [];
+  [...(j.temporadas_data || [])].sort((a, b) => (a.year || 0) - (b.year || 0)).forEach(t => {
+    const tm = (t.team || '').toUpperCase();
+    if (tm && tm !== 'TOT' && !seen.includes(tm)) seen.push(tm);
+  });
+  return seen;
+}
+function botFmt(stat, v, perGame) {
+  if (v == null) return '—';
+  if (stat.kind === 'pct') return fmtPct(v);
+  if (perGame && stat.kind === 'num') return fmtDec1(v);
+  return fmtEnt(v);
+}
+
+// Ranking de una estadística (top 5). dim: 'reg' | 'po'. asc: menos→más.
+function botRankList(stat, dim, asc, perGame) {
+  const field = perGame ? stat.pg : stat.total;
+  let pool = botPlayers.map(j => {
+    const src = dim === 'po' ? j.playoffs_totales : j;
+    const games = dim === 'po' ? (j.playoffs_totales ? j.playoffs_totales.partidos : 0) : j.partidos;
+    return { j, v: src ? src[field] : null, games: games || 0 };
+  }).filter(x => x.games > 0 && x.v != null);
+  if (stat.kind === 'pct') pool = pool.filter(x => x.games >= (dim === 'po' ? 20 : 50));
+  else pool = pool.filter(x => x.v > 0);
+  pool.sort((a, b) => asc ? a.v - b.v : b.v - a.v);
+  return pool.slice(0, 5);
+}
+
+// Respuesta a una pregunta. Devuelve HTML o null (no entendido).
+function botAnswer(raw) {
+  const text = raw.trim();
+  if (!text) return null;
+  const q = botNorm(text);
+  const players = botFindPlayers(text);
+  const stat = botFindStat(q);
+  const team = botFindTeam(q);
+  const dim = /playoff|postemporada|post ?temporada|eliminatoria|postseason/.test(q) ? 'po' : 'reg';
+  const dimTxt = dim === 'po' ? ' en playoffs' : '';
+  const perGame = /por partido|de media|media de|promedi|por noche|por juego/.test(q);
+  const superl = /quien|cual|cuales|mas |menos|maximo|max |mejor|peor|top|ranking|lider|record|primero/.test(q);
+  const asc = /menos|peor|menor/.test(q);
+
+  // 1) ANILLOS
+  if (/anillo|campeon|titulo nba|campeonato/.test(q)) {
+    if (superl && !players.length) {
+      const list = botPlayers.map(j => ({ j, n: Object.keys(botRings(j)).length })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
+      if (!list.length) return null;
+      const top = list[0];
+      return `Con más anillos NBA: <b>${top.j.nombre}</b> con <b>${top.n}</b>. ${botPlayerChip(top.j)}
+        <div class="bot-sub">${list.map(x => `${x.j.nombre}: ${x.n}`).join(' · ')}</div>`;
+    }
+    if (players.length) {
+      return players.map(j => {
+        const r = botRings(j), n = Object.keys(r).length;
+        if (!n) return `<b>${j.nombre}</b> no ganó ningún anillo NBA. ${botPlayerChip(j)}`;
+        const det = Object.entries(r).map(([y, t]) => `${y} (${teamInfo(t).label})`).join(' y ');
+        return `<b>${j.nombre}</b> ganó <b>${n}</b> anillo${n > 1 ? 's' : ''} NBA: ${det}. ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
+  }
+
+  // 2) DINERO / SALARIO
+  if (/dinero|cuanto (ha )?gan|ganad|salario|sueldo|cobr|euros|dolar|\$/.test(q) && !stat) {
+    if (superl && !players.length) {
+      const list = botPlayers.filter(j => j.ganancias).sort((a, b) => b.ganancias - a.ganancias).slice(0, 5);
+      if (!list.length) return null;
+      return `Quien más ha ganado: <b>${list[0].nombre}</b> con <b>${fmtDinero(list[0].ganancias)}</b>. ${botPlayerChip(list[0])}
+        <div class="bot-sub">${list.map(j => `${j.nombre}: ${fmtDinero(j.ganancias)}`).join(' · ')}</div>`;
+    }
+    if (players.length) {
+      return players.map(j => j.ganancias
+        ? `<b>${j.nombre}</b> ha ganado <b>${fmtDinero(j.ganancias)}</b> en la NBA. ${botPlayerChip(j)}`
+        : `No tengo datos de salario de <b>${j.nombre}</b>. ${botPlayerChip(j)}`).join('<hr class="bot-hr">');
+    }
+  }
+
+  // 3) DRAFT
+  if (/draft|drafte|elegid|pick|seleccionad/.test(q) && players.length) {
+    return players.map(j => {
+      if (!j.draft) return `<b>${j.nombre}</b> no fue drafteado (entró a la NBA como agente libre). ${botPlayerChip(j)}`;
+      return `<b>${j.nombre}</b> fue elegido en el <b>draft de ${j.draft_anio || '?'}</b> con el <b>pick #${j.draft_pick || '?'}</b>${j.draft_equipo ? ` por ${teamInfo(j.draft_equipo).name}` : ''}. ${botPlayerChip(j)}`;
+    }).join('<hr class="bot-hr">');
+  }
+
+  // 4) DEBUT
+  if (/debut|primer partido|estreno|cuando (empez|llego|debut)/.test(q) && players.length) {
+    return players.map(j => {
+      const p = j.primer_partido;
+      if (!p || !p.fecha) return `No tengo la fecha de debut de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+      return `<b>${j.nombre}</b> debutó en la NBA el <b>${p.fecha}</b>${p.equipo ? ` con ${teamInfo(p.equipo).name}` : ''}. ${botPlayerChip(j)}`;
+    }).join('<hr class="bot-hr">');
+  }
+
+  // 5) EQUIPOS DE UN JUGADOR
+  if (players.length && !team && /(que|cuantos|en que|donde).*(equipo|franquicia|jugo|jugado)|equipos (de|en que)|franquicias/.test(q)) {
+    return players.map(j => {
+      const ts = botTeamsOf(j);
+      if (!ts.length) return `No tengo trayectoria por equipos de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+      return `<b>${j.nombre}</b> jugó en <b>${ts.length}</b> equipo${ts.length > 1 ? 's' : ''}: ${ts.map(t => teamInfo(t).name).join(', ')}. ${botPlayerChip(j)}`;
+    }).join('<hr class="bot-hr">');
+  }
+
+  // 6) COMPARACIÓN (dos jugadores)
+  if ((players.length === 2 && (/vs|versus|compar|contra|o /.test(q) || stat)) || (/vs|versus|compar/.test(q) && players.length === 2)) {
+    const [a, b] = players;
+    const rows = [['Puntos', 'pts_g'], ['Rebotes', 'rbd_g'], ['Asistencias', 'ast_g']].map(([l, k]) => {
+      const va = a[k], vb = b[k];
+      const wa = (va != null && vb != null && va > vb), wb = (va != null && vb != null && vb > va);
+      return `<tr><td class="${wa ? 'bot-win' : ''}">${fmtDec1(va)}</td><th>${l} (por partido)</th><td class="${wb ? 'bot-win' : ''}">${fmtDec1(vb)}</td></tr>`;
+    }).join('');
+    const ra = Object.keys(botRings(a)).length, rb = Object.keys(botRings(b)).length;
+    const ringRow = `<tr><td class="${ra > rb ? 'bot-win' : ''}">${ra}</td><th>Anillos NBA</th><td class="${rb > ra ? 'bot-win' : ''}">${rb}</td></tr>`;
+    return `<div class="bot-cmp-head"><b>${a.nombre}</b><span>vs</span><b>${b.nombre}</b></div>
+      <table class="bot-cmp">${rows}${ringRow}</table>
+      <div class="bot-sub"><a href="comparador.html?a=${encodeURIComponent(a.id)}&b=${encodeURIComponent(b.id)}">Ver comparación completa →</a></div>`;
+  }
+
+  // 7) RANKING por estadística (superlativo sin jugador concreto)
+  if (stat && (superl || !players.length) && !players.length) {
+    const list = botRankList(stat, dim, asc, perGame || stat.kind === 'pct');
+    if (!list.length) return null;
+    const pg = perGame || stat.kind === 'pct';
+    const top = list[0];
+    const verbo = asc ? 'menos' : 'más';
+    return `Quien ${verbo} <b>${stat.label}</b>${pg && stat.kind === 'num' ? ' por partido' : ''}${dimTxt}: <b>${top.j.nombre}</b> con <b>${botFmt(stat, top.v, pg)}</b>. ${botPlayerChip(top.j)}
+      <ol class="bot-rank">${list.map(x => `<li><span>${x.j.nombre}</span><b>${botFmt(stat, x.v, pg)}</b></li>`).join('')}</ol>`;
+  }
+
+  // 8) ESTADÍSTICA de un jugador
+  if (players.length && stat) {
+    return players.map(j => {
+      const src = dim === 'po' ? j.playoffs_totales : j;
+      if (!src || (dim === 'po' && !(src.partidos > 0))) return `No tengo datos${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+      const pg = perGame || stat.kind === 'pct';
+      const v = src[pg ? stat.pg : stat.total];
+      if (v == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+      const suf = stat.kind === 'pct' ? '' : (pg ? ` ${stat.label} por partido` : ` ${stat.label}`);
+      const pre = stat.kind === 'pct' ? ` de ${stat.label}` : '';
+      return `<b>${j.nombre}</b>: <b>${botFmt(stat, v, pg)}</b>${suf}${pre}${dimTxt}. ${botPlayerChip(j)}`;
+    }).join('<hr class="bot-hr">');
+  }
+
+  // 9) JUGADORES DE UN EQUIPO
+  if (team) {
+    const list = botPlayers.filter(j => botTeamsOf(j).includes(team));
+    const name = teamInfo(team).name;
+    if (!list.length) return `Ningún español ha jugado en <b>${name}</b> (con datos registrados).`;
+    return `En <b>${name}</b> ${list.length === 1 ? 'ha jugado' : 'han jugado'} <b>${list.length}</b> español${list.length > 1 ? 'es' : ''}: ${list.map(j => j.nombre).join(', ')}.
+      <div class="bot-chips">${list.map(botPlayerChip).join('')}</div>`;
+  }
+
+  // 10) CUÁNTOS ESPAÑOLES / RECUENTO GLOBAL
+  if (/cuantos espanoles|cuantos jugadores|cuantos han jugado|numero de espanoles/.test(q)) {
+    const conNba = botPlayers.filter(j => (j.partidos || 0) > 0).length;
+    return `Han jugado en la NBA <b>${conNba}</b> españoles con minutos en partido oficial (${botPlayers.length} en la base de datos). <div class="bot-sub"><a href="jugadores.html">Ver todos →</a></div>`;
+  }
+
+  // 11) PREMIOS de un jugador (genérico)
+  if (/premio|galardon|mvp|dpoy|\broy\b|all[- ]?star|all[- ]?nba/.test(q) && players.length) {
+    return players.map(j => {
+      const p = j.premios || [];
+      if (!p.length) return `<b>${j.nombre}</b> no tiene premios individuales registrados. ${botPlayerChip(j)}`;
+      const top = p.slice(0, 8).map(a => `${a.tipo}${a.year ? ` (${a.year})` : ''}`).join(', ');
+      return `<b>${j.nombre}</b> tiene <b>${p.length}</b> premio${p.length > 1 ? 's' : ''}: ${top}${p.length > 8 ? '…' : ''}. ${botPlayerChip(j)}`;
+    }).join('<hr class="bot-hr">');
+  }
+
+  // 12) JUGADOR SUELTO → ficha resumen
+  if (players.length === 1) {
+    const j = players[0];
+    const bits = [];
+    if (j.partidos) bits.push(`${fmtEnt(j.partidos)} partidos`);
+    if (j.pts_g != null) bits.push(`${fmtDec1(j.pts_g)} pts`);
+    if (j.rbd_g != null) bits.push(`${fmtDec1(j.rbd_g)} reb`);
+    if (j.ast_g != null) bits.push(`${fmtDec1(j.ast_g)} ast`);
+    const rings = Object.keys(botRings(j)).length;
+    if (rings) bits.push(`${rings} anillo${rings > 1 ? 's' : ''}`);
+    return `<b>${j.nombre}</b> — ${bits.join(' · ') || 'sin estadísticas de carrera'}. ${botPlayerChip(j)}
+      <div class="bot-sub">Pregúntame por una estadística concreta (puntos, triples, asistencias…), su salario o en qué equipos jugó.</div>`;
+  }
+
+  return null;
+}
+
+function botReply(raw) {
+  const html = botAnswer(raw);
+  if (html) return html;
+  return `No he sabido responder a eso 🤔. Puedo responder sobre <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b>. Prueba con uno de los ejemplos de abajo.`;
+}
+
+function botAppend(role, html) {
+  const log = document.getElementById('bot-log');
+  const el = document.createElement('div');
+  el.className = 'bot-msg bot-msg--' + role;
+  el.innerHTML = html;
+  log.appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function botSubmit(text) {
+  const t = (text || '').trim();
+  if (!t) return;
+  botAppend('q', t.replace(/</g, '&lt;'));
+  const answer = botReply(t);
+  botAppend('a', answer);
+}
+
+async function initPreguntasPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  botPlayers = data.jugadores || [];
+  document.getElementById('hero-sub').textContent = `Escribe una pregunta y te respondo con los datos de los ${botPlayers.length} españoles de la NBA.`;
+
+  const sug = document.getElementById('bot-suggest');
+  if (sug) sug.innerHTML = BOT_EXAMPLES.map(e => `<button type="button" class="bot-eg">${e}</button>`).join('');
+  document.querySelectorAll('.bot-eg').forEach(b => b.addEventListener('click', () => { botSubmit(b.textContent); document.getElementById('bot-input').value = ''; }));
+
+  const form = document.getElementById('bot-form'), input = document.getElementById('bot-input');
+  form.addEventListener('submit', e => { e.preventDefault(); botSubmit(input.value); input.value = ''; input.focus(); });
+
+  botAppend('a', `¡Hola! 👋 Soy el buscador de <b>Españoles en la NBA</b>. Pregúntame lo que quieras sobre sus estadísticas, anillos, salarios, draft o trayectoria. Toca un ejemplo para empezar.`);
 }

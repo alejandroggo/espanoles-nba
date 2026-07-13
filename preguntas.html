@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comparador · Españoles en la NBA</title>
-<meta name="description" content="Compara cara a cara a dos jugadores españoles de la NBA: estadísticas de carrera, máximos, premios, dinero y playoffs.">
+<title>Pregúntame · Españoles en la NBA</title>
+<meta name="description" content="Haz una pregunta sobre los españoles en la NBA y te respondo con los datos de la web: estadísticas, rankings, anillos, salarios, draft, equipos y comparaciones.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Comparador · Españoles en la NBA">
-<meta property="og:description" content="Compara cara a cara a dos jugadores españoles de la NBA: estadísticas de carrera, máximos, premios, dinero y playoffs.">
-<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/comparador.html">
+<meta property="og:title" content="Pregúntame · Españoles en la NBA">
+<meta property="og:description" content="Haz una pregunta sobre los españoles en la NBA y te respondo con los datos de la web: estadísticas, rankings, anillos, salarios, draft, equipos y comparaciones.">
+<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/preguntas.html">
 <meta property="og:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Comparador · Españoles en la NBA">
-<meta name="twitter:description" content="Compara cara a cara a dos jugadores españoles de la NBA: estadísticas de carrera, máximos, premios, dinero y playoffs.">
+<meta name="twitter:title" content="Pregúntame · Españoles en la NBA">
+<meta name="twitter:description" content="Haz una pregunta sobre los españoles en la NBA y te respondo con los datos de la web.">
 <meta name="twitter:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,21 +45,19 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">El <em>Comparador</em></h1>
+        <h1 class="hero-title ag-hero"><em>Pregúntame</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
     </div>
   </section>
 
-  <section class="cmp-wrap" aria-label="Comparador de jugadores">
-    <div class="cmp-pick">
-      <label class="sel-wrap"><span class="sr-only">Jugador A</span><select id="cmp-a" class="sel"></select></label>
-      <span class="cmp-vs-lbl">VS</span>
-      <label class="sel-wrap"><span class="sr-only">Jugador B</span><select id="cmp-b" class="sel"></select></label>
-      <button type="button" id="cmp-swap" class="toggle-chip" title="Intercambiar" onclick="cmpSwap()">⇄</button>
-      <label class="sel-wrap"><span class="sr-only">Tercer jugador (opcional)</span><select id="cmp-c" class="sel cmp-sel-c"></select></label>
-    </div>
-    <div id="cmp-out"></div>
+  <section class="bot-wrap" aria-label="Buscador de preguntas">
+    <div class="bot-log" id="bot-log" aria-live="polite"></div>
+    <div class="bot-suggest" id="bot-suggest"></div>
+    <form class="bot-bar" id="bot-form" autocomplete="off">
+      <input type="text" id="bot-input" class="bot-input" placeholder="Ej: ¿Quién ha metido más triples?" aria-label="Escribe tu pregunta">
+      <button type="submit" class="bot-send" aria-label="Preguntar">Preguntar</button>
+    </form>
   </section>
 </main>
 
@@ -87,6 +85,6 @@
 </footer>
 
 <script src="app.js?v=73"></script>
-<script>initTheme(); initComparadorPage();</script>
+<script>initTheme(); initPreguntasPage();</script>
 </body>
 </html>
