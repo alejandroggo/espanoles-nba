@@ -1994,6 +1994,16 @@ function qCloseFour(pool, k, n = 4) {
 }
 function qDebutYear(j) { const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/); return m ? +m[1] : null; }
 function qNumTeams(j) { return (j.equipos_nba || '').split(/[,/]/).map(s => s.trim()).filter(Boolean).length; }
+// Partidos de temporada regular por equipo: { EQUIPO: { jugador: partidos } }
+function qBuildByTeam(J) {
+  const bt = {};
+  J.forEach(j => (j.temporadas_data || []).forEach(t => {
+    const tm = (t.team || '').toUpperCase();
+    if (!tm || tm === 'TOT') return;
+    (bt[tm] = bt[tm] || {})[j.nombre] = (bt[tm][j.nombre] || 0) + (t.g || 0);
+  }));
+  return bt;
+}
 
 // «¿Quién tiene más…?» — se eligen 4 jugadores con cifras parecidas para que no sea obvio
 const QSTAT = [
@@ -2151,6 +2161,28 @@ const QUIZ_GENS = [
     const s = qPick(D.sl);
     return { q: `¿Con qué equipo disputó <b>${s.jugador}</b> la Summer League${s.year ? ` de ${s.year}` : ''}?`, correct: s.equipo, options: qOptions(s.equipo, teams) };
   },
+  D => { // franquicia con más partidos de españoles (total)
+    const tot = Object.entries(D.byTeam).map(([tm, v]) => [tm, Object.values(v).reduce((s, n) => s + n, 0)]).sort((a, b) => b[1] - a[1]);
+    if (tot.length < 4 || tot.filter(x => x[1] === tot[0][1]).length > 1) return null;
+    const correct = teamInfo(tot[0][0]).name;
+    return { q: '¿En qué franquicia han jugado <b>más partidos</b> los españoles (en total)?', correct, options: qOptions(correct, tot.slice(1).map(([tm]) => teamInfo(tm).name)) };
+  },
+  D => { // quién ha jugado más partidos con X equipo
+    const cands = Object.entries(D.byTeam).filter(([, v]) => Object.keys(v).length >= 3);
+    if (!cands.length) return null;
+    const [tm, v] = qPick(cands);
+    const four = qSample(Object.entries(v), Math.min(4, Object.keys(v).length));   // [nombre, partidos]
+    const win = four.reduce((a, b) => b[1] > a[1] ? b : a);
+    if (four.filter(x => x[1] === win[1]).length > 1) return null;   // empate → descarta
+    return { q: `¿Quién ha jugado <b>más partidos</b> con ${teamInfo(tm).name}?`, correct: win[0], options: qShuffle(four.map(x => x[0])) };
+  },
+  D => { // único español que ha jugado en X franquicia
+    const solo = Object.entries(D.byTeam).filter(([, v]) => Object.keys(v).length === 1);
+    if (!solo.length || D.J.length < 4) return null;
+    const [tm, v] = qPick(solo);
+    const correct = Object.keys(v)[0];
+    return { q: `¿Cuál es el <b>único español</b> que ha jugado en ${teamInfo(tm).name}?`, correct, options: qOptions(correct, D.J.map(j => j.nombre).filter(n => n !== correct)) };
+  },
 ];
 
 async function initTestPage() {
@@ -2170,6 +2202,7 @@ async function initTestPage() {
     premios: J.flatMap(j => (j.premios || []).map(p => ({ ...p, jugador: j.nombre }))),
     sl: (data.summer_league || []).filter(s => s.equipo && s.jugador),
     trans: (data.transacciones || []),
+    byTeam: qBuildByTeam(J),
   };
   quizNext();
 }
