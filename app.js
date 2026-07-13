@@ -10,6 +10,7 @@ function initTheme() {
   buildNav();
   buildHeaderSearch();
   buildShareButton();
+  buildChatWidget();
   showLoadBar();
 }
 
@@ -4185,10 +4186,33 @@ function botAnswer(raw) {
   return null;
 }
 
+// Enrutado a la página correcta según el tema de la pregunta
+const BOT_PAGES = [
+  { re: /salario|sueldo|cuanto (ha )?gan|dinero|cobr/, page: 'salarios.html', label: 'Salarios' },
+  { re: /dorsal|numero de camiseta|camiseta|numero que llev/, page: 'dorsales.html', label: 'Dorsales' },
+  { re: /summer league|liga de verano/, page: 'summer-league.html', label: 'Summer League' },
+  { re: /transaccion|traspas|fichaj|\bcort|movimiento de mercado|firm/, page: 'transacciones.html', label: 'Transacciones' },
+  { re: /premio|galardon|all[- ]?star|all[- ]?nba|\bmvp\b|dpoy|\broy\b|quinteto/, page: 'premios.html', label: 'Premios' },
+  { re: /draft|drafte|elegid en el draft/, page: 'draft.html', label: 'Draft' },
+  { re: /debut|primer partido|estreno/, page: 'debut.html', label: 'Debut' },
+  { re: /career high|mejor partido|maximo en un partido|mejor temporada/, page: 'career-highs.html', label: 'Career Highs' },
+  { re: /comparar|comparador|cara a cara|\bvs\b|versus|enfrent/, page: 'comparador.html', label: 'Comparador' },
+  { re: /linea temporal|cronolog|trayectoria/, page: 'linea-temporal.html', label: 'Línea temporal' },
+  { re: /por equipo|franquicia|matriz|con cada equipo/, page: 'por-equipo.html', label: 'Por equipo' },
+  { re: /por temporada|temporada a temporada|cada temporada/, page: 'temporadas.html', label: 'Temporadas' },
+  { re: /test|quiz|trivial|poner a prueba/, page: 'test.html', label: 'Test' },
+  { re: /ranking|carrera|lider|estadisticas de carrera|mejores numeros/, page: 'ranking.html', label: 'Carrera' },
+  { re: /directorio|lista de jugadores|todos los jugadores|todos los espanoles|listado/, page: 'jugadores.html', label: 'Jugadores' },
+];
+function botRoute(q) { return BOT_PAGES.find(p => p.re.test(q)) || null; }
+
 function botReply(raw) {
   const html = botAnswer(raw);
   if (html) return html;
-  return `No he sabido responder a eso 🤔. Puedo responder sobre <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b>. Prueba con uno de los ejemplos de abajo.`;
+  // Si no hay respuesta con datos, intento llevar a la página adecuada
+  const r = botRoute(botNorm(raw));
+  if (r) return `Para eso, tu mejor sitio es la página de <b>${r.label}</b>. <div class="bot-sub"><a href="${r.page}">Ir a ${r.label} →</a></div>`;
+  return `No he sabido responder a eso 🤔. Puedo darte <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b> — o llevarte a la sección que busques. Prueba con un ejemplo.`;
 }
 
 function botAppend(role, html) {
@@ -4224,4 +4248,87 @@ async function initPreguntasPage() {
   form.addEventListener('submit', e => { e.preventDefault(); botSubmit(input.value); input.value = ''; input.focus(); });
 
   botAppend('a', `¡Hola! 👋 Soy el buscador de <b>Españoles en la NBA</b>. Pregúntame lo que quieras sobre sus estadísticas, anillos, salarios, draft o trayectoria. Toca un ejemplo para empezar.`);
+}
+
+// ── WIDGET DE CHAT FLOTANTE (burbuja abajo, en todas las páginas) ──
+let cwOpen = false, cwGreeted = false;
+
+function buildChatWidget() {
+  if (document.getElementById('cw-root')) return;
+  const here = location.pathname.split('/').pop() || 'index.html';
+  if (here === 'preguntas.html') return;   // esa página ya ES el buscador
+  const root = document.createElement('div');
+  root.id = 'cw-root';
+  root.innerHTML = `
+    <button class="cw-launch" id="cw-launch" aria-label="Abrir asistente" aria-expanded="false" aria-haspopup="dialog">
+      <svg class="cw-ico-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <svg class="cw-ico-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="cw-panel" id="cw-panel" hidden role="dialog" aria-label="Asistente de Españoles en la NBA">
+      <div class="cw-head">
+        <span class="cw-dot"></span>
+        <span class="cw-title">Pregúntame</span>
+        <a class="cw-expand" href="preguntas.html" title="Abrir en pantalla completa" aria-label="Abrir en pantalla completa">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        </a>
+      </div>
+      <div class="cw-log" id="cw-log" aria-live="polite"></div>
+      <div class="cw-suggest" id="cw-suggest"></div>
+      <form class="cw-bar" id="cw-form" autocomplete="off">
+        <input type="text" id="cw-input" class="cw-input" placeholder="Escribe tu pregunta…" aria-label="Escribe tu pregunta">
+        <button type="submit" class="cw-send" aria-label="Enviar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </form>
+    </div>`;
+  document.body.appendChild(root);
+  document.getElementById('cw-launch').addEventListener('click', cwToggle);
+  document.getElementById('cw-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const i = document.getElementById('cw-input');
+    cwSubmit(i.value); i.value='';
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && cwOpen) cwToggle(); });
+}
+
+async function cwEnsureData() {
+  if (botPlayers.length) return;
+  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPlayers = d.jugadores || []; } catch (e) { botPlayers = []; }
+}
+
+async function cwToggle() {
+  const panel = document.getElementById('cw-panel'), launch = document.getElementById('cw-launch');
+  if (!panel) return;
+  cwOpen = !cwOpen;
+  panel.hidden = !cwOpen;
+  launch.setAttribute('aria-expanded', String(cwOpen));
+  launch.classList.toggle('cw-launch--open', cwOpen);
+  if (!cwOpen) return;
+  await cwEnsureData();
+  if (!cwGreeted) {
+    cwGreeted = true;
+    cwAppend('a', `¡Hola! 👋 Pregúntame sobre los españoles en la NBA —estadísticas, anillos, salarios, comparaciones— o dime qué buscas y te llevo a la página.`);
+    const sug = document.getElementById('cw-suggest');
+    const egs = ['¿Quién ha metido más puntos?', 'Anillos de Pau Gasol', 'Salarios', 'Pau vs Marc'];
+    sug.innerHTML = egs.map(e => `<button type="button" class="cw-eg">${e}</button>`).join('');
+    sug.querySelectorAll('.cw-eg').forEach(b => b.addEventListener('click', () => cwSubmit(b.textContent)));
+  }
+  document.getElementById('cw-input').focus();
+}
+
+function cwAppend(role, html) {
+  const log = document.getElementById('cw-log');
+  const el = document.createElement('div');
+  el.className = 'cw-msg cw-msg--' + role;
+  el.innerHTML = html;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+function cwSubmit(text) {
+  const t = (text || '').trim();
+  if (!t) return;
+  const sug = document.getElementById('cw-suggest'); if (sug) sug.innerHTML = '';
+  cwAppend('q', t.replace(/</g, '&lt;'));
+  cwAppend('a', botReply(t));
 }
