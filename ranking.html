@@ -26,7 +26,7 @@
 <link rel="icon" type="image/svg+xml" href="/espanoles-nba/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/espanoles-nba/favicon.ico">
 <link rel="apple-touch-icon" href="/espanoles-nba/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=71">
+<link rel="stylesheet" href="style.css?v=72">
 </head>
 <body>
 
@@ -55,6 +55,10 @@
   <section class="controles" aria-label="Filtros">
     <div class="search-wrap">
       <input type="text" id="rk-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+    </div>
+    <div class="mode-switch" role="group" aria-label="Temporada regular o playoffs">
+      <button type="button" id="rk-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setRkDim('reg')">Temporada regular</button>
+      <button type="button" id="rk-dim-po" class="toggle-chip" aria-pressed="false" onclick="setRkDim('po')">Playoffs</button>
     </div>
     <div class="mode-switch" role="group" aria-label="Modo de estadísticas">
       <button type="button" id="rk-mode-pg" class="toggle-chip active" aria-pressed="true" onclick="setRkMode('pg')">Por partido</button>
@@ -95,7 +99,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=71"></script>
+<script src="app.js?v=72"></script>
 <script>initTheme(); initRankingPage();</script>
 </body>
 </html>

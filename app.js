@@ -1048,6 +1048,8 @@ function sortPr(col) {
 // PÁGINA RANKING
 // ══════════════════════════════════════════════
 let rkAll = [];
+let rkRegAll = [], rkPoAll = [];
+let rkDim = 'reg';          // 'reg' (temporada regular) | 'po' (playoffs)
 let rkMode = 'pg';          // 'pg' (por partido) | 'tot' (totales)
 let rkSortCol = 'pts_g';
 let rkSortAsc = false;
@@ -1106,20 +1108,35 @@ async function initRankingPage() {
     return;
   }
 
-  rkAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
-  rkAll.forEach(j => { j.pct_gs = j.partidos ? (j.partidos_titular || 0) / j.partidos : 0; });
   buildPlayerIds(data.jugadores);
+  rkRegAll = (data.jugadores || []).filter(j => (j.partidos || 0) > 0);
+  rkRegAll.forEach(j => { j.pct_gs = j.partidos ? (j.partidos_titular || 0) / j.partidos : 0; });
+  // Ranking de playoffs: se deriva de playoffs_totales (mismas claves que las de carrera regular)
+  rkPoAll = (data.jugadores || []).filter(j => j.playoffs_totales && (j.playoffs_totales.partidos || 0) > 0)
+    .map(j => {
+      const pt = j.playoffs_totales;
+      return { id: j.id, nombre: j.nombre, foto_url: j.foto_url, bref_id: j.bref_id, ...pt,
+        pct_gs: pt.partidos ? (pt.partidos_titular || 0) / pt.partidos : 0 };
+    });
+
+  const params = new URLSearchParams(location.search);
+  if (params.get('tipo') === 'po' && rkPoAll.length) {
+    rkDim = 'po';
+    ['reg', 'po'].forEach(x => {
+      const btn = document.getElementById('rk-dim-' + x);
+      if (btn) { btn.classList.toggle('active', x === 'po'); btn.setAttribute('aria-pressed', String(x === 'po')); }
+    });
+  }
+  rkAll = rkDim === 'po' ? rkPoAll : rkRegAll;
   buildRkRanks();
 
   // Modo desde la URL (?modo=totales)
-  const modo = new URLSearchParams(location.search).get('modo');
+  const modo = params.get('modo');
   if (modo === 'totales' || modo === 'tot') rkMode = 'tot';
   rkSortCol = rkMode === 'pg' ? 'pts_g' : 'pts_total';
   syncRkModeButtons();
 
-  document.getElementById('hero-sub').textContent =
-    `${rkAll.length} jugadores con partidos en la NBA · Estadísticas de carrera`;
-
+  rkUpdateHero();
   renderRkKpis();
   document.getElementById('rk-search').addEventListener('input', e => { rkSearch = e.target.value.trim().toLowerCase(); renderRkTable(); });
   const rkQ = new URLSearchParams(location.search).get('q');
@@ -1152,6 +1169,27 @@ function setRkMode(mode) {
   rkSortCol = mode === 'pg' ? 'pts_g' : 'pts_total';
   rkSortAsc = false;
   updateUrlParam('modo', mode === 'tot' ? 'totales' : 'partido');
+  renderRkTable();
+}
+
+function rkUpdateHero() {
+  document.getElementById('hero-sub').textContent = rkDim === 'po'
+    ? `${rkAll.length} españoles con partidos de playoffs · Totales y medias de playoffs`
+    : `${rkAll.length} jugadores con partidos en la NBA · Estadísticas de carrera`;
+}
+
+function setRkDim(d) {
+  if (rkDim === d) return;
+  rkDim = d;
+  rkAll = d === 'po' ? rkPoAll : rkRegAll;
+  ['reg', 'po'].forEach(x => {
+    const btn = document.getElementById('rk-dim-' + x);
+    if (btn) { btn.classList.toggle('active', x === d); btn.setAttribute('aria-pressed', String(x === d)); }
+  });
+  updateUrlParam('tipo', d === 'po' ? 'po' : '');
+  buildRkRanks();
+  rkUpdateHero();
+  renderRkKpis();
   renderRkTable();
 }
 
