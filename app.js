@@ -3620,6 +3620,15 @@ const POEQ_PLAYOFFS = {
   'fernando-martin':      { POR: 1 },
 };
 
+// Jugadores en activo en la NBA → equipo actual (mantener a mano)
+const POEQ_ACTIVE = {
+  'santi-aldama': 'MEM',
+  'hugo-gonzalez': 'BOS',
+  'sergio-de-larrea': 'MEM',
+  'baba-miller': 'LAC',
+  'aday-mara': 'OKC',
+};
+
 let poeqJ = [], poeqMode = 'reg';
 
 // {team: partidos} en temporada regular (desde temporadas_data, sin TOT)
@@ -3681,15 +3690,16 @@ function poeqHeat(v, max) {
 
 function renderPorEquipo() {
   const byTeam = poeqMode === 'reg' ? poeqRegByTeam : poeqPoByTeam;
+  const showActive = poeqMode === 'reg';   // los activos sin debutar solo en temporada regular
   const rows = poeqJ.map(j => {
     const bt = byTeam(j);
     const total = Object.values(bt).reduce((s, n) => s + n, 0);
     const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
-    return { id: j.id, nombre: j.nombre, foto: src, bt, total };
-  }).filter(r => r.total > 0).sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre, 'es'));
+    return { id: j.id, nombre: j.nombre, foto: src, bt, total, active: POEQ_ACTIVE[j.id] || null };
+  }).filter(r => r.total > 0 || (showActive && r.active)).sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre, 'es'));
 
-  // Equipos que aparecen, ordenados alfabéticamente
-  const teams = [...new Set(rows.flatMap(r => Object.keys(r.bt)))].sort();
+  // Equipos que aparecen (+ equipos actuales de los activos aunque no tengan partidos)
+  const teams = [...new Set(rows.flatMap(r => Object.keys(r.bt)).concat(showActive ? rows.map(r => r.active).filter(Boolean) : []))].sort();
   const grand = rows.reduce((s, r) => s + r.total, 0);
   const maxCell = Math.max(1, ...rows.flatMap(r => Object.values(r.bt)));
   const teamTot = {}, teamPl = {};
@@ -3698,7 +3708,9 @@ function renderPorEquipo() {
 
   document.getElementById('hero-sub').textContent =
     `${rows.length} españoles · ${grand.toLocaleString('es-ES')} partidos ${poeqMode === 'reg' ? 'de temporada regular' : 'de playoffs'} repartidos por ${teams.length} franquicias`;
-  document.getElementById('poeq-count').textContent = poeqMode === 'reg' ? '' : '⚠ Playoffs añadidos a mano (revisables)';
+  document.getElementById('poeq-count').innerHTML = poeqMode === 'reg'
+    ? '<b>En negrita</b>, jugadores en activo · • equipo actual'
+    : '⚠ Playoffs añadidos a mano (revisables)';
 
   const head = `<tr><th class="poeq-name-h">Jugador</th>${teams.map(t => {
     const info = teamInfo(t);
@@ -3712,10 +3724,13 @@ function renderPorEquipo() {
       : avatarHtml(r.nombre, 'player-thumb');
     const cells = teams.map(t => {
       const v = r.bt[t];
-      return v ? `<td class="poeq-cell" style="${poeqHeat(v, maxCell)}">${v}</td>` : `<td class="poeq-cell poeq-zero"></td>`;
+      const cur = (showActive && r.active === t);   // equipo actual del activo
+      if (v) return `<td class="poeq-cell${cur ? ' poeq-current' : ''}" style="${poeqHeat(v, maxCell)}">${v}</td>`;
+      if (cur) return `<td class="poeq-cell poeq-current" title="En plantilla actualmente">•</td>`;
+      return `<td class="poeq-cell poeq-zero"></td>`;
     }).join('');
     return `<tr>
-      <th scope="row" class="poeq-name"><span class="poeq-player">${thumb}${plLink(r.nombre, r.nombre)}</span></th>
+      <th scope="row" class="poeq-name${r.active ? ' poeq-active' : ''}"><span class="poeq-player">${thumb}${plLink(r.nombre, r.nombre)}</span></th>
       ${cells}
       <td class="poeq-tot">${r.total}</td>
       <td class="poeq-pct">${grand ? (r.total / grand * 100).toFixed(1) + '%' : '—'}</td>
