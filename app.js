@@ -3779,7 +3779,7 @@ function renderPorEquipo() {
   const footTeams = teams.map(t => `<td class="poeq-foot-team" title="${teamInfo(t).name}" style="box-shadow: inset 0 3px 0 ${teamInfo(t).color}">${t}</td>`).join('');
   document.getElementById('poeq-tfoot').innerHTML =
     `<tr class="poeq-foot"><th class="poeq-name">Total partidos</th>${footTot}<td class="poeq-tot">${grand}</td><td class="poeq-pct">100%</td></tr>
-     <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">% del total</th>${footPct}<td></td><td></td></tr>
+     <tr class="poeq-foot poeq-foot--sub poeq-foot--pct"><th class="poeq-name">% del total</th>${footPct}<td></td><td></td></tr>
      <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">Jugadores</th>${footPl}<td class="poeq-tot">${rows.length}</td><td></td></tr>
      <tr class="poeq-foot poeq-foot--teams"><th class="poeq-name poeq-name-h">Equipo</th>${footTeams}<td class="poeq-tot-h">TOTAL</td><td class="poeq-pct-h">%</td></tr>`;
 

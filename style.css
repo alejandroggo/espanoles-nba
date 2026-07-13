@@ -1074,6 +1074,7 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .poeq-foot th.poeq-name { text-align: left; font-weight: 700; z-index: 7; font-size: var(--font-sm); }
 .poeq-foot-num { font-weight: 700; }
 .poeq-foot--sub th, .poeq-foot--sub td { color: var(--text-muted); font-weight: 600; font-size: var(--font-sm); border-top: 0; }
+.poeq-foot--pct td { font-size: 0.58rem; font-weight: 700; letter-spacing: -0.02em; }
 .poeq-foot--teams td, .poeq-foot--teams th { font-size: 0.62rem; font-weight: 700; color: var(--text); border-top: 0; padding-top: var(--space-1); }
 .poeq-foot--teams th.poeq-name { color: var(--text); }
 .poeq-count-warn { color: var(--warning); }
