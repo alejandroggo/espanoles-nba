@@ -3629,6 +3629,9 @@ const POEQ_ACTIVE = {
   'aday-mara': 'OKC',
 };
 
+// Las 30 franquicias actuales (se muestran todas, aunque no tengan españoles)
+const POEQ_TEAMS = ['ATL', 'BKN', 'BOS', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW', 'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOL', 'NYK', 'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS'];
+
 let poeqJ = [], poeqMode = 'reg';
 
 // {team: partidos} en temporada regular (desde temporadas_data, sin TOT)
@@ -3698,8 +3701,8 @@ function renderPorEquipo() {
     return { id: j.id, nombre: j.nombre, foto: src, bt, total, active: POEQ_ACTIVE[j.id] || null };
   }).filter(r => r.total > 0 || (showActive && r.active)).sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre, 'es'));
 
-  // Equipos que aparecen (+ equipos actuales de los activos aunque no tengan partidos)
-  const teams = [...new Set(rows.flatMap(r => Object.keys(r.bt)).concat(showActive ? rows.map(r => r.active).filter(Boolean) : []))].sort();
+  // Las 30 franquicias (+ cualquier código histórico que aparezca en los datos)
+  const teams = [...new Set([...POEQ_TEAMS, ...rows.flatMap(r => Object.keys(r.bt)), ...(showActive ? rows.map(r => r.active).filter(Boolean) : [])])].sort();
   const grand = rows.reduce((s, r) => s + r.total, 0);
   const maxCell = Math.max(1, ...rows.flatMap(r => Object.values(r.bt)));
   const teamTot = {}, teamPl = {};
@@ -3740,10 +3743,12 @@ function renderPorEquipo() {
   const footTot = teams.map(t => `<td class="poeq-foot-num">${teamTot[t]}</td>`).join('');
   const footPct = teams.map(t => `<td class="poeq-foot-sub">${grand ? (teamTot[t] / grand * 100).toFixed(1) + '%' : ''}</td>`).join('');
   const footPl = teams.map(t => `<td class="poeq-foot-sub">${teamPl[t] || ''}</td>`).join('');
+  const footTeams = teams.map(t => `<td class="poeq-foot-team" title="${teamInfo(t).name}" style="box-shadow: inset 0 3px 0 ${teamInfo(t).color}">${t}</td>`).join('');
   document.getElementById('poeq-tfoot').innerHTML =
     `<tr class="poeq-foot"><th class="poeq-name">Total partidos</th>${footTot}<td class="poeq-tot">${grand}</td><td class="poeq-pct">100%</td></tr>
      <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">% del total</th>${footPct}<td></td><td></td></tr>
-     <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">Jugadores</th>${footPl}<td class="poeq-tot">${rows.length}</td><td></td></tr>`;
+     <tr class="poeq-foot poeq-foot--sub"><th class="poeq-name">Jugadores</th>${footPl}<td class="poeq-tot">${rows.length}</td><td></td></tr>
+     <tr class="poeq-foot poeq-foot--teams"><th class="poeq-name poeq-name-h">Equipo</th>${footTeams}<td class="poeq-tot-h">TOTAL</td><td class="poeq-pct-h">%</td></tr>`;
 
   const table = document.getElementById('poeq-table'), inner = document.getElementById('poeq-topscroll-inner'), wrap = document.getElementById('poeq-wrap'), top = document.getElementById('poeq-topscroll');
   if (table && inner) { inner.style.width = table.scrollWidth + 'px'; if (top) top.style.display = table.scrollWidth > wrap.clientWidth ? 'block' : 'none'; }
