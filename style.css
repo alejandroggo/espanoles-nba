@@ -1054,7 +1054,9 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 #poeq-table thead th { position: sticky; top: 0; z-index: 6; background: var(--surface-2); color: var(--text-muted); font-size: 0.62rem; font-weight: 700; text-align: center; white-space: nowrap; border-bottom: 2px solid var(--border); }
 .poeq-th { min-width: 34px; width: 34px; padding: var(--space-2) 0 !important; }
 .poeq-tot-h, .poeq-pct-h { padding: var(--space-2) var(--space-2) !important; }
-.poeq-name, .poeq-name-h { position: sticky; left: 0; z-index: 5; background: var(--surface); text-align: left; width: 210px; min-width: 210px; max-width: 210px; padding: 0 var(--space-3) !important; box-shadow: 1px 0 0 var(--border); }
+.poeq-name, .poeq-name-h { position: sticky; left: 0; z-index: 5; background: var(--surface); text-align: left; width: 250px; min-width: 250px; max-width: 250px; padding: 0 var(--space-3) !important; box-shadow: 1px 0 0 var(--border); white-space: nowrap; }
+.poeq-player { white-space: nowrap; }
+.poeq-player .pl-link { white-space: nowrap; }
 .poeq-name-h { z-index: 9; background: var(--surface-2); }
 .poeq-player { display: inline-flex; align-items: center; gap: var(--space-2); }
 #poeq-tbody tr { height: 40px; }
