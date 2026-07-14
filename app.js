@@ -3933,6 +3933,16 @@ function renderPorEquipo() {
 // ══════════════════════════════════════════════
 let botPlayers = [];
 let botCtx = null, botPending = null;   // memoria conversacional (seguimiento)
+// Prepara la lista de jugadores para el motor (deriva el nº de temporadas)
+function botPrepPlayers(list) {
+  botPlayers = list || [];
+  botPlayers.forEach(j => {
+    if (j._temporadas == null) {
+      const yrs = new Set((j.temporadas_data || []).filter(t => t.year && (t.team || '').toUpperCase() !== 'TOT').map(t => t.year));
+      j._temporadas = j.temporadas || yrs.size || null;
+    }
+  });
+}
 
 const BOT_EXAMPLES = [
   '¿Quién ha metido más puntos?',
@@ -3959,11 +3969,14 @@ const BOT_STATS = [
   { re: /tiro libre|libres|\bft%/, total: 'ft_pct', pg: 'ft_pct', label: 'FT% (tiros libres)', kind: 'pct' },
   { re: /triples?|\b3pm?\b/, total: 'tres_total', pg: 'tres_g', label: 'triples', kind: 'num' },
   { re: /minuto|\bmin\b/, total: 'min_total', pg: 'min_g', label: 'minutos', kind: 'num' },
+  { re: /\btemporadas\b|\bcampañas\b|\bcampanas\b/, total: '_temporadas', pg: '_temporadas', label: 'temporadas', kind: 'count' },
   { re: /partido|juego|\bgp\b/, total: 'partidos', pg: 'partidos', label: 'partidos', kind: 'count' },
 ];
 
 function botNorm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function botHref(page) { return page; }
+// Contenido secundario plegable: la respuesta va corta y se amplía solo al hacer click
+function botMore(inner) { return ` <details class="bot-more"><summary>Ver detalle</summary>${inner}</details>`; }
 function botPlayerChip(j) {
   const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
   const thumb = src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'bot-avatar');
@@ -4054,15 +4067,17 @@ function botTeamGames(j) {
   return m;
 }
 // Agrega una estadística de un jugador SOLO con un equipo (desde temporadas_data)
-function botTeamAgg(j, team, stat) {
-  let g = 0, weighted = 0, td = 0;
-  (j.temporadas_data || []).forEach(t => {
+function botTeamAgg(j, team, stat, dim) {
+  const rows = (dim === 'po' ? j.playoffs_temporadas : j.temporadas_data) || [];
+  let g = 0, weighted = 0, td = 0; const seasons = new Set();
+  rows.forEach(t => {
     if ((t.team || '').toUpperCase() !== team) return;
-    const gg = t.g || 0; g += gg; td += (t.td || 0);
+    const gg = t.g || 0; g += gg; td += (t.td || 0); if (t.year) seasons.add(t.year);
     const per = t[stat.pg];
     if (per != null) weighted += per * gg;
   });
   if (!g) return null;
+  if (stat.total === '_temporadas') return { v: seasons.size, g, per: null };
   if (stat.total === 'partidos') return { v: g, g, per: null };
   if (stat.label === 'triples dobles') return { v: td, g, per: null };
   if (stat.kind === 'pct') return { v: weighted / g, g, per: weighted / g };   // media ponderada por partidos
@@ -4200,8 +4215,7 @@ function botAnswer(raw) {
     if (superl && !players.length) {
       if (!ranked.length) return null;
       const top3 = ranked.slice(0, 3);
-      return `El español que más dinero ha ganado en la NBA es <b>${ranked[0].nombre}</b>, con <b>${fmtDinero(ranked[0].ganancias)}</b> brutos en toda su carrera. Le siguen <b>${top3[1] ? top3[1].nombre : ''}</b> (${top3[1] ? fmtDinero(top3[1].ganancias) : ''})${top3[2] ? ` y <b>${top3[2].nombre}</b> (${fmtDinero(top3[2].ganancias)})` : ''}. ${botPlayerChip(ranked[0])}
-        <ol class="bot-rank">${ranked.slice(0, 5).map(j => `<li><span>${j.nombre}</span><b>${fmtDinero(j.ganancias)}</b></li>`).join('')}</ol>`;
+      return `El español que más dinero ha ganado en la NBA es <b>${ranked[0].nombre}</b>, con <b>${fmtDinero(ranked[0].ganancias)}</b> brutos en toda su carrera. Le siguen <b>${top3[1] ? top3[1].nombre : ''}</b> (${top3[1] ? fmtDinero(top3[1].ganancias) : ''})${top3[2] ? ` y <b>${top3[2].nombre}</b> (${fmtDinero(top3[2].ganancias)})` : ''}. ${botPlayerChip(ranked[0])}${botMore(`<ol class="bot-rank">${ranked.slice(0, 5).map(j => `<li><span>${j.nombre}</span><b>${fmtDinero(j.ganancias)}</b></li>`).join('')}</ol>`)}`;
     }
     if (players.length) {
       return players.map(j => {
@@ -4268,8 +4282,7 @@ function botAnswer(raw) {
       const fmtV = v => stat.kind === 'pct' ? fmtPct(v) : ((pgMode && stat.kind === 'num') ? fmtDec1(v) : fmtEnt(v));
       const top = rows[0], second = rows[1];
       const modo = pgMode && stat.kind === 'num' ? ' por partido' : '';
-      return `En la temporada <b>${drSeason(year)}</b>, el español con ${asc ? 'menos' : 'más'} <b>${stat.label}</b>${modo} fue <b>${top.j.nombre}</b>, con <b>${fmtV(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtV(second.v)})` : ''}. ${botPlayerChip(top.j)}
-        <ol class="bot-rank">${rows.map(x => `<li><span>${x.j.nombre}</span><b>${fmtV(x.v)}</b></li>`).join('')}</ol>`;
+      return `En la temporada <b>${drSeason(year)}</b>, el español con ${asc ? 'menos' : 'más'} <b>${stat.label}</b>${modo} fue <b>${top.j.nombre}</b>, con <b>${fmtV(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtV(second.v)})` : ''}. ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${rows.map(x => `<li><span>${x.j.nombre}</span><b>${fmtV(x.v)}</b></li>`).join('')}</ol>`)}`;
     }
 
     // Jugador + año
@@ -4309,27 +4322,27 @@ function botAnswer(raw) {
     // De un jugador concreto
     if (players.length) {
       return players.map(j => {
-        const a = botTeamAgg(j, team, stat);
-        if (!a) return `<b>${j.nombre}</b> no jugó (o no tengo registro) con <b>${tname}</b>. ${botPlayerChip(j)}`;
-        if (stat.kind === 'pct') return `Con <b>${tname}</b>, <b>${j.nombre}</b> promedió un <b>${fmtPct(a.v)}</b> en ${stat.label} (${fmtEnt(a.g)} partidos). ${botPlayerChip(j)}`;
-        if (stat.total === 'partidos') return `<b>${j.nombre}</b> disputó <b>${fmtEnt(a.v)} partidos</b> con <b>${tname}</b>. ${botPlayerChip(j)}`;
-        if (stat.label === 'triples dobles') return `<b>${j.nombre}</b> firmó <b>${fmtEnt(a.v)} triples dobles</b> con <b>${tname}</b>. ${botPlayerChip(j)}`;
-        return `Con <b>${tname}</b>, <b>${j.nombre}</b> sumó <b>${fmtEnt(a.v)} ${stat.label}</b>, a una media de <b>${fmtDec1(a.per)} por partido</b> en ${fmtEnt(a.g)} partidos. ${botPlayerChip(j)}`;
+        const a = botTeamAgg(j, team, stat, dim);
+        if (!a) return `<b>${j.nombre}</b> no jugó${dimTxt} (o no tengo registro) con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        if (stat.kind === 'pct') return `Con <b>${tname}</b>${dimTxt}, <b>${j.nombre}</b> promedió un <b>${fmtPct(a.v)}</b> en ${stat.label} (${fmtEnt(a.g)} partidos). ${botPlayerChip(j)}`;
+        if (stat.total === 'partidos') return `<b>${j.nombre}</b> disputó <b>${fmtEnt(a.v)} partidos</b>${dimTxt} con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        if (stat.total === '_temporadas') return `<b>${j.nombre}</b> jugó <b>${fmtEnt(a.v)} temporada${a.v === 1 ? '' : 's'}</b>${dimTxt} con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        if (stat.label === 'triples dobles') return `<b>${j.nombre}</b> firmó <b>${fmtEnt(a.v)} triples dobles</b>${dimTxt} con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        return `Con <b>${tname}</b>${dimTxt}, <b>${j.nombre}</b> sumó <b>${fmtEnt(a.v)} ${stat.label}</b>, a una media de <b>${fmtDec1(a.per)} por partido</b> en ${fmtEnt(a.g)} partidos. ${botPlayerChip(j)}`;
       }).join('<hr class="bot-hr">');
     }
     // Ranking con ese equipo
     const rows = botPlayers.map(j => {
-      const a = botTeamAgg(j, team, stat);
+      const a = botTeamAgg(j, team, stat, dim);
       if (!a) return null;
       if (stat.kind === 'pct' && a.g < 15) return null;
       const v = pgMode ? a.per : a.v;
       return (v != null) ? { j, v } : null;
     }).filter(Boolean).sort((x, y) => asc ? x.v - y.v : y.v - x.v).slice(0, 5);
-    if (!rows.length) return `No me consta ningún español que haya jugado con <b>${tname}</b> para eso.`;
+    if (!rows.length) return `No me consta ningún español que haya jugado${dimTxt} con <b>${tname}</b> para eso.`;
     const fmtV = v => stat.kind === 'pct' ? fmtPct(v) : (pgMode ? fmtDec1(v) : fmtEnt(v));
     const top = rows[0], second = rows[1];
-    return `Con <b>${tname}</b>, el español con ${asc ? 'menos' : 'más'} <b>${stat.label}</b>${pgMode ? ' por partido' : ''} es <b>${top.j.nombre}</b>, con <b>${fmtV(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtV(second.v)})` : ''}. ${botPlayerChip(top.j)}
-      <ol class="bot-rank">${rows.map(x => `<li><span>${x.j.nombre}</span><b>${fmtV(x.v)}</b></li>`).join('')}</ol>`;
+    return `Con <b>${tname}</b>${dimTxt}, el español con ${asc ? 'menos' : 'más'} <b>${stat.label}</b>${pgMode ? ' por partido' : ''} es <b>${top.j.nombre}</b>, con <b>${fmtV(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtV(second.v)})` : ''}. ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${rows.map(x => `<li><span>${x.j.nombre}</span><b>${fmtV(x.v)}</b></li>`).join('')}</ol>`)}`;
   }
 
   // 5) EQUIPOS DE UN JUGADOR
@@ -4378,8 +4391,7 @@ function botAnswer(raw) {
       extra = pg ? ` (${fmtEnt(tot)} en total)` : ` (${fmtDec1((dim === 'po' ? (tj.playoffs_totales || {}) : tj)[stat.pg])} por partido en ${fmtEnt(g)} partidos)`;
     }
     const cola = second ? ` Le siguen <b>${second.j.nombre}</b> (${botFmt(stat, second.v, pg)})${third ? ` y <b>${third.j.nombre}</b> (${botFmt(stat, third.v, pg)})` : ''}.` : '';
-    return `El español con ${verbo} <b>${stat.label}</b>${pgTxt}${dimTxt} es <b>${top.j.nombre}</b>, con <b>${botFmt(stat, top.v, pg)}</b>${extra}.${cola} ${botPlayerChip(top.j)}
-      <ol class="bot-rank">${list.map(x => `<li><span>${x.j.nombre}</span><b>${botFmt(stat, x.v, pg)}</b></li>`).join('')}</ol>`;
+    return `El español con ${verbo} <b>${stat.label}</b>${pgTxt}${dimTxt} es <b>${top.j.nombre}</b>, con <b>${botFmt(stat, top.v, pg)}</b>${extra}.${cola} ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${list.map(x => `<li><span>${x.j.nombre}</span><b>${botFmt(stat, x.v, pg)}</b></li>`).join('')}</ol>`)}`;
   }
 
   // 8) ESTADÍSTICA de un jugador
@@ -4396,7 +4408,7 @@ function botAnswer(raw) {
       if (stat.kind === 'count') {
         const v = src[stat.total];
         if (v == null) return `No tengo ${stat.label}${dimTxt} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
-        const verbo = stat.total === 'partidos' ? 'ha disputado' : 'ha firmado';
+        const verbo = stat.total === 'partidos' ? 'ha disputado' : (stat.total === '_temporadas' ? 'ha jugado' : 'ha firmado');
         return `<b>${j.nombre}</b> ${verbo} <b>${fmtEnt(v)} ${stat.label}</b>${dimTxt} en la NBA.${botRankSentence(j, stat.total, dim, stat.label)} ${botPlayerChip(j)}`;
       }
       // num: total + media + puesto
@@ -4523,7 +4535,7 @@ async function initPreguntasPage() {
   try { data = await loadData(); }
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   buildPlayerIds(data.jugadores);
-  botPlayers = data.jugadores || [];
+  botPrepPlayers(data.jugadores);
   document.getElementById('hero-sub').textContent = `Escribe una pregunta y te respondo con los datos de los ${botPlayers.length} españoles de la NBA.`;
 
   const sug = document.getElementById('bot-suggest');
@@ -4579,7 +4591,7 @@ function buildChatWidget() {
 
 async function cwEnsureData() {
   if (botPlayers.length) return;
-  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPlayers = d.jugadores || []; } catch (e) { botPlayers = []; }
+  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPrepPlayers(d.jugadores); } catch (e) { botPlayers = []; }
 }
 
 async function cwToggle() {
