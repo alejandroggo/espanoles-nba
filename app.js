@@ -4741,11 +4741,11 @@ async function initEfemeridesPage() {
 // PÁGINA QUINTETO IDEAL (arrastrar jugadores a la pista)
 // ══════════════════════════════════════════════
 const QNT_SLOTS = [
-  { key: 'PG', label: 'Base',       left: '50%', top: '75%' },
-  { key: 'SG', label: 'Escolta',    left: '80%', top: '53%' },
-  { key: 'SF', label: 'Alero',      left: '20%', top: '53%' },
-  { key: 'PF', label: 'Ala-pívot',  left: '73%', top: '33%' },
-  { key: 'C',  label: 'Pívot',      left: '50%', top: '24%' },
+  { key: 'PG', label: 'PG', left: '50%', top: '76%' },
+  { key: 'SG', label: 'SG', left: '81%', top: '54%' },
+  { key: 'SF', label: 'SF', left: '19%', top: '54%' },
+  { key: 'PF', label: 'PF', left: '69%', top: '23%' },
+  { key: 'C',  label: 'C',  left: '31%', top: '23%' },
 ];
 let qntAll = [], qntById = {}, qntSel = null;
 const qntState = { PG: null, SG: null, SF: null, PF: null, C: null };

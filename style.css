@@ -1479,7 +1479,7 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .qnt-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .qnt-lineup { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .qnt-lineup li { font-size: .88rem; display: flex; gap: 8px; align-items: baseline; }
-.qnt-lu-pos { flex: 0 0 74px; font-size: .68rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+.qnt-lu-pos { flex: 0 0 34px; font-size: .72rem; font-weight: 800; color: var(--accent); }
 
 .qnt-poolwrap { max-width: 1040px; margin: var(--space-5) auto 0; padding: 0 var(--space-4) var(--space-6); }
 .qnt-pool-head { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
