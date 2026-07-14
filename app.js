@@ -3989,11 +3989,14 @@ function botFindPlayers(raw) {
 
 function botFindStat(q) { return BOT_STATS.find(s => s.re.test(q)) || null; }
 
+// Códigos que coinciden con palabras españolas comunes: no valen como detector de equipo
+const BOT_TEAM_STOP = new Set(['por', 'mil', 'min', 'den', 'sac', 'was']);
 // Detecta un equipo por nombre, ciudad o código
 function botFindTeam(q) {
   const nq = ' ' + q.replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ') + ' ';
   for (const [code, info] of Object.entries(TEAM_INFO)) {
-    const cand = [botNorm(info.name), botNorm(info.label), code.toLowerCase()];
+    const cand = [botNorm(info.name), botNorm(info.label)];
+    if (!BOT_TEAM_STOP.has(code.toLowerCase())) cand.push(code.toLowerCase());
     // apodos/última palabra (lakers, celtics, spurs…)
     const last = botNorm(info.name).split(' ').pop();
     if (last.length >= 4) cand.push(last);
@@ -4056,8 +4059,15 @@ function botYear(q) {
   if (m) { const y1 = parseInt(m[1] + m[2], 10), yy = parseInt(m[3], 10); let end = Math.floor(y1 / 100) * 100 + yy; if (end <= y1) end += 100; return end; }
   m = q.match(/\b(\d{2})\s*[-/–]\s*(\d{2})\b/);
   if (m) { const b = parseInt(m[2], 10); return b < 60 ? 2000 + b : 1900 + b; }
-  m = q.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
-  return m ? parseInt(m[1], 10) : null;
+  // Año suelto, pero NO si es una cantidad ("2000 puntos", "3000 rebotes")
+  const re = /\b(19[5-9]\d|20[0-2]\d)\b/g;
+  let mm;
+  while ((mm = re.exec(q))) {
+    const after = q.slice(mm.index + mm[0].length);
+    if (/^\s+(puntos?|rebotes?|asistencias?|triples?|tapones?|robos?|partidos?|minutos?|dolares?|millones?|anillos?|mil\b)/.test(after)) continue;
+    return parseInt(mm[1], 10);
+  }
+  return null;
 }
 function botSeasonRows(j, year) { return (j.temporadas_data || []).filter(t => t.year === year); }
 function botSeasonMain(j, year) {
@@ -4249,7 +4259,7 @@ function botAnswer(raw) {
   }
 
   // 6) COMPARACIÓN (dos jugadores)
-  if ((players.length === 2 && (/vs|versus|compar|contra|o /.test(q) || stat)) || (/vs|versus|compar/.test(q) && players.length === 2)) {
+  if (players.length === 2 && (/vs|versus|compar|contra|\bo\b/.test(q) || stat)) {
     const [a, b] = players;
     let winA = 0, winB = 0;
     const rows = [['Puntos', 'pts_g'], ['Rebotes', 'rbd_g'], ['Asistencias', 'ast_g']].map(([l, k]) => {
@@ -4360,6 +4370,16 @@ function botAnswer(raw) {
     if (rings) frases.push(`Ganó <b>${rings}</b> anillo${rings > 1 ? 's' : ''} de la NBA.`);
     return `${frases.join(' ')} ${botPlayerChip(j)}
       <div class="bot-sub">Puedes preguntarme por una estadística concreta (puntos, triples, asistencias…), su salario, su draft, su debut o en qué equipos jugó.</div>`;
+  }
+
+  // 13) VARIOS JUGADORES sin más contexto → desambiguación (p. ej. "Sergio", "Gasol", "Pau y Marc")
+  if (players.length > 1) {
+    const cmp = players.length === 2
+      ? ` <div class="bot-sub"><a href="comparador.html?a=${encodeURIComponent(players[0].id)}&b=${encodeURIComponent(players[1].id)}">Comparar ${players[0].nombre} y ${players[1].nombre} →</a></div>`
+      : '';
+    return `Puedo darte datos de varios: ${players.map(j => j.nombre).join(', ')}. ¿Sobre cuál preguntas?
+      <div class="bot-chips">${players.map(botPlayerChip).join('')}</div>
+      <div class="bot-sub">Dime el nombre completo o añade una estadística (p. ej. "puntos de ${players[0].nombre}").</div>${cmp}`;
   }
 
   return null;
