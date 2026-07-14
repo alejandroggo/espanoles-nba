@@ -3970,21 +3970,22 @@ function botPlayerChip(j) {
   return `<a class="bot-chip" href="${jugadorHref(j.id)}"><span class="bot-chip-thumb">${thumb}</span>${j.nombre}</a>`;
 }
 
-// Detecta a los jugadores mencionados (por nombre, apellido o nombre completo)
+// Detecta a los jugadores mencionados (por nombre, apellido o nombre completo).
+// Admite varios jugadores nombrados de forma desigual ("Marc Gasol e Ibaka").
 function botFindPlayers(raw) {
   const q = ' ' + botNorm(raw).replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
-  const scored = botPlayers.map(j => {
+  const cands = botPlayers.map(j => {
     const full = botNorm(j.nombre).replace(/[^a-z0-9]+/g, ' ').trim();
     const toks = full.split(' ').filter(t => t.length >= 3);
-    let hits = 0;
-    toks.forEach(t => { if (q.includes(' ' + t + ' ')) hits++; });
-    let score = hits;
-    if (full && q.includes(' ' + full + ' ')) score += 10;
-    return { j, score };
-  }).filter(x => x.score > 0);
-  if (!scored.length) return [];
-  const max = Math.max(...scored.map(x => x.score));
-  return scored.filter(x => x.score === max).map(x => x.j);
+    const matched = new Set(toks.filter(t => q.includes(' ' + t + ' ')));
+    return { j, matched };
+  }).filter(c => c.matched.size > 0);
+  if (!cands.length) return [];
+  // Descarta candidatos "dominados": otro jugador cubre un superconjunto estricto
+  // de sus tokens (así "Pau Gasol" descarta a Marc, pero "Gasol" mantiene a ambos).
+  const kept = cands.filter(c => !cands.some(o =>
+    o !== c && o.matched.size > c.matched.size && [...c.matched].every(t => o.matched.has(t))));
+  return kept.map(c => c.j);
 }
 
 function botFindStat(q) { return BOT_STATS.find(s => s.re.test(q)) || null; }
@@ -4068,6 +4069,19 @@ function botTeamAgg(j, team, stat) {
   return { v: weighted, g, per: weighted / g };                                 // total y media
 }
 function botDebutYear(j) { const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/); return m ? +m[1] : null; }
+// Temporadas-equipo de un jugador (para saber con quién coincidió)
+function botTeamSeasonSet(j) {
+  const s = new Set();
+  (j.temporadas_data || []).forEach(t => { const tm = (t.team || '').toUpperCase(); if (tm && tm !== 'TOT' && t.year) s.add(t.year + '|' + tm); });
+  return s;
+}
+// Temporadas en que dos jugadores fueron compañeros (mismo equipo y año)
+function botTogether(a, b) {
+  const sb = botTeamSeasonSet(b);
+  return [...botTeamSeasonSet(a)].filter(x => sb.has(x))
+    .map(x => { const p = x.split('|'); return { year: +p[0], team: p[1] }; })
+    .sort((p, q) => p.year - q.year);
+}
 // Detecta el año (de fin de temporada) mencionado: "2010", "2009-10", "15-16"
 function botYear(q) {
   let m = q.match(/\b(19|20)(\d{2})\s*[-/–]\s*(\d{2})\b/);
@@ -4130,6 +4144,33 @@ function botAnswer(raw) {
   }
   const dimTxt = dim === 'po' ? ' en playoffs' : '';
   botPending = { players, stat, year, dim, perGame };
+
+  // 0) COMPAÑEROS: españoles que jugaron juntos (mismo equipo y temporada)
+  if (/juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
+    const caveat = `<div class="bot-sub">Es el dato de temporadas compartidas en el mismo equipo; no tengo el recuento exacto de partidos juntos en pista.</div>`;
+    if (players.length >= 2) {
+      const [a, b] = players;
+      const c = botTogether(a, b);
+      if (!c.length) return `<b>${a.nombre}</b> y <b>${b.nombre}</b> <b>nunca</b> fueron compañeros en la NBA (no jugaron en el mismo equipo la misma temporada). ${botPlayerChip(a)}${botPlayerChip(b)}`;
+      const det = c.map(x => `${drSeason(x.year)} (${teamInfo(x.team).name})`).join(', ');
+      return `<b>${a.nombre}</b> y <b>${b.nombre}</b> fueron compañeros en <b>${c.length}</b> temporada${c.length > 1 ? 's' : ''}: ${det}. ${botPlayerChip(a)}${botPlayerChip(b)} ${caveat}`;
+    }
+    if (players.length === 1) {
+      const j = players[0];
+      const mates = botPlayers.filter(o => o.id !== j.id).map(o => ({ o, c: botTogether(j, o) })).filter(x => x.c.length);
+      if (!mates.length) return `<b>${j.nombre}</b> no coincidió con ningún otro español como compañero de equipo en la NBA. ${botPlayerChip(j)}`;
+      const det = mates.map(x => `<b>${x.o.nombre}</b> (${[...new Set(x.c.map(s => teamInfo(s.team).label + ' ' + drSeason(s.year)))].join(', ')})`).join('; ');
+      return `<b>${j.nombre}</b> compartió vestuario con <b>${mates.length}</b> español${mates.length > 1 ? 'es' : ''}: ${det}. <div class="bot-chips">${mates.map(x => botPlayerChip(x.o)).join('')}</div> ${caveat}`;
+    }
+    // General: todas las parejas
+    const seen = [];
+    for (let i = 0; i < botPlayers.length; i++) for (let k = i + 1; k < botPlayers.length; k++) {
+      const c = botTogether(botPlayers[i], botPlayers[k]);
+      if (c.length) seen.push({ a: botPlayers[i], b: botPlayers[k], c });
+    }
+    if (!seen.length) return null;
+    return `Estos españoles han sido <b>compañeros de equipo</b> en la NBA:<div class="bot-sub">${seen.map(s => `• <b>${s.a.nombre}</b> y <b>${s.b.nombre}</b> — ${[...new Set(s.c.map(x => teamInfo(x.team).label + ' ' + drSeason(x.year)))].join(', ')}`).join('<br>')}</div>`;
+  }
 
   // 1) ANILLOS
   if (/anillo|campeon|titulo nba|campeonato/.test(q)) {
