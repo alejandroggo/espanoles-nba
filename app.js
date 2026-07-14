@@ -4854,6 +4854,85 @@ async function initQuintetoPage() {
 
   document.getElementById('qnt-search').addEventListener('input', e => qntRenderPool(e.target.value));
   document.getElementById('qnt-reset').addEventListener('click', qntReset);
-  document.getElementById('qnt-share').addEventListener('click', sharePage);
+  document.getElementById('qnt-download').addEventListener('click', qntDownload);
+  document.getElementById('qnt-share').addEventListener('click', qntShare);
   qntRender();
+}
+
+// ── Quinteto: exportar como imagen (canvas, sin librerías) ──
+function qntAvatarColor(name) { let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffff; return `hsl(${h % 360} 45% 42%)`; }
+function qntInitials(name) { const p = name.trim().split(/\s+/); return (((p[0] || '')[0] || '') + ((p[p.length - 1] || '')[0] || '')).toUpperCase(); }
+
+async function qntBuildImage() {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const CO = { bg: '#0f1117', court: '#1b2230', line: 'rgba(255,255,255,.28)', accent: '#f87171', text: '#e8eaf0', muted: '#8892a4' };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  x.textAlign = 'center';
+  x.fillStyle = CO.accent; x.font = "italic 700 62px 'DM Serif Display', serif"; x.fillText('Mi Quinteto', W / 2, 92);
+  x.fillStyle = CO.muted; x.font = "600 25px Inter, sans-serif"; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 132);
+
+  const cw = 720, ch = Math.round(cw * 340 / 300), cx = (W - cw) / 2, cy = 170;
+  const M = (sx, sy) => [cx + sx / 300 * cw, cy + sy / 340 * ch];
+  const R = v => v / 300 * cw;
+  x.fillStyle = CO.court; x.beginPath(); x.roundRect(cx, cy, cw, ch, 16); x.fill();
+  x.strokeStyle = CO.line; x.lineWidth = 3; x.beginPath(); x.roundRect(cx, cy, cw, ch, 16); x.stroke();
+  const seg = (a, b, d, e) => { const p = M(a, b), q = M(d, e); x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(q[0], q[1]); x.stroke(); };
+  const circ = (a, b, r) => { const p = M(a, b); x.beginPath(); x.arc(p[0], p[1], R(r), 0, 7); x.stroke(); };
+  seg(130, 20, 170, 20); circ(150, 29, 7);
+  const k = M(118, 20), k2 = M(182, 128); x.strokeRect(k[0], k[1], k2[0] - k[0], k2[1] - k[1]);
+  circ(150, 128, 30);
+  seg(40, 20, 40, 128); seg(260, 20, 260, 128);
+  { const rim = M(150, 29); x.beginPath(); x.arc(rim[0], rim[1], R(148), 42 * Math.PI / 180, 138 * Math.PI / 180, false); x.stroke(); }
+  seg(3, 316, 297, 316); circ(150, 316, 28);
+
+  QNT_SLOTS.forEach(s => {
+    const px = cx + parseFloat(s.left) / 100 * cw, py = cy + parseFloat(s.top) / 100 * ch;
+    const id = qntState[s.key], j = id ? qntById[id] : null, r = 46;
+    x.beginPath(); x.arc(px, py, r, 0, 7);
+    if (j) {
+      x.fillStyle = qntAvatarColor(j.nombre); x.fill();
+      x.lineWidth = 3; x.strokeStyle = CO.accent; x.stroke();
+      x.fillStyle = '#fff'; x.font = "800 30px Inter, sans-serif"; x.textBaseline = 'middle'; x.fillText(qntInitials(j.nombre), px, py + 2); x.textBaseline = 'alphabetic';
+      x.fillStyle = CO.text; x.font = "700 21px Inter, sans-serif"; x.fillText(qntShort(j.nombre), px, py + r + 26);
+    } else {
+      x.setLineDash([6, 6]); x.strokeStyle = CO.line; x.lineWidth = 2; x.stroke(); x.setLineDash([]);
+      x.fillStyle = CO.muted; x.font = "700 34px Inter"; x.textBaseline = 'middle'; x.fillText('+', px, py + 2); x.textBaseline = 'alphabetic';
+    }
+    x.fillStyle = j ? CO.accent : CO.muted; x.font = "800 17px Inter"; x.fillText(s.label, px, py + r + (j ? 48 : 28));
+  });
+
+  const P = qntPlayers(), sum = k => P.reduce((s, j) => s + (j[k] || 0), 0);
+  const fy = cy + ch + 96;
+  [['PTS', fmtDec1(sum('pts_g'))], ['REB', fmtDec1(sum('rbd_g'))], ['AST', fmtDec1(sum('ast_g'))]].forEach((cc, i) => {
+    const colx = W / 2 + (i - 1) * 300;
+    x.fillStyle = CO.accent; x.font = "400 72px 'Bebas Neue', sans-serif"; x.fillText(cc[1], colx, fy);
+    x.fillStyle = CO.muted; x.font = "600 22px Inter"; x.fillText(cc[0], colx, fy + 34);
+  });
+  const rings = P.reduce((s, j) => s + qntRings(j), 0), stars = P.reduce((s, j) => s + qntAllStars(j), 0);
+  x.fillStyle = CO.text; x.font = "600 25px Inter"; x.fillText(`${rings} anillos · ${stars} All-Star · ${P.length}/5`, W / 2, fy + 92);
+  x.fillStyle = CO.muted; x.font = "500 22px Inter"; x.fillText('alejandroggo.github.io/espanoles-nba', W / 2, H - 42);
+  return c;
+}
+
+function qntBlob(c) { return new Promise(res => c.toBlob(res, 'image/png')); }
+async function qntDownload() {
+  if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
+  const c = await qntBuildImage(), bl = await qntBlob(c);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'mi-quinteto-espanol.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+async function qntShare() {
+  if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
+  const c = await qntBuildImage(), bl = await qntBlob(c);
+  const file = new File([bl], 'mi-quinteto-espanol.png', { type: 'image/png' });
+  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 ' + location.href;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: txt }); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'mi-quinteto-espanol.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt), '_blank', 'noopener');
 }
