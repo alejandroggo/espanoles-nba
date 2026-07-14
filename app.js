@@ -4052,6 +4052,21 @@ function botTeamGames(j) {
   (j.temporadas_data || []).forEach(t => { const tm = (t.team || '').toUpperCase(); if (tm && tm !== 'TOT') m[tm] = (m[tm] || 0) + (t.g || 0); });
   return m;
 }
+// Agrega una estadística de un jugador SOLO con un equipo (desde temporadas_data)
+function botTeamAgg(j, team, stat) {
+  let g = 0, weighted = 0, td = 0;
+  (j.temporadas_data || []).forEach(t => {
+    if ((t.team || '').toUpperCase() !== team) return;
+    const gg = t.g || 0; g += gg; td += (t.td || 0);
+    const per = t[stat.pg];
+    if (per != null) weighted += per * gg;
+  });
+  if (!g) return null;
+  if (stat.total === 'partidos') return { v: g, g, per: null };
+  if (stat.label === 'triples dobles') return { v: td, g, per: null };
+  if (stat.kind === 'pct') return { v: weighted / g, g, per: weighted / g };   // media ponderada por partidos
+  return { v: weighted, g, per: weighted / g };                                 // total y media
+}
 function botDebutYear(j) { const m = String((j.primer_partido && j.primer_partido.fecha) || '').match(/(\d{4})/); return m ? +m[1] : null; }
 // Detecta el año (de fin de temporada) mencionado: "2010", "2009-10", "15-16"
 function botYear(q) {
@@ -4244,6 +4259,36 @@ function botAnswer(raw) {
         return `En la temporada <b>${drSeason(year)}</b>, <b>${j.nombre}</b> promedió <b>${fmtDec1(main.pts_g)} puntos</b>, ${fmtDec1(main.rbd_g)} rebotes y ${fmtDec1(main.ast_g)} asistencias en ${fmtEnt(main.g)} partidos con ${teamTxt}${traspaso}. ${botPlayerChip(j)}`;
       }).join('<hr class="bot-hr">');
     }
+  }
+
+  // 4.7) ESTADÍSTICA FILTRADA POR EQUIPO ("puntos de Pau con Memphis", "quién metió más puntos con los Lakers")
+  if (team && stat && !year) {
+    const tname = teamInfo(team).name;
+    const pgMode = perGame && stat.kind === 'num';
+    // De un jugador concreto
+    if (players.length) {
+      return players.map(j => {
+        const a = botTeamAgg(j, team, stat);
+        if (!a) return `<b>${j.nombre}</b> no jugó (o no tengo registro) con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        if (stat.kind === 'pct') return `Con <b>${tname}</b>, <b>${j.nombre}</b> promedió un <b>${fmtPct(a.v)}</b> en ${stat.label} (${fmtEnt(a.g)} partidos). ${botPlayerChip(j)}`;
+        if (stat.total === 'partidos') return `<b>${j.nombre}</b> disputó <b>${fmtEnt(a.v)} partidos</b> con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        if (stat.label === 'triples dobles') return `<b>${j.nombre}</b> firmó <b>${fmtEnt(a.v)} triples dobles</b> con <b>${tname}</b>. ${botPlayerChip(j)}`;
+        return `Con <b>${tname}</b>, <b>${j.nombre}</b> sumó <b>${fmtEnt(a.v)} ${stat.label}</b>, a una media de <b>${fmtDec1(a.per)} por partido</b> en ${fmtEnt(a.g)} partidos. ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
+    // Ranking con ese equipo
+    const rows = botPlayers.map(j => {
+      const a = botTeamAgg(j, team, stat);
+      if (!a) return null;
+      if (stat.kind === 'pct' && a.g < 15) return null;
+      const v = pgMode ? a.per : a.v;
+      return (v != null) ? { j, v } : null;
+    }).filter(Boolean).sort((x, y) => asc ? x.v - y.v : y.v - x.v).slice(0, 5);
+    if (!rows.length) return `No me consta ningún español que haya jugado con <b>${tname}</b> para eso.`;
+    const fmtV = v => stat.kind === 'pct' ? fmtPct(v) : (pgMode ? fmtDec1(v) : fmtEnt(v));
+    const top = rows[0], second = rows[1];
+    return `Con <b>${tname}</b>, el español con ${asc ? 'menos' : 'más'} <b>${stat.label}</b>${pgMode ? ' por partido' : ''} es <b>${top.j.nombre}</b>, con <b>${fmtV(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtV(second.v)})` : ''}. ${botPlayerChip(top.j)}
+      <ol class="bot-rank">${rows.map(x => `<li><span>${x.j.nombre}</span><b>${fmtV(x.v)}</b></li>`).join('')}</ol>`;
   }
 
   // 5) EQUIPOS DE UN JUGADOR
