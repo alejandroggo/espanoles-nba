@@ -4164,7 +4164,7 @@ function botAnswer(raw) {
     if (!/(por partido|de media|totales?|en total)/.test(q)) perGame = perGame || botCtx.perGame;
   }
   const dimTxt = dim === 'po' ? ' en playoffs' : '';
-  botPending = { players, stat, year, dim, perGame };
+  botPending = { players, stat, year, dim, perGame, count: false };
 
   // 0) COMPAÑEROS: españoles que jugaron juntos (mismo equipo y temporada)
   if (/juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
@@ -4263,8 +4263,9 @@ function botAnswer(raw) {
   if (year) {
     const teamQ = /equipo|franquicia|jugaba|milita|donde jug/.test(q);
 
-    // Recuento de españoles esa temporada
-    if (!players.length && !stat && /cuantos|numero de|que espanoles|quienes/.test(q)) {
+    // Recuento de españoles esa temporada (o su seguimiento: "¿y un año después?")
+    if (!players.length && !stat && (/cuantos|numero de|que espanoles|quienes/.test(q) || (isFollow && botCtx && botCtx.count))) {
+      botPending.count = true;
       const list = botPlayers.filter(j => botSeasonMain(j, year));
       if (!list.length) return `No me consta ningún español en la NBA en la temporada <b>${drSeason(year)}</b>.`;
       return `En la temporada <b>${drSeason(year)}</b> jugaron <b>${list.length}</b> españoles en la NBA: ${list.map(j => j.nombre).join(', ')}.
