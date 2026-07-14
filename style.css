@@ -1383,8 +1383,9 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .cw-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
 .cw-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px color-mix(in srgb, #22c55e 25%, transparent); }
 .cw-title { font-weight: 700; font-size: 0.95rem; flex: 1; }
-.cw-expand { color: var(--text-muted); display: grid; place-items: center; padding: 2px; border-radius: 6px; }
-.cw-expand:hover { color: var(--accent); }
+.cw-expand, .cw-min { color: var(--text-muted); display: grid; place-items: center; padding: 2px; border-radius: 6px; }
+.cw-min { background: none; border: 0; cursor: pointer; }
+.cw-expand:hover, .cw-min:hover { color: var(--accent); }
 
 .cw-log { flex: 0 1 auto; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 .cw-msg { max-width: 90%; padding: 9px 12px; border-radius: 14px; line-height: 1.45; font-size: 0.88rem; }

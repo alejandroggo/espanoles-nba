@@ -1495,8 +1495,14 @@ const TR_COLS = [
   { key: 'tipo',    label: 'Tipo',     sortable: true },
   { key: 'equipo1', label: 'Equipo',   sortable: true,  cls: 'td-center' },
   { key: 'equipo2', label: 'Equipo 2', sortable: true,  cls: 'td-center' },
+  { key: 'contrato', label: 'Contrato', sortable: false, cls: 'td-center' },
   { key: 'chevron', label: '',         sortable: false, cls: 'td-chevron' },
 ];
+
+// El contrato solo aplica a firmas (agente libre, rookie, renovación/extensión).
+// Usa el campo CONTRATO del sheet si existe; si no, cae a las notas (donde hoy va el importe).
+function trEsFirma(t) { return /agente libre|firma contrato rookie|renovaci|extensi/i.test(t.tipo || ''); }
+function trContrato(t) { return trEsFirma(t) ? String(t.contrato ?? t.CONTRATO ?? t.Contrato ?? t.notas ?? '').trim() : ''; }
 
 // Nombre completo de franquicia → código de 3 letras (incluye históricas)
 const TEAM_ABBR = {
@@ -1646,6 +1652,7 @@ function renderTrTable() {
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
       <td class="td-center">${t.equipo1 || '—'}</td>
       <td class="td-center">${t.equipo2 || '—'}</td>
+      <td class="td-center td-muted">${trContrato(t) || '—'}</td>
       <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
@@ -1678,12 +1685,11 @@ function teamFull(name) {
 function openTrDrawer(id) {
   const t = trAll.find(x => x._id === id);
   if (!t) return;
-  // Campo CONTRATO del sheet (solo aplica a firmas: agente libre, rookie, renovación/extensión)
-  const contrato = t.contrato ?? t.CONTRATO ?? t.Contrato ?? '';
-  const esFirma = /agente libre|firma contrato rookie|renovaci|extensi/i.test(t.tipo || '');
+  // Campo CONTRATO (solo firmas). Cae a las notas si el sheet no exporta un campo propio.
+  const contrato = trContrato(t);
   const filas = [
     ['Jugador', plLink(t.jugador, t.jugador)],
-    (contrato && esFirma) ? ['Contrato', contrato] : null,
+    contrato ? ['Contrato', contrato] : null,
     t.equipo1 ? ['Equipo', teamFull(t.equipo1)] : null,
     t.equipo2 ? ['Segundo equipo', teamFull(t.equipo2)] : null,
     t.otros ? ['Otros jugadores', t.otros] : null,
@@ -1696,7 +1702,7 @@ function openTrDrawer(id) {
     <dl class="drawer-dl">
       ${filas.map(([k, v]) => `<div class="drawer-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
     </dl>
-    ${t.notas ? `<div class="drawer-notas"><h3>Notas</h3><p>${t.notas}</p></div>` : ''}`;
+    ${(t.notas && t.notas !== contrato) ? `<div class="drawer-notas"><h3>Notas</h3><p>${t.notas}</p></div>` : ''}`;
 
   document.getElementById('tr-overlay').hidden = false;
   const d = document.getElementById('tr-drawer');
@@ -4569,6 +4575,9 @@ function buildChatWidget() {
         <a class="cw-expand" href="preguntas.html" title="Abrir en pantalla completa" aria-label="Abrir en pantalla completa">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
         </a>
+        <button class="cw-min" id="cw-min" type="button" title="Minimizar" aria-label="Minimizar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+        </button>
       </div>
       <div class="cw-log" id="cw-log" aria-live="polite"></div>
       <div class="cw-suggest" id="cw-suggest"></div>
@@ -4581,6 +4590,7 @@ function buildChatWidget() {
     </div>`;
   document.body.appendChild(root);
   document.getElementById('cw-launch').addEventListener('click', cwToggle);
+  document.getElementById('cw-min').addEventListener('click', cwToggle);
   document.getElementById('cw-form').addEventListener('submit', e => {
     e.preventDefault();
     const i = document.getElementById('cw-input');
