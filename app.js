@@ -3932,6 +3932,7 @@ function renderPorEquipo() {
 // No usa IA ni servidor; nunca inventa: si no lo entiende, lo dice.
 // ══════════════════════════════════════════════
 let botPlayers = [];
+let botCtx = null, botPending = null;   // memoria conversacional (seguimiento)
 
 const BOT_EXAMPLES = [
   '¿Quién ha metido más puntos?',
@@ -4080,15 +4081,30 @@ function botAnswer(raw) {
   const text = raw.trim();
   if (!text) return null;
   const q = botNorm(text);
-  const players = botFindPlayers(text);
-  const stat = botFindStat(q);
+  let players = botFindPlayers(text);
+  let stat = botFindStat(q);
   const team = botFindTeam(q);
-  const dim = /playoff|postemporada|post ?temporada|eliminatoria|postseason/.test(q) ? 'po' : 'reg';
-  const dimTxt = dim === 'po' ? ' en playoffs' : '';
-  const perGame = /por partido|de media|media de|promedi|por noche|por juego/.test(q);
+  let dim = /playoff|postemporada|post ?temporada|eliminatoria|postseason/.test(q) ? 'po' : 'reg';
+  let perGame = /por partido|de media|media de|promedi|por noche|por juego/.test(q);
   const superl = /quien|cual|cuales|mas |menos|maximo|max |mejor|peor|top|ranking|lider|record|primero/.test(q);
   const asc = /menos|peor|menor/.test(q);
-  const year = botYear(q);
+  let year = botYear(q);
+
+  // Seguimiento conversacional: hereda lo que falte de la pregunta anterior
+  const qClean = q.replace(/^[¿¡\s]+/, '');
+  const shift = /siguiente|posterior|despues|que viene/.test(q) ? 1 : (/anterior|previ|antes/.test(q) ? -1 : 0);
+  const isFollow = /^y\b/.test(qClean) || /\bsiguiente\b|\banterior\b/.test(q) || shift !== 0;
+  if (isFollow && botCtx) {
+    if (!players.length && botCtx.players && botCtx.players.length) players = botCtx.players;
+    if (!stat && botCtx.stat) stat = botCtx.stat;
+    if (dim === 'reg' && botCtx.dim === 'po' && !/regular/.test(q)) dim = 'po';
+    let base = (year != null) ? year : botCtx.year;
+    if (shift && base != null) base += shift;
+    year = base != null ? base : null;
+    if (!/(por partido|de media|totales?|en total)/.test(q)) perGame = perGame || botCtx.perGame;
+  }
+  const dimTxt = dim === 'po' ? ' en playoffs' : '';
+  botPending = { players, stat, year, dim, perGame };
 
   // 1) ANILLOS
   if (/anillo|campeon|titulo nba|campeonato/.test(q)) {
@@ -4370,12 +4386,13 @@ const BOT_PAGES = [
 function botRoute(q) { return BOT_PAGES.find(p => p.re.test(q)) || null; }
 
 function botReply(raw) {
+  if (!botPlayers || !botPlayers.length) return `Estoy cargando los datos… dame un segundo y vuelve a preguntar. 🙂`;
   const html = botAnswer(raw);
-  if (html) return html;
+  if (html) { botCtx = botPending; return html; }   // recuerda el contexto solo si hubo respuesta
   // Si no hay respuesta con datos, intento llevar a la página adecuada
   const r = botRoute(botNorm(raw));
   if (r) return `Para eso, tu mejor sitio es la página de <b>${r.label}</b>. <div class="bot-sub"><a href="${r.page}">Ir a ${r.label} →</a></div>`;
-  return `No he sabido responder a eso 🤔. Puedo darte <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b> — o llevarte a la sección que busques. Prueba con un ejemplo.`;
+  return `No he sabido responder a eso 🤔. Puedo darte <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b> — o llevarte a la sección que busques. También puedes encadenar: "¿y la siguiente temporada?", "¿y Marc Gasol?", "¿y en playoffs?".`;
 }
 
 function botAppend(role, html) {
