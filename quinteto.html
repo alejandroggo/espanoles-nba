@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Línea temporal · Españoles en la NBA</title>
-<meta name="description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
+<title>Quinteto ideal · Españoles en la NBA</title>
+<meta name="description" content="Monta tu quinteto histórico ideal de españoles en la NBA arrastrando jugadores a cada posición y descubre las estadísticas combinadas de tu equipo.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Línea temporal · Españoles en la NBA">
-<meta property="og:description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
-<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/linea-temporal.html">
+<meta property="og:title" content="Quinteto ideal · Españoles en la NBA">
+<meta property="og:description" content="Monta tu quinteto histórico ideal de españoles en la NBA arrastrando jugadores a cada posición y descubre las estadísticas combinadas de tu equipo.">
+<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/quinteto.html">
 <meta property="og:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Línea temporal · Españoles en la NBA">
-<meta name="twitter:description" content="Línea temporal de todos los españoles en la NBA: en qué equipo estuvo cada uno, temporada a temporada, desde Fernando Martín.">
+<meta name="twitter:title" content="Quinteto ideal · Españoles en la NBA">
+<meta name="twitter:description" content="Monta tu quinteto histórico ideal de españoles en la NBA y mira sus estadísticas combinadas.">
 <meta name="twitter:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,35 +45,42 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">La <em>Línea temporal</em></h1>
+        <h1 class="hero-title ag-hero">Tu <em>Quinteto</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Orden y filtros">
-    <div class="mode-switch" role="group" aria-label="Ordenar por">
-      <button type="button" id="tl-sort-debut" class="toggle-chip active" aria-pressed="true" onclick="setTlSort('debut')">Por debut</button>
-      <button type="button" id="tl-sort-seas" class="toggle-chip" aria-pressed="false" onclick="setTlSort('seas')">Por temporadas</button>
-      <button type="button" id="tl-sort-alpha" class="toggle-chip" aria-pressed="false" onclick="setTlSort('alpha')">Alfabético</button>
+  <section class="qnt-top">
+    <div class="qnt-board">
+      <div class="qnt-court" id="qnt-court">
+        <svg class="qnt-svg" viewBox="0 0 300 340" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="3" y="3" width="294" height="334" rx="10" class="qnt-fill"/>
+          <rect x="3" y="3" width="294" height="334" rx="10" class="qnt-ln"/>
+          <line x1="130" y1="20" x2="170" y2="20" class="qnt-ln"/>
+          <circle cx="150" cy="29" r="7" class="qnt-ln qnt-none"/>
+          <rect x="118" y="20" width="64" height="108" class="qnt-ln qnt-none"/>
+          <circle cx="150" cy="128" r="30" class="qnt-ln qnt-none"/>
+          <path d="M40 20 L40 128 A130 130 0 0 0 260 128 L260 20" class="qnt-ln qnt-none"/>
+          <line x1="3" y1="316" x2="297" y2="316" class="qnt-ln"/>
+          <circle cx="150" cy="316" r="28" class="qnt-ln qnt-none"/>
+        </svg>
+        <div class="qnt-slots" id="qnt-slots"></div>
+      </div>
+      <div class="qnt-actions">
+        <button type="button" class="toggle-chip" id="qnt-reset">Vaciar pista</button>
+        <button type="button" class="toggle-chip" id="qnt-share">Compartir quinteto</button>
+      </div>
     </div>
-    <label class="sel-wrap tl-range">
-      <span class="tl-range-lbl">Desde</span>
-      <select id="tl-from" class="sel" aria-label="Año de inicio"></select>
-    </label>
-    <label class="sel-wrap tl-range">
-      <span class="tl-range-lbl">Hasta</span>
-      <select id="tl-to" class="sel" aria-label="Año final"></select>
-    </label>
+    <aside class="qnt-stats" id="qnt-stats" aria-live="polite"></aside>
   </section>
 
-  <div class="tl-topscroll" id="tl-topscroll" aria-hidden="true"><div id="tl-topscroll-inner"></div></div>
-  <section class="tl-wrap" id="tl-wrap" aria-label="Línea temporal de trayectorias">
-    <table id="tl-table">
-      <thead id="tl-thead"></thead>
-      <tbody id="tl-body"></tbody>
-      <tfoot id="tl-tfoot"></tfoot>
-    </table>
+  <section class="qnt-poolwrap" aria-label="Jugadores disponibles">
+    <div class="qnt-pool-head">
+      <h2 class="qnt-pool-title">Jugadores</h2>
+      <div class="search-wrap qnt-search"><input type="text" id="qnt-search" placeholder="Buscar jugador…" aria-label="Buscar jugador"></div>
+    </div>
+    <div class="qnt-pool" id="qnt-pool"></div>
   </section>
 </main>
 
@@ -101,6 +108,6 @@
 </footer>
 
 <script src="app.js?v=87"></script>
-<script>initTheme(); initLineaTemporalPage();</script>
+<script>initTheme(); initQuintetoPage();</script>
 </body>
 </html>

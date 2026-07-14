@@ -105,7 +105,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Efemérides', 'efemerides.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Efemérides', 'efemerides.html'], ['Quinteto', 'quinteto.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -4735,4 +4735,125 @@ async function initEfemeridesPage() {
   document.getElementById('efm-next').onclick = () => efmShift(1);
   document.getElementById('efm-today').onclick = () => { efmMonth = efmToday.m; efmDay = efmToday.d; renderEfm(); };
   renderEfm();
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA QUINTETO IDEAL (arrastrar jugadores a la pista)
+// ══════════════════════════════════════════════
+const QNT_SLOTS = [
+  { key: 'PG', label: 'Base',       left: '50%', top: '75%' },
+  { key: 'SG', label: 'Escolta',    left: '80%', top: '53%' },
+  { key: 'SF', label: 'Alero',      left: '20%', top: '53%' },
+  { key: 'PF', label: 'Ala-pívot',  left: '73%', top: '33%' },
+  { key: 'C',  label: 'Pívot',      left: '50%', top: '24%' },
+];
+let qntAll = [], qntById = {}, qntSel = null;
+const qntState = { PG: null, SG: null, SF: null, PF: null, C: null };
+
+function qntThumb(j, cls) {
+  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
+  return src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="" class="${cls}">` : avatarHtml(j.nombre, cls);
+}
+function qntShort(nombre) { const p = nombre.split(' '); return p.length > 1 ? `${p[0][0]}. ${p.slice(1).join(' ')}` : nombre; }
+function qntPlayers() { return QNT_SLOTS.map(s => qntState[s.key]).filter(Boolean).map(id => qntById[id]); }
+function qntRings(j) { return Object.keys(TL_ANILLOS[drNorm(j.nombre)] || {}).length; }
+function qntAllStars(j) { return (j.premios || []).filter(p => /all[\s-]?star/i.test(p.tipo) && !/concurso|weekend|skills|three|rising|celebr/i.test(p.tipo)).length; }
+function qntSeasons(j) { return j.temporadas || new Set((j.temporadas_data || []).filter(t => t.year && (t.team || '').toUpperCase() !== 'TOT').map(t => t.year)).size; }
+
+function qntAssign(slot, id) {
+  // si el jugador ya está en otra posición, se mueve
+  QNT_SLOTS.forEach(s => { if (qntState[s.key] === id) qntState[s.key] = null; });
+  qntState[slot] = id;
+  qntSel = null;
+  qntSyncUrl(); qntRender();
+}
+function qntClear(slot) { qntState[slot] = null; qntSyncUrl(); qntRender(); }
+function qntReset() { QNT_SLOTS.forEach(s => qntState[s.key] = null); qntSel = null; qntSyncUrl(); qntRender(); }
+
+function qntSyncUrl() { QNT_SLOTS.forEach(s => updateUrlParam(s.key.toLowerCase(), qntState[s.key] || '')); }
+
+function qntRenderSlots() {
+  document.getElementById('qnt-slots').innerHTML = QNT_SLOTS.map(s => {
+    const id = qntState[s.key], j = id ? qntById[id] : null;
+    const inner = j
+      ? `<span class="qnt-slot-face">${qntThumb(j, 'qnt-slot-img')}</span><span class="qnt-slot-name">${qntShort(j.nombre)}</span><button type="button" class="qnt-slot-x" data-slot="${s.key}" aria-label="Quitar">✕</button>`
+      : `<span class="qnt-slot-plus">＋</span>`;
+    return `<div class="qnt-slot${j ? ' filled' : ''}${qntSel ? ' droppable' : ''}" data-slot="${s.key}" style="left:${s.left};top:${s.top}">
+      ${inner}<span class="qnt-slot-pos">${s.label}</span></div>`;
+  }).join('');
+}
+
+function qntRenderPool(filter) {
+  const nq = drNorm((filter || '').trim());
+  const used = new Set(Object.values(qntState).filter(Boolean));
+  document.getElementById('qnt-pool').innerHTML = qntAll
+    .filter(j => !nq || drNorm(j.nombre).includes(nq))
+    .map(j => `<button type="button" class="qnt-card${used.has(j.id) ? ' used' : ''}${qntSel === j.id ? ' sel' : ''}" draggable="true" data-id="${j.id}">
+      <span class="qnt-card-thumb">${qntThumb(j, 'qnt-card-img')}</span><span class="qnt-card-name">${j.nombre}</span></button>`).join('')
+    || `<p class="td-muted" style="padding:1rem">Sin resultados.</p>`;
+}
+
+function qntRenderStats() {
+  const P = qntPlayers(), n = P.length, el = document.getElementById('qnt-stats');
+  if (!n) {
+    el.innerHTML = `<div class="qnt-stats-empty"><h2>Tu quinteto</h2><p>Arrastra (o toca) jugadores a cada posición de la pista. Iré calculando las estadísticas combinadas de tu equipo.</p></div>`;
+    return;
+  }
+  const sum = k => P.reduce((s, j) => s + (j[k] || 0), 0);
+  const pg = [['PTS', sum('pts_g')], ['REB', sum('rbd_g')], ['AST', sum('ast_g')], ['ROB', sum('stl_g')], ['TAP', sum('blk_g')], ['3PM', sum('tres_g')]]
+    .map(([l, v]) => statBox(l, fmtDec1(v))).join('');
+  const rings = P.reduce((s, j) => s + qntRings(j), 0);
+  const stars = P.reduce((s, j) => s + qntAllStars(j), 0);
+  const tot = [statBox('Puntos', fmtEnt(sum('pts_total'))), statBox('Anillos', fmtEnt(rings)), statBox('All-Star', fmtEnt(stars)), statBox('Temporadas', fmtEnt(P.reduce((s, j) => s + qntSeasons(j), 0)))].join('');
+  const lineup = QNT_SLOTS.filter(s => qntState[s.key]).map(s => { const j = qntById[qntState[s.key]]; return `<li><span class="qnt-lu-pos">${s.label}</span> ${plLink(j.nombre, j.nombre)}</li>`; }).join('');
+  el.innerHTML = `<div class="qnt-stats-head"><h2>Tu quinteto</h2><span class="qnt-stats-n">${n}/5</span></div>
+    <p class="qnt-stats-lead">Sumando las medias de carrera, este quinteto promediaría <b>${fmtDec1(sum('pts_g'))} puntos</b>, ${fmtDec1(sum('rbd_g'))} rebotes y ${fmtDec1(sum('ast_g'))} asistencias por partido.</p>
+    <h3 class="qnt-stats-sub">Promedios combinados</h3><div class="stat-grid qnt-grid">${pg}</div>
+    <h3 class="qnt-stats-sub">Palmarés y totales</h3><div class="stat-grid qnt-grid">${tot}</div>
+    <ol class="qnt-lineup">${lineup}</ol>`;
+}
+
+function qntRender() { qntRenderSlots(); qntRenderPool(document.getElementById('qnt-search').value); qntRenderStats(); qntWireDynamic(); }
+
+// Listeners de elementos que se regeneran (slots y cartas)
+function qntWireDynamic() {
+  document.querySelectorAll('#qnt-pool .qnt-card').forEach(card => {
+    const id = card.dataset.id;
+    card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', id); e.dataTransfer.effectAllowed = 'move'; });
+    card.addEventListener('click', () => {
+      const inSlot = Object.values(qntState).includes(id);
+      if (inSlot) { QNT_SLOTS.forEach(s => { if (qntState[s.key] === id) qntState[s.key] = null; }); qntSel = null; qntSyncUrl(); qntRender(); return; }
+      qntSel = (qntSel === id) ? null : id; qntRender();
+    });
+  });
+  document.querySelectorAll('#qnt-slots .qnt-slot').forEach(slot => {
+    const key = slot.dataset.slot;
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('over'));
+    slot.addEventListener('drop', e => { e.preventDefault(); slot.classList.remove('over'); const id = e.dataTransfer.getData('text/plain'); if (id && qntById[id]) qntAssign(key, id); });
+    slot.addEventListener('click', e => {
+      if (e.target.classList.contains('qnt-slot-x')) return;   // la ✕ tiene su propio handler
+      if (qntSel) qntAssign(key, qntSel);
+    });
+  });
+  document.querySelectorAll('.qnt-slot-x').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); qntClear(x.dataset.slot); }));
+}
+
+async function initQuintetoPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  qntAll = (data.jugadores || []).slice().sort((a, b) => (b.pts_total || 0) - (a.pts_total || 0));
+  qntById = {}; qntAll.forEach(j => qntById[j.id] = j);
+  document.getElementById('hero-sub').textContent = `Monta tu quinteto histórico de españoles y descubre sus números combinados`;
+
+  // Restaurar desde la URL
+  const params = new URLSearchParams(location.search);
+  QNT_SLOTS.forEach(s => { const id = params.get(s.key.toLowerCase()); if (id && qntById[id]) qntState[s.key] = id; });
+
+  document.getElementById('qnt-search').addEventListener('input', e => qntRenderPool(e.target.value));
+  document.getElementById('qnt-reset').addEventListener('click', qntReset);
+  document.getElementById('qnt-share').addEventListener('click', sharePage);
+  qntRender();
 }
