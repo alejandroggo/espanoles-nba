@@ -4860,6 +4860,8 @@ async function initQuintetoPage() {
 }
 
 // ── Quinteto: exportar como imagen (canvas, sin librerías) ──
+// Carga una imagen del mismo origen; resuelve null si no existe (para no romper la exportación).
+function qntLoadImg(src) { return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
 function qntAvatarColor(name) { let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffff; return `hsl(${h % 360} 45% 42%)`; }
 function qntInitials(name) { const p = name.trim().split(/\s+/); return (((p[0] || '')[0] || '') + ((p[p.length - 1] || '')[0] || '')).toUpperCase(); }
 
@@ -4887,11 +4889,21 @@ async function qntBuildImage() {
   { const rim = M(150, 29); x.beginPath(); x.arc(rim[0], rim[1], R(148), 42 * Math.PI / 180, 138 * Math.PI / 180, false); x.stroke(); }
   seg(3, 316, 297, 316); circ(150, 316, 28);
 
+  // Fotos locales (mismo origen → sin "taint"). Si no existen, se usan iniciales.
+  const imgs = {};
+  await Promise.all(QNT_SLOTS.map(async s => { const id = qntState[s.key]; if (id) imgs[id] = await qntLoadImg(`img/players/${id}.jpg`); }));
+
   QNT_SLOTS.forEach(s => {
     const px = cx + parseFloat(s.left) / 100 * cw, py = cy + parseFloat(s.top) / 100 * ch;
-    const id = qntState[s.key], j = id ? qntById[id] : null, r = 46;
+    const id = qntState[s.key], j = id ? qntById[id] : null, r = 46, im = id ? imgs[id] : null;
     x.beginPath(); x.arc(px, py, r, 0, 7);
-    if (j) {
+    if (j && im) {
+      x.save(); x.clip();
+      const sc = Math.max(2 * r / im.naturalWidth, 2 * r / im.naturalHeight), dw = im.naturalWidth * sc, dh = im.naturalHeight * sc;
+      x.drawImage(im, px - dw / 2, py - dh / 2, dw, dh); x.restore();
+      x.beginPath(); x.arc(px, py, r, 0, 7); x.lineWidth = 3; x.strokeStyle = CO.accent; x.stroke();
+      x.fillStyle = CO.text; x.font = "700 21px Inter, sans-serif"; x.fillText(qntShort(j.nombre), px, py + r + 26);
+    } else if (j) {
       x.fillStyle = qntAvatarColor(j.nombre); x.fill();
       x.lineWidth = 3; x.strokeStyle = CO.accent; x.stroke();
       x.fillStyle = '#fff'; x.font = "800 30px Inter, sans-serif"; x.textBaseline = 'middle'; x.fillText(qntInitials(j.nombre), px, py + 2); x.textBaseline = 'alphabetic';
