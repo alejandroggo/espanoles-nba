@@ -2752,6 +2752,8 @@ const TEAM_INFO = {
   TOR: { name: 'Toronto Raptors',        label: 'Toronto',       color: '#c8353b' },
   UTA: { name: 'Utah Jazz',              label: 'Utah',          color: '#5b2e8e' },
   WAS: { name: 'Washington Wizards',     label: 'Washington',    color: '#1f3a78' },
+  SEA: { name: 'Seattle SuperSonics',    label: 'Seattle',       color: '#1a6b3c' },
+  NJN: { name: 'New Jersey Nets',        label: 'New Jersey',    color: '#1a2a5e' },
 };
 function teamInfo(code) { return TEAM_INFO[code] || { name: code, label: code, color: '#6b7280' }; }
 
