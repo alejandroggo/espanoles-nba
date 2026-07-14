@@ -1377,7 +1377,8 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .cw-launch--open .cw-ico-chat { opacity: 0; transform: rotate(90deg) scale(.6); }
 .cw-launch--open .cw-ico-close { opacity: 1; transform: none; }
 
-.cw-panel { position: absolute; right: 0; bottom: 70px; width: 370px; max-width: calc(100vw - 32px); max-height: min(70vh, 560px); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 16px 48px rgba(0,0,0,.32); overflow: hidden; animation: cwIn .18s ease; }
+.cw-panel[hidden], .cw-launch[hidden] { display: none; }
+.cw-panel { position: absolute; right: 0; bottom: 0; width: 370px; max-width: calc(100vw - 32px); max-height: min(70vh, 560px); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 16px 48px rgba(0,0,0,.32); overflow: hidden; animation: cwIn .18s ease; }
 @keyframes cwIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
 
 .cw-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
@@ -1409,5 +1410,5 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .cw-send:hover { filter: brightness(1.08); }
 
 @media (max-width: 480px) {
-  .cw-panel { width: calc(100vw - 24px); max-height: min(72vh, 540px); bottom: 68px; }
+  .cw-panel { width: calc(100vw - 24px); max-height: min(72vh, 540px); bottom: 0; }
 }

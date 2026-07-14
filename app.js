@@ -4609,8 +4609,9 @@ async function cwToggle() {
   if (!panel) return;
   cwOpen = !cwOpen;
   panel.hidden = !cwOpen;
+  // La burbuja solo abre: mientras el panel está abierto se oculta (se cierra con el botón − o Escape)
+  launch.hidden = cwOpen;
   launch.setAttribute('aria-expanded', String(cwOpen));
-  launch.classList.toggle('cw-launch--open', cwOpen);
   if (!cwOpen) return;
   await cwEnsureData();
   if (!cwGreeted) {
