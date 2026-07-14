@@ -1412,3 +1412,33 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 @media (max-width: 480px) {
   .cw-panel { width: calc(100vw - 24px); max-height: min(72vh, 540px); bottom: 0; }
 }
+
+/* ── PÁGINA EFEMÉRIDES ────────────────────────────────── */
+.efm-nav { max-width: 760px; margin: 0 auto; padding: 0 var(--space-4); display: flex; align-items: center; gap: var(--space-3); }
+.efm-arrow { width: 40px; height: 40px; flex: 0 0 40px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 50%; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.efm-arrow:hover { border-color: var(--accent); color: var(--accent); }
+.efm-datewrap { flex: 1; text-align: center; }
+.efm-date { display: block; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.5rem; color: var(--text); }
+.efm-count { font-size: 0.8rem; color: var(--text-muted); }
+.efm-hoy { flex: 0 0 auto; }
+
+.efm-wrap { max-width: 760px; margin: var(--space-5) auto 0; padding: 0 var(--space-4) var(--space-6); }
+.efm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.efm-item { display: flex; gap: var(--space-4); align-items: flex-start; padding: var(--space-3) 0; border-top: 1px solid var(--border); }
+.efm-item:first-child { border-top: 0; }
+.efm-year { flex: 0 0 74px; text-align: right; font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; line-height: 1; color: var(--accent); }
+.efm-ago { display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.efm-body { flex: 1; }
+.efm-tag { display: inline-block; margin-bottom: 5px; }
+.efm-tag--debut { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
+.efm-tag--draft { background: color-mix(in srgb, #6366f1 20%, transparent); color: #6366f1; }
+:root[data-theme="dark"] .efm-tag--debut { color: #4ade80; }
+:root[data-theme="dark"] .efm-tag--draft { color: #a5b4fc; }
+.efm-text { margin: 0; line-height: 1.5; font-size: 0.95rem; }
+.efm-text a { color: var(--text); font-weight: 600; }
+.efm-text a:hover { color: var(--accent); }
+.efm-empty { color: var(--text-muted); padding: var(--space-4) 0; text-align: center; }
+@media (max-width: 560px) {
+  .efm-year { flex-basis: 58px; font-size: 1.6rem; }
+  .efm-date { font-size: 1.25rem; }
+}

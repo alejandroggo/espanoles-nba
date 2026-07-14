@@ -105,7 +105,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
   ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
   ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Efemérides', 'efemerides.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
@@ -4641,4 +4641,96 @@ function cwSubmit(text) {
   const sug = document.getElementById('cw-suggest'); if (sug) sug.innerHTML = '';
   cwAppend('q', t.replace(/</g, '&lt;'));
   cwAppend('a', botReply(t));
+}
+
+// ══════════════════════════════════════════════
+// PÁGINA EFEMÉRIDES ("Un día como hoy")
+// Cruza transacciones + debuts + drafts por día del año.
+// ══════════════════════════════════════════════
+let efmEvents = [], efmMonth = 1, efmDay = 1, efmToday = { m: 1, d: 1 };
+
+function efmParseShort(s) {
+  const m = String(s || '').match(/(\d{1,2})\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]{3,})\s+(\d{4})/);
+  if (!m) return null;
+  const mo = MESES.indexOf(drNorm(m[2]).slice(0, 3));
+  if (mo < 0) return null;
+  return { d: +m[1], m: mo + 1, year: +m[3] };
+}
+function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); return TEAM_INFO[c] ? TEAM_INFO[c].name : x; }
+
+function efmBuild(data) {
+  const ev = [];
+  const draftKey = new Set();
+  // Debuts y drafts (fuente principal del draft, con nº de pick)
+  (data.jugadores || []).forEach(j => {
+    const p = j.primer_partido;
+    if (p && p.fecha) { const dt = efmParseShort(p.fecha); if (dt) ev.push({ ...dt, kind: 'debut', tag: 'Debut', html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${p.equipo ? ` con ${efmTeamName(p.equipo)}` : ''}` }); }
+    if (j.draft && j.draft_fecha) {
+      const dt = efmParseShort(j.draft_fecha);
+      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> elegido en el draft${j.draft_pick ? ` (nº ${j.draft_pick})` : ''}${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+    }
+  });
+  // Transacciones (evitando duplicar el draft ya recogido arriba)
+  (data.transacciones || []).forEach(t => {
+    const m = String(t.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!m) return;
+    if (/draft/i.test(t.tipo || '') && draftKey.has(drNorm(t.jugador) + '|' + (+m[1]))) return;
+    const contrato = trContrato(t);
+    const eqs = [t.equipo1, t.equipo2].filter(Boolean);
+    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo,
+      html: `<b>${plLink(t.jugador, t.jugador)}</b>${eqs.length ? ` · ${eqs.join(' → ')}` : ''}${contrato ? ` · ${contrato}` : ''}` });
+  });
+  return ev;
+}
+
+function efmNextDay() {
+  for (let i = 1; i <= 366; i++) {
+    const dt = new Date(2000, efmMonth - 1, efmDay); dt.setDate(dt.getDate() + i);
+    const mm = dt.getMonth() + 1, dd = dt.getDate();
+    if (efmEvents.some(e => e.m === mm && e.d === dd)) return { m: mm, d: dd };
+  }
+  return null;
+}
+function efmShift(delta) { const dt = new Date(2000, efmMonth - 1, efmDay); dt.setDate(dt.getDate() + delta); efmMonth = dt.getMonth() + 1; efmDay = dt.getDate(); renderEfm(); }
+function efmGoto(m, d) { efmMonth = m; efmDay = d; renderEfm(); }
+
+function renderEfm() {
+  const list = efmEvents.filter(e => e.m === efmMonth && e.d === efmDay).sort((a, b) => b.year - a.year || a.tag.localeCompare(b.tag));
+  const nowY = new Date().getFullYear();
+  const fecha = `${efmDay} de ${MESES_LARGOS[efmMonth - 1]}`;
+  document.getElementById('efm-date').textContent = fecha;
+  document.getElementById('efm-count').textContent = list.length ? `${list.length} efeméride${list.length === 1 ? '' : 's'}` : '';
+  const isToday = efmMonth === efmToday.m && efmDay === efmToday.d;
+  document.getElementById('efm-today').classList.toggle('active', isToday);
+  const body = document.getElementById('efm-list');
+  if (!list.length) {
+    const next = efmNextDay();
+    body.innerHTML = `<li class="efm-empty">No hay efemérides registradas el <b>${fecha}</b>.${next ? ` <button type="button" class="toggle-chip" onclick="efmGoto(${next.m},${next.d})">Ir al ${next.d} de ${MESES_LARGOS[next.m - 1]} →</button>` : ''}</li>`;
+    return;
+  }
+  body.innerHTML = list.map(e => {
+    const ago = nowY - e.year;
+    const tagCls = e.kind === 'trans' ? trTipoClass(e.tag) : ('efm-tag--' + e.kind);
+    return `<li class="efm-item">
+      <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
+      <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p></div>
+    </li>`;
+  }).join('');
+}
+
+async function initEfemeridesPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  efmEvents = efmBuild(data);
+  const now = new Date();
+  efmMonth = now.getMonth() + 1; efmDay = now.getDate();
+  efmToday = { m: efmMonth, d: efmDay };
+  const dias = new Set(efmEvents.map(e => e.m + '-' + e.d)).size;
+  document.getElementById('hero-sub').textContent = `Un día como hoy en la historia de los españoles en la NBA · ${efmEvents.length} efemérides en ${dias} días`;
+  document.getElementById('efm-prev').onclick = () => efmShift(-1);
+  document.getElementById('efm-next').onclick = () => efmShift(1);
+  document.getElementById('efm-today').onclick = () => { efmMonth = efmToday.m; efmDay = efmToday.d; renderEfm(); };
+  renderEfm();
 }

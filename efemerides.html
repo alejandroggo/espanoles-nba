@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Partidos por equipo · Españoles en la NBA</title>
-<meta name="description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
+<title>Efemérides · Españoles en la NBA</title>
+<meta name="description" content="Un día como hoy en la historia de los españoles en la NBA: drafts, debuts, fichajes y traspasos que ocurrieron cada día.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Partidos por equipo · Españoles en la NBA">
-<meta property="og:description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
-<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/por-equipo.html">
+<meta property="og:title" content="Efemérides · Españoles en la NBA">
+<meta property="og:description" content="Un día como hoy en la historia de los españoles en la NBA: drafts, debuts, fichajes y traspasos que ocurrieron cada día.">
+<meta property="og:url" content="https://alejandroggo.github.io/espanoles-nba/efemerides.html">
 <meta property="og:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Partidos por equipo · Españoles en la NBA">
-<meta name="twitter:description" content="Cuántos partidos ha jugado cada español con cada franquicia NBA, en temporada regular y en playoffs. Matriz jugador × equipo con totales.">
+<meta name="twitter:title" content="Efemérides · Españoles en la NBA">
+<meta name="twitter:description" content="Un día como hoy en la historia de los españoles en la NBA.">
 <meta name="twitter:image" content="https://alejandroggo.github.io/espanoles-nba/og-banner.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,27 +45,24 @@
   <section class="hero hero--page">
     <div class="hero-top">
       <div>
-        <h1 class="hero-title ag-hero">Partidos por <em>equipo</em></h1>
+        <h1 class="hero-title ag-hero">Las <em>Efemérides</em></h1>
         <p class="hero-sub" id="hero-sub">Cargando datos…</p>
       </div>
     </div>
   </section>
 
-  <section class="controles" aria-label="Temporada regular o playoffs">
-    <div class="mode-switch" role="group" aria-label="Competición">
-      <button type="button" id="poeq-reg" class="toggle-chip active" aria-pressed="true" onclick="setPoeqMode('reg')">Temporada regular</button>
-      <button type="button" id="poeq-po" class="toggle-chip" aria-pressed="false" onclick="setPoeqMode('po')">Playoffs</button>
+  <section class="efm-nav" aria-label="Navegación de fecha">
+    <button type="button" class="efm-arrow" id="efm-prev" aria-label="Día anterior">‹</button>
+    <div class="efm-datewrap">
+      <span class="efm-date" id="efm-date"></span>
+      <span class="efm-count" id="efm-count"></span>
     </div>
-    <span class="results-count" id="poeq-count"></span>
+    <button type="button" class="efm-arrow" id="efm-next" aria-label="Día siguiente">›</button>
+    <button type="button" class="toggle-chip efm-hoy" id="efm-today">Hoy</button>
   </section>
 
-  <div class="poeq-topscroll" id="poeq-topscroll" aria-hidden="true"><div id="poeq-topscroll-inner"></div></div>
-  <section class="poeq-wrap" id="poeq-wrap" aria-label="Matriz de partidos por equipo">
-    <table id="poeq-table">
-      <thead id="poeq-thead"></thead>
-      <tbody id="poeq-tbody"></tbody>
-      <tfoot id="poeq-tfoot"></tfoot>
-    </table>
+  <section class="efm-wrap" aria-label="Efemérides del día">
+    <ul class="efm-list" id="efm-list"></ul>
   </section>
 </main>
 
@@ -93,6 +90,6 @@
 </footer>
 
 <script src="app.js?v=85"></script>
-<script>initTheme(); initPorEquipoPage();</script>
+<script>initTheme(); initEfemeridesPage();</script>
 </body>
 </html>
