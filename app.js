@@ -4748,7 +4748,8 @@ const QNT_SLOTS = [
   { key: 'C',  label: 'C',  left: '31%', top: '23%' },
 ];
 let qntAll = [], qntById = {}, qntSel = null;
-const qntState = { PG: null, SG: null, SF: null, PF: null, C: null };
+const qntState = { PG: null, SG: null, SF: null, PF: null, C: null };   // slot → id
+const qntYear = { PG: null, SG: null, SF: null, PF: null, C: null };    // slot → año (null = carrera)
 
 function qntThumb(j, cls) {
   const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
@@ -4759,24 +4760,43 @@ function qntPlayers() { return QNT_SLOTS.map(s => qntState[s.key]).filter(Boolea
 function qntRings(j) { return Object.keys(TL_ANILLOS[drNorm(j.nombre)] || {}).length; }
 function qntAllStars(j) { return (j.premios || []).filter(p => /all[\s-]?star/i.test(p.tipo) && !/concurso|weekend|skills|three|rising|celebr/i.test(p.tipo)).length; }
 function qntSeasons(j) { return j.temporadas || new Set((j.temporadas_data || []).filter(t => t.year && (t.team || '').toUpperCase() !== 'TOT').map(t => t.year)).size; }
+function qntSeasonYears(j) { return [...new Set((j.temporadas_data || []).filter(t => t.year).map(t => t.year))].sort((a, b) => a - b); }
+function qntSeasonRow(j, year) { const rows = (j.temporadas_data || []).filter(t => t.year === year); return rows.find(t => String(t.team || '').toUpperCase() === 'TOT') || rows[0] || null; }
+function qntSeasonShort(year) { return drSeason(year).slice(2); }   // "06-07"
+// Estadística de un slot (carrera o una temporada concreta)
+function qntStat(id, year) {
+  const j = qntById[id]; if (!j) return null;
+  if (!year) return { pts_g: j.pts_g || 0, rbd_g: j.rbd_g || 0, ast_g: j.ast_g || 0, stl_g: j.stl_g || 0, blk_g: j.blk_g || 0, tres_g: j.tres_g || 0, pts_total: j.pts_total || 0, rings: qntRings(j), allstars: qntAllStars(j) };
+  const r = qntSeasonRow(j, year) || {}, g = r.g || 0;
+  return { pts_g: r.pts_g || 0, rbd_g: r.rbd_g || 0, ast_g: r.ast_g || 0, stl_g: r.stl_g || 0, blk_g: r.blk_g || 0, tres_g: r.tres_g || 0,
+    pts_total: Math.round((r.pts_g || 0) * g),
+    rings: (TL_ANILLOS[drNorm(j.nombre)] || {})[year] ? 1 : 0,
+    allstars: (j.premios || []).filter(p => /all[\s-]?star/i.test(p.tipo) && !/concurso|weekend|skills|three|rising|celebr/i.test(p.tipo) && p.year === year).length };
+}
+function qntStatsList() { return QNT_SLOTS.filter(s => qntState[s.key]).map(s => qntStat(qntState[s.key], qntYear[s.key])); }
 
 function qntAssign(slot, id) {
-  // si el jugador ya está en otra posición, se mueve
-  QNT_SLOTS.forEach(s => { if (qntState[s.key] === id) qntState[s.key] = null; });
-  qntState[slot] = id;
+  // si el jugador ya está en otra posición, se mueve (y suelta su temporada)
+  QNT_SLOTS.forEach(s => { if (qntState[s.key] === id) { qntState[s.key] = null; qntYear[s.key] = null; } });
+  qntState[slot] = id; qntYear[slot] = null;
   qntSel = null;
   qntSyncUrl(); qntRender();
 }
-function qntClear(slot) { qntState[slot] = null; qntSyncUrl(); qntRender(); }
-function qntReset() { QNT_SLOTS.forEach(s => qntState[s.key] = null); qntSel = null; qntSyncUrl(); qntRender(); }
+function qntClear(slot) { qntState[slot] = null; qntYear[slot] = null; qntSyncUrl(); qntRender(); }
+function qntReset() { QNT_SLOTS.forEach(s => { qntState[s.key] = null; qntYear[s.key] = null; }); qntSel = null; qntSyncUrl(); qntRender(); }
 
-function qntSyncUrl() { QNT_SLOTS.forEach(s => updateUrlParam(s.key.toLowerCase(), qntState[s.key] || '')); }
+function qntSyncUrl() { QNT_SLOTS.forEach(s => { const id = qntState[s.key]; updateUrlParam(s.key.toLowerCase(), id ? (id + (qntYear[s.key] ? ':' + qntYear[s.key] : '')) : ''); }); }
 
 function qntRenderSlots() {
   document.getElementById('qnt-slots').innerHTML = QNT_SLOTS.map(s => {
     const id = qntState[s.key], j = id ? qntById[id] : null;
+    const yrs = j ? qntSeasonYears(j) : [];
+    const sel = (j && yrs.length) ? `<select class="qnt-season" data-slot="${s.key}" aria-label="Temporada de ${j.nombre}">
+        <option value=""${!qntYear[s.key] ? ' selected' : ''}>Carrera</option>
+        ${yrs.map(y => `<option value="${y}"${qntYear[s.key] === y ? ' selected' : ''}>${qntSeasonShort(y)}</option>`).join('')}
+      </select>` : '';
     const inner = j
-      ? `<span class="qnt-slot-face">${qntThumb(j, 'qnt-slot-img')}</span><span class="qnt-slot-name">${qntShort(j.nombre)}</span><button type="button" class="qnt-slot-x" data-slot="${s.key}" aria-label="Quitar">✕</button>`
+      ? `<span class="qnt-slot-face">${qntThumb(j, 'qnt-slot-img')}</span><span class="qnt-slot-name">${qntShort(j.nombre)}</span>${sel}<button type="button" class="qnt-slot-x" data-slot="${s.key}" aria-label="Quitar">✕</button>`
       : `<span class="qnt-slot-plus">＋</span>`;
     return `<div class="qnt-slot${j ? ' filled' : ''}${qntSel ? ' droppable' : ''}" data-slot="${s.key}" style="left:${s.left};top:${s.top}">
       ${inner}<span class="qnt-slot-pos">${s.label}</span></div>`;
@@ -4794,22 +4814,23 @@ function qntRenderPool(filter) {
 }
 
 function qntRenderStats() {
-  const P = qntPlayers(), n = P.length, el = document.getElementById('qnt-stats');
+  const L = qntStatsList(), n = L.length, el = document.getElementById('qnt-stats');
   if (!n) {
-    el.innerHTML = `<div class="qnt-stats-empty"><h2>Tu quinteto</h2><p>Arrastra (o toca) jugadores a cada posición de la pista. Iré calculando las estadísticas combinadas de tu equipo.</p></div>`;
+    el.innerHTML = `<div class="qnt-stats-empty"><h2>Tu quinteto</h2><p>Arrastra (o toca) jugadores a cada posición de la pista. Podrás elegir su carrera o una temporada concreta, y calcularé las estadísticas combinadas.</p></div>`;
     return;
   }
-  const sum = k => P.reduce((s, j) => s + (j[k] || 0), 0);
+  const sum = k => L.reduce((s, v) => s + (v[k] || 0), 0);
   const pg = [['PTS', sum('pts_g')], ['REB', sum('rbd_g')], ['AST', sum('ast_g')], ['ROB', sum('stl_g')], ['TAP', sum('blk_g')], ['3PM', sum('tres_g')]]
     .map(([l, v]) => statBox(l, fmtDec1(v))).join('');
-  const rings = P.reduce((s, j) => s + qntRings(j), 0);
-  const stars = P.reduce((s, j) => s + qntAllStars(j), 0);
-  const tot = [statBox('Puntos', fmtEnt(sum('pts_total'))), statBox('Anillos', fmtEnt(rings)), statBox('All-Star', fmtEnt(stars)), statBox('Temporadas', fmtEnt(P.reduce((s, j) => s + qntSeasons(j), 0)))].join('');
-  const lineup = QNT_SLOTS.filter(s => qntState[s.key]).map(s => { const j = qntById[qntState[s.key]]; return `<li><span class="qnt-lu-pos">${s.label}</span> ${plLink(j.nombre, j.nombre)}</li>`; }).join('');
+  const tot = [statBox('Puntos', fmtEnt(sum('pts_total'))), statBox('Anillos', fmtEnt(sum('rings'))), statBox('All-Star', fmtEnt(sum('allstars')))].join('');
+  const lineup = QNT_SLOTS.filter(s => qntState[s.key]).map(s => {
+    const j = qntById[qntState[s.key]], y = qntYear[s.key];
+    return `<li><span class="qnt-lu-pos">${s.label}</span> ${plLink(j.nombre, j.nombre)}${y ? ` <span class="qnt-lu-yr">${drSeason(y)}</span>` : ''}</li>`;
+  }).join('');
   el.innerHTML = `<div class="qnt-stats-head"><h2>Tu quinteto</h2><span class="qnt-stats-n">${n}/5</span></div>
-    <p class="qnt-stats-lead">Sumando las medias de carrera, este quinteto promediaría <b>${fmtDec1(sum('pts_g'))} puntos</b>, ${fmtDec1(sum('rbd_g'))} rebotes y ${fmtDec1(sum('ast_g'))} asistencias por partido.</p>
+    <p class="qnt-stats-lead">Este quinteto promediaría <b>${fmtDec1(sum('pts_g'))} puntos</b>, ${fmtDec1(sum('rbd_g'))} rebotes y ${fmtDec1(sum('ast_g'))} asistencias por partido.</p>
     <h3 class="qnt-stats-sub">Promedios combinados</h3><div class="stat-grid qnt-grid">${pg}</div>
-    <h3 class="qnt-stats-sub">Palmarés y totales</h3><div class="stat-grid qnt-grid">${tot}</div>
+    <h3 class="qnt-stats-sub">Palmarés</h3><div class="stat-grid qnt-grid">${tot}</div>
     <ol class="qnt-lineup">${lineup}</ol>`;
 }
 
@@ -4837,6 +4858,11 @@ function qntWireDynamic() {
     });
   });
   document.querySelectorAll('.qnt-slot-x').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); qntClear(x.dataset.slot); }));
+  document.querySelectorAll('#qnt-slots .qnt-season').forEach(se => {
+    se.addEventListener('click', e => e.stopPropagation());       // no dispara la asignación del slot
+    se.addEventListener('mousedown', e => e.stopPropagation());
+    se.addEventListener('change', e => { qntYear[se.dataset.slot] = e.target.value ? parseInt(e.target.value, 10) : null; qntSyncUrl(); qntRenderStats(); });
+  });
 }
 
 async function initQuintetoPage() {
@@ -4848,9 +4874,13 @@ async function initQuintetoPage() {
   qntById = {}; qntAll.forEach(j => qntById[j.id] = j);
   document.getElementById('hero-sub').textContent = `Monta tu quinteto histórico de españoles y descubre sus números combinados`;
 
-  // Restaurar desde la URL
+  // Restaurar desde la URL (formato id  o  id:año)
   const params = new URLSearchParams(location.search);
-  QNT_SLOTS.forEach(s => { const id = params.get(s.key.toLowerCase()); if (id && qntById[id]) qntState[s.key] = id; });
+  QNT_SLOTS.forEach(s => {
+    const raw = params.get(s.key.toLowerCase()); if (!raw) return;
+    const [id, yr] = raw.split(':');
+    if (qntById[id]) { qntState[s.key] = id; if (yr && qntSeasonYears(qntById[id]).includes(+yr)) qntYear[s.key] = +yr; }
+  });
 
   document.getElementById('qnt-search').addEventListener('input', e => qntRenderPool(e.target.value));
   document.getElementById('qnt-reset').addEventListener('click', qntReset);
@@ -4895,35 +4925,38 @@ async function qntBuildImage() {
 
   QNT_SLOTS.forEach(s => {
     const px = cx + parseFloat(s.left) / 100 * cw, py = cy + parseFloat(s.top) / 100 * ch;
-    const id = qntState[s.key], j = id ? qntById[id] : null, r = 46, im = id ? imgs[id] : null;
+    const id = qntState[s.key], j = id ? qntById[id] : null, r = 46, im = id ? imgs[id] : null, yr = id ? qntYear[s.key] : null;
     x.beginPath(); x.arc(px, py, r, 0, 7);
     if (j && im) {
       x.save(); x.clip();
       const sc = Math.max(2 * r / im.naturalWidth, 2 * r / im.naturalHeight), dw = im.naturalWidth * sc, dh = im.naturalHeight * sc;
       x.drawImage(im, px - dw / 2, py - dh / 2, dw, dh); x.restore();
       x.beginPath(); x.arc(px, py, r, 0, 7); x.lineWidth = 3; x.strokeStyle = CO.accent; x.stroke();
-      x.fillStyle = CO.text; x.font = "700 21px Inter, sans-serif"; x.fillText(qntShort(j.nombre), px, py + r + 26);
     } else if (j) {
       x.fillStyle = qntAvatarColor(j.nombre); x.fill();
       x.lineWidth = 3; x.strokeStyle = CO.accent; x.stroke();
       x.fillStyle = '#fff'; x.font = "800 30px Inter, sans-serif"; x.textBaseline = 'middle'; x.fillText(qntInitials(j.nombre), px, py + 2); x.textBaseline = 'alphabetic';
-      x.fillStyle = CO.text; x.font = "700 21px Inter, sans-serif"; x.fillText(qntShort(j.nombre), px, py + r + 26);
     } else {
       x.setLineDash([6, 6]); x.strokeStyle = CO.line; x.lineWidth = 2; x.stroke(); x.setLineDash([]);
       x.fillStyle = CO.muted; x.font = "700 34px Inter"; x.textBaseline = 'middle'; x.fillText('+', px, py + 2); x.textBaseline = 'alphabetic';
     }
-    x.fillStyle = j ? CO.accent : CO.muted; x.font = "800 17px Inter"; x.fillText(s.label, px, py + r + (j ? 48 : 28));
+    if (j) {
+      x.fillStyle = CO.text; x.font = "700 21px Inter, sans-serif"; x.fillText(qntShort(j.nombre), px, py + r + 26);
+      if (yr) { x.fillStyle = CO.muted; x.font = "600 16px Inter, sans-serif"; x.fillText(drSeason(yr), px, py + r + 47); }
+      x.fillStyle = CO.accent; x.font = "800 17px Inter"; x.fillText(s.label, px, py + r + (yr ? 68 : 48));
+    } else {
+      x.fillStyle = CO.muted; x.font = "800 17px Inter"; x.fillText(s.label, px, py + r + 28);
+    }
   });
 
-  const P = qntPlayers(), sum = k => P.reduce((s, j) => s + (j[k] || 0), 0);
+  const L = qntStatsList(), sum = k => L.reduce((s, v) => s + (v[k] || 0), 0);
   const fy = cy + ch + 96;
   [['PTS', fmtDec1(sum('pts_g'))], ['REB', fmtDec1(sum('rbd_g'))], ['AST', fmtDec1(sum('ast_g'))]].forEach((cc, i) => {
     const colx = W / 2 + (i - 1) * 300;
     x.fillStyle = CO.accent; x.font = "400 72px 'Bebas Neue', sans-serif"; x.fillText(cc[1], colx, fy);
     x.fillStyle = CO.muted; x.font = "600 22px Inter"; x.fillText(cc[0], colx, fy + 34);
   });
-  const rings = P.reduce((s, j) => s + qntRings(j), 0), stars = P.reduce((s, j) => s + qntAllStars(j), 0);
-  x.fillStyle = CO.text; x.font = "600 25px Inter"; x.fillText(`${rings} anillos · ${stars} All-Star · ${P.length}/5`, W / 2, fy + 92);
+  x.fillStyle = CO.text; x.font = "600 25px Inter"; x.fillText(`${sum('rings')} anillos · ${sum('allstars')} All-Star · ${L.length}/5`, W / 2, fy + 92);
   x.fillStyle = CO.muted; x.font = "500 22px Inter"; x.fillText('alejandroggo.github.io/espanoles-nba', W / 2, H - 42);
   return c;
 }
