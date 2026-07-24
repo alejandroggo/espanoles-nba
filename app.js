@@ -4674,6 +4674,7 @@ function cwSubmit(text) {
 // Cruza transacciones + debuts + drafts por día del año.
 // ══════════════════════════════════════════════
 let efmEvents = [], efmMonth = 1, efmDay = 1, efmToday = { m: 1, d: 1 };
+let efmPlMap = {}, efmDaySet = new Set(), efmCalMonth = null, efmCalOpen = false;
 
 // Meses en inglés (abreviados) para admitir fechas tipo "10 jan 2015" o "30 april 2010"
 const MESES_EN = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -4765,6 +4766,9 @@ const EFM_MANUAL = [
 function efmBuild(data) {
   const ev = [];
   const draftKey = new Set();
+  // Mapa nombre -> datos de foto del jugador (para el avatar de cada efeméride)
+  efmPlMap = {};
+  (data.jugadores || []).forEach(j => { efmPlMap[drNorm(j.nombre)] = { id: j.id, foto: j.foto_url || '', bref: j.bref_id || '', nombre: j.nombre }; });
   // Efemérides manuales: preferimos la pestaña del Sheet (data.efemerides);
   // si el bot aún no la exporta, se usan las de EFM_MANUAL como respaldo.
   let manual;
@@ -4792,7 +4796,7 @@ function efmBuild(data) {
         html = `<b>${plLink(jug, jug)}</b> ` + e.text.replace(/^([A-Za-zÁÉÍÓÚÑáéíóúñ])/, c => c.toLowerCase());
       }
     }
-    ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html, video: e.video || '' });
+    ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html, video: e.video || '', player: jug });
   });
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
@@ -4803,12 +4807,12 @@ function efmBuild(data) {
         const eq = p.equipo ? ` con ${efmTeamName(p.equipo)}` : '';
         const riv = p.rival ? ` ante ${efmTeamName(p.rival)}` : '';
         const st = efmDebutStat(p);
-        ev.push({ ...dt, kind: 'debut', tag: 'Debut', video: String(p.video || p.video_url || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${eq}${riv}${st ? `, firmando ${st}` : ''}.` });
+        ev.push({ ...dt, kind: 'debut', tag: 'Debut', player: j.nombre, video: String(p.video || p.video_url || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${eq}${riv}${st ? `, firmando ${st}` : ''}.` });
       }
     }
     if (j.draft && j.draft_fecha) {
       const dt = efmParseShort(j.draft_fecha);
-      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', video: String(j.draft_video || j.video_draft || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', player: j.nombre, video: String(j.draft_video || j.video_draft || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
     }
   });
   // Transacciones (evitando duplicar el draft ya recogido arriba)
@@ -4816,7 +4820,7 @@ function efmBuild(data) {
     const m = String(t.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (!m) return;
     if (/draft/i.test(t.tipo || '') && draftKey.has(drNorm(t.jugador) + '|' + (+m[1]))) return;
-    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, video: String(t.video || t.video_url || t.youtube || t.yt || '').trim(), html: efmTransText(t) });
+    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, player: t.jugador || '', video: String(t.video || t.video_url || t.youtube || t.yt || '').trim(), html: efmTransText(t) });
   });
   return ev;
 }
@@ -4829,8 +4833,52 @@ function efmNextDay() {
   }
   return null;
 }
-function efmShift(delta) { const dt = new Date(2000, efmMonth - 1, efmDay); dt.setDate(dt.getDate() + delta); efmMonth = dt.getMonth() + 1; efmDay = dt.getDate(); renderEfm(); }
-function efmGoto(m, d) { efmMonth = m; efmDay = d; renderEfm(); }
+function efmShift(delta) { const dt = new Date(2000, efmMonth - 1, efmDay); dt.setDate(dt.getDate() + delta); efmMonth = dt.getMonth() + 1; efmDay = dt.getDate(); efmCalMonth = efmMonth; renderEfm(); }
+function efmGoto(m, d) { efmMonth = m; efmDay = d; efmCalMonth = m; renderEfm(); }
+
+// Foto (enlazada) del jugador de una efeméride; cae a iniciales si no hay foto
+function efmPhoto(name) {
+  const j = efmPlMap[drNorm(name || '')];
+  if (!j) return '';
+  const src = j.foto || (j.bref ? BREF_HEADSHOTS + '/' + j.bref + '.jpg' : '');
+  const inner = src ? `<img loading="lazy" class="efm-photo-img" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'efm-photo-img');
+  return `<a class="efm-photo" href="${jugadorHref(j.id)}" aria-label="${j.nombre}">${inner}</a>`;
+}
+
+// ── Calendario para saltar a cualquier fecha ──
+function efmToggleCal() {
+  efmCalOpen = !efmCalOpen;
+  const cal = document.getElementById('efm-cal');
+  if (cal) cal.hidden = !efmCalOpen;
+  const btn = document.getElementById('efm-cal-btn');
+  if (btn) btn.classList.toggle('active', efmCalOpen);
+  if (efmCalOpen) renderEfmCal();
+}
+function efmCalShift(delta) { efmCalMonth = ((efmCalMonth - 1 + delta + 12) % 12) + 1; renderEfmCal(); }
+function renderEfmCal() {
+  const cal = document.getElementById('efm-cal');
+  if (!cal) return;
+  if (efmCalMonth == null) efmCalMonth = efmMonth;
+  const mIdx = efmCalMonth;
+  const nDays = new Date(2000, mIdx, 0).getDate();          // 2000 es bisiesto → sale el 29-feb
+  const offset = (new Date(2000, mIdx - 1, 1).getDay() + 6) % 7;  // lunes primero
+  let cells = '';
+  for (let i = 0; i < offset; i++) cells += '<span class="efm-cal-empty"></span>';
+  for (let d = 1; d <= nDays; d++) {
+    const has = efmDaySet.has(mIdx + '-' + d);
+    const sel = (mIdx === efmMonth && d === efmDay);
+    const today = (mIdx === efmToday.m && d === efmToday.d);
+    cells += `<button type="button" class="efm-cal-day${has ? ' has' : ''}${sel ? ' sel' : ''}${today ? ' today' : ''}" onclick="efmGoto(${mIdx},${d})">${d}</button>`;
+  }
+  cal.innerHTML = `
+    <div class="efm-cal-head">
+      <button type="button" class="efm-arrow efm-arrow-sm" onclick="efmCalShift(-1)" aria-label="Mes anterior">‹</button>
+      <span class="efm-cal-title">${MESES_LARGOS[mIdx - 1]}</span>
+      <button type="button" class="efm-arrow efm-arrow-sm" onclick="efmCalShift(1)" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="efm-cal-dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="efm-cal-grid">${cells}</div>`;
+}
 
 function renderEfm() {
   const list = efmEvents.filter(e => e.m === efmMonth && e.d === efmDay).sort((a, b) => b.year - a.year || a.tag.localeCompare(b.tag));
@@ -4840,6 +4888,7 @@ function renderEfm() {
   document.getElementById('efm-count').textContent = list.length ? `${list.length} efeméride${list.length === 1 ? '' : 's'}` : '';
   const isToday = efmMonth === efmToday.m && efmDay === efmToday.d;
   document.getElementById('efm-today').classList.toggle('active', isToday);
+  if (efmCalOpen) renderEfmCal();
   const body = document.getElementById('efm-list');
   if (!list.length) {
     const next = efmNextDay();
@@ -4852,8 +4901,10 @@ function renderEfm() {
     const tagsHtml = (tags.length ? tags : ['Hito']).map(tg => `<span class="tr-tipo ${efmTagClass(tg)} efm-tag">${tg}</span>`).join(' ');
     const vid = e.video ? efmYtId(e.video) : '';
     const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
+    const photo = efmPhoto(e.player);
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
+      ${photo}
       <div class="efm-body"><span class="efm-tags">${tagsHtml}</span><p class="efm-text">${e.html}</p>${videoBtn}</div>
     </li>`;
   }).join('');
@@ -4868,11 +4919,14 @@ async function initEfemeridesPage() {
   const now = new Date();
   efmMonth = now.getMonth() + 1; efmDay = now.getDate();
   efmToday = { m: efmMonth, d: efmDay };
-  const dias = new Set(efmEvents.map(e => e.m + '-' + e.d)).size;
-  document.getElementById('hero-sub').textContent = `Un día como hoy en la historia de los españoles en la NBA · ${efmEvents.length} efemérides en ${dias} días`;
+  efmCalMonth = efmMonth;
+  efmDaySet = new Set(efmEvents.map(e => e.m + '-' + e.d));
+  document.getElementById('hero-sub').textContent = `Un día como hoy en la historia de los españoles en la NBA · ${efmEvents.length} efemérides en ${efmDaySet.size} días`;
   document.getElementById('efm-prev').onclick = () => efmShift(-1);
   document.getElementById('efm-next').onclick = () => efmShift(1);
-  document.getElementById('efm-today').onclick = () => { efmMonth = efmToday.m; efmDay = efmToday.d; renderEfm(); };
+  document.getElementById('efm-today').onclick = () => { efmMonth = efmToday.m; efmDay = efmToday.d; efmCalMonth = efmMonth; renderEfm(); };
+  const calBtn = document.getElementById('efm-cal-btn');
+  if (calBtn) calBtn.onclick = efmToggleCal;
   renderEfm();
 }
 

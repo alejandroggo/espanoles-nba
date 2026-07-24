@@ -1421,6 +1421,26 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-date { display: block; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.5rem; color: var(--text); }
 .efm-count { font-size: 0.8rem; color: var(--text-muted); }
 .efm-hoy { flex: 0 0 auto; }
+.efm-cal-btn { flex: 0 0 auto; }
+
+/* Calendario para saltar a cualquier fecha */
+.efm-cal { max-width: 340px; margin: var(--space-3) auto 0; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+.efm-cal[hidden] { display: none; }
+.efm-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+.efm-cal-title { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.15rem; text-transform: capitalize; }
+.efm-arrow-sm { width: 30px; height: 30px; flex: 0 0 30px; font-size: 1.05rem; }
+.efm-cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 3px; }
+.efm-cal-dow span { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+.efm-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.efm-cal-empty { aspect-ratio: 1; }
+.efm-cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: var(--text); font-family: inherit; font-size: 0.82rem; cursor: pointer; position: relative; }
+.efm-cal-day:hover { background: var(--surface-2); }
+.efm-cal-day.has { font-weight: 700; color: var(--accent); }
+.efm-cal-day.has::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.efm-cal-day.today { outline: 1px solid var(--accent); outline-offset: -1px; }
+.efm-cal-day.sel { background: var(--accent); color: #fff; }
+.efm-cal-day.sel.has { color: #fff; }
+.efm-cal-day.sel.has::after { background: #fff; }
 
 .efm-wrap { max-width: 760px; margin: var(--space-5) auto 0; padding: 0 var(--space-4) var(--space-6); }
 .efm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
@@ -1428,7 +1448,10 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-item:first-child { border-top: 0; }
 .efm-year { flex: 0 0 74px; text-align: right; font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; line-height: 1; color: var(--accent); }
 .efm-ago { display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
-.efm-body { flex: 1; }
+.efm-photo { flex: 0 0 46px; display: block; margin-top: 2px; }
+.efm-photo-img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; object-position: top center; background: var(--surface-2); border: 1px solid var(--border); display: block; }
+span.efm-photo-img { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; color: #fff; }
+.efm-body { flex: 1; min-width: 0; }
 .efm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
 .efm-tag { display: inline-block; }
 .efm-tag--debut { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
@@ -1461,8 +1484,12 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-text a:hover { color: var(--accent); }
 .efm-empty { color: var(--text-muted); padding: var(--space-4) 0; text-align: center; }
 @media (max-width: 560px) {
-  .efm-year { flex-basis: 58px; font-size: 1.6rem; }
+  .efm-item { gap: var(--space-3); }
+  .efm-year { flex-basis: 46px; font-size: 1.5rem; }
+  .efm-photo { flex-basis: 38px; }
+  .efm-photo-img { width: 38px; height: 38px; }
   .efm-date { font-size: 1.25rem; }
+  .efm-nav { flex-wrap: wrap; }
 }
 
 /* ── PÁGINA QUINTETO IDEAL ────────────────────────────── */

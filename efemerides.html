@@ -37,7 +37,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=102">
+<link rel="stylesheet" href="style.css?v=103">
 </head>
 <body>
 
@@ -69,8 +69,11 @@
       <span class="efm-count" id="efm-count"></span>
     </div>
     <button type="button" class="efm-arrow" id="efm-next" aria-label="Día siguiente">›</button>
+    <button type="button" class="toggle-chip efm-cal-btn" id="efm-cal-btn" aria-label="Abrir calendario">📅 Calendario</button>
     <button type="button" class="toggle-chip efm-hoy" id="efm-today">Hoy</button>
   </section>
+
+  <div class="efm-cal" id="efm-cal" hidden></div>
 
   <section class="efm-wrap" aria-label="Efemérides del día">
     <ul class="efm-list" id="efm-list"></ul>
@@ -101,7 +104,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=102"></script>
+<script src="app.js?v=103"></script>
 <script>initTheme(); initEfemeridesPage();</script>
 </body>
 </html>
