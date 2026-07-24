@@ -4683,6 +4683,8 @@ function efmParseShort(s) {
   return { d: +m[1], m: mo + 1, year: +m[3] };
 }
 function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); return TEAM_INFO[c] ? TEAM_INFO[c].name : x; }
+// Texto de una efeméride del Sheet: escapa HTML y permite **negrita**
+function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' ? '&lt;' : '&gt;').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); }
 
 // Efemérides añadidas A MANO (hitos, récords, momentos históricos que no salen
 // de los datos automáticos). Formato: { d, m, year, text, tag? }  (tag por defecto: 'Hito')
@@ -4696,8 +4698,22 @@ const EFM_MANUAL = [
 function efmBuild(data) {
   const ev = [];
   const draftKey = new Set();
-  // Efemérides manuales
-  EFM_MANUAL.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text }); });
+  // Efemérides manuales: preferimos la pestaña del Sheet (data.efemerides);
+  // si el bot aún no la exporta, se usan las de EFM_MANUAL como respaldo.
+  let manual;
+  if (data.efemerides && data.efemerides.length) {
+    manual = data.efemerides.map(e => {
+      const s = String(e.fecha || '').trim();
+      let dm = null, m;
+      if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) dm = { year: +m[1], m: +m[2], d: +m[3] };
+      else if ((m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/))) { let y = +m[3]; if (y < 100) y += 2000; dm = { d: +m[1], m: +m[2], year: y }; }
+      else dm = efmParseShort(s);
+      return dm ? { d: dm.d, m: dm.m, year: dm.year, tag: (e.tipo || e.etiqueta || 'Hito'), text: efmFmtText(e.texto || e.text || '') } : null;
+    }).filter(x => x && x.text);
+  } else {
+    manual = EFM_MANUAL;
+  }
+  manual.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text }); });
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
     const p = j.primer_partido;
