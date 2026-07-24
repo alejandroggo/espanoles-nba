@@ -11,7 +11,31 @@ function initTheme() {
   buildHeaderSearch();
   buildShareButton();
   buildChatWidget();
+  buildCookieBanner();
   showLoadBar();
+}
+
+// ── AVISO DE COOKIES + CONSENT MODE ───────────────
+function agSetConsent(v) {
+  try { localStorage.setItem('ag-consent', v); } catch (e) { }
+  if (v === 'granted' && typeof gtag === 'function') gtag('consent', 'update', { analytics_storage: 'granted' });
+  const el = document.getElementById('cookie-banner'); if (el) el.remove();
+}
+function buildCookieBanner() {
+  if (document.getElementById('cookie-banner')) return;
+  let c = null; try { c = localStorage.getItem('ag-consent'); } catch (e) { }
+  if (c === 'granted' || c === 'denied') return;   // ya eligió
+  const el = document.createElement('div');
+  el.className = 'cookie-banner'; el.id = 'cookie-banner';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Aviso de cookies');
+  el.innerHTML = `<p class="cookie-text">Uso cookies de <b>Google Analytics</b> para medir las visitas de forma anónima. ¿Las aceptas?</p>
+    <div class="cookie-btns">
+      <button type="button" class="cookie-btn cookie-btn--no" id="cookie-no">Rechazar</button>
+      <button type="button" class="cookie-btn cookie-btn--yes" id="cookie-yes">Aceptar</button>
+    </div>`;
+  document.body.appendChild(el);
+  document.getElementById('cookie-yes').addEventListener('click', () => agSetConsent('granted'));
+  document.getElementById('cookie-no').addEventListener('click', () => agSetConsent('denied'));
 }
 
 // ── BOTÓN COMPARTIR (cabecera, todas las páginas) ──

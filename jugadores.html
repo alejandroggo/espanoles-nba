@@ -10,6 +10,8 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied'});
+  try { if (localStorage.getItem('ag-consent') === 'granted') gtag('consent', 'update', {analytics_storage:'granted'}); } catch(e){}
   gtag('config', 'G-NCR152YQ9F');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +37,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=90">
+<link rel="stylesheet" href="style.css?v=91">
 </head>
 <body>
 
@@ -96,7 +98,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=90"></script>
+<script src="app.js?v=91"></script>
 <script>initTheme(); initJugadoresPage();</script>
 </body>
 </html>
