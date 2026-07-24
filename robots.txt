@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://alejandroggo.github.io/espanoles-nba/sitemap.xml
+Sitemap: https://espanoles-nba.alejandroggo.com/sitemap.xml
