@@ -4685,6 +4685,19 @@ function efmParseShort(s) {
 function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); return TEAM_INFO[c] ? TEAM_INFO[c].name : x; }
 // Texto de una efeméride del Sheet: escapa HTML y permite **negrita**
 function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' ? '&lt;' : '&gt;').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); }
+// Clase de color de la etiqueta de una efeméride (insensible a mayúsculas/acentos)
+function efmTagClass(tag) {
+  const t = drNorm(tag || '');
+  if (/anillo|campe|titulo|title/.test(t)) return 'efm-tag--anillo';
+  if (/career.?high|record/.test(t)) return 'efm-tag--record';
+  if (/game.?winner|tiro ganador|ganador sobre la bocina|buzzer/.test(t)) return 'efm-tag--winner';
+  if (/lesion/.test(t)) return 'efm-tag--lesion';
+  if (/serie/.test(t)) return 'efm-tag--serie';
+  if (/partido|destacad|actuacion/.test(t)) return 'efm-tag--partido';
+  if (/debut/.test(t)) return 'efm-tag--debut';
+  if (/draft/.test(t)) return 'efm-tag--draft';
+  return 'efm-tag--hito';
+}
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
 function efmMoney(s) { const m = String(s || '').match(/\$\s?[\d.,]+\s?[MK]?(?:\s?[x×]\s?\d+)?/i); return m ? m[0].replace(/\s+/g, ' ').trim() : ''; }
 function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('#' + m[1]) : ''; }
@@ -4800,7 +4813,7 @@ function renderEfm() {
   }
   body.innerHTML = list.map(e => {
     const ago = nowY - e.year;
-    const tagCls = e.kind === 'trans' ? trTipoClass(e.tag) : ('efm-tag--' + e.kind);
+    const tagCls = e.kind === 'trans' ? trTipoClass(e.tag) : efmTagClass(e.tag);
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
       <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p></div>
