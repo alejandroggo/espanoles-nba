@@ -4689,14 +4689,16 @@ function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' 
 function efmTagClass(tag) {
   const t = drNorm(tag || '');
   if (/anillo|campe|titulo|title|finales/.test(t)) return 'efm-tag--anillo';
-  if (/franquicia|career.?high|record|milestone|marca|primera vez|primer espanol|primer español/.test(t)) return 'efm-tag--record';
-  if (/game.?winner|tiro ganador|bocina|buzzer|jugada histor|jugadon/.test(t)) return 'efm-tag--winner';
-  if (/lesion/.test(t)) return 'efm-tag--lesion';
-  if (/serie|debut.*playoff|playoff/.test(t)) return 'efm-tag--serie';
-  if (/triple.?doble|partido|destacad|actuacion/.test(t)) return 'efm-tag--partido';
   if (/all.?star|premio|mvp|galardon/.test(t)) return 'efm-tag--allstar';
-  if (/debut/.test(t)) return 'efm-tag--debut';
-  if (/draft/.test(t)) return 'efm-tag--draft';
+  if (/serie|debut.*playoff/.test(t)) return 'efm-tag--serie';
+  // Violeta (jugadas y partidos destacados: fusión de violeta + azul)
+  if (/game.?winner|tiro ganador|bocina|buzzer|jugada histor|jugadon|triple.?doble|partido|destacad|actuacion/.test(t)) return 'efm-tag--winner';
+  // Rojo (lesiones + cortes, waivers, renuncias y opciones rechazadas)
+  if (/lesion|cortad|waiver|renuncia|rechaza|opcion|opción/.test(t)) return 'efm-tag--lesion';
+  // Naranja (récords, primeras veces y debut)
+  if (/franquicia|career.?high|record|milestone|marca|primera vez|primer espanol|primer español|debut/.test(t)) return 'efm-tag--record';
+  // Azul (movimientos: draft, traspaso y firmas)
+  if (/draft|traspas|firma|renov|agente libre|extensi|sign|contrato/.test(t)) return 'efm-tag--partido';
   return 'efm-tag--hito';
 }
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
@@ -4814,7 +4816,7 @@ function renderEfm() {
   }
   body.innerHTML = list.map(e => {
     const ago = nowY - e.year;
-    const tagCls = e.kind === 'trans' ? trTipoClass(e.tag) : efmTagClass(e.tag);
+    const tagCls = efmTagClass(e.tag);
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
       <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p></div>
