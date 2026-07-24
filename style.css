@@ -1414,7 +1414,7 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 }
 
 /* ── PÁGINA EFEMÉRIDES ────────────────────────────────── */
-.efm-nav { max-width: 760px; margin: 0 auto; padding: 0 var(--space-4); display: flex; align-items: center; gap: var(--space-3); }
+.efm-nav { position: relative; max-width: 760px; margin: 0 auto; padding: 0 var(--space-4); display: flex; align-items: center; gap: var(--space-3); }
 .efm-arrow { width: 40px; height: 40px; flex: 0 0 40px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 50%; font-size: 1.3rem; line-height: 1; cursor: pointer; }
 .efm-arrow:hover { border-color: var(--accent); color: var(--accent); }
 .efm-datewrap { flex: 1; text-align: center; }
@@ -1423,8 +1423,9 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-hoy { flex: 0 0 auto; }
 .efm-cal-btn { flex: 0 0 auto; }
 
-/* Calendario para saltar a cualquier fecha */
-.efm-cal { max-width: 340px; margin: var(--space-3) auto 0; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+/* Calendario flotante para saltar a cualquier fecha (no empuja la lista) */
+.efm-cal { position: absolute; top: calc(100% + 10px); right: var(--space-4); z-index: 50; width: 320px; max-width: calc(100vw - 2 * var(--space-4)); padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18); }
+:root[data-theme="dark"] .efm-cal { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); }
 .efm-cal[hidden] { display: none; }
 .efm-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
 .efm-cal-title { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.15rem; text-transform: capitalize; }
