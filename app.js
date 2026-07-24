@@ -4685,6 +4685,38 @@ function efmParseShort(s) {
 function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); return TEAM_INFO[c] ? TEAM_INFO[c].name : x; }
 // Texto de una efeméride del Sheet: escapa HTML y permite **negrita**
 function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' ? '&lt;' : '&gt;').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); }
+// Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
+function efmMoney(s) { const m = String(s || '').match(/\$\s?[\d.,]+\s?[MK]?(?:\s?[x×]\s?\d+)?/i); return m ? m[0].replace(/\s+/g, ' ').trim() : ''; }
+function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('nº ' + m[1]) : ''; }
+// Línea de estadísticas destacadas del debut (pts / reb / ast)
+function efmDebutStat(p) {
+  const parts = [];
+  if (p.pts != null) parts.push(`<b>${p.pts}</b> punto${p.pts === 1 ? '' : 's'}`);
+  if (p.rbd != null) parts.push(`<b>${p.rbd}</b> rebote${p.rbd === 1 ? '' : 's'}`);
+  if (p.ast != null) parts.push(`<b>${p.ast}</b> asistencia${p.ast === 1 ? '' : 's'}`);
+  if (!parts.length) return '';
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(', ') + ' y ' + parts[parts.length - 1];
+}
+// Frase natural para una transacción según su tipo
+function efmTransText(t) {
+  const j = `<b>${plLink(t.jugador, t.jugador)}</b>`, e1 = t.equipo1 || '', e2 = t.equipo2 || '';
+  const money = efmMoney(t.notas || ''), por = money ? ` por <b>${money}</b>` : '';
+  const tp = drNorm(t.tipo || '');
+  if (/traspas/.test(tp)) return e2 ? `${j} es traspasado de ${e1} a ${e2}.` : `${j} es traspasado${e1 ? ` a ${e1}` : ''}.`;
+  if (/agente libre/.test(tp)) return `${j} firma como agente libre con ${e1}${por}.`;
+  if (/contrato rookie/.test(tp)) return `${j} firma su contrato rookie con ${e1}${por}.`;
+  if (/renovaci/.test(tp)) return `${j} renueva con ${e1}${por}.`;
+  if (/extensi/.test(tp)) return `${j} firma una extensión de contrato con ${e1}${por}.`;
+  if (/cortad|waived/.test(tp)) return `${e1 || 'Su equipo'} corta a ${j}.`;
+  if (/waivers/.test(tp)) return `${j} es reclamado en waivers por ${e1}.`;
+  if (/renuncia de derechos/.test(tp)) return `${e1 || 'Su equipo'} renuncia a los derechos de ${j}.`;
+  if (/rechaza opci.*jugador/.test(tp)) return `${j} rechaza su opción de jugador con ${e1} y queda agente libre.`;
+  if (/rechaza opci.*equipo/.test(tp)) return `${e1 || 'Su equipo'} no ejerce la opción sobre ${j}, que queda agente libre.`;
+  if (/draft/.test(tp)) { const pk = efmPick(t.notas); return `${j} es elegido en el draft${e1 ? ` por ${e1}` : ''}${pk ? ` (${pk})` : ''}.`; }
+  const eqs = [e1, e2].filter(Boolean);
+  return `${j}${eqs.length ? ` · ${eqs.join(' → ')}` : ''}`;
+}
 
 // Efemérides añadidas A MANO (hitos, récords, momentos históricos que no salen
 // de los datos automáticos). Formato: { d, m, year, text, tag? }  (tag por defecto: 'Hito')
@@ -4717,10 +4749,18 @@ function efmBuild(data) {
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
     const p = j.primer_partido;
-    if (p && p.fecha) { const dt = efmParseShort(p.fecha); if (dt) ev.push({ ...dt, kind: 'debut', tag: 'Debut', html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${p.equipo ? ` con ${efmTeamName(p.equipo)}` : ''}` }); }
+    if (p && p.fecha) {
+      const dt = efmParseShort(p.fecha);
+      if (dt) {
+        const eq = p.equipo ? ` con ${efmTeamName(p.equipo)}` : '';
+        const riv = p.rival ? ` ante ${efmTeamName(p.rival)}` : '';
+        const st = efmDebutStat(p);
+        ev.push({ ...dt, kind: 'debut', tag: 'Debut', html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${eq}${riv}${st ? `, firmando ${st}` : ''}.` });
+      }
+    }
     if (j.draft && j.draft_fecha) {
       const dt = efmParseShort(j.draft_fecha);
-      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> elegido en el draft${j.draft_pick ? ` (nº ${j.draft_pick})` : ''}${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` (nº ${j.draft_pick})` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
     }
   });
   // Transacciones (evitando duplicar el draft ya recogido arriba)
@@ -4728,10 +4768,7 @@ function efmBuild(data) {
     const m = String(t.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (!m) return;
     if (/draft/i.test(t.tipo || '') && draftKey.has(drNorm(t.jugador) + '|' + (+m[1]))) return;
-    const contrato = trContrato(t);
-    const eqs = [t.equipo1, t.equipo2].filter(Boolean);
-    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo,
-      html: `<b>${plLink(t.jugador, t.jugador)}</b>${eqs.length ? ` · ${eqs.join(' → ')}` : ''}${contrato ? ` · ${contrato}` : ''}` });
+    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, html: efmTransText(t) });
   });
   return ev;
 }
