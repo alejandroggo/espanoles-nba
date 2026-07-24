@@ -4868,7 +4868,7 @@ function renderEfmCal() {
     const has = efmDaySet.has(mIdx + '-' + d);
     const sel = (mIdx === efmMonth && d === efmDay);
     const today = (mIdx === efmToday.m && d === efmToday.d);
-    cells += `<button type="button" class="efm-cal-day${has ? ' has' : ''}${sel ? ' sel' : ''}${today ? ' today' : ''}" onclick="efmGoto(${mIdx},${d})">${d}</button>`;
+    cells += `<button type="button" class="efm-cal-day${has ? ' has' : ''}${sel ? ' efm-day-sel' : ''}${today ? ' today' : ''}" onclick="efmGoto(${mIdx},${d})">${d}</button>`;
   }
   cal.innerHTML = `
     <div class="efm-cal-head">
