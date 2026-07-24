@@ -4675,10 +4675,14 @@ function cwSubmit(text) {
 // ══════════════════════════════════════════════
 let efmEvents = [], efmMonth = 1, efmDay = 1, efmToday = { m: 1, d: 1 };
 
+// Meses en inglés (abreviados) para admitir fechas tipo "10 jan 2015" o "30 april 2010"
+const MESES_EN = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 function efmParseShort(s) {
   const m = String(s || '').match(/(\d{1,2})\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]{3,})\s+(\d{4})/);
   if (!m) return null;
-  const mo = MESES.indexOf(drNorm(m[2]).slice(0, 3));
+  const mo3 = drNorm(m[2]).slice(0, 3);
+  let mo = MESES.indexOf(mo3);
+  if (mo < 0) mo = MESES_EN.indexOf(mo3);
   if (mo < 0) return null;
   return { d: +m[1], m: mo + 1, year: +m[3] };
 }
@@ -4771,12 +4775,25 @@ function efmBuild(data) {
       if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) dm = { year: +m[1], m: +m[2], d: +m[3] };
       else if ((m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/))) { let y = +m[3]; if (y < 100) y += 2000; dm = { d: +m[1], m: +m[2], year: y }; }
       else dm = efmParseShort(s);
-      return dm ? { d: dm.d, m: dm.m, year: dm.year, tag: (e.tipo || e.etiqueta || 'Hito'), text: efmFmtText(e.texto || e.text || ''), video: String(e.video || e.video_url || e.youtube || e.yt || '').trim() } : null;
+      return dm ? { d: dm.d, m: dm.m, year: dm.year, tag: (e.tipo || e.etiqueta || 'Hito'), jugador: String(e.jugador || '').trim(), text: efmFmtText(e.texto || e.text || e.hito || ''), video: String(e.video || e.video_url || e.youtube || e.yt || '').trim() } : null;
     }).filter(x => x && x.text);
   } else {
     manual = EFM_MANUAL;
   }
-  manual.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text, video: e.video || '' }); });
+  manual.forEach(e => {
+    if (!(e.d && e.m && e.year)) return;
+    let html = e.text;
+    const jug = e.jugador || '';
+    // Si hay columna JUGADOR y el texto no empieza ya por ese nombre, anteponemos el
+    // nombre enlazado y pasamos a minúscula la primera letra del texto (que suele ser un verbo).
+    if (jug) {
+      const plain = drNorm(e.text.replace(/<[^>]+>/g, ''));
+      if (!plain.startsWith(drNorm(jug))) {
+        html = `<b>${plLink(jug, jug)}</b> ` + e.text.replace(/^([A-Za-zÁÉÍÓÚÑáéíóúñ])/, c => c.toLowerCase());
+      }
+    }
+    ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html, video: e.video || '' });
+  });
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
     const p = j.primer_partido;
