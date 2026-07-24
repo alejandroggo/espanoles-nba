@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-07-24T19:36:29.551Z",
+  "actualizado": "2026-07-24T19:55:30.622Z",
   "summer_league": [
     {
       "year": 1985,
@@ -2138,7 +2138,88 @@
       "notas": "Pelicans no ejercen la opción y queda agente libre. Vuelve a Europa."
     }
   ],
-  "efemerides": [],
+  "efemerides": [
+    {
+      "fecha": "2006-02-19",
+      "jugador": "Pau Gasol",
+      "hito": "Debuta en un All-Star Game. Es el primer español en la historia en conseguirlo (y el primer jugador en la historia de los Grizzlies).",
+      "etiqueta": "ALL-STAR",
+      "video": "",
+      "etiquetas": "CAREER-HIGH"
+    },
+    {
+      "fecha": "2006-03-28",
+      "jugador": "Pau Gasol",
+      "hito": "Anota 44 puntos en la derrota de los Memphis Grizzlies ante Seattle SuperSonics. Game winner de Ray Allen.",
+      "etiqueta": "PARTIDO DESTACADO",
+      "video": "https://www.youtube.com/watch?v=SoS29exGECw",
+      "etiquetas": "LESIÓN"
+    },
+    {
+      "fecha": "2009-12-16",
+      "jugador": "Pau Gasol",
+      "hito": "Baja 22 rebotes en la victoria de Los Angeles Lakers ante Milwaukee Bucks, con además, 26 puntos. Su primer 20+20",
+      "etiqueta": "PARTIDO DESTACADO",
+      "video": "",
+      "etiquetas": "ANILLO"
+    },
+    {
+      "fecha": "10 jan 2015",
+      "jugador": "Pau Gasol",
+      "hito": "Anota 46 puntos en la victoria de los Chicago Bulls ante Milwaukee Bucks, además de 18 rebotes. Es la máxima anotación de un español en la historia de la NBA.",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=rN-vdKOp7gE",
+      "etiquetas": "GAME WINNER"
+    },
+    {
+      "fecha": "11 jan 2008",
+      "jugador": "Pau Gasol",
+      "hito": "Anota 43 puntos en la derrota de los Memphis Grizzlies ante Golden State Warriors.",
+      "etiqueta": "PARTIDO DESTACADO",
+      "video": "",
+      "etiquetas": "SERIE GANADA"
+    },
+    {
+      "fecha": "17 apr 2004",
+      "jugador": "Pau Gasol",
+      "hito": "Debuta en playoffs en la derrota de los Memphis Grizzlies ante San Antonio Spurs con 14 puntos y 2 rebotes",
+      "etiqueta": "DEBUT PLAYOFFS",
+      "video": "",
+      "etiquetas": "PARTIDO DESTACADO"
+    },
+    {
+      "fecha": "30 apr 1987",
+      "jugador": "Fernando Martín",
+      "hito": "Debuta en playoffs en la derrota de los Portland Trail Blazers ante Houston Rocketts. Juega apenas un minuto, pero es el primer español en conseguirlo.",
+      "etiqueta": "DEBUT PLAYOFFS, PRIMERA VEZ",
+      "video": "",
+      "etiquetas": "TRIPLE-DOBLE"
+    },
+    {
+      "fecha": "30 apr 2010",
+      "jugador": "Pau Gasol",
+      "hito": "Palmeo para ganar el sexto partido de la primera ronda ante los Thunder y llevarse la eliminatoria camino al anillo.",
+      "etiqueta": "GAME WINNER, SERIE GANADA",
+      "video": "https://www.youtube.com/watch?v=GklQlH1z_KE",
+      "etiquetas": "ALL-STAR"
+    },
+    {
+      "fecha": "2006-02-13",
+      "jugador": "Pau Gasol",
+      "hito": "Canasta sobre la bocina para que los Memphis Grizzlies se llevaran el triunfo ante Golden State",
+      "etiqueta": "GAME WINNER",
+      "video": "https://www.youtube.com/watch?v=IKAac4Q0LGw",
+      "etiquetas": "DEBUT PLAYOFFS"
+    },
+    {
+      "fecha": "2015-02-08",
+      "jugador": "Pau Gasol",
+      "hito": "Rebote ofensivo y canasta para que los Chicago Bulls se llevaran el triunfo ante Orlando Magic.",
+      "etiqueta": "GAME WINNER",
+      "video": "https://www.youtube.com/watch?v=d4wmkY0Z9iU",
+      "etiquetas": "PREMIO"
+    }
+  ],
   "jugadores": [
     {
       "id": "pau-gasol",
