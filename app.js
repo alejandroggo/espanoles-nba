@@ -4687,7 +4687,7 @@ function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); 
 function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' ? '&lt;' : '&gt;').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); }
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
 function efmMoney(s) { const m = String(s || '').match(/\$\s?[\d.,]+\s?[MK]?(?:\s?[x×]\s?\d+)?/i); return m ? m[0].replace(/\s+/g, ' ').trim() : ''; }
-function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('nº ' + m[1]) : ''; }
+function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('#' + m[1]) : ''; }
 // Línea de estadísticas destacadas del debut (pts / reb / ast)
 function efmDebutStat(p) {
   const parts = [];
@@ -4713,7 +4713,7 @@ function efmTransText(t) {
   if (/renuncia de derechos/.test(tp)) return `${e1 || 'Su equipo'} renuncia a los derechos de ${j}.`;
   if (/rechaza opci.*jugador/.test(tp)) return `${j} rechaza su opción de jugador con ${e1} y queda agente libre.`;
   if (/rechaza opci.*equipo/.test(tp)) return `${e1 || 'Su equipo'} no ejerce la opción sobre ${j}, que queda agente libre.`;
-  if (/draft/.test(tp)) { const pk = efmPick(t.notas); return `${j} es elegido en el draft${e1 ? ` por ${e1}` : ''}${pk ? ` (${pk})` : ''}.`; }
+  if (/draft/.test(tp)) { const pk = efmPick(t.notas); return `${j} es elegido en el draft${e1 ? ` por ${e1}` : ''}${pk ? ` con el pick ${pk}` : ''}.`; }
   const eqs = [e1, e2].filter(Boolean);
   return `${j}${eqs.length ? ` · ${eqs.join(' → ')}` : ''}`;
 }
@@ -4760,7 +4760,7 @@ function efmBuild(data) {
     }
     if (j.draft && j.draft_fecha) {
       const dt = efmParseShort(j.draft_fecha);
-      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` (nº ${j.draft_pick})` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
     }
   });
   // Transacciones (evitando duplicar el draft ya recogido arriba)
