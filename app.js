@@ -207,16 +207,18 @@ const FOTO_OVERRIDES = {
   'dani diez':    `${BREF_HEADSHOTS}/daniel-diez-1.jpg`,
 };
 
+let AG_DATA_PROMISE = null;
 async function loadData() {
-  // Caché de sesión: solo se descarga data.json una vez por pestaña (navegación entre secciones instantánea)
-  let data = null;
-  try { const c = sessionStorage.getItem('ag-data'); if (c) data = JSON.parse(c); } catch (e) {}
-  if (!data) {
-    const res = await fetch('data.json');
-    if (!res.ok) throw new Error('No se pudo cargar data.json');
-    data = await res.json();
-    try { sessionStorage.setItem('ag-data', JSON.stringify(data)); } catch (e) {}
+  // Una sola descarga por carga de página (dedupe de llamadas concurrentes), pero
+  // se revalida contra el servidor en cada recarga para que los datos nuevos del
+  // bot (transacciones, efemérides…) aparezcan sin tener que cerrar la pestaña.
+  if (!AG_DATA_PROMISE) {
+    AG_DATA_PROMISE = fetch('data.json', { cache: 'no-cache' })
+      .then(res => { if (!res.ok) throw new Error('No se pudo cargar data.json'); return res.json(); });
   }
+  let data;
+  try { data = await AG_DATA_PROMISE; }
+  catch (e) { AG_DATA_PROMISE = null; throw e; }
   (data.jugadores || []).forEach(j => {
     const ov = FOTO_OVERRIDES[drNorm(j.nombre)];
     if (ov) j.foto_url = ov;
