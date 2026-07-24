@@ -4689,13 +4689,12 @@ function efmFmtText(s) { return String(s || '').replace(/[<>]/g, c => c === '<' 
 function efmTagClass(tag) {
   const t = drNorm(tag || '');
   if (/anillo|campe|titulo|title|finales/.test(t)) return 'efm-tag--anillo';
-  if (/franquicia|career.?high|record|milestone|marca/.test(t)) return 'efm-tag--record';
+  if (/franquicia|career.?high|record|milestone|marca|primera vez|primer espanol|primer español/.test(t)) return 'efm-tag--record';
   if (/game.?winner|tiro ganador|bocina|buzzer|jugada histor|jugadon/.test(t)) return 'efm-tag--winner';
   if (/lesion/.test(t)) return 'efm-tag--lesion';
   if (/serie|debut.*playoff|playoff/.test(t)) return 'efm-tag--serie';
   if (/triple.?doble|partido|destacad|actuacion/.test(t)) return 'efm-tag--partido';
   if (/all.?star|premio|mvp|galardon/.test(t)) return 'efm-tag--allstar';
-  if (/primera vez|primer espanol|primer español|historic/.test(t)) return 'efm-tag--primera';
   if (/debut/.test(t)) return 'efm-tag--debut';
   if (/draft/.test(t)) return 'efm-tag--draft';
   return 'efm-tag--hito';

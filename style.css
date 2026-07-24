@@ -1440,7 +1440,6 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-tag--serie { background: color-mix(in srgb, #10b981 20%, transparent); color: #047857; }
 .efm-tag--partido { background: color-mix(in srgb, #3b82f6 18%, transparent); color: #2563eb; }
 .efm-tag--allstar { background: color-mix(in srgb, #ec4899 18%, transparent); color: #be185d; }
-.efm-tag--primera { background: color-mix(in srgb, #06b6d4 20%, transparent); color: #0e7490; }
 :root[data-theme="dark"] .efm-tag--debut { color: #4ade80; }
 :root[data-theme="dark"] .efm-tag--draft { color: #a5b4fc; }
 :root[data-theme="dark"] .efm-tag--hito { color: #fbbf24; }
@@ -1451,7 +1450,6 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 :root[data-theme="dark"] .efm-tag--serie { color: #34d399; }
 :root[data-theme="dark"] .efm-tag--partido { color: #93c5fd; }
 :root[data-theme="dark"] .efm-tag--allstar { color: #f9a8d4; }
-:root[data-theme="dark"] .efm-tag--primera { color: #22d3ee; }
 .efm-text { margin: 0; line-height: 1.5; font-size: 0.95rem; }
 .efm-text a { color: var(--text); font-weight: 600; }
 .efm-text a:hover { color: var(--accent); }
