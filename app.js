@@ -4701,6 +4701,21 @@ function efmTagClass(tag) {
   if (/draft|traspas|firma|renov|agente libre|extensi|sign|contrato/.test(t)) return 'efm-tag--partido';
   return 'efm-tag--hito';
 }
+// Extrae el ID de un vídeo de YouTube desde varias formas de URL (o el propio ID)
+function efmYtId(url) {
+  const s = String(url || '').trim();
+  const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|[?&]v=)([\w-]{11})/);
+  if (m) return m[1];
+  if (/^[\w-]{11}$/.test(s)) return s;
+  return '';
+}
+// Sustituye el botón por el reproductor embebido de YouTube (carga diferida al hacer clic)
+function efmPlayVideo(btn, id) {
+  const wrap = document.createElement('div');
+  wrap.className = 'efm-video';
+  wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}" title="Vídeo de la efeméride" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+  btn.replaceWith(wrap);
+}
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
 function efmMoney(s) { const m = String(s || '').match(/\$\s?[\d.,]+\s?[MK]?(?:\s?[x×]\s?\d+)?/i); return m ? m[0].replace(/\s+/g, ' ').trim() : ''; }
 function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('#' + m[1]) : ''; }
@@ -4756,12 +4771,12 @@ function efmBuild(data) {
       if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) dm = { year: +m[1], m: +m[2], d: +m[3] };
       else if ((m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/))) { let y = +m[3]; if (y < 100) y += 2000; dm = { d: +m[1], m: +m[2], year: y }; }
       else dm = efmParseShort(s);
-      return dm ? { d: dm.d, m: dm.m, year: dm.year, tag: (e.tipo || e.etiqueta || 'Hito'), text: efmFmtText(e.texto || e.text || '') } : null;
+      return dm ? { d: dm.d, m: dm.m, year: dm.year, tag: (e.tipo || e.etiqueta || 'Hito'), text: efmFmtText(e.texto || e.text || ''), video: String(e.video || e.video_url || e.youtube || e.yt || '').trim() } : null;
     }).filter(x => x && x.text);
   } else {
     manual = EFM_MANUAL;
   }
-  manual.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text }); });
+  manual.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text, video: e.video || '' }); });
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
     const p = j.primer_partido;
@@ -4817,9 +4832,11 @@ function renderEfm() {
   body.innerHTML = list.map(e => {
     const ago = nowY - e.year;
     const tagCls = efmTagClass(e.tag);
+    const vid = e.video ? efmYtId(e.video) : '';
+    const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
-      <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p></div>
+      <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p>${videoBtn}</div>
     </li>`;
   }).join('');
 }
