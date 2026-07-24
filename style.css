@@ -1429,7 +1429,8 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-year { flex: 0 0 74px; text-align: right; font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; line-height: 1; color: var(--accent); }
 .efm-ago { display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 .efm-body { flex: 1; }
-.efm-tag { display: inline-block; margin-bottom: 5px; }
+.efm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.efm-tag { display: inline-block; }
 .efm-tag--debut { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
 .efm-tag--draft { background: color-mix(in srgb, #6366f1 20%, transparent); color: #6366f1; }
 .efm-tag--hito { background: color-mix(in srgb, #eab308 22%, transparent); color: #a16207; }

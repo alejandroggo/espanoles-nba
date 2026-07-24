@@ -4786,12 +4786,12 @@ function efmBuild(data) {
         const eq = p.equipo ? ` con ${efmTeamName(p.equipo)}` : '';
         const riv = p.rival ? ` ante ${efmTeamName(p.rival)}` : '';
         const st = efmDebutStat(p);
-        ev.push({ ...dt, kind: 'debut', tag: 'Debut', html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${eq}${riv}${st ? `, firmando ${st}` : ''}.` });
+        ev.push({ ...dt, kind: 'debut', tag: 'Debut', video: String(p.video || p.video_url || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> debutó en la NBA${eq}${riv}${st ? `, firmando ${st}` : ''}.` });
       }
     }
     if (j.draft && j.draft_fecha) {
       const dt = efmParseShort(j.draft_fecha);
-      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+      if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', video: String(j.draft_video || j.video_draft || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
     }
   });
   // Transacciones (evitando duplicar el draft ya recogido arriba)
@@ -4799,7 +4799,7 @@ function efmBuild(data) {
     const m = String(t.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (!m) return;
     if (/draft/i.test(t.tipo || '') && draftKey.has(drNorm(t.jugador) + '|' + (+m[1]))) return;
-    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, html: efmTransText(t) });
+    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, video: String(t.video || t.video_url || t.youtube || t.yt || '').trim(), html: efmTransText(t) });
   });
   return ev;
 }
@@ -4831,12 +4831,13 @@ function renderEfm() {
   }
   body.innerHTML = list.map(e => {
     const ago = nowY - e.year;
-    const tagCls = efmTagClass(e.tag);
+    const tags = String(e.tag || '').split(/\s*[,/|]\s*/).map(s => s.trim()).filter(Boolean);
+    const tagsHtml = (tags.length ? tags : ['Hito']).map(tg => `<span class="tr-tipo ${efmTagClass(tg)} efm-tag">${tg}</span>`).join(' ');
     const vid = e.video ? efmYtId(e.video) : '';
     const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
-      <div class="efm-body"><span class="tr-tipo ${tagCls} efm-tag">${e.tag}</span><p class="efm-text">${e.html}</p>${videoBtn}</div>
+      <div class="efm-body"><span class="efm-tags">${tagsHtml}</span><p class="efm-text">${e.html}</p>${videoBtn}</div>
     </li>`;
   }).join('');
 }
