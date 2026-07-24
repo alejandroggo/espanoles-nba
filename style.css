@@ -1432,8 +1432,10 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-tag { display: inline-block; margin-bottom: 5px; }
 .efm-tag--debut { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
 .efm-tag--draft { background: color-mix(in srgb, #6366f1 20%, transparent); color: #6366f1; }
+.efm-tag--hito { background: color-mix(in srgb, #eab308 22%, transparent); color: #a16207; }
 :root[data-theme="dark"] .efm-tag--debut { color: #4ade80; }
 :root[data-theme="dark"] .efm-tag--draft { color: #a5b4fc; }
+:root[data-theme="dark"] .efm-tag--hito { color: #fbbf24; }
 .efm-text { margin: 0; line-height: 1.5; font-size: 0.95rem; }
 .efm-text a { color: var(--text); font-weight: 600; }
 .efm-text a:hover { color: var(--accent); }

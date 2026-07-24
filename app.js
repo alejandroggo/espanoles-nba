@@ -4684,9 +4684,20 @@ function efmParseShort(s) {
 }
 function efmTeamName(x) { if (!x) return ''; const c = String(x).toUpperCase(); return TEAM_INFO[c] ? TEAM_INFO[c].name : x; }
 
+// Efemérides añadidas A MANO (hitos, récords, momentos históricos que no salen
+// de los datos automáticos). Formato: { d, m, year, text, tag? }  (tag por defecto: 'Hito')
+// El texto admite HTML (p. ej. <b>…</b>).
+const EFM_MANUAL = [
+  { d: 14, m: 6, year: 2009, text: '<b>Pau Gasol</b> conquista su <b>primer anillo NBA</b> con Los Angeles Lakers (Finales ante Orlando), primer español campeón de la NBA.' },
+  { d: 17, m: 6, year: 2010, text: '<b>Pau Gasol</b> gana su <b>segundo anillo</b> con los Lakers en el séptimo partido de las Finales ante Boston.' },
+  { d: 13, m: 6, year: 2019, text: '<b>Marc Gasol</b> y <b>Serge Ibaka</b> se proclaman campeones con los Toronto Raptors, primer título de la franquicia.' },
+];
+
 function efmBuild(data) {
   const ev = [];
   const draftKey = new Set();
+  // Efemérides manuales
+  EFM_MANUAL.forEach(e => { if (e.d && e.m && e.year) ev.push({ d: e.d, m: e.m, year: e.year, kind: 'hito', tag: e.tag || 'Hito', html: e.text }); });
   // Debuts y drafts (fuente principal del draft, con nº de pick)
   (data.jugadores || []).forEach(j => {
     const p = j.primer_partido;
