@@ -4676,7 +4676,7 @@ function cwSubmit(text) {
 // Cruza transacciones + debuts + drafts por día del año.
 // ══════════════════════════════════════════════
 let efmEvents = [], efmMonth = 1, efmDay = 1, efmToday = { m: 1, d: 1 };
-let efmPlMap = {}, efmDaySet = new Set(), efmCalMonth = null, efmCalOpen = false;
+let efmPlMap = {}, efmDaySet = new Set(), efmCalMonth = null, efmCalOpen = false, efmCurrentList = [];
 
 // Meses en inglés (abreviados) para admitir fechas tipo "10 jan 2015" o "30 april 2010"
 const MESES_EN = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -4822,7 +4822,8 @@ function efmBuild(data) {
     const m = String(t.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (!m) return;
     if (/draft/i.test(t.tipo || '') && draftKey.has(drNorm(t.jugador) + '|' + (+m[1]))) return;
-    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, player: t.jugador || '', video: String(t.video || t.video_url || t.youtube || t.yt || '').trim(), html: efmTransText(t) });
+    ev.push({ m: +m[2], d: +m[3], year: +m[1], kind: 'trans', tag: t.tipo, player: t.jugador || '', video: String(t.video || t.video_url || t.youtube || t.yt || '').trim(), html: efmTransText(t),
+      detail: { jugador: t.jugador || '', fecha: t.fecha || '', tipo: t.tipo || '', equipo1: t.equipo1 || '', equipo2: t.equipo2 || '', otros: t.otros || '', notas: t.notas || '' } });
   });
   return ev;
 }
@@ -4837,6 +4838,48 @@ function efmNextDay() {
 }
 function efmShift(delta) { const dt = new Date(2000, efmMonth - 1, efmDay); dt.setDate(dt.getDate() + delta); efmMonth = dt.getMonth() + 1; efmDay = dt.getDate(); efmCalMonth = efmMonth; renderEfm(); }
 function efmGoto(m, d) { efmMonth = m; efmDay = d; efmCalMonth = m; renderEfm(); }
+
+// Fecha completa "DD de mes de AAAA" a partir de una fecha ISO o texto corto
+function efmFullDate(s) {
+  const iso = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let d;
+  if (iso) d = { d: +iso[3], m: +iso[2], year: +iso[1] };
+  else d = efmParseShort(s);
+  return d ? `${d.d} de ${MESES_LARGOS[d.m - 1]} de ${d.year}` : String(s || '');
+}
+
+// Popup con los detalles completos de una transacción (efeméride)
+function efmShowDetail(i) {
+  const e = efmCurrentList[i];
+  if (!e || !e.detail) return;
+  const d = e.detail;
+  const rows = [];
+  const add = (label, val) => { if (val) rows.push(`<div class="efm-md-row"><span class="efm-md-k">${label}</span><span class="efm-md-v">${val}</span></div>`); };
+  const esTraspaso = /traspas/i.test(d.tipo || '');
+  add('Jugador', d.jugador ? `<b>${plLink(d.jugador, d.jugador)}</b>` : '');
+  add('Fecha', efmFullDate(d.fecha));
+  add('Tipo', d.tipo);
+  add(esTraspaso && d.equipo2 ? 'Desde' : 'Equipo', efmTeamName(d.equipo1));
+  if (d.equipo2) add(esTraspaso ? 'Hacia' : 'Equipo 2', efmTeamName(d.equipo2));
+  add('Otros implicados', d.otros);
+  add('Notas', d.notas);
+
+  const modal = document.createElement('div');
+  modal.className = 'efm-modal';
+  modal.innerHTML = `
+    <div class="efm-modal-box" role="dialog" aria-modal="true" aria-label="Detalles de la transacción">
+      <button type="button" class="efm-modal-close" aria-label="Cerrar">×</button>
+      <div class="efm-modal-head"><span class="tr-tipo ${efmTagClass(e.tag)}">${e.tag}</span><span class="efm-modal-year">${e.year}</span></div>
+      <p class="efm-modal-title">${e.html}</p>
+      <div class="efm-md-rows">${rows.join('')}</div>
+    </div>`;
+  document.body.appendChild(modal);
+  const close = () => { modal.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = ev => { if (ev.key === 'Escape') close(); };
+  modal.addEventListener('click', ev => { if (ev.target === modal) close(); });
+  modal.querySelector('.efm-modal-close').addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
+}
 
 // Foto (enlazada) del jugador de una efeméride; cae a iniciales si no hay foto
 function efmPhoto(name) {
@@ -4897,17 +4940,20 @@ function renderEfm() {
     body.innerHTML = `<li class="efm-empty">No hay efemérides registradas el <b>${fecha}</b>.${next ? ` <button type="button" class="toggle-chip" onclick="efmGoto(${next.m},${next.d})">Ir al ${next.d} de ${MESES_LARGOS[next.m - 1]} →</button>` : ''}</li>`;
     return;
   }
-  body.innerHTML = list.map(e => {
+  efmCurrentList = list;
+  body.innerHTML = list.map((e, i) => {
     const ago = nowY - e.year;
     const tags = String(e.tag || '').split(/\s*[,/|]\s*/).map(s => s.trim()).filter(Boolean);
     const tagsHtml = (tags.length ? tags : ['Hito']).map(tg => `<span class="tr-tipo ${efmTagClass(tg)} efm-tag">${tg}</span>`).join(' ');
     const vid = e.video ? efmYtId(e.video) : '';
     const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
+    const detailBtn = e.detail ? `<button type="button" class="efm-detail-btn" onclick="efmShowDetail(${i})">Ver detalles</button>` : '';
+    const acts = (videoBtn || detailBtn) ? `<div class="efm-acts">${videoBtn}${detailBtn}</div>` : '';
     const photo = efmPhoto(e.player);
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
       ${photo}
-      <div class="efm-body"><span class="efm-tags">${tagsHtml}</span><p class="efm-text">${e.html}</p>${videoBtn}</div>
+      <div class="efm-body"><span class="efm-tags">${tagsHtml}</span><p class="efm-text">${e.html}</p>${acts}</div>
     </li>`;
   }).join('');
 }
