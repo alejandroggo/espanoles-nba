@@ -3046,9 +3046,13 @@ function renderTimeline() {
       const teams = p.seasons[c];
       if (!teams || !teams.length) { cells.push(`<td class="tl-empty" data-c0="${i}" data-c1="${i}"></td>`); i++; continue; }
       if (teams.length > 1) {
-        const segs = teams.map(tm => {
+        // Si el primer/último segmento continúa la barra vecina del mismo equipo, no repetimos
+        // el código (la barra grande de al lado ya lo etiqueta); solo queda el color, que enlaza.
+        const cL = connL(c), cR = connR(c);
+        const segs = teams.map((tm, si) => {
           const info = teamInfo(tm);
-          return `<span class="tl-seg" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}">${tm}</span>`;
+          const cont = (si === 0 && cL) || (si === teams.length - 1 && cR);
+          return `<span class="tl-seg${cont ? ' tl-seg-cont' : ''}" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}">${cont ? '' : tm}</span>`;
         }).join('');
         // El anillo se centra en el año (no en el segmento) para alinearlo con otros campeones del mismo año
         const ringHtml = p.rings[c] ? `<span class="tl-ring" style="left:50%">🏆</span>` : '';
