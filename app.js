@@ -1785,6 +1785,7 @@ function statBox(label, val) {
   return `<div class="stat-box"><div class="stat-box-val">${val}</div><div class="stat-box-lbl">${label}</div></div>`;
 }
 
+let jugAll = [], jugEvents = [];
 async function initJugadorPage() {
   const id = new URLSearchParams(location.search).get('id');
   const el = document.getElementById('jug-content');
@@ -1796,6 +1797,10 @@ async function initJugadorPage() {
   if (!j) { el.innerHTML = '<p class="td-muted" style="padding:2rem">Jugador no encontrado.</p>'; return; }
   document.title = `${j.nombre} · Españoles en la NBA`;
 
+  buildPlayerIds(data.jugadores);
+  jugAll = data.jugadores || [];
+  jugEvents = efmBuild(data);
+
   const n = drNorm(j.nombre);
   const dorsales = (data.dorsales || []).filter(d => drNorm(d.jugador) === n);
   const sl = (data.summer_league || []).filter(s => drNorm(s.jugador) === n);
@@ -1806,7 +1811,9 @@ async function initJugadorPage() {
   el.innerHTML = [
     jugHeader(j),
     jugCrossLinks(j, trans),
+    jugRankings(j),
     jugStats(j),
+    jugDebut(j),
     jugGameHighs(j),
     jugTemporadas(j),
     jugPlayoffs(j),
@@ -1815,6 +1822,7 @@ async function initJugadorPage() {
     jugSalario(j),
     jugDorsalesSec(dorsales),
     jugSummer(sl),
+    jugEfemerides(j),
     jugTransSec(trans),
   ].filter(Boolean).join('');
 }
@@ -1909,6 +1917,64 @@ function jugGameHighs(j) {
   ].filter(([, v]) => v != null).map(([l, v]) => statBox(l, fmtEnt(v))).join('');
   if (!boxes) return '';
   return jugSection('Máximos en un partido', `<div class="stat-grid">${boxes}</div>`);
+}
+
+// Tarjeta del debut en la NBA (box score del primer partido)
+function jugDebut(j) {
+  const p = j.primer_partido;
+  if (!p || !p.fecha) return '';
+  const rl = String(p.resultado).toLowerCase();
+  const resHtml = rl === 'true' ? '<span class="jug-debut-res win">Victoria</span>'
+    : rl === 'false' ? '<span class="jug-debut-res loss">Derrota</span>' : '';
+  const vs = `${teamInfo(p.equipo).name}${p.rival ? ` vs ${teamInfo(p.rival).name}` : ''}`;
+  const boxes = [
+    ['MIN', p.min], ['PTS', p.pts], ['REB', p.rbd], ['AST', p.ast], ['ROB', p.stl], ['TAP', p.blk],
+    ['TC', (p.fgm != null && p.fga != null) ? `${p.fgm}/${p.fga}` : null],
+    ['T3', (p.tres_m != null && p.tres_a != null) ? `${p.tres_m}/${p.tres_a}` : null],
+    ['TL', (p.ftm != null && p.fta != null) ? `${p.ftm}/${p.fta}` : null],
+    ['TOV', p.tov], ['PF', p.pf],
+  ].filter(([, v]) => v != null && v !== '').map(([l, v]) => statBox(l, v)).join('');
+  const meta = `<div class="jug-debut-meta"><b>${vs}</b>${resHtml}<span class="jug-debut-sub">${p.fecha}${p.edad != null ? ` · ${Math.floor(p.edad)} años` : ''}</span></div>`;
+  return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>`);
+}
+
+// Puesto histórico del jugador entre todos los españoles (por totales de carrera)
+function jugRankings(j) {
+  if (!jugAll.length || !(j.partidos > 0)) return '';
+  const cats = [
+    ['pts_total', 'puntos'], ['rbd_total', 'rebotes'], ['ast_total', 'asistencias'],
+    ['blk_total', 'tapones'], ['stl_total', 'robos'], ['tres_total', 'triples'],
+  ];
+  const chips = cats.map(([key, label]) => {
+    if (!(j[key] > 0)) return '';
+    const ranked = jugAll.filter(p => (p[key] || 0) > 0).sort((a, b) => (b[key] || 0) - (a[key] || 0));
+    const rank = ranked.findIndex(p => p.id === j.id) + 1;
+    if (rank < 1) return '';
+    return `<span class="jug-rank-chip${rank <= 3 ? ' top' : ''}"><b>${rank}.º</b> en ${label}</span>`;
+  }).filter(Boolean).join('');
+  if (!chips) return '';
+  return jugSection('Entre los españoles',
+    `<div class="jug-ranks">${chips}</div>
+     <p class="jug-rank-note">Puesto histórico entre los ${jugAll.length} españoles que han jugado en la NBA, por totales de carrera.</p>`);
+}
+
+// Efemérides del jugador (debut, draft, fichajes, hitos) enlazando a la página de Efemérides
+function jugEfemerides(j) {
+  const evs = jugEvents.filter(e => drNorm(e.player || '') === drNorm(j.nombre));
+  if (!evs.length) return '';
+  evs.sort((a, b) => a.year - b.year || a.m - b.m || a.d - b.d);
+  const items = evs.map(e => {
+    const tags = String(e.tag || '').split(/\s*[,/|]\s*/).map(s => s.trim()).filter(Boolean);
+    const tagsHtml = (tags.length ? tags : ['Hito']).map(t => `<span class="tr-tipo ${efmTagClass(t)} efm-tag">${t}</span>`).join(' ');
+    // En su propia ficha quitamos el nombre del jugador (redundante) y ponemos la frase en mayúscula
+    let txt = e.html.replace(/^<b>[\s\S]*?<\/b>\s*/, '');
+    txt = txt ? txt.charAt(0).toUpperCase() + txt.slice(1) : e.html;
+    return `<li class="jug-efm-item">
+      <a class="jug-efm-date" href="efemerides.html?m=${e.m}&d=${e.d}">${e.d} ${MESES[e.m - 1]} ${e.year}</a>
+      <div class="jug-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="jug-efm-txt">${txt}</span></div>
+    </li>`;
+  }).join('');
+  return jugSection('Efemérides', `<ul class="jug-efm-list">${items}</ul>`);
 }
 
 let jugSeasonJ = null, jugSeasonMode = 'pg';
@@ -5061,8 +5127,12 @@ async function initEfemeridesPage() {
   buildPlayerIds(data.jugadores);
   efmEvents = efmBuild(data);
   const now = new Date();
-  efmMonth = now.getMonth() + 1; efmDay = now.getDate();
-  efmToday = { m: efmMonth, d: efmDay };
+  efmToday = { m: now.getMonth() + 1, d: now.getDate() };
+  // Fecha inicial: parámetros ?m=&d= (enlaces desde el perfil) o el día de hoy
+  const params = new URLSearchParams(location.search);
+  const pm = +params.get('m'), pd = +params.get('d');
+  if (pm >= 1 && pm <= 12 && pd >= 1 && pd <= 31) { efmMonth = pm; efmDay = pd; }
+  else { efmMonth = efmToday.m; efmDay = efmToday.d; }
   efmCalMonth = efmMonth;
   efmDaySet = new Set(efmEvents.map(e => e.m + '-' + e.d));
   document.getElementById('hero-sub').textContent = `Un día como hoy en la historia de los españoles en la NBA · ${efmEvents.length} efemérides en ${efmDaySet.size} días`;

@@ -887,6 +887,36 @@ body.drawer-lock { overflow: hidden; }
 .jug-section { margin-top: var(--space-8); }
 .jug-subh { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: var(--space-4) 0 var(--space-2); }
 
+/* Debut NBA */
+.jug-debut-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); font-size: 0.95rem; }
+.jug-debut-sub { color: var(--text-muted); font-size: var(--font-sm); }
+.jug-debut-res { font-size: var(--font-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: var(--radius-full); }
+.jug-debut-res.win { background: color-mix(in srgb, #22c55e 18%, transparent); color: #16a34a; }
+.jug-debut-res.loss { background: color-mix(in srgb, #e11d48 16%, transparent); color: #be123c; }
+:root[data-theme="dark"] .jug-debut-res.win { color: #4ade80; }
+:root[data-theme="dark"] .jug-debut-res.loss { color: #fb7185; }
+
+/* Rankings entre españoles */
+.jug-ranks { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.jug-rank-chip { font-size: var(--font-sm); padding: var(--space-1) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-full); color: var(--text); background: var(--surface); }
+.jug-rank-chip b { color: var(--text); }
+.jug-rank-chip.top { border-color: var(--accent); background: var(--accent-light); }
+.jug-rank-chip.top b { color: var(--accent); }
+.jug-rank-note { font-size: var(--font-xs); color: var(--text-muted); margin: var(--space-2) 0 0; }
+
+/* Efemérides del jugador */
+.jug-efm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.jug-efm-item { display: flex; gap: var(--space-3); align-items: baseline; padding: var(--space-2) 0; border-top: 1px solid var(--border); }
+.jug-efm-item:first-child { border-top: 0; }
+.jug-efm-date { flex: 0 0 118px; font-size: var(--font-sm); font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.jug-efm-date:hover { text-decoration: underline; }
+.jug-efm-body { flex: 1; }
+.jug-efm-txt { display: block; margin-top: 3px; line-height: 1.45; font-size: 0.92rem; }
+@media (max-width: 560px) {
+  .jug-efm-item { flex-direction: column; gap: 4px; }
+  .jug-efm-date { flex-basis: auto; }
+}
+
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-2); }
 .stat-grid--money { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 .stat-grid--money .stat-box-val { font-size: 1.6rem; white-space: nowrap; }
