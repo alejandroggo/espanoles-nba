@@ -37,7 +37,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=107">
+<link rel="stylesheet" href="style.css?v=108">
 </head>
 <body>
 
@@ -74,13 +74,19 @@
       <span class="sr-only">Filtrar por temporada</span>
       <select id="tmp-year" class="sel"></select>
     </label>
-    <div class="mode-switch" role="group" aria-label="Temporada regular o playoffs">
-      <button type="button" id="tmp-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setTmpDim('reg')">Temporada regular</button>
-      <button type="button" id="tmp-dim-po" class="toggle-chip" aria-pressed="false" onclick="setTmpDim('po')">Playoffs</button>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Competición</span>
+      <div class="seg" role="group" aria-label="Temporada regular o playoffs">
+        <button type="button" id="tmp-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setTmpDim('reg')">Temporada regular</button>
+        <button type="button" id="tmp-dim-po" class="toggle-chip" aria-pressed="false" onclick="setTmpDim('po')">Playoffs</button>
+      </div>
     </div>
-    <div class="mode-switch" role="group" aria-label="Totales o por partido">
-      <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
-      <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Datos</span>
+      <div class="seg" role="group" aria-label="Totales o por partido">
+        <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
+        <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
+      </div>
     </div>
     <button type="button" id="tmp-hide" class="toggle-chip" aria-pressed="false" onclick="toggleTmpPartials()">Ocultar parciales</button>
     <span class="results-count" id="tmp-count"></span>
@@ -123,7 +129,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=107"></script>
+<script src="app.js?v=108"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
