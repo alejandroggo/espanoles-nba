@@ -1491,7 +1491,7 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 .efm-arrow { width: 40px; height: 40px; flex: 0 0 40px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 50%; font-size: 1.3rem; line-height: 1; cursor: pointer; }
 .efm-arrow:hover { border-color: var(--accent); color: var(--accent); }
 .efm-datewrap { flex: 1; text-align: center; }
-.efm-date { display: block; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.5rem; color: var(--text); }
+.efm-date { display: block; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.5rem; color: var(--text); white-space: nowrap; }
 .efm-count { font-size: 0.8rem; color: var(--text-muted); }
 .efm-hoy { flex: 0 0 auto; }
 .efm-cal-btn { flex: 0 0 auto; }
@@ -1579,7 +1579,7 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
   .efm-photo { flex-basis: 38px; }
   .efm-photo-img { width: 38px; height: 38px; }
   .efm-date { font-size: 1.25rem; }
-  .efm-nav { flex-wrap: wrap; }
+  .efm-nav { flex-wrap: wrap; justify-content: center; row-gap: var(--space-2); }
 }
 
 /* ── PÁGINA QUINTETO IDEAL ────────────────────────────── */
