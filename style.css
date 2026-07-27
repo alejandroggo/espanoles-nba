@@ -381,6 +381,20 @@ main { flex: 1; }
 .seg .toggle-chip:hover { border-color: transparent; background: color-mix(in srgb, var(--text-muted) 14%, transparent); color: var(--text); }
 .seg .toggle-chip.active { border-color: transparent; background: var(--accent); color: var(--accent-contrast); }
 .seg .toggle-chip.active:hover { background: var(--accent); }
+
+/* Constructor de filtros avanzados (Temporadas) */
+.tmp-filterbar { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.tmp-filter { display: inline-flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 2px 3px 2px 5px; }
+.tmp-filter select, .tmp-filter input { border: 0; background: transparent; font-family: inherit; font-size: var(--font-sm); color: var(--text); padding: 5px 4px; min-height: 30px; outline: none; }
+.tmp-filter select { cursor: pointer; }
+.tmp-f-col { font-weight: 600; }
+.tmp-f-op { text-align: center; }
+.tmp-f-val { width: 82px; border-left: 1px solid var(--border) !important; margin-left: 2px; }
+.tmp-f-val::placeholder { color: var(--text-muted); }
+.tmp-f-del { border: 0; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 1.15rem; line-height: 1; padding: 0 5px; }
+.tmp-f-del:hover { color: var(--accent); }
+.tmp-add-filter { display: inline-flex; align-items: center; gap: 6px; }
+.tmp-add-ico { font-size: 0.7rem; }
 .results-count { margin-left: auto; font-size: var(--font-sm); color: var(--text-muted); }
 td.td-hl { color: var(--text); font-weight: 600; background: rgba(200, 16, 46, 0.05); }
 .stat-rank { font-size: 0.62rem; color: var(--text-muted); font-variant-numeric: tabular-nums; margin-left: 3px; }

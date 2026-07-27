@@ -3560,6 +3560,7 @@ let tmpRows = [], tmpMode = 'total', tmpDim = 'reg';
 let tmpRowsReg = [], tmpRowsPo = [];
 let tmpSortCol = 'year', tmpSortAsc = false;
 let tmpFilterTeam = '', tmpFilterYear = '', tmpSearch = '', tmpHidePartials = false;
+let tmpFilters = []; // filtros avanzados: [{ col, op, value }]
 
 // Estadísticas por partido; en 'total' se multiplican por los partidos (salvo
 // TD, que ya es un conteo de temporada). Los porcentajes solo en 'por partido'.
@@ -3582,6 +3583,93 @@ function tmpStatCols() {
   if (tmpMode === 'total') cols.push({ key: 'td', label: 'TD', val: r => r.t.td != null ? r.t.td : null, fmt: fmtEnt });
   else TMP_PCT.forEach(c => cols.push({ key: c.key, label: c.label, val: r => r.t[c.key] != null ? r.t[c.key] : null, fmt: fmtPct }));
   return cols;
+}
+
+// ── Filtros avanzados (constructor de condiciones) ──
+// Columnas filtrables (los per-game se ajustan al modo Totales/Por partido).
+function tmpFilterCols() {
+  const perg = key => r => { const v = r.t[key]; if (v == null) return null; return tmpMode === 'total' ? (r.g ? v * r.g : null) : v; };
+  const pct = key => r => r.t[key] != null ? r.t[key] * 100 : null;
+  return [
+    { key: 'jugador', label: 'Jugador', type: 'text', val: r => r.jugador },
+    { key: 'year', label: 'Año', type: 'num', val: r => r.year },
+    { key: 'team', label: 'Equipo', type: 'text', val: r => r.team },
+    { key: 'g', label: 'GP', type: 'num', val: r => r.g },
+    { key: 'min_g', label: 'MIN', type: 'num', val: perg('min_g') },
+    { key: 'pts_g', label: 'PTS', type: 'num', val: perg('pts_g') },
+    { key: 'rbd_g', label: 'REB', type: 'num', val: perg('rbd_g') },
+    { key: 'ast_g', label: 'AST', type: 'num', val: perg('ast_g') },
+    { key: 'stl_g', label: 'ROB', type: 'num', val: perg('stl_g') },
+    { key: 'blk_g', label: 'TAP', type: 'num', val: perg('blk_g') },
+    { key: 'fgm_g', label: 'FGM', type: 'num', val: perg('fgm_g') },
+    { key: 'tres_g', label: '3PM', type: 'num', val: perg('tres_g') },
+    { key: 'ftm_g', label: 'FTM', type: 'num', val: perg('ftm_g') },
+    { key: 'tov_g', label: 'TOV', type: 'num', val: perg('tov_g') },
+    { key: 'pf_g', label: 'PF', type: 'num', val: perg('pf_g') },
+    { key: 'td', label: 'TD', type: 'num', val: r => r.t.td },
+    { key: 'fg_pct', label: 'FG%', type: 'num', val: pct('fg_pct') },
+    { key: 'tres_pct', label: '3P%', type: 'num', val: pct('tres_pct') },
+    { key: 'ft_pct', label: 'FT%', type: 'num', val: pct('ft_pct') },
+  ];
+}
+const TMP_OPS_NUM = [['>', '>'], ['>=', '≥'], ['<', '<'], ['<=', '≤'], ['=', '='], ['!=', '≠']];
+const TMP_OPS_TXT = [['contiene', 'contiene'], ['=', 'es'], ['!=', 'no es']];
+
+function tmpApplyFilters(rows) {
+  const active = tmpFilters.filter(f => f.value !== '' && f.value != null);
+  if (!active.length) return rows;
+  const colMap = {}; tmpFilterCols().forEach(c => colMap[c.key] = c);
+  return rows.filter(r => active.every(f => {
+    const col = colMap[f.col];
+    if (!col) return true;
+    const v = col.val(r);
+    if (col.type === 'text') {
+      const s = String(v || '').toLowerCase(), q = String(f.value).toLowerCase();
+      if (f.op === '=') return s === q;
+      if (f.op === '!=') return s !== q;
+      return s.includes(q);
+    }
+    if (v == null) return false;
+    const n = parseFloat(String(f.value).replace(',', '.'));
+    if (isNaN(n)) return true;
+    switch (f.op) {
+      case '>': return v > n; case '>=': return v >= n;
+      case '<': return v < n; case '<=': return v <= n;
+      case '=': return Math.abs(v - n) < 1e-9; case '!=': return Math.abs(v - n) >= 1e-9;
+    }
+    return true;
+  }));
+}
+
+function tmpAddFilter() { tmpFilters.push({ col: 'pts_g', op: '>', value: '' }); renderTmpFilters(); }
+function tmpDelFilter(i) { tmpFilters.splice(i, 1); renderTmpFilters(); renderTmpTable(); }
+function tmpSetFilterCol(i, key) {
+  const col = tmpFilterCols().find(c => c.key === key);
+  tmpFilters[i].col = key;
+  const validOps = (col && col.type === 'text' ? TMP_OPS_TXT : TMP_OPS_NUM).map(o => o[0]);
+  if (!validOps.includes(tmpFilters[i].op)) tmpFilters[i].op = validOps[0];
+  renderTmpFilters(); renderTmpTable();
+}
+function tmpSetFilterOp(i, op) { tmpFilters[i].op = op; renderTmpTable(); }
+function tmpSetFilterVal(i, v) { tmpFilters[i].value = v; renderTmpTable(); }
+
+function renderTmpFilters() {
+  const wrap = document.getElementById('tmp-filterbar');
+  if (!wrap) return;
+  const cols = tmpFilterCols();
+  const rowsHtml = tmpFilters.map((f, i) => {
+    const col = cols.find(c => c.key === f.col) || cols[0];
+    const ops = col.type === 'text' ? TMP_OPS_TXT : TMP_OPS_NUM;
+    const colOpts = cols.map(c => `<option value="${c.key}"${c.key === f.col ? ' selected' : ''}>${c.label}</option>`).join('');
+    const opOpts = ops.map(o => `<option value="${o[0]}"${o[0] === f.op ? ' selected' : ''}>${o[1]}</option>`).join('');
+    return `<div class="tmp-filter">
+      <select class="tmp-f-col" aria-label="Columna" onchange="tmpSetFilterCol(${i}, this.value)">${colOpts}</select>
+      <select class="tmp-f-op" aria-label="Operador" onchange="tmpSetFilterOp(${i}, this.value)">${opOpts}</select>
+      <input class="tmp-f-val" aria-label="Valor" placeholder="Valor" value="${String(f.value).replace(/"/g, '&quot;')}" oninput="tmpSetFilterVal(${i}, this.value)">
+      <button type="button" class="tmp-f-del" aria-label="Quitar filtro" onclick="tmpDelFilter(${i})">×</button>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = `${rowsHtml}<button type="button" class="toggle-chip tmp-add-filter" onclick="tmpAddFilter()"><span class="tmp-add-ico">▼</span> Añadir filtro</button>`;
 }
 
 // ¿El jugador fue cortado (waived) a mitad de esa temporada? (lista de la Línea temporal)
@@ -3650,6 +3738,9 @@ function renderTmpTable() {
     (!tmpFilterTeam || r.teamCode === tmpFilterTeam) &&
     (!tmpFilterYear || r.year === +tmpFilterYear) &&
     !(tmpHidePartials && r.kind === 'partial'));
+  const beforeAdv = rows.length;
+  rows = tmpApplyFilters(rows);
+  const advFilteredOut = beforeAdv - rows.length;
 
   const dir = tmpSortAsc ? 1 : -1;
   rows.sort((a, b) => {
@@ -3661,7 +3752,7 @@ function renderTmpTable() {
     return (b.year - a.year) || a.jugador.localeCompare(b.jugador, 'es') || (a.seq - b.seq); // desempate: total antes que parciales
   });
 
-  document.getElementById('tmp-count').textContent = `${rows.length} fila${rows.length === 1 ? '' : 's'}`;
+  document.getElementById('tmp-count').textContent = `${rows.length} fila${rows.length === 1 ? '' : 's'}${advFilteredOut > 0 ? ` · ${advFilteredOut} filtrada${advFilteredOut === 1 ? '' : 's'}` : ''}`;
 
   // Mejor valor de cada estadística entre las temporadas completas visibles
   // (se excluyen los tramos parciales para no comparar fragmentos con años enteros)
@@ -3821,6 +3912,7 @@ async function initTemporadasPage() {
   const tmpQ = new URLSearchParams(location.search).get('q');
   if (tmpQ) { tmpSearch = tmpQ.trim().toLowerCase(); document.getElementById('tmp-search').value = tmpQ; }
 
+  renderTmpFilters();
   renderTmpTable();
 }
 
