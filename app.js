@@ -1938,24 +1938,44 @@ function jugDebut(j) {
   return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>`);
 }
 
-// Puesto histórico del jugador entre todos los españoles (por totales de carrera)
+// Puesto histórico del jugador entre los españoles que han debutado en la NBA.
+// Fijas: puntos, rebotes y asistencias. Más las dos categorías donde mejor clasificado esté.
 function jugRankings(j) {
-  if (!jugAll.length || !(j.partidos > 0)) return '';
-  const cats = [
-    ['pts_total', 'puntos'], ['rbd_total', 'rebotes'], ['ast_total', 'asistencias'],
-    ['blk_total', 'tapones'], ['stl_total', 'robos'], ['tres_total', 'triples'],
+  const pool = jugAll.filter(p => p.partidos > 0);
+  if (!(j.partidos > 0) || !pool.length) return '';
+  const N = pool.length;
+  // Ranking de competición: nº de jugadores con valor estrictamente mayor + 1
+  const rankIn = (subpool, key) => {
+    const jv = j[key];
+    if (jv == null) return null;
+    if (!subpool.some(p => p.id === j.id)) return null;
+    return subpool.filter(p => p[key] != null && p[key] > jv).length + 1;
+  };
+  const rankTot = key => (j[key] > 0 ? rankIn(pool, key) : null);
+  // Los porcentajes solo se rankean con un mínimo de partidos (evita cifras engañosas con pocas muestras)
+  const pctPool = pool.filter(p => p.partidos >= 20 && p.fg_pct != null);
+  const rankPct = key => (j.partidos >= 20 && j[key] != null ? rankIn(pctPool, key) : null);
+  const chip = (rank, label) => rank ? `<span class="jug-rank-chip${rank <= 3 ? ' top' : ''}"><b>#${rank}</b> en ${label}</span>` : '';
+
+  const fijas = [chip(rankTot('pts_total'), 'puntos'), chip(rankTot('rbd_total'), 'rebotes'), chip(rankTot('ast_total'), 'asistencias')];
+
+  const cands = [
+    { rank: rankTot('blk_total'), label: 'tapones' },
+    { rank: rankTot('stl_total'), label: 'robos' },
+    { rank: rankTot('tres_total'), label: 'triples' },
+    { rank: rankPct('tres_pct'), label: '% de triple' },
+    { rank: rankPct('fg_pct'), label: '% de tiro' },
+    { rank: rankPct('ft_pct'), label: '% en tiros libres' },
   ];
-  const chips = cats.map(([key, label]) => {
-    if (!(j[key] > 0)) return '';
-    const ranked = jugAll.filter(p => (p[key] || 0) > 0).sort((a, b) => (b[key] || 0) - (a[key] || 0));
-    const rank = ranked.findIndex(p => p.id === j.id) + 1;
-    if (rank < 1) return '';
-    return `<span class="jug-rank-chip${rank <= 3 ? ' top' : ''}"><b>${rank}.º</b> en ${label}</span>`;
-  }).filter(Boolean).join('');
+  const extras = cands.map((c, i) => (c.rank ? { ...c, pri: i } : null)).filter(Boolean)
+    .sort((a, b) => a.rank - b.rank || a.pri - b.pri).slice(0, 2)
+    .map(c => chip(c.rank, c.label));
+
+  const chips = [...fijas, ...extras].filter(Boolean).join('');
   if (!chips) return '';
   return jugSection('Entre los españoles',
     `<div class="jug-ranks">${chips}</div>
-     <p class="jug-rank-note">Puesto histórico entre los ${jugAll.length} españoles que han jugado en la NBA, por totales de carrera.</p>`);
+     <p class="jug-rank-note">Puesto histórico entre los ${N} españoles que han debutado en la NBA.</p>`);
 }
 
 // Efemérides del jugador (debut, draft, fichajes, hitos) enlazando a la página de Efemérides
