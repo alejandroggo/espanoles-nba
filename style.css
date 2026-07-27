@@ -1115,7 +1115,11 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .poeq-player { display: inline-flex; align-items: center; gap: var(--space-2); }
 #poeq-tbody tr { height: 40px; }
 #poeq-tbody tr:nth-child(even) .poeq-name { background: var(--surface-2); }
-#poeq-tbody tr:hover td, #poeq-tbody tr:hover .poeq-name { outline: 1px solid var(--accent); outline-offset: -1px; }
+/* Al pasar por una fila se resaltan solo las casillas con partidos (no las 30 vacías) */
+#poeq-tbody tr:hover .poeq-name,
+#poeq-tbody tr:hover .poeq-cell:not(.poeq-zero),
+#poeq-tbody tr:hover .poeq-tot,
+#poeq-tbody tr:hover .poeq-pct { outline: 1px solid var(--accent); outline-offset: -1px; }
 .poeq-cell { text-align: center; font-size: var(--font-sm); color: var(--text); border-right: 1px solid var(--border); }
 .poeq-cell.poeq-zero { background: transparent; }
 .poeq-tot { text-align: center; font-weight: 700; padding: 0 var(--space-2) !important; background: var(--surface-2); }
