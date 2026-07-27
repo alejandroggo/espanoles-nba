@@ -651,6 +651,22 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .ag-footer-meta { text-align: left; }
 }
 
+/* Cabecera compacta en móvil: cabe logo + Secciones + tema sin scroll horizontal */
+@media (max-width: 600px) {
+  .logo { font-size: 1.05rem; letter-spacing: 0.03em; }
+  .header-inner { gap: var(--space-3); }
+  .header-right { gap: var(--space-2); }
+  .hsearch { display: none; }            /* buscador global: se usa el de cada página */
+  #share-btn { display: none; }          /* compartir: se usa el del navegador */
+  .tt-lbl { display: none; }             /* tema: solo icono */
+  .theme-toggle { padding: var(--space-1) var(--space-2); }
+}
+@media (max-width: 380px) {
+  .logo { font-size: 0.95rem; }
+  .nav-toggle { font-size: 0; padding: var(--space-1) var(--space-2); }  /* solo la flecha ▾ */
+  .nav-toggle::after { content: '☰'; font-size: 1rem; }
+}
+
 /* ── DORSALES ────────────────────────────────── */
 .kpi-sub { font-size: 0.9rem; color: var(--text-muted); }
 
