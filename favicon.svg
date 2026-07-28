@@ -10,10 +10,6 @@
     <!-- Costuras del balón -->
     <g fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round">
       <line x1="3" y1="50" x2="97" y2="50"/>
-      <path d="M11 31 Q50 22 89 31"/>
-      <path d="M5 41 Q50 35 95 41"/>
-      <path d="M5 59 Q50 65 95 59"/>
-      <path d="M11 69 Q50 78 89 69"/>
     </g>
   </g>
   <!-- Borde del balón -->
