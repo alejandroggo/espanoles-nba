@@ -10,7 +10,7 @@ function initTheme() {
   buildNav();
   buildHeaderSearch();
   buildShareButton();
-  buildChatWidget();
+  // buildChatWidget();   // Pregúntame oculto por ahora
   buildCookieBanner();
   showLoadBar();
 }
@@ -126,10 +126,12 @@ function hsClose() {
 // ── NAVEGACIÓN GLOBAL ─────────────────────────
 const NAV_LINKS = [
   ['Inicio', 'index.html'], ['Jugadores', 'jugadores.html'], ['Draft', 'draft.html'],
-  ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Career Highs', 'career-highs.html'],
-  ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'], ['Salarios', 'salarios.html'],
-  ['Summer League', 'summer-league.html'], ['Dorsales', 'dorsales.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Temporadas', 'temporadas.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Efemérides', 'efemerides.html'], ['Quinteto', 'quinteto.html'], ['Pregúntame', 'preguntas.html'], ['Test', 'test.html'],
+  ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Temporadas', 'temporadas.html'],
+  ['Career Highs', 'career-highs.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
+  ['Salarios', 'salarios.html'], ['Dorsales', 'dorsales.html'], ['Summer League', 'summer-league.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'],
+  ['Efemérides', 'efemerides.html'], ['Quinteto', 'quinteto.html'], ['Test', 'test.html'],
+  // ['Pregúntame', 'preguntas.html'],   // oculto por ahora
 ];
 function buildNav() {
   const right = document.querySelector('.header-right');
