@@ -555,7 +555,7 @@ function renderSalariosTable() {
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
       <td class="td-num${maxSpj && j.sueldo_pj === maxSpj ? ' td-leader' : ''}">${fmtDinero(j.sueldo_pj)}</td>
       <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
-      <td class="td-muted">${j.equipos_nba || '—'}</td>
+      <td class="td-muted td-equipos">${j.equipos_nba || '—'}</td>
     </tr>`).join('');
 
   // Pie: totales
@@ -1552,6 +1552,11 @@ function teamAbbr(name) {
   if (s.length <= 4) return s.toUpperCase();          // ya es un código (MEM, POR…)
   return TEAM_ABBR[drNorm(s)] || s;                    // desconocido → nombre completo
 }
+// Celda de equipo: nombre completo (escritorio) + abreviatura (móvil, vía CSS)
+function trTeamCell(name) {
+  if (!name) return '—';
+  return `<span class="team-full">${name}</span><span class="team-abbr">${teamAbbr(name)}</span>`;
+}
 
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const MESES_LARGOS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -1678,8 +1683,8 @@ function renderTrTable() {
       <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
       <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, t.jugador)}</td>
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
-      <td class="td-center">${t.equipo1 || '—'}</td>
-      <td class="td-center">${t.equipo2 || '—'}</td>
+      <td class="td-center">${trTeamCell(t.equipo1)}</td>
+      <td class="td-center">${trTeamCell(t.equipo2)}</td>
       <td class="td-center td-muted">${trContrato(t) || '—'}</td>
       <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
@@ -2164,7 +2169,7 @@ function jugTransSec(trans) {
       onclick="openTrDrawer('${t._id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
     <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
     <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
-    <td class="td-center">${t.equipo1 || '—'}</td><td class="td-center">${t.equipo2 || '—'}</td>
+    <td class="td-center">${trTeamCell(t.equipo1)}</td><td class="td-center">${trTeamCell(t.equipo2)}</td>
     <td class="td-chevron" aria-hidden="true">›</td>
   </tr>`).join('');
   return jugSection('Transacciones',
@@ -2965,12 +2970,18 @@ function tlClearCol() {
   const t = document.getElementById('tl-table');
   if (t) t.querySelectorAll('.tl-colhl').forEach(el => el.classList.remove('tl-colhl'));
 }
+// Elegir una temporada: resalta a los que jugaron ese año y atenúa al resto (clic de nuevo = quitar)
+function tlSelectYear(year) {
+  tlSelYear = (tlSelYear === year) ? null : year;
+  renderTimeline();
+}
 
 let tlPlayers = [];
 let tlAxis = [];
 let tlSortMode = 'debut';
 let tlYearFrom = null;
 let tlYearTo = null;
+let tlSelYear = null;   // temporada elegida (clic en la cabecera de año) → resalta activos ese año
 
 async function initLineaTemporalPage() {
   let data;
@@ -3113,7 +3124,7 @@ function renderTimeline() {
   // Cabecera
   const headCells = axis.map((c, idx) => (typeof c === 'object')
     ? `<th class="tl-break">${tlYY(c.brk[0])}–${tlYY(c.brk[1])}</th>`
-    : `<th class="tl-year" data-idx="${idx}" onmouseenter="tlHighlightCol(${idx})" onmouseleave="tlClearCol()">${tlYY(c)}</th>`).join('');
+    : `<th class="tl-year${c === tlSelYear ? ' tl-year-sel' : ''}" data-idx="${idx}" onmouseenter="tlHighlightCol(${idx})" onmouseleave="tlClearCol()" onclick="tlSelectYear(${c})" title="${drSeason(c)} · clic para resaltar quién jugó">${tlYY(c)}</th>`).join('');
   document.getElementById('tl-thead').innerHTML =
     `<tr><th class="tl-name-h" scope="col">Jugador</th><th class="tl-debut-h" scope="col">Debut</th>${headCells}<th class="tl-seas-h" scope="col">Total</th></tr>`;
 
@@ -3165,7 +3176,8 @@ function renderTimeline() {
       cells.push(`<td class="tl-cell${flush(connL(y0), connR(y1))}" data-team="${tm}" data-c0="${i}" data-c1="${i + span - 1}" colspan="${span}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${per}${ringOffs.length ? ' · ' + ringOffs.length + '× campeón' : ''}"><span class="tl-lbl">${label}</span>${ringHtml}</td>`);
       i += span;
     }
-    return `<tr data-pid="${p.j.id || ''}">
+    const dim = (tlSelYear != null && !p.seasons[tlSelYear]) ? ' tl-dim' : '';
+    return `<tr data-pid="${p.j.id || ''}" class="${dim.trim()}">
       <th scope="row" class="tl-name"><span class="tl-namewrap">${tlFace(p)}${p.j.id ? `<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>` : `<span class="tl-pname">${p.j.nombre}</span>`}</span></th>
       <td class="tl-debut">${p._debut || tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
@@ -4023,7 +4035,7 @@ const POEQ_ACTIVE = {
 // Las 30 franquicias actuales (se muestran todas, aunque no tengan españoles)
 const POEQ_TEAMS = ['ATL', 'BKN', 'BOS', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW', 'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOL', 'NYK', 'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS'];
 
-let poeqJ = [], poeqMode = 'reg';
+let poeqJ = [], poeqMode = 'reg', poeqSelTeam = null;
 
 // {team: partidos} en temporada regular (desde temporadas_data, sin TOT)
 function poeqRegByTeam(j) {
@@ -4081,6 +4093,12 @@ function poeqHeat(v, max) {
   return `background: rgba(22,163,74,${a.toFixed(3)});`;
 }
 
+// Elegir un equipo: resalta a los que jugaron ahí y atenúa al resto (clic de nuevo = quitar)
+function poeqSelectTeam(t) {
+  poeqSelTeam = (poeqSelTeam === t) ? null : t;
+  renderPorEquipo();
+}
+
 function renderPorEquipo() {
   const byTeam = poeqMode === 'reg' ? poeqRegByTeam : poeqPoByTeam;
   const showActive = poeqMode === 'reg';   // los activos sin debutar solo en temporada regular
@@ -4107,7 +4125,7 @@ function renderPorEquipo() {
 
   const head = `<tr><th class="poeq-name-h">Jugador</th>${teams.map(t => {
     const info = teamInfo(t);
-    return `<th class="poeq-th" title="${info.name}" style="box-shadow: inset 0 -3px 0 ${info.color}">${t}</th>`;
+    return `<th class="poeq-th${t === poeqSelTeam ? ' poeq-th-sel' : ''}" title="${info.name} · clic para resaltar quién jugó aquí" style="box-shadow: inset 0 -3px 0 ${info.color}" onclick="poeqSelectTeam('${t}')">${t}</th>`;
   }).join('')}<th class="poeq-tot-h">TOTAL</th><th class="poeq-pct-h">%</th></tr>`;
   document.getElementById('poeq-thead').innerHTML = head;
 
@@ -4122,7 +4140,8 @@ function renderPorEquipo() {
       if (cur) return `<td class="poeq-cell poeq-current" title="En plantilla actualmente">•</td>`;
       return `<td class="poeq-cell poeq-zero"></td>`;
     }).join('');
-    return `<tr>
+    const dim = (poeqSelTeam && !r.bt[poeqSelTeam]) ? ' poeq-dim' : '';
+    return `<tr class="${dim.trim()}">
       <th scope="row" class="poeq-name${r.active ? ' poeq-active' : ''}"><span class="poeq-player">${thumb}${plLink(r.nombre, r.nombre)}</span></th>
       ${cells}
       <td class="poeq-tot">${r.total}</td>

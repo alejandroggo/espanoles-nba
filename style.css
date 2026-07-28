@@ -456,6 +456,7 @@ td {
 .td-foto { width: 44px; padding-right: 0; }
 .td-notas { min-width: 180px; max-width: 320px; white-space: normal; word-break: break-word; }
 .td-center { text-align: center; }
+.team-abbr { display: none; }   /* abreviatura de equipo: solo en móvil */
 
 /* Filas destacadas (premios hito) */
 tr.row-oro   td { background: rgba(245, 197, 24, 0.14); }
@@ -590,6 +591,11 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   /* El overflow-x rompe el sticky de la cabecera de tabla y acababa tapando la 1ª fila:
      en móvil la dejamos estática (se desplaza con el contenido, nada queda oculto). */
   thead th { position: static; }
+  /* Transacciones: equipos abreviados en móvil (OKC en vez de Oklahoma City Thunder) */
+  .team-full { display: none; }
+  .team-abbr { display: inline; }
+  /* Salarios: la lista de equipos del jugador en una sola línea */
+  .td-equipos { white-space: nowrap; }
   /* Columna de jugador fija al hacer scroll horizontal en tablas anchas */
   td.td-nombre {
     position: sticky; left: 0; z-index: 3;
@@ -1127,8 +1133,12 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 #poeq-table { border-collapse: separate; border-spacing: 0; width: auto; font-variant-numeric: tabular-nums; }
 #poeq-table th, #poeq-table td { padding: 0; }
 #poeq-table thead th { position: sticky; top: 0; z-index: 6; background: var(--surface-2); color: var(--text-muted); font-size: 0.62rem; font-weight: 700; text-align: center; white-space: nowrap; border-bottom: 2px solid var(--border); }
-.poeq-th { min-width: 34px; width: 34px; padding: var(--space-2) 0 !important; }
+.poeq-th { min-width: 34px; width: 34px; padding: var(--space-2) 0 !important; cursor: pointer; }
 #poeq-table thead th.poeq-th { color: var(--text); }
+#poeq-table thead th.poeq-th.poeq-th-sel { background: var(--accent); color: #fff; }
+/* Equipo elegido: se atenúan los jugadores que no jugaron ahí */
+#poeq-tbody tr.poeq-dim { opacity: 0.28; transition: opacity .12s; }
+#poeq-tbody tr.poeq-dim:hover { opacity: 0.65; }
 .poeq-tot-h, .poeq-pct-h { padding: var(--space-2) var(--space-2) !important; }
 .poeq-name, .poeq-name-h { position: sticky; left: 0; z-index: 5; background: var(--surface); text-align: left; width: 250px; min-width: 250px; max-width: 250px; padding: 0 var(--space-3) !important; box-shadow: 1px 0 0 var(--border); white-space: nowrap; }
 .poeq-player { white-space: nowrap; }
@@ -1208,7 +1218,12 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 #tl-body tr:hover > * { box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
 
 /* Resaltado de columna al pasar por el año (marcado) */
+.tl-year { cursor: pointer; }
 .tl-year.tl-colhl { color: var(--accent-contrast); background: var(--accent); }
+.tl-year.tl-year-sel { color: var(--accent-contrast); background: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+/* Temporada elegida: se atenúan los jugadores que no jugaron ese año */
+#tl-body tr.tl-dim { opacity: 0.26; transition: opacity .12s; }
+#tl-body tr.tl-dim:hover { opacity: 0.6; }
 td.tl-colhl { position: relative; }
 td.tl-colhl::after { content: ''; position: absolute; inset: 0; background: rgba(80,80,80,0.26); pointer-events: none; z-index: 2; }
 td.tl-empty.tl-colhl::after { background: rgba(80,80,80,0.18); }
