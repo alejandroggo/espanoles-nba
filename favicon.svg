@@ -1,17 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <clipPath id="ball"><circle cx="50" cy="50" r="32"/></clipPath>
+    <clipPath id="ball"><circle cx="50" cy="50" r="47"/></clipPath>
   </defs>
-  <!-- Fondo rojo España -->
-  <circle cx="50" cy="50" r="50" fill="#b91c1c"/>
-  <!-- Fino anillo amarillo (guiño a la bandera) -->
-  <circle cx="50" cy="50" r="36" fill="#f5c518"/>
-  <!-- Balón de baloncesto -->
-  <circle cx="50" cy="50" r="32" fill="#ee7733"/>
-  <g clip-path="url(#ball)" fill="none" stroke="#7a2f0a" stroke-width="2.6">
-    <line x1="50" y1="18" x2="50" y2="82"/>
-    <line x1="18" y1="50" x2="82" y2="50"/>
-    <path d="M50 18 Q22 50 50 82"/>
-    <path d="M50 18 Q78 50 50 82"/>
+  <g clip-path="url(#ball)">
+    <!-- Bandera de España: rojo · amarillo (doble) · rojo -->
+    <rect x="0" y="0"  width="100" height="27" fill="#c60b1e"/>
+    <rect x="0" y="27" width="100" height="46" fill="#ffc400"/>
+    <rect x="0" y="73" width="100" height="27" fill="#c60b1e"/>
+    <!-- Costuras del balón -->
+    <g fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round">
+      <line x1="50" y1="2" x2="50" y2="98"/>
+      <line x1="2" y1="50" x2="98" y2="50"/>
+      <path d="M50 2 Q18 50 50 98"/>
+      <path d="M50 2 Q82 50 50 98"/>
+    </g>
   </g>
+  <!-- Borde del balón -->
+  <circle cx="50" cy="50" r="47" fill="none" stroke="#141414" stroke-width="3"/>
 </svg>
