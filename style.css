@@ -577,6 +577,15 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 }
 .home-card:hover .home-card-arrow { transform: translateX(4px); }
 
+/* Home en móvil: tarjetas compactas, 2-3 por fila, sin la descripción */
+@media (max-width: 600px) {
+  .home-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--space-3); }
+  .home-card { padding: var(--space-4); gap: var(--space-1); min-height: 96px; }
+  .home-card-desc { display: none; }
+  .home-card-title { font-size: 1.05rem; line-height: 1.1; overflow-wrap: anywhere; }
+  .home-card-arrow { font-size: var(--font-sm); }
+}
+
 @media (max-width: 768px) {
   .hero { padding: var(--space-10) var(--space-4) var(--space-8); }
   .hero--page { padding: var(--space-8) var(--space-4) var(--space-6); }
