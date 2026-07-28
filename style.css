@@ -583,9 +583,13 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .hero-kpis { gap: var(--space-6); }
   .kpi { text-align: left; }
   .home-grid { padding: 0 var(--space-4) var(--space-8); }
+  /* Tabla con scroll propio y cabecera/columna fijas: así la 1ª fila no queda
+     tapada por la cabecera del sitio (el overflow horizontal rompía el sticky). */
   .tabla-wrap { padding: 0 var(--space-4) var(--space-6); overflow-x: auto; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
-  thead th { top: 48px; }
+  /* El overflow-x rompe el sticky de la cabecera de tabla y acababa tapando la 1ª fila:
+     en móvil la dejamos estática (se desplaza con el contenido, nada queda oculto). */
+  thead th { position: static; }
   /* Columna de jugador fija al hacer scroll horizontal en tablas anchas */
   td.td-nombre {
     position: sticky; left: 0; z-index: 3;
@@ -593,7 +597,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
     box-shadow: 1px 0 0 var(--border);
   }
   th.td-nombre {
-    position: sticky; left: 0; z-index: 11;
+    position: sticky; left: 0; top: auto; z-index: 11;
     background: var(--surface-2);
     box-shadow: 1px 0 0 var(--border);
   }
@@ -643,6 +647,8 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 }
 @media (max-width: 768px) {
   .header-inner { padding: 0 var(--space-4); height: 48px; }
+  /* Cabecera no fija en móvil: al hacer scroll no tapa la 1ª fila de las tablas */
+  .site-header { position: static; }
   .ag-footer {
     grid-template-columns: 1fr;
     gap: var(--space-6);
