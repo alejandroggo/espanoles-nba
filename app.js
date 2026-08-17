@@ -101,8 +101,7 @@ function hsRender(q) {
   hsList = hsMatches(q);
   if (!hsList.length) { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); return; }
   panel.innerHTML = hsList.map((j, i) => {
-    const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
-    const thumb = src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'hsearch-avatar');
+    const thumb = (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'hsearch-avatar');
     return `<a class="hsearch-item${i === hsIdx ? ' active' : ''}" role="option" href="${jugadorHref(j.id)}"><span class="hsearch-thumb">${thumb}</span>${j.nombre}</a>`;
   }).join('');
   panel.hidden = false;
@@ -245,6 +244,19 @@ function avatarColor(nombre) {
 function avatarHtml(nombre, cls) {
   return `<span class="${cls} avatar" style="background:${avatarColor(nombre)}" aria-hidden="true">${iniciales(nombre)}</span>`;
 }
+
+// ── FOTO DEL JUGADOR: local (img/players/<id>.jpg) con respaldo a foto_url/bref ──
+function agFotoFb(j) { return j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : ''); }
+// Devuelve  src="…" [data-fb="…"]  con la foto local primero (id) y respaldo fb
+function agFotoSrc2(id, fb) {
+  const primary = id ? `img/players/${id}.jpg` : fb;
+  return `src="${primary}"${(id && fb) ? ` data-fb="${fb}"` : ''}`;
+}
+function agFotoSrc(j) { return agFotoSrc2(j.id, agFotoFb(j)); }
+// onerror: prueba el respaldo (bref) una vez; si también falla, oculta o elimina
+function agImgFb(img) { const fb = img.getAttribute('data-fb'); if (fb && !img.dataset.fbt) { img.dataset.fbt = '1'; img.src = fb; return true; } return false; }
+function agImgHide(img) { if (!agImgFb(img)) img.style.visibility = 'hidden'; }
+function agImgRemove(img) { if (!agImgFb(img)) img.remove(); }
 
 function setLastUpdate(iso) {
   if (!iso) return;
@@ -411,7 +423,7 @@ function renderDraftTable() {
   document.getElementById('draft-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-pick${j.draft_pick === bestPick ? ' td-leader' : ''}">#${j.draft_pick}</td>
       <td class="td-num">${j.draft_equipo || '—'}</td>
@@ -548,7 +560,7 @@ function renderSalariosTable() {
   document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-dinero${maxGan && j.ganancias === maxGan ? ' td-leader' : ''}">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
@@ -1248,7 +1260,7 @@ function renderRkTable() {
     <tr>
       ${cols.map(c => {
         if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
-        if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
+        if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
         if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
         const val = c.fmt ? c.fmt(j[c.key]) : (j[c.key] ?? '—');
         const hl = rkSortCol === c.key ? ' td-hl' : '';
@@ -1316,8 +1328,7 @@ function drNorm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/
 
 function drPhoto(jugador) {
   const j = drMeta[drNorm(jugador)];
-  const src = j && (j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : ''));
-  if (src) return `<span class="dp-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt=""></span>`;
+  if (j && (j.id || j.foto_url || j.bref_id)) return `<span class="dp-photo"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt=""></span>`;
   return avatarHtml(jugador, 'dp-photo');
 }
 
@@ -1765,8 +1776,7 @@ function closeTrDrawer() {
 function jugadorHref(id) { return `jugador.html?id=${encodeURIComponent(id)}`; }
 
 function jugPhoto(j, cls) {
-  const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
-  if (src) return `<span class="jug-photo ${cls || ''}"><img loading="lazy" src="${src}" onerror="this.remove()" alt="${j.nombre}"></span>`;
+  if (j.id || j.foto_url || j.bref_id) return `<span class="jug-photo ${cls || ''}"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt="${j.nombre}"></span>`;
   return avatarHtml(j.nombre, `jug-photo ${cls || ''}`);
 }
 
@@ -2639,7 +2649,7 @@ function renderHighs() {
     const j = r.j;
     const cells = cols.map(c => {
       if (c.key === 'rank') return `<td class="td-rank td-muted">${i + 1}</td>`;
-      if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" src="${j.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
+      if (c.key === 'foto') return `<td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>`;
       if (c.key === 'nombre') return `<td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>`;
       const v = r.best[c.key];
       const lead = (v != null && v === colMax[c.key] && colMax[c.key] > 0) ? ' td-leader' : '';
@@ -2760,7 +2770,7 @@ function renderDebutTable() {
   document.getElementById('debut-body').innerHTML = rows.map((r, i) => `
     <tr>
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.foto_url || r.bref_id) ? `<img loading="lazy" class="player-thumb" src="${r.foto_url || `https://www.basketball-reference.com/req/202605210/images/headshots/${r.bref_id}.jpg`}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(r.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto"><a class="pl-link" href="${jugadorHref(r.id)}">${(r.id || r.foto_url || r.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(r)} onerror="agImgHide(this)" alt="">` : avatarHtml(r.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(r.nombre, r.nombre)}</td>
       <td class="td-center">${r.fecha}</td>
       <td class="td-num">${r.edad != null ? Math.floor(r.edad) : '—'}</td>
@@ -2824,10 +2834,9 @@ function renderJugs() {
   document.getElementById('jug-count').textContent = `${rows.length} jugador${rows.length === 1 ? '' : 'es'}`;
 
   document.getElementById('jugs-grid').innerHTML = rows.map(j => {
-    const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
     const meta = jugMeta(j);
     return `<a class="jug-card" href="${jugadorHref(j.id)}">
-      ${src ? `<span class="jug-card-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt=""></span>` : avatarHtml(j.nombre, 'jug-card-photo')}
+      ${(j.id || j.foto_url || j.bref_id) ? `<span class="jug-card-photo"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt=""></span>` : avatarHtml(j.nombre, 'jug-card-photo')}
       <span class="jug-card-info">
         <span class="jug-card-name">${j.nombre}</span>
         <span class="jug-card-meta">${meta}</span>
@@ -2937,8 +2946,8 @@ const TL_ORDEN = {
 // Cara del jugador (foto) con las iniciales de respaldo si no carga / no hay foto
 function tlFace(p) {
   const j = p.j || {};
-  const src = j.foto_url || (j.bref_id ? `https://www.basketball-reference.com/req/202605210/images/headshots/${j.bref_id}.jpg` : '');
-  return `<span class="tl-facewrap">${avatarHtml(j.nombre, 'tl-avatar')}${src ? `<img loading="lazy" class="tl-face" src="${src}" onerror="this.remove()" alt="">` : ''}</span>`;
+  const has = j.id || j.foto_url || j.bref_id;
+  return `<span class="tl-facewrap">${avatarHtml(j.nombre, 'tl-avatar')}${has ? `<img loading="lazy" class="tl-face" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt="">` : ''}</span>`;
 }
 
 // Celda de un año con estado especial (cortado / two-way). fc = clases de conexión (fl/fr)
@@ -3427,8 +3436,7 @@ function cmpRow(row, datas) {
 }
 
 function cmpCard(j, side) {
-  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
-  const foto = src ? `<span class="cmp-photo"><img loading="lazy" src="${src}" onerror="this.remove()" alt="${j.nombre}"></span>` : `<span class="cmp-photo">${avatarHtml(j.nombre, 'cmp-avatar')}</span>`;
+  const foto = (j.id || j.foto_url || j.bref_id) ? `<span class="cmp-photo"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt="${j.nombre}"></span>` : `<span class="cmp-photo">${avatarHtml(j.nombre, 'cmp-avatar')}</span>`;
   const draft = j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'}` : 'No drafteado';
   return `<div class="cmp-card cmp-${side}">
     ${foto}
@@ -3885,8 +3893,8 @@ function renderTmpTable() {
     if (r.kind === 'total') { teamCell = `<span class="tmp-total-lbl" title="Total de la temporada · ${r.team} (${r.nEq} equipos)">Total</span>`; cls = 'tmp-total'; }
     else if (r.kind === 'partial') { cls = 'tmp-partial'; title = `title="Temporada parcial: jugó en ${r.nEq} equipos ese año"`; }
     if (r.cut) { cls += ' tmp-cut'; title = `title="Cortado (waived) a mitad de temporada — cuenta como media"`; }
-    const thumb = r.foto
-      ? `<img loading="lazy" class="player-thumb" src="${r.foto}" onerror="this.style.visibility='hidden'" alt="">`
+    const thumb = (r.id || r.foto)
+      ? `<img loading="lazy" class="player-thumb" ${agFotoSrc2(r.id, r.foto)} onerror="agImgHide(this)" alt="">`
       : avatarHtml(r.jugador, 'player-thumb');
     return `<tr class="${cls.trim()}" ${title}>
       <td class="td-nombre"><span class="tmp-player">${thumb}${plLink(r.jugador, r.jugador)}</span></td>
@@ -4130,8 +4138,8 @@ function renderPorEquipo() {
   document.getElementById('poeq-thead').innerHTML = head;
 
   document.getElementById('poeq-tbody').innerHTML = rows.map(r => {
-    const thumb = r.foto
-      ? `<img loading="lazy" class="player-thumb" src="${r.foto}" onerror="this.style.visibility='hidden'" alt="">`
+    const thumb = (r.id || r.foto)
+      ? `<img loading="lazy" class="player-thumb" ${agFotoSrc2(r.id, r.foto)} onerror="agImgHide(this)" alt="">`
       : avatarHtml(r.nombre, 'player-thumb');
     const cells = teams.map(t => {
       const v = r.bt[t];
@@ -4215,8 +4223,7 @@ function botHref(page) { return page; }
 // Contenido secundario plegable: la respuesta va corta y se amplía solo al hacer click
 function botMore(inner) { return ` <details class="bot-more"><summary>Ver detalle</summary>${inner}</details>`; }
 function botPlayerChip(j) {
-  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
-  const thumb = src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'bot-avatar');
+  const thumb = (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'bot-avatar');
   return `<a class="bot-chip" href="${jugadorHref(j.id)}"><span class="bot-chip-thumb">${thumb}</span>${j.nombre}</a>`;
 }
 
@@ -5088,8 +5095,8 @@ function efmShowDetail(i) {
 function efmPhoto(name) {
   const j = efmPlMap[drNorm(name || '')];
   if (!j) return '';
-  const src = j.foto || (j.bref ? BREF_HEADSHOTS + '/' + j.bref + '.jpg' : '');
-  const inner = src ? `<img loading="lazy" class="efm-photo-img" src="${src}" onerror="this.style.visibility='hidden'" alt="">` : avatarHtml(j.nombre, 'efm-photo-img');
+  const fb = j.foto || (j.bref ? BREF_HEADSHOTS + '/' + j.bref + '.jpg' : '');
+  const inner = (j.id || fb) ? `<img loading="lazy" class="efm-photo-img" ${agFotoSrc2(j.id, fb)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'efm-photo-img');
   return `<a class="efm-photo" href="${jugadorHref(j.id)}" aria-label="${j.nombre}">${inner}</a>`;
 }
 
@@ -5200,8 +5207,7 @@ const qntState = { PG: null, SG: null, SF: null, PF: null, C: null };   // slot 
 const qntYear = { PG: null, SG: null, SF: null, PF: null, C: null };    // slot → año (null = carrera)
 
 function qntThumb(j, cls) {
-  const src = j.foto_url || (j.bref_id ? `${BREF_HEADSHOTS}/${j.bref_id}.jpg` : '');
-  return src ? `<img loading="lazy" src="${src}" onerror="this.style.visibility='hidden'" alt="" class="${cls}">` : avatarHtml(j.nombre, cls);
+  return (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="" class="${cls}">` : avatarHtml(j.nombre, cls);
 }
 function qntShort(nombre) { const p = nombre.split(' '); return p.length > 1 ? `${p[0][0]}. ${p.slice(1).join(' ')}` : nombre; }
 function qntPlayers() { return QNT_SLOTS.map(s => qntState[s.key]).filter(Boolean).map(id => qntById[id]); }
