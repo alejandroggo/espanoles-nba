@@ -577,6 +577,23 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 }
 .home-card:hover .home-card-arrow { transform: translateX(4px); }
 
+/* Widget "Un día como hoy" en la home */
+.home-efm { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-8); }
+.home-efm-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-3); }
+.home-efm-kicker { font-family: var(--display); font-size: 1.15rem; letter-spacing: 0.03em; color: var(--text); }
+.home-efm-link { font-size: var(--font-sm); color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.home-efm-link:hover { text-decoration: underline; }
+.home-efm-list { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.home-efm-item { display: flex; gap: var(--space-3); align-items: baseline; padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); }
+.home-efm-item:first-child { border-top: 0; }
+.home-efm-year { flex: 0 0 62px; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; line-height: 1; color: var(--accent); }
+.home-efm-year small { display: block; font-family: 'Inter', sans-serif; font-size: 0.6rem; color: var(--text-muted); margin-top: 2px; }
+.home-efm-body { flex: 1; min-width: 0; }
+.home-efm-txt { display: block; margin-top: 3px; font-size: 0.92rem; line-height: 1.45; }
+.home-efm-txt a { color: var(--text); font-weight: 600; }
+.home-efm-txt a:hover { color: var(--accent); }
+@media (max-width: 600px) { .home-efm { padding: 0 var(--space-4) var(--space-6); } .home-efm-year { flex-basis: 52px; font-size: 1.3rem; } }
+
 /* Home en móvil: tarjetas compactas, 2-3 por fila, sin la descripción */
 @media (max-width: 600px) {
   .home-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }

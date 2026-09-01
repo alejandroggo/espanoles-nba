@@ -310,6 +310,40 @@ async function initHome() {
   if (totalSal) partes.push(`${fmtDinero(totalSal)} en salarios`);
 
   if (sub) sub.textContent = partes.join(' · ');
+
+  // Widget "Un día como hoy": efeméride del día (o la próxima si hoy no hay)
+  try {
+    buildPlayerIds(J);
+    const evs = efmBuild(data);
+    const now = new Date();
+    const tm = now.getMonth() + 1, td = now.getDate();
+    let day = { m: tm, d: td }, list = evs.filter(e => e.m === tm && e.d === td), isToday = true;
+    if (!list.length) {
+      isToday = false;
+      for (let i = 1; i <= 366 && !list.length; i++) {
+        const dt = new Date(2000, tm - 1, td); dt.setDate(dt.getDate() + i);
+        const mm = dt.getMonth() + 1, dd = dt.getDate();
+        const l = evs.filter(e => e.m === mm && e.d === dd);
+        if (l.length) { list = l; day = { m: mm, d: dd }; }
+      }
+    }
+    renderHomeEfm(list, day, isToday);
+  } catch (e) {}
+}
+
+function renderHomeEfm(list, day, isToday) {
+  const el = document.getElementById('home-efm');
+  if (!el || !list.length) return;
+  const nowY = new Date().getFullYear();
+  const items = [...list].sort((a, b) => b.year - a.year).slice(0, 3).map(e => {
+    const tags = String(e.tag || '').split(/\s*[,/|]\s*/).map(s => s.trim()).filter(Boolean);
+    const tagsHtml = (tags.length ? tags : ['Hito']).map(t => `<span class="tr-tipo ${efmTagClass(t)} efm-tag">${t}</span>`).join(' ');
+    const ago = nowY - e.year;
+    return `<li class="home-efm-item"><span class="home-efm-year">${e.year}<small>${ago > 0 ? `hace ${ago}` : 'este año'}</small></span><div class="home-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="home-efm-txt">${e.html}</span></div></li>`;
+  }).join('');
+  const kicker = isToday ? 'Un día como hoy' : `Próxima efeméride · ${day.d} de ${MESES_LARGOS[day.m - 1]}`;
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">📅 ${kicker}</span><a class="home-efm-link" href="efemerides.html?m=${day.m}&d=${day.d}">Ver Efemérides →</a></div><ul class="home-efm-list">${items}</ul>`;
+  el.hidden = false;
 }
 
 // ══════════════════════════════════════════════
