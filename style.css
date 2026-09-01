@@ -579,8 +579,10 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 
 /* Home en móvil: tarjetas compactas, 2-3 por fila, sin la descripción */
 @media (max-width: 600px) {
-  .home-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--space-3); }
+  .home-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
   .home-card { padding: var(--space-4); gap: var(--space-1); min-height: 96px; }
+  /* Si el total es impar, la última tarjeta ocupa el ancho completo (no queda coja) */
+  .home-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .home-card-desc { display: none; }
   .home-card-title { font-size: 1.05rem; line-height: 1.1; overflow-wrap: anywhere; }
   .home-card-arrow { font-size: var(--font-sm); }
