@@ -15,22 +15,20 @@
   gtag('config', 'G-NCR152YQ9F');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Efemérides · Españoles en la NBA</title>
-<meta name="description" content="Un día como hoy en la historia de los españoles en la NBA: drafts, debuts, fichajes y traspasos que ocurrieron cada día.">
+<title>Sergio Rodríguez · Españoles en la NBA</title>
+<meta name="description" content="Sergio Rodríguez en la NBA: 353 partidos, 4,9 pts, 1,5 reb y 3,4 ast por partido. Estadísticas, temporadas, playoffs, premios y trayectoria.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Efemérides · Españoles en la NBA">
-<meta property="og:description" content="Un día como hoy en la historia de los españoles en la NBA: drafts, debuts, fichajes y traspasos que ocurrieron cada día.">
-<meta property="og:url" content="https://espanoles-nba.alejandroggo.com/efemerides.html">
-<link rel="canonical" href="https://espanoles-nba.alejandroggo.com/efemerides.html">
-<meta property="og:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Efemérides · Españoles en la NBA">
-<meta name="twitter:description" content="Un día como hoy en la historia de los españoles en la NBA.">
-<meta name="twitter:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
+<meta property="og:title" content="Sergio Rodríguez · Españoles en la NBA">
+<meta property="og:description" content="Sergio Rodríguez en la NBA: 353 partidos, 4,9 pts, 1,5 reb y 3,4 ast por partido. Estadísticas, temporadas, playoffs, premios y trayectoria.">
+<meta property="og:url" content="https://espanoles-nba.alejandroggo.com/jugador-sergio-rodriguez.html">
+<link rel="canonical" href="https://espanoles-nba.alejandroggo.com/jugador-sergio-rodriguez.html">
+<meta property="og:image" content="https://espanoles-nba.alejandroggo.com/img/players/sergio-rodriguez.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sergio Rodríguez · Españoles en la NBA">
+<meta name="twitter:description" content="Sergio Rodríguez en la NBA: 353 partidos, 4,9 pts, 1,5 reb y 3,4 ast por partido. Estadísticas, temporadas, playoffs, premios y trayectoria.">
+<meta name="twitter:image" content="https://espanoles-nba.alejandroggo.com/img/players/sergio-rodriguez.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.basketball-reference.com">
@@ -54,31 +52,18 @@
 
 <!-- CONTENIDO -->
 <main>
-  <section class="hero hero--page">
-    <div class="hero-top">
-      <div>
-        <h1 class="hero-title ag-hero">Las <em>Efemérides</em></h1>
-        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="efm-nav" aria-label="Navegación de fecha">
-    <button type="button" class="efm-arrow" id="efm-prev" aria-label="Día anterior">‹</button>
-    <div class="efm-datewrap">
-      <span class="efm-date" id="efm-date"></span>
-      <span class="efm-count" id="efm-count"></span>
-    </div>
-    <button type="button" class="efm-arrow" id="efm-next" aria-label="Día siguiente">›</button>
-    <button type="button" class="toggle-chip efm-cal-btn" id="efm-cal-btn" aria-label="Abrir calendario">📅 Calendario</button>
-    <button type="button" class="toggle-chip efm-hoy" id="efm-today">Hoy</button>
-    <div class="efm-cal" id="efm-cal" hidden></div>
-  </section>
-
-  <section class="efm-wrap" aria-label="Efemérides del día">
-    <ul class="efm-list" id="efm-list"></ul>
-  </section>
+  <div class="jug-wrap">
+    <a class="back-link" href="jugadores.html" onclick="if(history.length>1){history.back();return false;}">← Volver</a>
+    <div id="jug-content"><p class="td-muted" style="padding:2rem">Cargando…</p></div>
+  </div>
 </main>
+
+<!-- DRAWER DETALLE TRANSACCIÓN -->
+<div class="drawer-overlay" id="tr-overlay" hidden onclick="closeTrDrawer()"></div>
+<aside class="drawer" id="tr-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="tr-drawer-title">
+  <button class="drawer-close" aria-label="Cerrar detalle" onclick="closeTrDrawer()">✕</button>
+  <div id="tr-drawer-content"></div>
+</aside>
 
 <!-- FOOTER -->
 <footer class="ag-footer">
@@ -105,6 +90,6 @@
 </footer>
 
 <script src="app.js?v=124"></script>
-<script>initTheme(); initEfemeridesPage();</script>
+<script>initTheme(); initJugadorPage();</script>
 </body>
 </html>

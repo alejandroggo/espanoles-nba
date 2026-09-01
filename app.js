@@ -1807,7 +1807,7 @@ function closeTrDrawer() {
 // ══════════════════════════════════════════════
 // FICHA DE JUGADOR
 // ══════════════════════════════════════════════
-function jugadorHref(id) { return `jugador.html?id=${encodeURIComponent(id)}`; }
+function jugadorHref(id) { return `jugador-${id}.html`; }
 
 function jugPhoto(j, cls) {
   if (j.id || j.foto_url || j.bref_id) return `<span class="jug-photo ${cls || ''}"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt="${j.nombre}"></span>`;
@@ -1838,7 +1838,8 @@ function statBox(label, val) {
 
 let jugAll = [], jugEvents = [];
 async function initJugadorPage() {
-  const id = new URLSearchParams(location.search).get('id');
+  let id = new URLSearchParams(location.search).get('id');
+  if (!id) { const m = location.pathname.match(/jugador-([^/]+?)\.html$/); if (m) id = decodeURIComponent(m[1]); }
   const el = document.getElementById('jug-content');
   let data;
   try { data = await loadData(); }
