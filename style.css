@@ -1172,7 +1172,7 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .poeq-player { white-space: nowrap; }
 .poeq-player .pl-link { white-space: nowrap; }
 .poeq-name-h { z-index: 9; background: var(--surface-2); }
-.poeq-player { display: inline-flex; align-items: center; gap: var(--space-2); }
+.poeq-player { display: inline-flex; align-items: center; vertical-align: middle; gap: var(--space-2); }
 #poeq-tbody tr { height: 40px; }
 #poeq-tbody tr:nth-child(even) .poeq-name { background: var(--surface-2); }
 /* Al pasar por una fila se resaltan solo las casillas con partidos (no las 30 vacías) */
