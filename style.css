@@ -454,7 +454,7 @@ td {
 .td-pick { color: var(--accent); font-weight: 500; }
 .td-rank { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: var(--space-2); }
 .td-foto { width: 44px; padding-right: 0; }
-.td-notas { min-width: 180px; max-width: 320px; white-space: normal; word-break: break-word; }
+.td-notas { white-space: nowrap; }
 .td-center { text-align: center; }
 .team-abbr { display: none; }   /* abreviatura de equipo: solo en móvil */
 
@@ -609,7 +609,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .hero { padding: var(--space-10) var(--space-4) var(--space-8); }
   .hero--page { padding: var(--space-8) var(--space-4) var(--space-6); }
   .hero-top { grid-template-columns: 1fr; align-items: start; }
-  .hero-kpis { gap: var(--space-6); }
+  .hero-kpis { gap: var(--space-6); justify-content: flex-start; align-items: flex-start; }
   .kpi { text-align: left; }
   .home-grid { padding: 0 var(--space-4) var(--space-8); }
   /* Tabla con scroll propio y cabecera/columna fijas: así la 1ª fila no queda
