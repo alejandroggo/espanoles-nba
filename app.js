@@ -746,6 +746,8 @@ function renderSlKpis() {
     <div class="kpi"><div class="kpi-num">${participaciones}</div><div class="kpi-label">Participaciones</div></div>
     <div class="kpi"><div class="kpi-num">${jugadores}</div><div class="kpi-label">Jugadores distintos</div></div>
     <div class="kpi"><div class="kpi-num">${topAnios.join(' · ') || '—'}</div><div class="kpi-label">Año con más${maxCount ? ` (${maxCount})` : ''}</div></div>`;
+  document.getElementById('hero-sub').textContent =
+    `${participaciones} participaciones de ${jugadores} españoles en la Summer League`;
 }
 
 function buildSlYearFilter() {
