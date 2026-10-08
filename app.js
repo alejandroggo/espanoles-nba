@@ -290,6 +290,25 @@ function plLink(name, inner) {
   return id ? `<a class="pl-link" href="${jugadorHref(id)}">${content}</a>` : content;
 }
 
+// Abrevia el nombre de pila a la inicial ("Willy Hernangómez" -> "W. Hernangómez"),
+// manteniendo apellido final, partículas (de, del...) e iniciales ya existentes (M.).
+const AG_PARTICULAS = new Set(['de', 'del', 'la', 'las', 'los', 'van', 'von', 'da', 'di', 'y']);
+function abrevNombre(nombre) {
+  const parts = String(nombre || '').trim().split(/\s+/);
+  if (parts.length < 2) return nombre;
+  const last = parts.length - 1;
+  return parts.map((t, i) => {
+    if (i === last) return t;                               // apellido final completo
+    if (AG_PARTICULAS.has(t.toLowerCase())) return t;       // partícula
+    if (t.endsWith('.')) return t;                          // ya es inicial (M., A.)
+    return t.charAt(0).toUpperCase() + '.';                 // inicial
+  }).join(' ');
+}
+// Nombre con versión completa (escritorio) y abreviada (móvil), conmutadas por CSS.
+function nombreResp(nombre) {
+  return `<span class="ag-nom-full">${nombre}</span><span class="ag-nom-abbr">${abrevNombre(nombre)}</span>`;
+}
+
 // ══════════════════════════════════════════════
 // HOME · subtítulo dinámico
 // ══════════════════════════════════════════════
@@ -4185,7 +4204,7 @@ function renderPorEquipo() {
     }).join('');
     const dim = (poeqSelTeam && !r.bt[poeqSelTeam]) ? ' poeq-dim' : '';
     return `<tr class="${dim.trim()}">
-      <th scope="row" class="poeq-name${r.active ? ' poeq-active' : ''}"><span class="poeq-player">${thumb}${plLink(r.nombre, r.nombre)}</span></th>
+      <th scope="row" class="poeq-name${r.active ? ' poeq-active' : ''}"><span class="poeq-player">${thumb}${plLink(r.nombre, nombreResp(r.nombre))}</span></th>
       ${cells}
       <td class="poeq-tot">${r.total}</td>
       <td class="poeq-pct">${grand ? (r.total / grand * 100).toFixed(1) + '%' : '—'}</td>

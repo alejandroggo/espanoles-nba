@@ -1701,3 +1701,12 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
 .cookie-btn--yes { background: var(--accent); color: #fff; border-color: var(--accent); }
 .cookie-btn--yes:hover { filter: brightness(1.08); }
 @media (max-width: 480px) { .cookie-banner { width: calc(100vw - 24px); } }
+
+/* Nombre responsive: completo en escritorio, abreviado (W. Hernangómez) en móvil */
+.ag-nom-abbr { display: none; }
+@media (max-width: 600px) {
+  .ag-nom-full { display: none; }
+  .ag-nom-abbr { display: inline; }
+  /* margen de seguridad en la columna fija de la matriz Por equipo */
+  .poeq-name .poeq-player { padding-right: 10px; }
+}
