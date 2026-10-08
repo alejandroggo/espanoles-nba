@@ -455,7 +455,7 @@ td {
 .td-rank { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: var(--space-2); }
 .td-foto { width: 44px; padding-right: 0; }
 .td-notas { white-space: nowrap; }
-.td-center { text-align: center; }
+.td-center { text-align: center; white-space: nowrap; }
 .team-abbr { display: none; }   /* abreviatura de equipo: solo en móvil */
 
 /* Filas destacadas (premios hito) */
