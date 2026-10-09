@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-09T18:56:02.549Z",
+  "actualizado": "2026-10-09T19:24:20.711Z",
   "summer_league": [
     {
       "year": 1985,
@@ -2140,36 +2140,356 @@
   ],
   "efemerides": [
     {
-      "fecha": "2006-02-19",
-      "jugador": "Pau Gasol",
-      "hito": "Debuta en un All-Star Game. Es el primer español en la historia en conseguirlo (y el primer jugador en la historia de los Grizzlies).",
-      "etiqueta": "ALL-STAR",
+      "fecha": "2025-03-01",
+      "jugador": "Santi Aldama",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 11 ante Spurs (Grizzlies 128-130 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": "CAREER-HIGH"
     },
     {
-      "fecha": "2006-03-28",
-      "jugador": "Pau Gasol",
-      "hito": "Anota 44 puntos en la derrota de los Memphis Grizzlies ante Seattle SuperSonics. Game winner de Ray Allen.",
-      "etiqueta": "PARTIDO DESTACADO",
-      "video": "https://youtu.be/SoS29exGECw?si=eJggKnWWhlGe3VgQ",
+      "fecha": "26 jan 2005",
+      "jugador": "Raül Lopez",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 11 ante SuperSonics (Jazz 109-100).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
       "etiquetas": "LESIÓN"
     },
     {
-      "fecha": "2009-12-16",
-      "jugador": "Pau Gasol",
-      "hito": "Baja 22 rebotes en la victoria de Los Angeles Lakers ante Milwaukee Bucks, con además, 26 puntos. Su primer 20+20",
-      "etiqueta": "PARTIDO DESTACADO",
+      "fecha": "15 apr 2009",
+      "jugador": "Sergio Rodríguez",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 12 ante Nuggets (Trail Blazers 104-76).",
+      "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": "ANILLO"
     },
     {
-      "fecha": "10 jan 2015",
-      "jugador": "Pau Gasol",
-      "hito": "Anota 46 puntos en la victoria de los Chicago Bulls ante Milwaukee Bucks, además de 18 rebotes. Es la máxima anotación de un español en la historia de la NBA.",
+      "fecha": "2017-11-25",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 14 ante Nuggets (Grizzlies 92-104 (derrota)).",
       "etiqueta": "CAREER-HIGH",
-      "video": "https://www.youtube.com/watch?v=rN-vdKOp7gE",
+      "video": "",
       "etiquetas": "GAME WINNER"
+    },
+    {
+      "fecha": "2016-02-27",
+      "jugador": "Pau Gasol",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 14 ante Trail Blazers (Bulls 95-103 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "SERIE GANADA"
+    },
+    {
+      "fecha": "2009-03-29",
+      "jugador": "José M. Calderón",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 19 ante Bulls (Raptors 134-129 (OT)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=Bwr_gC7ykWg",
+      "etiquetas": "TRIPLE-DOBLE"
+    },
+    {
+      "fecha": "2017-03-13",
+      "jugador": "Ricky Rubio",
+      "hito": "Alcanza su máximo de asistencias en la NBA: 19 ante Wizards (Timberwolves 119-104).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "ALL-STAR"
+    },
+    {
+      "fecha": "22 apr 2019",
+      "jugador": "Ricky Rubio",
+      "hito": "Alcanza su máximo de asistencias en los playoffs: 11 ante Rockets (Jazz 107-91).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": "DEBUT PLAYOFFS"
+    },
+    {
+      "fecha": "24 apr 2008",
+      "jugador": "José M. Calderón",
+      "hito": "Alcanza su máximo de asistencias en los playoffs: 13 ante Magic (Raptors 108-94).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": "PREMIO"
+    },
+    {
+      "fecha": "2007-11-27",
+      "jugador": "Juan Carlos Navarro",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 11 ante Nets (Grizzlies 110-103).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "FINALES"
+    },
+    {
+      "fecha": "2006-11-24",
+      "jugador": "Jorge Garbajosa",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 12 ante Hawks (Raptors 93-97 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "RÉCORD FRANQUICIA"
+    },
+    {
+      "fecha": "26 dec 2018",
+      "jugador": "Juancho Hernangómez",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 13 ante Spurs (Nuggets 103-111 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "PRIMERA VEZ"
+    },
+    {
+      "fecha": "2013-03-12",
+      "jugador": "Ricky Rubio",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 13 ante Spurs (Timberwolves 107-83).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "MILESTONE"
+    },
+    {
+      "fecha": "1 apr 2022",
+      "jugador": "Usman Garuba",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 14 ante Kings (Rockets 117-122 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "JUGADA HISTÓRICA"
+    },
+    {
+      "fecha": "2018-02-10",
+      "jugador": "Nikola Mirotic",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 16 ante Nets (Pelicans 138-128 (2OT)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "PARTIDO DESTACADO"
+    },
+    {
+      "fecha": "23 jan 2019",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Hornets (Grizzlies 107-118 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": "PLAYOFFS-HIGH"
+    },
+    {
+      "fecha": "2024-11-25",
+      "jugador": "Santi Aldama",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Trail Blazers (Grizzlies 123-98).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2021-02-17",
+      "jugador": "Willy Hernangómez",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Trail Blazers (Pelicans 124-126 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "16 dec 2009",
+      "jugador": "Pau Gasol",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 22 ante Bucks (Lakers 107-106 (OT)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2015-02-19",
+      "jugador": "Serge Ibaka",
+      "hito": "Alcanza su máximo de rebotes en la NBA: 22 ante Mavericks (Thunder 104-89).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "25 apr 2018",
+      "jugador": "Ricky Rubio",
+      "hito": "Alcanza su máximo de rebotes en los playoffs: 12 ante Thunder (Jazz 99-107 (derrota)).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "23 apr 2011",
+      "jugador": "Serge Ibaka",
+      "hito": "Alcanza su máximo de rebotes en los playoffs: 16 ante Nuggets (Thunder 97-94).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2008-05-29",
+      "jugador": "Pau Gasol",
+      "hito": "Alcanza su máximo de rebotes en los playoffs: 19 ante Spurs (Lakers 100-92).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2011-05-09",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de rebotes en los playoffs: 21 ante Thunder (Grizzlies 123-133 (3OT)).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2022-10-22",
+      "jugador": "Usman Garuba",
+      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Bucks (Rockets 105-125 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2018-10-30",
+      "jugador": "Alex Abrines",
+      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Clippers (Thunder 128-110).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2006-11-17",
+      "jugador": "Jorge Garbajosa",
+      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Lakers (Raptors 100-107 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2004-02-18",
+      "jugador": "Raül Lopez",
+      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Magic (Jazz 77-90 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2006-03-08",
+      "jugador": "Pau Gasol",
+      "hito": "Alcanza su máximo de robos en la NBA: 4 ante SuperSonics (Grizzlies 99-74).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "13 apr 2016",
+      "jugador": "Nikola Mirotic",
+      "hito": "Alcanza su máximo de robos en la NBA: 5 ante 76ers (Bulls 115-105).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-03-13",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Clippers (Grizzlies 96-85).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "7 jan 2014",
+      "jugador": "José M. Calderón",
+      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Lakers (Mavericks 110-97).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "17 jan 2011",
+      "jugador": "Rudy Fernández",
+      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Timberwolves (Trail Blazers 113-102).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "28 dec 2025",
+      "jugador": "Santi Aldama",
+      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Wizards (Grizzlies 112-116 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2010-02-22",
+      "jugador": "Sergio Rodríguez",
+      "hito": "Alcanza su máximo de robos en la NBA: 8 ante Bucks (Knicks 67-83 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "3 apr 2013",
+      "jugador": "Ricky Rubio",
+      "hito": "Alcanza su máximo de robos en la NBA: 8 ante Bucks (Timberwolves 107-98).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "16 apr 2019",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de robos en los playoffs: 4 ante Magic (Raptors 111-82).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2007-05-04",
+      "jugador": "José M. Calderón",
+      "hito": "Alcanza su máximo de robos en los playoffs: 4 ante Nets (Raptors 97-98 (derrota)).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2012-02-19",
+      "jugador": "Serge Ibaka",
+      "hito": "Alcanza su máximo de tapones en la NBA: 11 ante Nuggets (Thunder 124-118 (OT)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2024-03-25",
+      "jugador": "Santi Aldama",
+      "hito": "Alcanza su máximo de tapones en la NBA: 4 ante Nuggets (Grizzlies 103-128 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2014-11-28",
+      "jugador": "Nikola Mirotic",
+      "hito": "Alcanza su máximo de tapones en la NBA: 5 ante Celtics (Bulls 109-102).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "4 jan 2013",
+      "jugador": "Marc Gasol",
+      "hito": "Alcanza su máximo de tapones en la NBA: 8 ante Trail Blazers (Grizzlies 84-86 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "1 jan 2015",
+      "jugador": "Pau Gasol",
+      "hito": "Alcanza su máximo de tapones en la NBA: 9 ante Nuggets (Bulls 106-101).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2016-03-23",
+      "jugador": "Nikola Mirotic",
+      "hito": "Alcanza su máximo de triples en la NBA: 9 ante Knicks (Bulls 107-115 (derrota)).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "",
+      "etiquetas": ""
     },
     {
       "fecha": "11 jan 2008",
@@ -2177,31 +2497,31 @@
       "hito": "Anota 43 puntos en la derrota de los Memphis Grizzlies ante Golden State Warriors.",
       "etiqueta": "PARTIDO DESTACADO",
       "video": "",
-      "etiquetas": "SERIE GANADA"
+      "etiquetas": ""
     },
     {
-      "fecha": "17 apr 2004",
+      "fecha": "2006-03-28",
       "jugador": "Pau Gasol",
-      "hito": "Debuta en playoffs en la derrota de los Memphis Grizzlies ante San Antonio Spurs con 14 puntos y 2 rebotes",
-      "etiqueta": "DEBUT PLAYOFFS",
-      "video": "",
-      "etiquetas": "PARTIDO DESTACADO"
+      "hito": "Anota 44 puntos en la derrota de los Memphis Grizzlies ante Seattle SuperSonics. Game winner de Ray Allen.",
+      "etiqueta": "PARTIDO DESTACADO",
+      "video": "https://youtu.be/SoS29exGECw?si=eJggKnWWhlGe3VgQ",
+      "etiquetas": ""
     },
     {
-      "fecha": "30 apr 1987",
-      "jugador": "Fernando Martín",
-      "hito": "Debuta en playoffs en la derrota de los Portland Trail Blazers ante Houston Rocketts. Juega apenas un minuto, pero es el primer español en conseguirlo.",
-      "etiqueta": "DEBUT PLAYOFFS, PRIMERA VEZ",
-      "video": "",
-      "etiquetas": "TRIPLE-DOBLE"
-    },
-    {
-      "fecha": "30 apr 2010",
+      "fecha": "10 jan 2015",
       "jugador": "Pau Gasol",
-      "hito": "Palmeo para ganar el sexto partido de la primera ronda ante los Thunder y llevarse la eliminatoria camino al anillo.",
-      "etiqueta": "GAME WINNER, SERIE GANADA",
-      "video": "https://www.youtube.com/watch?v=GklQlH1z_KE",
-      "etiquetas": "ALL-STAR"
+      "hito": "Anota 46 puntos en la victoria de los Chicago Bulls ante Milwaukee Bucks, además de 18 rebotes. Es la máxima anotación de un español en la historia de la NBA.",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=rN-vdKOp7gE",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2009-12-16",
+      "jugador": "Pau Gasol",
+      "hito": "Baja 22 rebotes en la victoria de Los Angeles Lakers ante Milwaukee Bucks, con además, 26 puntos. Su primer 20+20",
+      "etiqueta": "PARTIDO DESTACADO",
+      "video": "",
+      "etiquetas": ""
     },
     {
       "fecha": "2006-02-13",
@@ -2209,55 +2529,39 @@
       "hito": "Canasta sobre la bocina para que los Memphis Grizzlies se llevaran el triunfo ante Golden State",
       "etiqueta": "GAME WINNER",
       "video": "https://www.youtube.com/watch?v=IKAac4Q0LGw",
-      "etiquetas": "DEBUT PLAYOFFS"
+      "etiquetas": ""
     },
     {
-      "fecha": "2015-02-08",
+      "fecha": "17 apr 2004",
       "jugador": "Pau Gasol",
-      "hito": "Rebote ofensivo y canasta para que los Chicago Bulls se llevaran el triunfo ante Orlando Magic.",
-      "etiqueta": "GAME WINNER",
-      "video": "https://www.youtube.com/watch?v=d4wmkY0Z9iU",
-      "etiquetas": "PREMIO"
+      "hito": "Debuta en playoffs en la derrota de los Memphis Grizzlies ante San Antonio Spurs con 14 puntos y 2 rebotes",
+      "etiqueta": "DEBUT PLAYOFFS",
+      "video": "",
+      "etiquetas": ""
     },
     {
-      "fecha": "20 apr 2008",
+      "fecha": "30 apr 1987",
+      "jugador": "Fernando Martín",
+      "hito": "Debuta en playoffs en la derrota de los Portland Trail Blazers ante Houston Rocketts. Juega apenas un minuto, pero es el primer español en conseguirlo.",
+      "etiqueta": "DEBUT PLAYOFFS, PRIMERA VEZ",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2006-02-19",
       "jugador": "Pau Gasol",
-      "hito": "Firma su máxima anotación en playoffs con 36 puntos ante Nuggets (Lakers W 128-114).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Debuta en un All-Star Game. Es el primer español en la historia en conseguirlo (y el primer jugador en la historia de los Grizzlies).",
+      "etiqueta": "ALL-STAR",
       "video": "",
-      "etiquetas": "FINALES"
+      "etiquetas": ""
     },
     {
-      "fecha": "2021-11-07",
-      "jugador": "Ricky Rubio",
-      "hito": "Firma su máxima anotación en la NBA con 37 puntos ante Knicks (Cavaliers W 126-109).",
+      "fecha": "2022-11-16",
+      "jugador": "Usman Garuba",
+      "hito": "Firma su máxima anotación en la NBA con 12 puntos ante Mavericks (Rockets W 101-92).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
-      "etiquetas": "RÉCORD FRANQUICIA"
-    },
-    {
-      "fecha": "21 apr 2018",
-      "jugador": "Ricky Rubio",
-      "hito": "Firma su máxima anotación en playoffs con 26 puntos ante Thunder (Jazz W 115-102).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": "PRIMERA VEZ"
-    },
-    {
-      "fecha": "2017-02-13",
-      "jugador": "Juancho Hernangómez",
-      "hito": "Firma su máxima anotación en la NBA con 27 puntos ante Warriors (Nuggets W 132-110).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": "MILESTONE"
-    },
-    {
-      "fecha": "23 apr 2022",
-      "jugador": "Juancho Hernangómez",
-      "hito": "Firma su máxima anotación en playoffs con 6 puntos ante Mavericks (Jazz W 100-99).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": "JUGADA HISTÓRICA"
+      "etiquetas": ""
     },
     {
       "fecha": "2014-02-26",
@@ -2268,27 +2572,35 @@
       "etiquetas": ""
     },
     {
-      "fecha": "2018-10-19",
-      "jugador": "Nikola Mirotic",
-      "hito": "Firma su máxima anotación en la NBA con 36 puntos ante Kings (Pelicans W 149-129).",
+      "fecha": "2026-03-02",
+      "jugador": "Hugo González",
+      "hito": "Firma su máxima anotación en la NBA con 18 puntos y bate su record de rebotes con 16 ante Bucks (Celtics W 108-81).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=AXlM4QQTnHk",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2007-03-23",
+      "jugador": "Jorge Garbajosa",
+      "hito": "Firma su máxima anotación en la NBA con 22 puntos ante Nuggets (Raptors W 121-94).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=TucdNjUvxxQ",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2009-11-29",
+      "jugador": "Sergio Rodríguez",
+      "hito": "Firma su máxima anotación en la NBA con 24 puntos ante Hornets (Kings W 112-96).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "19 apr 2018",
-      "jugador": "Nikola Mirotic",
-      "hito": "Firma su máxima anotación en playoffs con 30 puntos ante Trail Blazers (Pelicans W 119-102).",
+      "fecha": "2018-11-01",
+      "jugador": "Alex Abrines",
+      "hito": "Firma su máxima anotación en la NBA con 25 puntos ante Hornets (Thunder W 111-107).",
       "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2022-11-16",
-      "jugador": "Usman Garuba",
-      "hito": "Firma su máxima anotación en la NBA con 12 puntos ante Mavericks (Rockets W 101-92).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
+      "video": "https://www.youtube.com/watch?v=VMmG3L8XxrE",
       "etiquetas": ""
     },
     {
@@ -2308,81 +2620,17 @@
       "etiquetas": ""
     },
     {
-      "fecha": "24 apr 2009",
-      "jugador": "Rudy Fernández",
-      "hito": "Firma su máxima anotación en playoffs con 17 puntos ante Rockets (Trail Blazers L 83-86).",
+      "fecha": "2017-02-13",
+      "jugador": "Juancho Hernangómez",
+      "hito": "Firma su máxima anotación en la NBA con 27 puntos ante Warriors (Nuggets W 132-110).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2018-11-04",
-      "jugador": "Serge Ibaka",
-      "hito": "Firma su máxima anotación en la NBA con 34 puntos ante Lakers (Raptors W 121-107).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "23 aug 2020",
-      "jugador": "Serge Ibaka",
-      "hito": "Firma su máxima anotación en playoffs con 27 puntos ante Nets (Raptors W 150-122).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2009-11-29",
-      "jugador": "Sergio Rodríguez",
-      "hito": "Firma su máxima anotación en la NBA con 24 puntos ante Hornets (Kings W 112-96).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "18 apr 2009",
-      "jugador": "Sergio Rodríguez",
-      "hito": "Firma su máxima anotación en playoffs con 2 puntos ante Rockets (Trail Blazers L 81-108).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2026-03-02",
-      "jugador": "Hugo González",
-      "hito": "Firma su máxima anotación en la NBA con 18 puntos ante Bucks (Celtics W 108-81).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "20 dec 2025",
-      "jugador": "Santi Aldama",
-      "hito": "Firma su máxima anotación en la NBA con 37 puntos ante Wizards (Grizzlies L 122-130).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "26 apr 2025",
-      "jugador": "Santi Aldama",
-      "hito": "Firma su máxima anotación en playoffs con 23 puntos ante Thunder (Grizzlies L 115-117).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2018-11-01",
-      "jugador": "Alex Abrines",
-      "hito": "Firma su máxima anotación en la NBA con 25 puntos ante Hornets (Thunder W 111-107).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "21 apr 2017",
-      "jugador": "Alex Abrines",
-      "hito": "Firma su máxima anotación en playoffs con 11 puntos ante Rockets (Thunder L 99-105).",
+      "fecha": "2007-11-16",
+      "jugador": "Juan Carlos Navarro",
+      "hito": "Firma su máxima anotación en la NBA con 28 puntos y de triples anotados, con 8, ante Hornets (Grizzlies L 118-120 (OT)).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
@@ -2396,25 +2644,41 @@
       "etiquetas": ""
     },
     {
-      "fecha": "24 apr 2022",
-      "jugador": "Willy Hernangómez",
-      "hito": "Firma su máxima anotación en playoffs con 2 puntos ante Suns (Pelicans W 118-103).",
+      "fecha": "2012-02-12",
+      "jugador": "José M. Calderón",
+      "hito": "Firma su máxima anotación en la NBA con 30 puntos ante Lakers (Raptors L 92-94).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2 dec 1986",
-      "jugador": "Fernando Martín",
-      "hito": "Firma su máxima anotación en la NBA con 6 puntos ante Clippers (Trail Blazers W 134-99). Primer español en la historia de la NBA.",
+      "fecha": "2018-11-04",
+      "jugador": "Serge Ibaka",
+      "hito": "Firma su máxima anotación en la NBA con 34 puntos ante Lakers (Raptors W 121-107).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2007-11-16",
-      "jugador": "Juan Carlos Navarro",
-      "hito": "Firma su máxima anotación en la NBA con 28 puntos ante Hornets (Grizzlies L 118-120 (OT)).",
+      "fecha": "2018-10-19",
+      "jugador": "Nikola Mirotic",
+      "hito": "Firma su máxima anotación en la NBA con 36 puntos ante Kings (Pelicans W 149-129).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=8wgD1KEKIYE",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "20 dec 2025",
+      "jugador": "Santi Aldama",
+      "hito": "Firma su máxima anotación en la NBA con 37 puntos ante Wizards (Grizzlies L 122-130).",
+      "etiqueta": "CAREER-HIGH",
+      "video": "https://www.youtube.com/watch?v=EqDoEdP1oko",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2021-11-07",
+      "jugador": "Ricky Rubio",
+      "hito": "Firma su máxima anotación en la NBA con 37 puntos y de triples, con 7, ante Knicks (Cavaliers W 126-109).",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
@@ -2428,18 +2692,50 @@
       "etiquetas": ""
     },
     {
-      "fecha": "15 apr 2017",
-      "jugador": "Marc Gasol",
-      "hito": "Firma su máxima anotación en playoffs con 32 puntos ante Spurs (Grizzlies L 82-111).",
+      "fecha": "2 dec 1986",
+      "jugador": "Fernando Martín",
+      "hito": "Firma su máxima anotación en la NBA con 6 puntos ante Clippers (Trail Blazers W 134-99). Primer español en la historia de la NBA.",
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2012-02-12",
-      "jugador": "José M. Calderón",
-      "hito": "Firma su máxima anotación en la NBA con 30 puntos ante Lakers (Raptors L 92-94).",
-      "etiqueta": "CAREER-HIGH",
+      "fecha": "21 apr 2017",
+      "jugador": "Alex Abrines",
+      "hito": "Firma su máxima anotación en playoffs con 11 puntos ante Rockets (Thunder L 99-105).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "24 apr 2009",
+      "jugador": "Rudy Fernández",
+      "hito": "Firma su máxima anotación en playoffs con 17 puntos ante Rockets (Trail Blazers L 83-86).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "18 apr 2009",
+      "jugador": "Sergio Rodríguez",
+      "hito": "Firma su máxima anotación en playoffs con 2 puntos ante Rockets (Trail Blazers L 81-108).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "24 apr 2022",
+      "jugador": "Willy Hernangómez",
+      "hito": "Firma su máxima anotación en playoffs con 2 puntos ante Suns (Pelicans W 118-103).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "26 apr 2025",
+      "jugador": "Santi Aldama",
+      "hito": "Firma su máxima anotación en playoffs con 23 puntos ante Thunder (Grizzlies L 115-117).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
@@ -2447,464 +2743,72 @@
       "fecha": "2007-05-01",
       "jugador": "José M. Calderón",
       "hito": "Firma su máxima anotación en playoffs con 25 puntos ante Nets (Raptors W 98-96).",
-      "etiqueta": "CAREER-HIGH",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2007-03-23",
-      "jugador": "Jorge Garbajosa",
-      "hito": "Firma su máxima anotación en la NBA con 22 puntos ante Nuggets (Raptors W 121-94).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2004-02-18",
-      "jugador": "Raül Lopez",
-      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Magic (Jazz 77-90 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "26 jan 2005",
-      "jugador": "Raül Lopez",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 11 ante SuperSonics (Jazz 109-100).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2006-03-08",
-      "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de robos en la NBA: 4 ante SuperSonics (Grizzlies 99-74).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2006-03-28",
-      "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 17 ante SuperSonics (Grizzlies 97-98 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2006-11-17",
-      "jugador": "Jorge Garbajosa",
-      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Lakers (Raptors 100-107 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2006-11-24",
-      "jugador": "Jorge Garbajosa",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 12 ante Hawks (Raptors 93-97 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "14 jan 2007",
-      "jugador": "Sergio Rodríguez",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 11 ante Nuggets (Trail Blazers 93-109 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2007-05-04",
-      "jugador": "José M. Calderón",
-      "hito": "Alcanza su máximo de robos en los playoffs: 4 ante Nets (Raptors 97-98 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2007-11-16",
-      "jugador": "Juan Carlos Navarro",
-      "hito": "Alcanza su máximo de triples en la NBA: 8 ante Hornets (Grizzlies 118-120 (derrota) (OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2007-11-27",
-      "jugador": "Juan Carlos Navarro",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 11 ante Nets (Grizzlies 110-103).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "24 apr 2008",
-      "jugador": "José M. Calderón",
-      "hito": "Alcanza su máximo de asistencias en los playoffs: 13 ante Magic (Raptors 108-94).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2008-05-29",
-      "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de rebotes en los playoffs: 19 ante Spurs (Lakers 100-92).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2009-03-29",
-      "jugador": "José M. Calderón",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 19 ante Bulls (Raptors 134-129 (OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "15 apr 2009",
-      "jugador": "Sergio Rodríguez",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 12 ante Nuggets (Trail Blazers 104-76).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "16 dec 2009",
-      "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 22 ante Bucks (Lakers 107-106 (OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2010-02-22",
-      "jugador": "Sergio Rodríguez",
-      "hito": "Alcanza su máximo de robos en la NBA: 8 ante Bucks (Knicks 67-83 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "17 jan 2011",
-      "jugador": "Rudy Fernández",
-      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Timberwolves (Trail Blazers 113-102).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "23 apr 2011",
-      "jugador": "Serge Ibaka",
-      "hito": "Alcanza su máximo de rebotes en los playoffs: 16 ante Nuggets (Thunder 97-94).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2011-05-09",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de rebotes en los playoffs: 21 ante Thunder (Grizzlies 123-133 (3OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2012-02-12",
-      "jugador": "José M. Calderón",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 13 ante Lakers (Raptors 92-94 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2012-02-19",
-      "jugador": "Serge Ibaka",
-      "hito": "Alcanza su máximo de tapones en la NBA: 11 ante Nuggets (Thunder 124-118 (OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "4 jan 2013",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de tapones en la NBA: 8 ante Trail Blazers (Grizzlies 84-86 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2013-03-12",
+      "fecha": "21 apr 2018",
       "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 13 ante Spurs (Timberwolves 107-83).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Firma su máxima anotación en playoffs con 26 puntos ante Thunder (Jazz W 115-102).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2013-03-13",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Clippers (Grizzlies 96-85).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "3 apr 2013",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de robos en la NBA: 8 ante Bucks (Timberwolves 107-98).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "7 jan 2014",
-      "jugador": "José M. Calderón",
-      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Lakers (Mavericks 110-97).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2014-11-28",
-      "jugador": "Nikola Mirotic",
-      "hito": "Alcanza su máximo de tapones en la NBA: 5 ante Celtics (Bulls 109-102).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "1 jan 2015",
-      "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de tapones en la NBA: 9 ante Nuggets (Bulls 106-101).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2015-02-19",
+      "fecha": "23 aug 2020",
       "jugador": "Serge Ibaka",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 22 ante Mavericks (Thunder 104-89).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Firma su máxima anotación en playoffs con 27 puntos ante Nets (Raptors W 150-122).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "16 jan 2016",
+      "fecha": "19 apr 2018",
+      "jugador": "Nikola Mirotic",
+      "hito": "Firma su máxima anotación en playoffs con 30 puntos ante Trail Blazers (Pelicans W 119-102).",
+      "etiqueta": "PLAYOFFS-HIGH",
+      "video": "",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "15 apr 2017",
       "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 15 ante Knicks (Grizzlies 103-95).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Firma su máxima anotación en playoffs con 32 puntos ante Spurs (Grizzlies L 82-111).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2016-02-27",
+      "fecha": "20 apr 2008",
       "jugador": "Pau Gasol",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 14 ante Trail Blazers (Bulls 95-103 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Firma su máxima anotación en playoffs con 36 puntos ante Nuggets (Lakers W 128-114).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "2016-03-23",
-      "jugador": "Nikola Mirotic",
-      "hito": "Alcanza su máximo de triples en la NBA: 9 ante Knicks (Bulls 107-115 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "13 apr 2016",
-      "jugador": "Nikola Mirotic",
-      "hito": "Alcanza su máximo de robos en la NBA: 5 ante 76ers (Bulls 115-105).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2017-03-13",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 19 ante Wizards (Timberwolves 119-104).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2017-03-25",
-      "jugador": "Willy Hernangómez",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 11 ante Spurs (Knicks 98-106 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2017-11-25",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 14 ante Nuggets (Grizzlies 92-104 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2018-02-10",
-      "jugador": "Nikola Mirotic",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 16 ante Nets (Pelicans 138-128 (2OT)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "25 apr 2018",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de rebotes en los playoffs: 12 ante Thunder (Jazz 99-107 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2018-10-19",
-      "jugador": "Nikola Mirotic",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 14 ante Kings (Pelicans 149-129).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2018-10-30",
-      "jugador": "Alex Abrines",
-      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Clippers (Thunder 128-110).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2018-11-04",
-      "jugador": "Serge Ibaka",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 15 ante Lakers (Raptors 121-107).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "26 dec 2018",
+      "fecha": "23 apr 2022",
       "jugador": "Juancho Hernangómez",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 13 ante Spurs (Nuggets 103-111 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
+      "hito": "Firma su máxima anotación en playoffs con 6 puntos ante Mavericks (Jazz W 100-99).",
+      "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "etiquetas": ""
     },
     {
-      "fecha": "23 jan 2019",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Hornets (Grizzlies 107-118 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
+      "fecha": "30 apr 2010",
+      "jugador": "Pau Gasol",
+      "hito": "Palmeo para ganar el sexto partido de la primera ronda ante los Thunder y llevarse la eliminatoria camino al anillo.",
+      "etiqueta": "GAME WINNER, SERIE GANADA",
+      "video": "https://www.youtube.com/watch?v=GklQlH1z_KE",
       "etiquetas": ""
     },
     {
-      "fecha": "16 apr 2019",
-      "jugador": "Marc Gasol",
-      "hito": "Alcanza su máximo de robos en los playoffs: 4 ante Magic (Raptors 111-82).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "22 apr 2019",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de asistencias en los playoffs: 11 ante Rockets (Jazz 107-91).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2021-02-17",
-      "jugador": "Willy Hernangómez",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Trail Blazers (Pelicans 124-126 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2021-11-07",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 13 ante Knicks (Cavaliers 126-109).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2021-11-07",
-      "jugador": "Ricky Rubio",
-      "hito": "Alcanza su máximo de triples en la NBA: 8 ante Knicks (Cavaliers 126-109).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "1 apr 2022",
-      "jugador": "Usman Garuba",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 14 ante Kings (Rockets 117-122 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2022-10-22",
-      "jugador": "Usman Garuba",
-      "hito": "Alcanza su máximo de robos en la NBA: 4 ante Bucks (Rockets 105-125 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2024-03-25",
-      "jugador": "Santi Aldama",
-      "hito": "Alcanza su máximo de tapones en la NBA: 4 ante Nuggets (Grizzlies 103-128 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2024-11-25",
-      "jugador": "Santi Aldama",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 17 ante Trail Blazers (Grizzlies 123-98).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2025-03-01",
-      "jugador": "Santi Aldama",
-      "hito": "Alcanza su máximo de asistencias en la NBA: 11 ante Spurs (Grizzlies 128-130 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "20 dec 2025",
-      "jugador": "Santi Aldama",
-      "hito": "Alcanza su máximo de tiros de campo en la NBA: 15 ante Wizards (Grizzlies 122-130 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "28 dec 2025",
-      "jugador": "Santi Aldama",
-      "hito": "Alcanza su máximo de robos en la NBA: 5 ante Wizards (Grizzlies 112-116 (derrota)).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2026-03-02",
-      "jugador": "Hugo González",
-      "hito": "Alcanza su máximo de rebotes en la NBA: 16 ante Bucks (Celtics 108-81).",
-      "etiqueta": "CAREER-HIGH",
-      "video": "",
+      "fecha": "2015-02-08",
+      "jugador": "Pau Gasol",
+      "hito": "Rebote ofensivo y canasta para que los Chicago Bulls se llevaran el triunfo ante Orlando Magic.",
+      "etiqueta": "GAME WINNER",
+      "video": "https://www.youtube.com/watch?v=d4wmkY0Z9iU",
       "etiquetas": ""
     }
   ],
