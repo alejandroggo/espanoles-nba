@@ -4989,6 +4989,34 @@ function efmPlayVideo(btn, id) {
   wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}" title="Vídeo de la efeméride" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
   btn.replaceWith(wrap);
 }
+// Comparte la efeméride: menú nativo del móvil (navigator.share) o copia el enlace en escritorio.
+// El enlace lleva ?m=&d= para abrir justo ese día en la página de efemérides.
+function efmShare(btn, i) {
+  const e = (efmCurrentList || [])[i];
+  if (!e) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = e.html || '';
+  const texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+  const fechaTxt = `${efmDay} de ${MESES_LARGOS[efmMonth - 1]} de ${e.year}`;
+  const url = `${location.origin}${location.pathname}?m=${efmMonth}&d=${efmDay}`;
+  const cuerpo = `📅 ${fechaTxt} — Españoles en la NBA\n${texto}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Españoles en la NBA · Efeméride', text: cuerpo, url }).catch(() => {});
+    return;
+  }
+  const full = `${cuerpo}\n${url}`;
+  const ok = () => {
+    const prev = btn.innerHTML;
+    btn.innerHTML = '✓ Copiado';
+    setTimeout(() => { btn.innerHTML = prev; }, 1800);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(full).then(ok).catch(() => window.prompt('Copia el enlace para compartir:', url));
+  } else {
+    window.prompt('Copia el enlace para compartir:', url);
+  }
+}
+
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
 function efmMoney(s) { const m = String(s || '').match(/\$\s?[\d.,]+\s?[MK]?(?:\s?[x×]\s?\d+)?/i); return m ? m[0].replace(/\s+/g, ' ').trim() : ''; }
 function efmPick(s) { const m = String(s || '').match(/#\s?(\d+)/); return m ? ('#' + m[1]) : ''; }
@@ -5214,7 +5242,8 @@ function renderEfm() {
     const vid = e.video ? efmYtId(e.video) : '';
     const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     const detailBtn = e.detail ? `<button type="button" class="efm-detail-btn" onclick="efmShowDetail(${i})">Ver detalles</button>` : '';
-    const acts = (videoBtn || detailBtn) ? `<div class="efm-acts">${videoBtn}${detailBtn}</div>` : '';
+    const shareBtn = `<button type="button" class="efm-share-btn" onclick="efmShare(this,${i})"><span class="efm-video-ico">↗</span> Compartir</button>`;
+    const acts = `<div class="efm-acts">${videoBtn}${detailBtn}${shareBtn}</div>`;
     const photo = efmPhoto(e.player);
     return `<li class="efm-item">
       <div class="efm-year">${e.year}<span class="efm-ago">${ago > 0 ? `hace ${ago} año${ago === 1 ? '' : 's'}` : 'este año'}</span></div>
