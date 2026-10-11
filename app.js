@@ -5002,20 +5002,34 @@ function efmPlayVideo(btn, id) {
   wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}" title="Vídeo de la efeméride" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
   btn.replaceWith(wrap);
 }
-// Comparte la efeméride: menú nativo del móvil (navigator.share) o copia el enlace en escritorio.
+// Handles de X (Twitter) por jugador. Clave: nombre normalizado (drNorm). Valor: handle SIN @.
+// Rellenar solo con handles verificados — un handle equivocado etiquetaría a otra persona.
+const TW_HANDLES = {
+  // 'pau gasol': 'paugasol',
+  // 'marc gasol': 'MarcGasol',
+};
+function efmHandle(nombre) {
+  const h = TW_HANDLES[drNorm(nombre || '')];
+  return h ? ('@' + String(h).replace(/^@/, '')) : '';
+}
+
+// Comparte la efeméride en X: abre el compositor con el texto + enlace.
 // El enlace lleva ?m=&d= para abrir justo ese día en la página de efemérides.
 function efmShare(btn, i) {
   const e = (efmCurrentList || [])[i];
   if (!e) return;
   const tmp = document.createElement('div');
   tmp.innerHTML = e.html || '';
-  const texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+  let texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+  // Si el jugador tiene handle verificado, usamos el @ en vez de su nombre.
+  const handle = efmHandle(e.player);
+  if (handle && e.player) texto = texto.split(e.player).join(handle);
   const fechaTxt = `${efmDay} de ${MESES_LARGOS[efmMonth - 1]} de ${e.year}`;
   const url = `${location.origin}${location.pathname}?m=${efmMonth}&d=${efmDay}`;
   const prefijo = `📅 ${fechaTxt} — `;
-  const sufijo = ' #NBA (vía @alejandroggo)';
+  const sufijo = ' #NBA #EspañolesNBA (vía @alejandroggo)';
   // X/Twitter cuenta ~280 caracteres y la URL ocupa 23 (+1 espacio); recortamos
-  // solo el texto de la efeméride para que el prefijo, el hashtag/vía y la URL quepan siempre.
+  // solo el texto de la efeméride para que el prefijo, los hashtags/vía y la URL quepan siempre.
   const presupuesto = 280 - 24 - prefijo.length - sufijo.length;
   let cuerpoTexto = texto;
   if (cuerpoTexto.length > presupuesto) cuerpoTexto = cuerpoTexto.slice(0, presupuesto - 1).trimEnd() + '…';
@@ -5518,7 +5532,7 @@ async function qntShare() {
   if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
   const c = await qntBuildImage(), bl = await qntBlob(c);
   const file = new File([bl], 'mi-quinteto-espanol.png', { type: 'image/png' });
-  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 ' + location.href;
+  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA ' + location.href;
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], text: txt }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
