@@ -444,24 +444,42 @@ function renderHomeWatch(data) {
     if (perPlayer[k] <= 3) top.push(w);
     if (top.length >= 6) break;
   }
-  const items = top.map(rwItemHtml).join('');
+  const items = rwGroup(top).map(rwRowHtml).join('');
   el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><a class="home-efm-link" href="marcas.html">Ver todas →</a></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
   el.hidden = false;
 }
 
 // HTML de una marca (compartido por la home y la página de marcas).
 const RW_SING = { puntos: 'punto', rebotes: 'rebote', asistencias: 'asistencia', triples: 'triple', tapones: 'tapón', robos: 'robo', partidos: 'partido' };
-function rwItemHtml(w) {
-  const j = w.j;
-  const foto = (j.id || j.foto_url || j.bref_id)
-    ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">`
-    : avatarHtml(j.nombre, 'hw-avatar');
-  const sw = w.gap === 1 ? (RW_SING[w.stat] || w.stat) : w.stat;
-  const txt = w.type === 'pass'
-    ? `A <b>${w.gap} ${sw}</b> de superar a ${w.rival}`
-    : `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
-  const badge = isFinite(w.games) ? `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}` : 'Debutante';
-  return `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(j.id)}"><span class="hw-thumb">${foto}</span><span class="hw-body"><span class="hw-name">${j.nombre}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></a></li>`;
+// Agrupa marcas idénticas de varios jugadores (mismo objetivo) en una sola fila.
+function rwGroup(ws) {
+  const map = new Map(), order = [];
+  ws.forEach(w => {
+    const key = [w.type, w.stat, w.gap, w.type === 'pass' ? w.rival : w.milestone, w.games].join('|');
+    if (map.has(key)) map.get(key).players.push(w.j);
+    else { map.set(key, { ...w, players: [w.j] }); order.push(key); }
+  });
+  return order.map(k => map.get(k));
+}
+function rwNames(players) {
+  const n = players.map(p => p.nombre);
+  return n.length <= 1 ? (n[0] || '') : n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1];
+}
+function rwRowHtml(g) {
+  const players = g.players || [g.j];
+  const thumbs = players.slice(0, 3).map(p => (p.id || p.foto_url || p.bref_id)
+    ? `<img loading="lazy" ${agFotoSrc(p)} onerror="agImgHide(this)" alt="">`
+    : avatarHtml(p.nombre, 'hw-avatar')).join('');
+  const sw = g.gap === 1 ? (RW_SING[g.stat] || g.stat) : g.stat;
+  const txt = g.type === 'pass'
+    ? `A <b>${g.gap} ${sw}</b> de superar a ${g.rival}`
+    : `A <b>${g.gap} ${sw}</b> de los ${g.milestone.toLocaleString('es-ES')}`;
+  const badge = isFinite(g.games) ? `~${g.games} ${g.games === 1 ? 'partido' : 'partidos'}` : 'Debutante';
+  const multi = players.length > 1;
+  const inner = `<span class="hw-thumb${multi ? ' hw-thumb-multi' : ''}">${thumbs}</span><span class="hw-body"><span class="hw-name">${rwNames(players)}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span>`;
+  return multi
+    ? `<li class="home-watch-item"><div class="hw-link hw-link--static">${inner}</div></li>`
+    : `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(players[0].id)}">${inner}</a></li>`;
 }
 
 // ── PÁGINA "MARCAS AL ALCANCE" (listado completo con filtro) ──
@@ -490,7 +508,7 @@ async function initMarcasPage() {
 function renderMarcas() {
   const list = document.getElementById('mk-list'), empty = document.getElementById('mk-empty'), count = document.getElementById('mk-count');
   const rows = mkFilter === 'all' ? mkAll : mkAll.filter(w => w.type === mkFilter);
-  list.innerHTML = rows.map(rwItemHtml).join('');
+  list.innerHTML = rwGroup(rows).map(rwRowHtml).join('');
   if (empty) empty.hidden = rows.length > 0;
   if (count) count.textContent = `${rows.length} ${rows.length === 1 ? 'marca' : 'marcas'}`;
 }
