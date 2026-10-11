@@ -3829,7 +3829,22 @@ function cmpRender() {
   const head = sides.length === 3
     ? `${scoreboard}<div class="cmp-head cmp-head--3">${sideHtml.join('')}</div>`
     : `<div class="cmp-head">${sideHtml[0]}${scoreboard}${sideHtml[1]}</div>`;
-  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + sections;
+  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + sections + cmpShareBar();
+}
+
+function cmpShareBar() {
+  return `<div class="cmp-share-row"><button type="button" class="efm-share-btn" onclick="cmpShare()" aria-label="Compartir comparación en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir comparación</button></div>`;
+}
+function cmpShare() {
+  if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // asegura que la URL refleja la comparación actual
+  const players = cmpPlayers();
+  if (players.length < 2) return;
+  const names = players.map(p => p.nombre);
+  const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
+  const texto = `${vs} — cara a cara 🏀 #EspañolesNBA`;
+  const url = location.href;
+  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`;
+  window.open(intent, '_blank', 'noopener,noreferrer');
 }
 
 function cmpCur(side) {

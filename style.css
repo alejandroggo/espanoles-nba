@@ -1703,6 +1703,7 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
 .efm-detail-btn, .efm-share-btn { color: var(--text); }
 .efm-video-ico { font-size: 0.7rem; }
 .efm-share-ico { display: inline-flex; align-items: center; }
+.cmp-share-row { display: flex; justify-content: center; margin-top: var(--space-6); }
 
 /* Popup de detalles de transacción */
 .efm-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: var(--space-4); background: rgba(0, 0, 0, 0.55); }
