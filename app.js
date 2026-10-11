@@ -2274,7 +2274,7 @@ function jugEfemerides(j) {
     const videoBtn = vid ? `<button type="button" class="efm-video-btn jug-efm-video" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     return `<li class="jug-efm-item">
       <a class="jug-efm-date" href="efemerides.html?m=${e.m}&d=${e.d}">${e.d} ${MESES[e.m - 1]} ${e.year}</a>
-      <div class="jug-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="jug-efm-txt">${txt}</span>${videoBtn}</div>
+      <div class="jug-efm-body"><div class="jug-efm-top"><span class="efm-tags">${tagsHtml}</span>${videoBtn}</div><span class="jug-efm-txt">${txt}</span></div>
     </li>`;
   }).join('');
   return jugSection('Efemérides', `<ul class="jug-efm-list">${items}</ul>`);
