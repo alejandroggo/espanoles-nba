@@ -2264,10 +2264,10 @@ function jugDebut(j) {
     ['TL', (p.ftm != null && p.fta != null) ? `${p.ftm}/${p.fta}` : null],
     ['TOV', p.tov], ['PF', p.pf],
   ].filter(([, v]) => v != null && v !== '').map(([l, v]) => statBox(l, v)).join('');
-  const meta = `<div class="jug-debut-meta"><b>${vs}</b>${resHtml}<span class="jug-debut-sub">${p.fecha}${p.edad != null ? ` · ${Math.floor(p.edad)} años` : ''}</span></div>`;
   const vid = efmYtId(p.video);
-  const videoBtn = vid ? `<div class="jug-debut-video"><button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo del debut</button></div>` : '';
-  return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>${videoBtn}`);
+  const videoBtn = vid ? `<button type="button" class="efm-video-btn jug-debut-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo del debut</button>` : '';
+  const meta = `<div class="jug-debut-meta"><b>${vs}</b>${resHtml}<span class="jug-debut-sub">${p.fecha}${p.edad != null ? ` · ${Math.floor(p.edad)} años` : ''}</span>${videoBtn}</div>`;
+  return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>`);
 }
 
 // Puesto histórico del jugador entre los españoles que han debutado en la NBA.
@@ -3715,7 +3715,7 @@ function cmpNTeams(j) {
 }
 function cmpPremios(j, filter) {
   const p = j.premios || [];
-  return (filter ? p.filter(filter).length : p.length) || null;
+  return filter ? p.filter(filter).length : p.length;   // devuelve 0 (no null): las filas de premios se muestran siempre
 }
 
 // Lista de premios del jugador (incluye anillos), filtrada al periodo activo del lado
@@ -3775,7 +3775,7 @@ const CMP_SECTIONS = [
     { label: 'Robos',       get: j => j.game_highs && j.game_highs.stl, fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'Tapones',     get: j => j.game_highs && j.game_highs.blk, fmt: fmtEnt, dir: 'high', bar: true },
   ]},
-  { title: 'Premios', premios: true, when: (a, b) => (a.premios || []).length || (b.premios || []).length || TL_ANILLOS[drNorm(a.nombre)] || TL_ANILLOS[drNorm(b.nombre)], rows: [
+  { title: 'Premios', premios: true, rows: [
     { label: 'Anillos NBA',          get: j => cmpPremios(j, p => /campe/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'All-NBA',              get: j => cmpPremios(j, p => /all[\s-]?nba/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
     { label: 'All-Star',             get: j => cmpPremios(j, p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
@@ -3880,20 +3880,41 @@ function cmpModeBar(players) {
   </div>`;
 }
 
+// Franquicias en las que jugó dentro de un rango [lo, hi] (en orden cronológico).
+// Una temporada → la franquicia; varias → todas las franquicias del tramo.
+function cmpTeamsLabel(j, lo, hi) {
+  const seen = [];
+  (j.temporadas_data || []).forEach(t => {
+    const y = t.year, tm = (t.team || '').toUpperCase();
+    if (!y || !tm || tm === 'TOT') return;
+    if ((lo != null && y < lo) || (hi != null && y > hi)) return;
+    if (!seen.includes(tm)) seen.push(tm);
+  });
+  return seen.map(tm => teamInfo(tm).name).join(' · ');
+}
+
 // Selector Desde/Hasta bajo la foto (solo en modo 'diff')
 function cmpRangeUI(side, j, agg) {
   if (cmpMode !== 'diff') {
-    if (cmpMode === 'same' && cmpSame) return `<div class="cmp-range cmp-range--one">${drSeason(cmpSame)}</div>`;
+    if (cmpMode === 'same' && cmpSame) {
+      const teams = cmpTeamsLabel(j, cmpSame, cmpSame);
+      return `<div class="cmp-range cmp-range--one">${drSeason(cmpSame)}${teams ? `<span class="cmp-range-team">${teams}</span>` : ''}</div>`;
+    }
     return '';
   }
   const seasons = cmpSeasons(j);
   if (!seasons.length) return '';
-  if (seasons.length === 1) return `<div class="cmp-range cmp-range--one">${drSeason(seasons[0])}</div>`;
+  if (seasons.length === 1) {
+    const teams = cmpTeamsLabel(j, seasons[0], seasons[0]);
+    return `<div class="cmp-range cmp-range--one">${drSeason(seasons[0])}${teams ? `<span class="cmp-range-team">${teams}</span>` : ''}</div>`;
+  }
   const optFrom = seasons.map(y => `<option value="${y}"${y === agg._from ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
   const optTo = seasons.map(y => `<option value="${y}"${y === agg._to ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
   const lbl = agg._full
     ? `<span class="cmp-range-lbl">Toda la carrera</span>`
     : `<span class="cmp-range-lbl">${agg._n} temp. · ${fmtEnt(agg.partidos)} GP · <button type="button" class="cmp-range-reset" onclick="cmpResetRange('${side}')">Toda la carrera</button></span>`;
+  const teams = cmpTeamsLabel(j, agg._from, agg._to);
+  const teamsHtml = teams ? `<div class="cmp-range-team">${teams}</div>` : '';
   return `<div class="cmp-range">
     <div class="cmp-range-sel">
       <select class="sel cmp-rsel" aria-label="Desde" onchange="cmpSetRange('${side}','from',this.value)">${optFrom}</select>
@@ -3901,6 +3922,7 @@ function cmpRangeUI(side, j, agg) {
       <select class="sel cmp-rsel" aria-label="Hasta" onchange="cmpSetRange('${side}','to',this.value)">${optTo}</select>
     </div>
     ${lbl}
+    ${teamsHtml}
   </div>`;
 }
 
@@ -3919,7 +3941,6 @@ function cmpRender() {
     .map(s => {
       const datas = sides.map((_, i) => (s.premios ? prems[i] : (s.ranged ? aggs[i] : players[i])));
       let rows = s.rows.map(r => cmpRow(r, datas));
-      if (s.premios) rows = rows.filter(r => !r.empty);   // ocultar premios sin datos en ninguno
       if (!rows.length) return '';
       rows.forEach(r => r.wins.forEach((w, i) => { if (w) scores[i]++; }));
       const note = ((s.ranged || s.premios) && partial) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
@@ -3964,7 +3985,6 @@ function cmpScoreData() {
     .forEach(s => {
       const datas = sides.map((_, i) => (s.premios ? prems[i] : (s.ranged ? aggs[i] : players[i])));
       let rows = s.rows.map(r => cmpRow(r, datas));
-      if (s.premios) rows = rows.filter(r => !r.empty);
       if (!rows.length) return;
       const sec = sides.map(() => 0);
       rows.forEach(r => r.wins.forEach((w, i) => { if (w) { sec[i]++; total[i]++; } }));
@@ -3991,11 +4011,17 @@ async function cmpBuildImage(d) {
   // kicker
   x.textAlign = 'center'; x.textBaseline = 'alphabetic';
   x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif';
-  x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 70); x.restore();
+  x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 60); x.restore();
+  // periodo comparado (toda la carrera / temporada / tramos)
+  const tfTxt = d.modoTxt === 'toda la carrera' ? 'Toda la carrera'
+    : d.modoTxt === 'tramos elegidos' ? 'Tramos elegidos por jugador'
+    : `Temporada ${d.modoTxt}`;
+  x.fillStyle = CO.muted; x.font = '600 22px Inter, sans-serif';
+  x.save(); x.letterSpacing = '1px'; x.fillText(tfTxt, W / 2, 94); x.restore();
 
   // caras + nombres
   const cols = n === 2 ? [W * 0.26, W * 0.74] : [W * 0.2, W * 0.5, W * 0.8];
-  const cy = 190, r = 92;
+  const cy = 208, r = 92;
   const drawFace = (cx, img, name) => {
     x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.closePath(); x.clip();
     if (img) { const s = Math.max(2 * r / img.width, 2 * r / img.height); const w = img.width * s, h = img.height * s; x.drawImage(img, cx - w / 2, cy - h / 2 - r * 0.12, w, h); }
@@ -4070,9 +4096,10 @@ async function cmpShare() {
   if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // la URL refleja la comparación actual
   const d = cmpScoreData();
   if (!d || d.players.length < 2) return;
-  const names = d.players.map(p => p.nombre);
+  const names = d.players.map(p => efmHandle(p.nombre) || p.nombre);   // @ de X si lo tenemos, si no el nombre
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
-  const texto = `${vs} — cara a cara 🏀 #EspañolesNBA`;
+  const modo = d.modoTxt === 'toda la carrera' ? '' : (d.modoTxt === 'tramos elegidos' ? ' (tramos elegidos)' : ` (${d.modoTxt})`);
+  const texto = `${vs} — cara a cara${modo} 🏀 #EspañolesNBA`;
   const url = location.href;
   const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto + '\n\n' + url)}`;
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
