@@ -355,14 +355,15 @@ async function initHome() {
     let day = { m: tm, d: td }, list = evs.filter(e => e.m === tm && e.d === td), isToday = true;
     if (!list.length) {
       isToday = false;
-      for (let i = 1; i <= 366 && !list.length; i++) {
+      // Solo mostramos la próxima efeméride si cae dentro de la próxima semana (7 días).
+      for (let i = 1; i <= 7 && !list.length; i++) {
         const dt = new Date(2000, tm - 1, td); dt.setDate(dt.getDate() + i);
         const mm = dt.getMonth() + 1, dd = dt.getDate();
         const l = evs.filter(e => e.m === mm && e.d === dd);
         if (l.length) { list = l; day = { m: mm, d: dd }; }
       }
     }
-    renderHomeEfm(list, day, isToday);
+    renderHomeEfm(list, day, isToday);   // si sigue vacía, renderHomeEfm no muestra nada
   } catch (e) {}
   try { renderHomeWatch(data); } catch (e) {}
 }
