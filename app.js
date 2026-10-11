@@ -3670,18 +3670,14 @@ const CMP_SECTIONS = [
     { label: 'Tapones',     get: j => j.game_highs && j.game_highs.blk, fmt: fmtEnt, dir: 'high', bar: true },
   ]},
   { title: 'Premios', premios: true, when: (a, b) => (a.premios || []).length || (b.premios || []).length || TL_ANILLOS[drNorm(a.nombre)] || TL_ANILLOS[drNorm(b.nombre)], rows: [
-    { label: 'Anillos NBA',     get: j => cmpPremios(j, p => /campe/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
-    { label: 'Premios (total)', get: j => (j.premios || []).length || null, fmt: fmtEnt, dir: 'high', bar: true },
-    { label: 'All-Star',        get: j => cmpPremios(j, p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'All-NBA',         get: j => cmpPremios(j, p => /all[\s-]?nba/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'All-Defense',     get: j => cmpPremios(j, p => /all[\s-]?defense|defensiv/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'MVP (votos)',     get: j => cmpPremios(j, p => /mvp/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'ROY',             get: j => cmpPremios(j, p => /\broy\b|rookie of the year/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'DPOY',            get: j => cmpPremios(j, p => /dpoy|defensive player/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'All-Rookie',      get: j => cmpPremios(j, p => /all[\s-]?rookie/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'Jugador del Mes', get: j => cmpPremios(j, p => /player of the month/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'Rookie del Mes',  get: j => cmpPremios(j, p => /rookie of the month/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
-    { label: 'Rising Stars',    get: j => cmpPremios(j, p => /rising stars/i.test(p.tipo)), fmt: fmtEnt, dir: 'high' },
+    { label: 'Anillos NBA',          get: j => cmpPremios(j, p => /campe/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'All-NBA',              get: j => cmpPremios(j, p => /all[\s-]?nba/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'All-Star',             get: j => cmpPremios(j, p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
+    { label: 'All-Defense',          get: j => cmpPremios(j, p => /all[\s-]?defense/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
+    // Premios individuales mayores: MVP (votos), ROY y DPOY
+    { label: 'Premios individuales', get: j => cmpPremios(j, p => /mvp|\broy\b|rookie of the year|\bdpoy\b/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
+    // Premios menores: All-Rookie, Jugador/Rookie del Mes, Rising Stars y concursos del All-Star
+    { label: 'Premios menores',      get: j => cmpPremios(j, p => /all[\s-]?rookie|player of the month|rookie of the month|rising stars|concurso/i.test(p.tipo)), fmt: fmtEnt, dir: 'high', bar: true },
   ]},
   { title: 'Dinero', career: true, when: (a, b) => a.ganancias || b.ganancias, rows: [
     { label: 'Ganancias', get: j => j.ganancias || null, fmt: fmtDinero, dir: 'high', bar: true },
