@@ -3929,14 +3929,15 @@ async function cmpBuildImage(d) {
     if (n === 2) { x.fillStyle = CO.muted; x.font = '400 26px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, y); }
     y += rowH;
   });
-  // total
-  x.fillStyle = CO.coral; x.fillRect(40, y - rowH / 2 + 4, W - 80, totalH - 8);
+  // total (texto centrado verticalmente en la barra)
+  const barTop = y - rowH / 2 + 4, barCy = barTop + (totalH - 8) / 2;
+  x.fillStyle = CO.coral; x.fillRect(40, barTop, W - 80, totalH - 8);
   x.fillStyle = '#fff'; x.font = '800 32px Inter, sans-serif'; x.textAlign = 'left';
-  x.fillText('TOTAL', 70, y + 6);
+  x.fillText('TOTAL', 70, barCy);
   x.textAlign = 'center'; x.font = '800 44px Inter, sans-serif';
   const sx = n === 2 ? [W - 360, W - 130] : [W - 430, W - 280, W - 130];
-  d.total.forEach((s, i) => { x.fillStyle = '#fff'; x.fillText(String(s), sx[i], y + 6); });
-  if (n === 2) { x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '400 34px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, y + 6); }
+  d.total.forEach((s, i) => { x.fillStyle = '#fff'; x.fillText(String(s), sx[i], barCy); });
+  if (n === 2) { x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '400 34px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, barCy); }
 
   // footer
   x.textBaseline = 'alphabetic';
