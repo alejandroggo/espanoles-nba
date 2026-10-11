@@ -1377,7 +1377,8 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 #tl-body tr:nth-child(even) .tl-debut { background: var(--surface-2); }
 #tl-body tr:hover .tl-name,
 #tl-body tr:hover .tl-debut { background: var(--accent-light); }
-#tl-body td { border-bottom: 2px solid var(--bg); }
+#tl-body td, #tl-body th { border-bottom: 2px solid var(--bg); }
+.tl-year.tl-yearhl { background: var(--accent); color: var(--accent-contrast); }
 
 .tl-cell {
   position: relative;
@@ -1386,9 +1387,9 @@ th.tl-break { color: var(--accent); font-size: 0.55rem; }
 }
 /* Anillo NBA: marca en el año exacto sobre la barra */
 .tl-ring {
-  position: absolute; top: 50%; transform: translate(-50%, -50%);
-  font-size: 0.66rem; line-height: 1; pointer-events: none; z-index: 1;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.55));
+  position: absolute; top: 1px; transform: translateX(-50%);
+  font-size: 0.58rem; line-height: 1; pointer-events: none; z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.75));
 }
 .tl-lbl {
   display: block; color: inherit;

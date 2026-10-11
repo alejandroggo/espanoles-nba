@@ -3327,6 +3327,21 @@ function tlClearCol() {
   const t = document.getElementById('tl-table');
   if (t) t.querySelectorAll('.tl-colhl').forEach(el => el.classList.remove('tl-colhl'));
 }
+// Hover sobre una fila: marca esa fila y resalta en la cabecera los años que jugó.
+function tlHoverRow(tr) {
+  const t = document.getElementById('tl-table');
+  if (!t) return;
+  tr.classList.add('tl-rowhl');
+  tr.querySelectorAll('td.tl-cell').forEach(td => {
+    const a = +td.dataset.c0, b = +td.dataset.c1;
+    for (let k = a; k <= b; k++) t.querySelectorAll(`.tl-year[data-idx="${k}"]`).forEach(el => el.classList.add('tl-yearhl'));
+  });
+}
+function tlClearRow(tr) {
+  if (tr) tr.classList.remove('tl-rowhl');
+  const t = document.getElementById('tl-table');
+  if (t) t.querySelectorAll('.tl-year.tl-yearhl').forEach(el => el.classList.remove('tl-yearhl'));
+}
 // Elegir una temporada: resalta a los que jugaron ese año y atenúa al resto (clic de nuevo = quitar)
 function tlSelectYear(year) {
   tlSelYear = (tlSelYear === year) ? null : year;
@@ -3508,7 +3523,8 @@ function renderTimeline() {
         const segs = teams.map((tm, si) => {
           const info = teamInfo(tm);
           const cont = (si === 0 && cL) || (si === teams.length - 1 && cR);
-          return `<span class="tl-seg${cont ? ' tl-seg-cont' : ''}" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}">${cont ? '' : tm}</span>`;
+          // En celdas de traspaso (2+ equipos en una temporada) no cabe el código: solo color (el tooltip lo dice).
+          return `<span class="tl-seg${cont ? ' tl-seg-cont' : ''}" data-team="${tm}" style="background-color:${info.color};color:${info.text || '#fff'}" title="${info.name} · ${drSeason(c)}${p.rings[c] === tm ? ' · campeón' : ''}"></span>`;
         }).join('');
         // El anillo se centra en el año (no en el segmento) para alinearlo con otros campeones del mismo año
         const ringHtml = p.rings[c] ? `<span class="tl-ring" style="left:50%">🏆</span>` : '';
@@ -3534,7 +3550,7 @@ function renderTimeline() {
       i += span;
     }
     const dim = (tlSelYear != null && !p.seasons[tlSelYear]) ? ' tl-dim' : '';
-    return `<tr data-pid="${p.j.id || ''}" class="${dim.trim()}">
+    return `<tr data-pid="${p.j.id || ''}" class="${dim.trim()}" onmouseenter="tlHoverRow(this)" onmouseleave="tlClearRow(this)">
       <th scope="row" class="tl-name"><span class="tl-namewrap">${tlFace(p)}${p.j.id ? `<a class="pl-link tl-pname" href="${jugadorHref(p.j.id)}">${p.j.nombre}</a>` : `<span class="tl-pname">${p.j.nombre}</span>`}</span></th>
       <td class="tl-debut">${p._debut || tlDebutYear(p.j, p.first)}</td>
       ${cells.join('')}
