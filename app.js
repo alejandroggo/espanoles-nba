@@ -5176,6 +5176,8 @@ function efmTagClass(tag) {
   if (/franquicia|career.?high|record|milestone|marca|primera vez|primer espanol|primer español|debut/.test(t)) return 'efm-tag--record';
   // Azul (movimientos: draft, traspaso y firmas)
   if (/draft|traspas|firma|renov|agente libre|extensi|sign|contrato/.test(t)) return 'efm-tag--partido';
+  // Turquesa (cumpleaños / nacimiento)
+  if (/cumple|nacimiento|nace/.test(t)) return 'efm-tag--cumple';
   return 'efm-tag--hito';
 }
 // Extrae el ID de un vídeo de YouTube desde varias formas de URL (o el propio ID)
@@ -5321,6 +5323,11 @@ function efmBuild(data) {
     if (j.draft && j.draft_fecha) {
       const dt = efmParseShort(j.draft_fecha);
       if (dt) { ev.push({ ...dt, kind: 'draft', tag: 'Draft', player: j.nombre, video: String(j.draft_video || j.video_draft || '').trim(), html: `<b>${plLink(j.nombre, j.nombre)}</b> es elegido en el draft${j.draft_equipo ? ` por ${efmTeamName(j.draft_equipo)}` : ''}${j.draft_pick ? ` con el pick #${j.draft_pick}` : ''}.` }); draftKey.add(drNorm(j.nombre) + '|' + dt.year); }
+    }
+    // Cumpleaños: "un día como hoy nació X"
+    if (j.nacimiento_fecha) {
+      const dt = efmParseShort(j.nacimiento_fecha);
+      if (dt) ev.push({ ...dt, kind: 'cumple', tag: 'Cumpleaños', player: j.nombre, video: '', html: `Nace <b>${plLink(j.nombre, j.nombre)}</b>.` });
     }
   });
   // Transacciones (evitando duplicar el draft ya recogido arriba)

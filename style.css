@@ -625,6 +625,18 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .jugmk-item:first-child { border-top: 0; }
 .jugmk-txt { font-size: 0.95rem; line-height: 1.4; }
 .jugmk-txt b { color: var(--accent); font-weight: 700; }
+/* CTA newsletter (home) */
+.home-cta { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-12); }
+.home-cta-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-8); box-shadow: var(--shadow-sm); }
+.home-cta-title { font-family: var(--display); font-size: 1.6rem; margin: 0 0 var(--space-1); color: var(--text); }
+.home-cta-sub { margin: 0; color: var(--text-muted); font-size: 0.95rem; max-width: 62ch; line-height: 1.5; }
+.home-cta-btn { flex: 0 0 auto; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.95rem; padding: var(--space-3) var(--space-5); border-radius: var(--radius-full); text-decoration: none; white-space: nowrap; transition: opacity .15s; }
+.home-cta-btn:hover { opacity: 0.9; }
+@media (max-width: 600px) {
+  .home-cta { padding: 0 var(--space-4) var(--space-10); }
+  .home-cta-inner { flex-direction: column; align-items: flex-start; padding: var(--space-5); }
+  .home-cta-title { font-size: 1.3rem; }
+}
 .hw-avatar.avatar { width: 40px; height: 40px; font-size: 0.72rem; }
 .hw-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .hw-name { font-weight: 700; font-size: 0.9rem; }
@@ -1656,6 +1668,7 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
 .efm-tag--serie { background: color-mix(in srgb, #10b981 20%, transparent); color: #047857; }
 .efm-tag--partido { background: color-mix(in srgb, #3b82f6 18%, transparent); color: #2563eb; }
 .efm-tag--allstar { background: color-mix(in srgb, #ec4899 18%, transparent); color: #be185d; }
+.efm-tag--cumple { background: color-mix(in srgb, #06b6d4 18%, transparent); color: #0e7490; }
 :root[data-theme="dark"] .efm-tag--debut { color: #4ade80; }
 :root[data-theme="dark"] .efm-tag--draft { color: #a5b4fc; }
 :root[data-theme="dark"] .efm-tag--hito { color: #fbbf24; }
