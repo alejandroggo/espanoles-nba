@@ -4435,6 +4435,17 @@ function renderTmpTable() {
   }).join('') || `<tr><td colspan="${cols.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
+function toggleTmpAdv() {
+  const bar = document.getElementById('tmp-filterbar');
+  const btn = document.getElementById('tmp-adv');
+  if (!bar || !btn) return;
+  const open = bar.hidden;
+  bar.hidden = !open;
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-expanded', String(open));
+  const caret = btn.querySelector('.tmp-adv-caret');
+  if (caret) caret.textContent = open ? '▴' : '▾';
+}
 function toggleTmpPartials() {
   tmpHidePartials = !tmpHidePartials;
   const btn = document.getElementById('tmp-hide');

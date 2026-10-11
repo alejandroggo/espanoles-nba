@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=164">
+<link rel="stylesheet" href="style.css?v=165">
 </head>
 <body>
 
@@ -89,15 +89,16 @@
       <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
     </div>
     <button type="button" id="tmp-hide" class="toggle-chip" aria-pressed="false" onclick="toggleTmpPartials()">Ocultar parciales</button>
+    <button type="button" id="tmp-adv" class="toggle-chip" aria-expanded="false" onclick="toggleTmpAdv()">Filtros avanzados <span class="tmp-adv-caret">▾</span></button>
     <span class="results-count" id="tmp-count"></span>
   </section>
+
+  <section class="tmp-filterbar" id="tmp-filterbar" aria-label="Filtros avanzados" hidden></section>
 
   <div class="tmp-legend" aria-label="Leyenda">
     <span class="tmp-lg"><span class="tmp-sw tmp-sw-parcial"></span> Traspasado</span>
     <span class="tmp-lg"><span class="tmp-sw tmp-sw-cut"></span> Cortado</span>
   </div>
-
-  <section class="tmp-filterbar" id="tmp-filterbar" aria-label="Filtros avanzados"></section>
 
   <section class="tabla-wrap" aria-label="Todas las temporadas">
     <table id="tmp-table">
@@ -131,7 +132,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=164"></script>
+<script src="app.js?v=165"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
