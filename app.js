@@ -425,8 +425,9 @@ function rwBuild(data) {
 function renderHomeWatch(data) {
   const el = document.getElementById('home-watch');
   if (!el) return;
-  // En portada mostramos solo lo inminente: marcas a ~3 partidos o menos.
-  const all = rwBuild(data).filter(w => w.games <= 3);
+  // En portada: superar a otro español solo si es inminente (~3 partidos);
+  // las cifras redondas (hitos) se anuncian con algo más de margen (~15 partidos).
+  const all = rwBuild(data).filter(w => w.type === 'pass' ? w.games <= 3 : w.games <= 15);
   if (!all.length) return;
   // Variedad: máximo 3 marcas por jugador, hasta 6 en total.
   const perPlayer = {}, top = [];
