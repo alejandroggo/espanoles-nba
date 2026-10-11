@@ -73,14 +73,24 @@ function buildHeaderSearch() {
   wrap.className = 'hsearch';
   wrap.id = 'hsearch';
   wrap.innerHTML = `
+    <button type="button" class="hsearch-toggle" id="hsearch-toggle" aria-label="Buscar jugador" aria-expanded="false">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    </button>
     <input id="hsearch-input" class="hsearch-input" type="search" autocomplete="off" placeholder="Buscar jugador…"
       aria-label="Buscar jugador" role="combobox" aria-expanded="false" aria-controls="hsearch-panel">
     <div class="hsearch-panel" id="hsearch-panel" role="listbox" hidden></div>`;
   right.insertBefore(wrap, right.firstChild);
   const input = wrap.querySelector('#hsearch-input');
+  const toggle = wrap.querySelector('#hsearch-toggle');
   input.addEventListener('focus', hsEnsureData);
   input.addEventListener('input', () => { hsIdx = -1; hsRender(input.value); });
   input.addEventListener('keydown', hsKey);
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = !wrap.classList.contains('open');
+    if (open) { wrap.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); hsEnsureData(); setTimeout(() => input.focus(), 30); }
+    else { hsClose(); }
+  });
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) hsClose(); });
 }
 
@@ -120,6 +130,9 @@ function hsClose() {
   const panel = document.getElementById('hsearch-panel'), input = document.getElementById('hsearch-input');
   if (panel) panel.hidden = true;
   if (input) input.setAttribute('aria-expanded', 'false');
+  const wrap = document.getElementById('hsearch'), tg = document.getElementById('hsearch-toggle');
+  if (wrap) wrap.classList.remove('open');
+  if (tg) tg.setAttribute('aria-expanded', 'false');
 }
 
 // ── NAVEGACIÓN GLOBAL ─────────────────────────

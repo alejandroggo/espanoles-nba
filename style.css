@@ -174,6 +174,7 @@ main { flex: 1; }
 /* ── NAV MENU ────────────────────────────────── */
 /* ── BUSCADOR GLOBAL (cabecera) ── */
 .hsearch { position: relative; }
+.hsearch-toggle { display: none; }   /* solo visible en móvil */
 .hsearch-input {
   width: 168px; max-width: 40vw;
   padding: var(--space-1) var(--space-2);
@@ -696,7 +697,27 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .logo { font-size: 1.05rem; letter-spacing: 0.03em; }
   .header-inner { gap: var(--space-3); }
   .header-right { gap: var(--space-2); }
-  .hsearch { display: none; }            /* buscador global: se usa el de cada página */
+  /* buscador global en móvil: icono 🔍 que despliega una barra a lo ancho */
+  .hsearch { display: block; }
+  .hsearch-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 30px; padding: 0;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  .hsearch-input { display: none; }
+  .hsearch.open .hsearch-toggle { border-color: var(--accent); color: var(--accent); }
+  .hsearch.open .hsearch-input {
+    display: block; position: fixed;
+    left: var(--space-4); right: var(--space-4); top: 54px;
+    width: auto; max-width: none;
+    padding: var(--space-2) var(--space-3); font-size: var(--font-sm);
+    box-shadow: var(--shadow-lg); z-index: 210;
+  }
+  .hsearch.open .hsearch-panel {
+    position: fixed; left: var(--space-4); right: var(--space-4); top: 94px;
+    width: auto; max-width: none; z-index: 210;
+  }
   #share-btn { display: none; }          /* compartir: se usa el del navegador */
   .tt-lbl { display: none; }             /* tema: solo icono */
   .theme-toggle { padding: var(--space-1) var(--space-2); }
