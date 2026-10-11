@@ -3633,6 +3633,7 @@ const CMP_SECTIONS = [
     { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: '% titular',         get: j => j.partidos ? (j.partidos_titular || 0) / j.partidos : null, fmt: fmtPct, dir: 'high', bar: true },
     { label: 'Equipos NBA',       get: j => cmpNTeams(j), fmt: fmtEnt, dir: 'high' },
+    { label: 'Franquicias',       get: j => j.equipos_nba || null, fmt: v => v, dir: 'neutral', cls: 'cmp-row-teams' },
     { label: 'Año de draft',      get: j => j.draft_anio || null, fmt: v => String(v), dir: 'neutral' },
     { label: 'Nº de draft',       get: j => j.draft ? (j.draft_pick || null) : 'undr', fmt: v => v === 'undr' ? 'No drafteado' : ('#' + v), dir: 'low' },
   ]},
@@ -3713,15 +3714,16 @@ function cmpRow(row, datas) {
   const bar = i => (row.bar && nums[i] != null && present.length >= 2)
     ? `<div class="cmp-bar"><span class="cmp-fill${wins[i] ? ' win' : ''}" style="width:${Math.round(Math.abs(nums[i]) / mx * 100)}%"></span></div>` : '';
 
+  const extraCls = row.cls ? ' ' + row.cls : '';
   let html;
   if (datas.length === 2) {
-    html = `<div class="cmp-row">
+    html = `<div class="cmp-row${extraCls}">
       <div class="cmp-cell a"><div class="cmp-val a${wins[0] ? ' win' : ''}">${fmts[0]}</div>${bar(0)}</div>
       <div class="cmp-metric">${row.label}</div>
       <div class="cmp-cell b"><div class="cmp-val b${wins[1] ? ' win' : ''}">${fmts[1]}</div>${bar(1)}</div>
     </div>`;
   } else {
-    html = `<div class="cmp-row3">
+    html = `<div class="cmp-row3${extraCls}">
       <div class="cmp-metric cmp-metric--left">${row.label}</div>
       ${datas.map((_, i) => `<div class="cmp-cell3"><div class="cmp-val${wins[i] ? ' win' : ''}">${fmts[i]}</div>${bar(i)}</div>`).join('')}
     </div>`;
@@ -3736,7 +3738,6 @@ function cmpCard(j, side) {
     ${foto}
     <a class="cmp-name" href="${jugadorHref(j.id)}">${j.nombre}</a>
     <span class="cmp-meta">${draft}</span>
-    <span class="cmp-meta">${j.equipos_nba || ''}</span>
   </div>`;
 }
 
@@ -3784,14 +3785,16 @@ function cmpRangeUI(side, j, agg) {
   if (seasons.length === 1) return `<div class="cmp-range cmp-range--one">${drSeason(seasons[0])}</div>`;
   const optFrom = seasons.map(y => `<option value="${y}"${y === agg._from ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
   const optTo = seasons.map(y => `<option value="${y}"${y === agg._to ? ' selected' : ''}>${drSeason(y)}</option>`).join('');
-  const lbl = agg._full ? 'Toda la carrera' : `${agg._n} temp. · ${fmtEnt(agg.partidos)} GP`;
+  const lbl = agg._full
+    ? `<span class="cmp-range-lbl">Toda la carrera</span>`
+    : `<span class="cmp-range-lbl">${agg._n} temp. · ${fmtEnt(agg.partidos)} GP · <button type="button" class="cmp-range-reset" onclick="cmpResetRange('${side}')">Toda la carrera</button></span>`;
   return `<div class="cmp-range">
     <div class="cmp-range-sel">
       <select class="sel cmp-rsel" aria-label="Desde" onchange="cmpSetRange('${side}','from',this.value)">${optFrom}</select>
       <span class="cmp-range-dash">–</span>
       <select class="sel cmp-rsel" aria-label="Hasta" onchange="cmpSetRange('${side}','to',this.value)">${optTo}</select>
     </div>
-    <div class="cmp-range-lbl">${lbl}</div>
+    ${lbl}
   </div>`;
 }
 
@@ -3962,6 +3965,13 @@ function cmpSetRange(side, which, value) {
   const st = cmpState[side];
   if (which === 'from') { st.from = v; if (st.to != null && st.to < v) st.to = v; }
   else { st.to = v; if (st.from != null && st.from > v) st.from = v; }
+  cmpRender();
+  cmpSyncUrl();
+}
+
+function cmpResetRange(side) {
+  const st = cmpState[side];
+  st.from = null; st.to = null;   // null = toda la carrera (ver cmpAgg)
   cmpRender();
   cmpSyncUrl();
 }
