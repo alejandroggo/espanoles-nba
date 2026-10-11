@@ -5012,10 +5012,14 @@ function efmShare(btn, i) {
   const texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
   const fechaTxt = `${efmDay} de ${MESES_LARGOS[efmMonth - 1]} de ${e.year}`;
   const url = `${location.origin}${location.pathname}?m=${efmMonth}&d=${efmDay}`;
-  let cuerpo = `📅 ${fechaTxt} — ${texto}`;
-  // X/Twitter cuenta ~280 caracteres y la URL ocupa 23; recortamos para que quepa.
-  const MAX = 280 - 24 - 1;
-  if (cuerpo.length > MAX) cuerpo = cuerpo.slice(0, MAX - 1).trimEnd() + '…';
+  const prefijo = `📅 ${fechaTxt} — `;
+  const sufijo = ' #NBA (vía @alejandroggo)';
+  // X/Twitter cuenta ~280 caracteres y la URL ocupa 23 (+1 espacio); recortamos
+  // solo el texto de la efeméride para que el prefijo, el hashtag/vía y la URL quepan siempre.
+  const presupuesto = 280 - 24 - prefijo.length - sufijo.length;
+  let cuerpoTexto = texto;
+  if (cuerpoTexto.length > presupuesto) cuerpoTexto = cuerpoTexto.slice(0, presupuesto - 1).trimEnd() + '…';
+  const cuerpo = `${prefijo}${cuerpoTexto}${sufijo}`;
   const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(cuerpo)}&url=${encodeURIComponent(url)}`;
   window.open(intent, '_blank', 'noopener,noreferrer');
 }
