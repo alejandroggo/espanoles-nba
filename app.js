@@ -3077,6 +3077,37 @@ async function initJugadoresPage() {
   document.getElementById('hero-sub').textContent = `${jugsAll.length} jugadores · pulsa para ver su ficha`;
   document.getElementById('jug-search').addEventListener('input', e => { jugsSearch = e.target.value.trim().toLowerCase(); renderJugs(); });
   renderJugs();
+  renderOrigenes(jugsAll);
+}
+
+// Comunidad autónoma de nacimiento por jugador (clave: nombre normalizado).
+const AG_COMUNIDAD = {
+  'pau gasol': 'Cataluña', 'marc gasol': 'Cataluña', 'juan carlos navarro': 'Cataluña', 'ricky rubio': 'Cataluña', 'raul lopez': 'Cataluña', 'jose a. montero': 'Cataluña', 'albert miralles': 'Cataluña',
+  'willy hernangomez': 'Madrid', 'juancho hernangomez': 'Madrid', 'hugo gonzalez': 'Madrid', 'jorge garbajosa': 'Madrid', 'fernando martin': 'Madrid', 'roberto duenas': 'Madrid', 'dani diez': 'Madrid', 'juan nunez': 'Madrid',
+  'rudy fernandez': 'Baleares', 'alex abrines': 'Baleares', 'baba miller': 'Baleares', 'sergio llull': 'Baleares',
+  'santi aldama': 'Canarias', 'sergio rodriguez': 'Canarias',
+  'jose m. calderon': 'Extremadura', 'victor claver': 'C. Valenciana', 'usman garuba': 'Castilla-La Mancha',
+  'sergio de larrea': 'Castilla y León', 'aday mara': 'Aragón', 'fran vazquez': 'Galicia',
+  'nikola mirotic': 'Fuera de España', 'serge ibaka': 'Fuera de España',
+};
+function renderOrigenes(jugadores) {
+  const el = document.getElementById('jug-origenes');
+  if (!el) return;
+  const groups = {};
+  jugadores.forEach(j => { const ca = AG_COMUNIDAD[drNorm(j.nombre)] || 'Otros'; (groups[ca] = groups[ca] || []).push(j); });
+  const entries = Object.entries(groups).sort((a, b) => {
+    if (a[0] === 'Fuera de España') return 1;
+    if (b[0] === 'Fuera de España') return -1;
+    return b[1].length - a[1].length || a[0].localeCompare(b[0], 'es');
+  });
+  const card = ([ca, js]) => {
+    const chips = js.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')).map(j => {
+      const foto = (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'orig-avatar');
+      return `<a class="orig-chip" href="${jugadorHref(j.id)}"><span class="orig-thumb">${foto}</span><span class="orig-name">${nombreResp(j.nombre)}</span></a>`;
+    }).join('');
+    return `<div class="orig-card"><div class="orig-head"><span class="orig-region">${ca}</span><span class="orig-count">${js.length}</span></div><div class="orig-players">${chips}</div></div>`;
+  };
+  el.innerHTML = `<h2 class="orig-title">¿De dónde son?</h2><p class="orig-sub">Los ${jugadores.length} españoles en la NBA por comunidad de nacimiento.</p><div class="orig-grid">${entries.map(card).join('')}</div>`;
 }
 
 // Año de draft, o de debut si no fue drafteado (sin posición)
