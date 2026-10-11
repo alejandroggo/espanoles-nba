@@ -3712,16 +3712,19 @@ function cmpRow(row, datas) {
     ? `<div class="cmp-bar"><span class="cmp-fill${wins[i] ? ' win' : ''}" style="width:${Math.round(Math.abs(nums[i]) / mx * 100)}%"></span></div>` : '';
 
   const extraCls = row.cls ? ' ' + row.cls : '';
+  const metricLabel = row.dir === 'neutral'
+    ? `${row.label} <span class="cmp-noscore">no puntúa</span>`
+    : row.label;
   let html;
   if (datas.length === 2) {
     html = `<div class="cmp-row${extraCls}">
       <div class="cmp-cell a"><div class="cmp-val a${wins[0] ? ' win' : ''}">${fmts[0]}</div>${bar(0)}</div>
-      <div class="cmp-metric">${row.label}</div>
+      <div class="cmp-metric">${metricLabel}</div>
       <div class="cmp-cell b"><div class="cmp-val b${wins[1] ? ' win' : ''}">${fmts[1]}</div>${bar(1)}</div>
     </div>`;
   } else {
     html = `<div class="cmp-row3${extraCls}">
-      <div class="cmp-metric cmp-metric--left">${row.label}</div>
+      <div class="cmp-metric cmp-metric--left">${metricLabel}</div>
       ${datas.map((_, i) => `<div class="cmp-cell3"><div class="cmp-val${wins[i] ? ' win' : ''}">${fmts[i]}</div>${bar(i)}</div>`).join('')}
     </div>`;
   }
@@ -3829,7 +3832,10 @@ function cmpRender() {
   const head = sides.length === 3
     ? `${scoreboard}<div class="cmp-head cmp-head--3">${sideHtml.join('')}</div>`
     : `<div class="cmp-head">${sideHtml[0]}${scoreboard}${sideHtml[1]}</div>`;
-  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + cmpShareBar() + sections;
+  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + cmpShareBar() + sections + cmpLegend();
+}
+function cmpLegend() {
+  return `<p class="cmp-legend">El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador. Los empates no puntúan, y las filas marcadas <span class="cmp-noscore">no puntúa</span> son solo informativas.</p>`;
 }
 
 function cmpShareBar() {
@@ -3950,6 +3956,10 @@ function cmpShortName(nombre, n) {
   return parts[0][0] + '. ' + parts.slice(1).join(' ');
 }
 
+function cmpDescargaImagen(bl) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'comparacion-espanoles-nba.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
 async function cmpShare() {
   if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // la URL refleja la comparación actual
   const d = cmpScoreData();
@@ -3957,19 +3967,28 @@ async function cmpShare() {
   const names = d.players.map(p => p.nombre);
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
   const texto = `${vs} — cara a cara 🏀 #EspañolesNBA`;
-  let bl;
-  try { const c = await cmpBuildImage(d); bl = await qntBlob(c); } catch (e) { bl = null; }
-  if (bl) {
+  const url = location.href;
+  const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`;
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+  // Escritorio: abrir X dentro del gesto (si no, el navegador bloquea el popup) y descargar la imagen aparte.
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await cmpBuildImage(d); cmpDescargaImagen(await qntBlob(c)); } catch (e) { }
+    return;
+  }
+
+  // Móvil/táctil: menú nativo con la imagen adjunta (permite elegir la app de X con la foto).
+  try {
+    const c = await cmpBuildImage(d); const bl = await qntBlob(c);
     const file = new File([bl], 'comparacion-espanoles-nba.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], text: `${texto} ${location.href}` }); return; }
-      catch (e) { if (e && e.name === 'AbortError') return; }
+      await navigator.share({ files: [file], text: `${texto} ${url}` });
+      return;
     }
-    // Escritorio: descarga la imagen y abre X con el enlace (para adjuntarla)
-    const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'comparacion-espanoles-nba.png';
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-  }
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(location.href)}`, '_blank', 'noopener,noreferrer');
+    cmpDescargaImagen(bl);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 
 function cmpCur(side) {
