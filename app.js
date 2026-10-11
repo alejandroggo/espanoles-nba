@@ -361,6 +361,7 @@ async function initHome() {
     }
     renderHomeEfm(list, day, isToday);
   } catch (e) {}
+  try { renderHomeWatch(data); } catch (e) {}
 }
 
 function renderHomeEfm(list, day, isToday) {
@@ -375,6 +376,79 @@ function renderHomeEfm(list, day, isToday) {
   }).join('');
   const kicker = isToday ? 'Un día como hoy' : `Próxima efeméride · ${day.d} de ${MESES_LARGOS[day.m - 1]}`;
   el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">📅 ${kicker}</span><a class="home-efm-link" href="efemerides.html?m=${day.m}&d=${day.d}">Ver Efemérides →</a></div><ul class="home-efm-list">${items}</ul>`;
+  el.hidden = false;
+}
+
+// ── MARCAS AL ALCANCE (record watch) ──────────────────
+// Para los españoles en activo, calcula qué marcas tienen cerca: superar al
+// siguiente español en una estadística acumulada o llegar a un número redondo.
+// "Activo" = juega la temporada actual (año de fin de temporada más reciente).
+function rwBuild(data) {
+  const J = data.jugadores || [];
+  const now = new Date();
+  const endYear = now.getMonth() >= 7 ? now.getFullYear() + 1 : now.getFullYear();
+  const maxYear = j => (j.temporadas_data || []).reduce((m, r) => Math.max(m, r.year || 0), 0);
+  const active = J.filter(j => maxYear(j) >= endYear && (j.partidos || 0) > 0);
+  const STATS = [
+    { tot: 'pts_total', pg: 'pts_g', label: 'puntos', step: 1000 },
+    { tot: 'rbd_total', pg: 'rbd_g', label: 'rebotes', step: 500 },
+    { tot: 'ast_total', pg: 'ast_g', label: 'asistencias', step: 250 },
+    { tot: 'tres_total', pg: 'tres_g', label: 'triples', step: 100 },
+    { tot: 'blk_total', pg: 'blk_g', label: 'tapones', step: 100 },
+    { tot: 'stl_total', pg: 'stl_g', label: 'robos', step: 100 },
+    { tot: 'partidos', pg: null, label: 'partidos', step: 100 },
+  ];
+  const MAXGAMES = 82;   // solo marcas alcanzables en ~1 temporada
+  const out = [];
+  active.forEach(j => {
+    STATS.forEach(s => {
+      const mine = j[s.tot] || 0;
+      if (!mine) return;
+      const perg = s.pg ? (j[s.pg] || 0) : 1;
+      const games = gap => perg > 0 ? Math.ceil(gap / perg) : Infinity;
+      // superar al siguiente español por encima
+      let rival = null, rval = Infinity;
+      J.forEach(x => { if (x !== j) { const v = x[s.tot] || 0; if (v > mine && v < rval) { rval = v; rival = x; } } });
+      if (rival) {
+        const gap = rval - mine, g = games(gap);
+        if (g <= MAXGAMES) out.push({ j, type: 'pass', stat: s.label, gap, games: g, rival: rival.nombre });
+      }
+      // siguiente número redondo
+      const nr = (Math.floor(mine / s.step) + 1) * s.step, gapr = nr - mine, gr = games(gapr);
+      if (gr <= MAXGAMES && gapr > 0) out.push({ j, type: 'round', stat: s.label, gap: gapr, games: gr, milestone: nr });
+    });
+  });
+  out.sort((a, b) => a.games - b.games || a.gap - b.gap);
+  return out;
+}
+
+function renderHomeWatch(data) {
+  const el = document.getElementById('home-watch');
+  if (!el) return;
+  const all = rwBuild(data);
+  if (!all.length) return;
+  // Variedad: máximo 3 marcas por jugador, hasta 6 en total.
+  const perPlayer = {}, top = [];
+  for (const w of all) {
+    const k = w.j.id || w.j.nombre;
+    perPlayer[k] = (perPlayer[k] || 0) + 1;
+    if (perPlayer[k] <= 3) top.push(w);
+    if (top.length >= 6) break;
+  }
+  const SING = { puntos: 'punto', rebotes: 'rebote', asistencias: 'asistencia', triples: 'triple', tapones: 'tapón', robos: 'robo', partidos: 'partido' };
+  const items = top.map(w => {
+    const j = w.j;
+    const foto = (j.id || j.foto_url || j.bref_id)
+      ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">`
+      : avatarHtml(j.nombre, 'hw-avatar');
+    const sw = w.gap === 1 ? (SING[w.stat] || w.stat) : w.stat;
+    const txt = w.type === 'pass'
+      ? `A <b>${w.gap} ${sw}</b> de superar a ${w.rival}`
+      : `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
+    const badge = `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}`;
+    return `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(j.id)}"><span class="hw-thumb">${foto}</span><span class="hw-body"><span class="hw-name">${j.nombre}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></a></li>`;
+  }).join('');
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><span class="home-watch-note">a su ritmo de carrera</span></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
   el.hidden = false;
 }
 
