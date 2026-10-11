@@ -13,6 +13,9 @@ function initTheme() {
   // buildChatWidget();   // Pregúntame oculto por ahora
   buildCookieBanner();
   showLoadBar();
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
+  }
 }
 
 // ── AVISO DE COOKIES + CONSENT MODE ───────────────
