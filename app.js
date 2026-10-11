@@ -5012,22 +5012,12 @@ function efmShare(btn, i) {
   const texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
   const fechaTxt = `${efmDay} de ${MESES_LARGOS[efmMonth - 1]} de ${e.year}`;
   const url = `${location.origin}${location.pathname}?m=${efmMonth}&d=${efmDay}`;
-  const cuerpo = `📅 ${fechaTxt} — Españoles en la NBA\n${texto}`;
-  if (navigator.share) {
-    navigator.share({ title: 'Españoles en la NBA · Efeméride', text: cuerpo, url }).catch(() => {});
-    return;
-  }
-  const full = `${cuerpo}\n${url}`;
-  const ok = () => {
-    const prev = btn.innerHTML;
-    btn.innerHTML = '✓ Copiado';
-    setTimeout(() => { btn.innerHTML = prev; }, 1800);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(full).then(ok).catch(() => window.prompt('Copia el enlace para compartir:', url));
-  } else {
-    window.prompt('Copia el enlace para compartir:', url);
-  }
+  let cuerpo = `📅 ${fechaTxt} — ${texto}`;
+  // X/Twitter cuenta ~280 caracteres y la URL ocupa 23; recortamos para que quepa.
+  const MAX = 280 - 24 - 1;
+  if (cuerpo.length > MAX) cuerpo = cuerpo.slice(0, MAX - 1).trimEnd() + '…';
+  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(cuerpo)}&url=${encodeURIComponent(url)}`;
+  window.open(intent, '_blank', 'noopener,noreferrer');
 }
 
 // Extrae la cifra del contrato de las notas (ej. "$17,2M x 3", "$300K x 2")
@@ -5255,7 +5245,7 @@ function renderEfm() {
     const vid = e.video ? efmYtId(e.video) : '';
     const videoBtn = vid ? `<button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     const detailBtn = e.detail ? `<button type="button" class="efm-detail-btn" onclick="efmShowDetail(${i})">Ver detalles</button>` : '';
-    const shareBtn = `<button type="button" class="efm-share-btn" onclick="efmShare(this,${i})"><span class="efm-video-ico">↗</span> Compartir</button>`;
+    const shareBtn = `<button type="button" class="efm-share-btn" onclick="efmShare(this,${i})" aria-label="Compartir en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir en X</button>`;
     const acts = `<div class="efm-acts">${videoBtn}${detailBtn}${shareBtn}</div>`;
     const photo = efmPhoto(e.player);
     return `<li class="efm-item">

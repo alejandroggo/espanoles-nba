@@ -1624,6 +1624,7 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
 .efm-video-btn:hover, .efm-detail-btn:hover, .efm-share-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .efm-detail-btn, .efm-share-btn { color: var(--text); }
 .efm-video-ico { font-size: 0.7rem; }
+.efm-share-ico { display: inline-flex; align-items: center; }
 
 /* Popup de detalles de transacción */
 .efm-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: var(--space-4); background: rgba(0, 0, 0, 0.55); }
