@@ -1654,13 +1654,28 @@ function renderDrPorJugador() {
     .map(([jug, set]) => ({ jug, n: set.size }))
     .sort((a, b) => b.n - a.n || a.jug.localeCompare(b.jug));
   if (!rows.length) { el.innerHTML = ''; return; }
+  drPjRows = rows;
 
   el.innerHTML = `
     <h2 class="section-title">Dorsales por jugador</h2>
-    <p class="section-sub">Cuántos números distintos ha vestido cada español.</p>
+    <p class="section-sub">Pulsa un jugador para ver sus dorsales marcados arriba.</p>
     <ul class="dr-pj-list">
-      ${rows.map(r => `<li class="dr-pj-item"><span class="dr-pj-n">${r.n}</span><span>${r.jug}</span></li>`).join('')}
+      ${rows.map((r, i) => `<li class="dr-pj-item" data-i="${i}" onclick="drTogglePlayer(${i})"><span class="dr-pj-n">${r.n}</span><span>${r.jug}</span></li>`).join('')}
     </ul>`;
+}
+let drPjRows = [], drSelPlayer = null;
+function drTogglePlayer(i) {
+  const jug = drPjRows[i] && drPjRows[i].jug;
+  if (!jug) return;
+  const same = drSelPlayer === jug;
+  document.querySelectorAll('.jersey.jersey-player').forEach(b => b.classList.remove('jersey-player'));
+  document.querySelectorAll('.dr-pj-item.dr-pj-sel').forEach(li => li.classList.remove('dr-pj-sel'));
+  if (same) { drSelPlayer = null; return; }
+  drSelPlayer = jug;
+  const btns = document.querySelectorAll('.jersey');
+  drAll.forEach(d => { if (d.jugador === jug) { const n = Number(d.numero); if (btns[n]) btns[n].classList.add('jersey-player'); } });
+  const li = document.querySelector(`.dr-pj-item[data-i="${i}"]`);
+  if (li) { li.classList.add('dr-pj-sel'); }
 }
 
 function drPlayers(entries) { return [...new Set(entries.map(e => e.jugador))]; }
@@ -1683,7 +1698,7 @@ function renderDrKpis() {
   }
   document.getElementById('dr-kpis').innerHTML = `
     <div class="kpi"><div class="kpi-num">${usados}<span class="kpi-sub">/100</span></div><div class="kpi-label">Dorsales usados</div></div>
-    <div class="kpi"><div class="kpi-num">${top.n ?? '—'}</div><div class="kpi-label">Más llevado${top.c ? ` · ${top.c} jugadores` : ''}</div></div>
+    <div class="kpi"><div class="kpi-num">${top.n != null ? '#' + top.n : '—'}</div><div class="kpi-label">Más llevado${top.c ? ` · ${top.c} jugadores` : ''}</div></div>
     <div class="kpi"><div class="kpi-num">${sinUsar}</div><div class="kpi-label">Sin estrenar</div></div>`;
 }
 
@@ -2250,7 +2265,9 @@ function jugDebut(j) {
     ['TOV', p.tov], ['PF', p.pf],
   ].filter(([, v]) => v != null && v !== '').map(([l, v]) => statBox(l, v)).join('');
   const meta = `<div class="jug-debut-meta"><b>${vs}</b>${resHtml}<span class="jug-debut-sub">${p.fecha}${p.edad != null ? ` · ${Math.floor(p.edad)} años` : ''}</span></div>`;
-  return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>`);
+  const vid = efmYtId(p.video);
+  const videoBtn = vid ? `<div class="jug-debut-video"><button type="button" class="efm-video-btn" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo del debut</button></div>` : '';
+  return jugSection('Su debut en la NBA', `${meta}<div class="stat-grid">${boxes}</div>${videoBtn}`);
 }
 
 // Puesto histórico del jugador entre los españoles que han debutado en la NBA.
@@ -2295,8 +2312,8 @@ function jugRankings(j) {
 
 // Efemérides del jugador (debut, draft, fichajes, hitos) enlazando a la página de Efemérides
 function jugEfemerides(j) {
-  // Ocultamos las transacciones: ya aparecen en su propia sección justo debajo.
-  const evs = jugEvents.filter(e => drNorm(e.player || '') === drNorm(j.nombre) && e.kind !== 'trans');
+  // En la ficha ocultamos: transacciones (ya salen abajo), draft (en transacciones) y cumpleaños.
+  const evs = jugEvents.filter(e => drNorm(e.player || '') === drNorm(j.nombre) && e.kind !== 'trans' && e.kind !== 'draft' && e.kind !== 'cumple');
   if (!evs.length) return '';
   evs.sort((a, b) => a.year - b.year || a.m - b.m || a.d - b.d);
   const items = evs.map(e => {
@@ -3749,7 +3766,7 @@ function cmpRow(row, datas) {
 
   const extraCls = row.cls ? ' ' + row.cls : '';
   const metricLabel = row.dir === 'neutral'
-    ? `${row.label} <span class="cmp-noscore">no puntúa</span>`
+    ? `${row.label}<span class="cmp-noscore">*</span>`
     : row.label;
   let html;
   if (datas.length === 2) {
@@ -3871,7 +3888,7 @@ function cmpRender() {
   document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + cmpShareBar() + sections + cmpLegend();
 }
 function cmpLegend() {
-  return `<p class="cmp-legend">El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador. Los empates no puntúan, y las filas marcadas <span class="cmp-noscore">no puntúa</span> son solo informativas.</p>`;
+  return `<p class="cmp-legend"><span class="cmp-noscore">*</span> No puntúa (fila informativa). El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador; los empates no cuentan.</p>`;
 }
 
 function cmpShareBar() {
@@ -4004,7 +4021,7 @@ async function cmpShare() {
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
   const texto = `${vs} — cara a cara 🏀 #EspañolesNBA`;
   const url = location.href;
-  const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`;
+  const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto + '\n\n' + url)}`;
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
   // Escritorio: abrir X dentro del gesto (si no, el navegador bloquea el popup) y descargar la imagen aparte.
@@ -4019,7 +4036,7 @@ async function cmpShare() {
     const c = await cmpBuildImage(d); const bl = await qntBlob(c);
     const file = new File([bl], 'comparacion-espanoles-nba.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], text: `${texto} ${url}` });
+      await navigator.share({ files: [file], text: `${texto}\n\n${url}` });
       return;
     }
     cmpDescargaImagen(bl);
@@ -5483,7 +5500,7 @@ function efmShare(btn, i) {
   let cuerpoTexto = texto;
   if (cuerpoTexto.length > presupuesto) cuerpoTexto = cuerpoTexto.slice(0, presupuesto - 1).trimEnd() + '…';
   const cuerpo = `${prefijo}${cuerpoTexto}${sufijo}`;
-  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(cuerpo)}&url=${encodeURIComponent(url)}`;
+  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(cuerpo + '\n\n' + url)}`;
   window.open(intent, '_blank', 'noopener,noreferrer');
 }
 
@@ -5986,7 +6003,7 @@ async function qntShare() {
   if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
   const c = await qntBuildImage(), bl = await qntBlob(c);
   const file = new File([bl], 'mi-quinteto-espanol.png', { type: 'image/png' });
-  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA ' + location.href;
+  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA\n\n' + location.href;
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], text: txt }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
