@@ -2727,6 +2727,43 @@ const QUIZ_GENS = [
     const correct = Object.keys(v)[0];
     return { q: `¿Cuál es el <b>único español</b> que ha jugado en ${teamInfo(tm).name}?`, correct, options: qOptions(correct, D.J.map(j => j.nombre).filter(n => n !== correct)) };
   },
+  D => { // ¿de qué comunidad autónoma es?
+    const pool = D.J.filter(j => { const ca = AG_COMUNIDAD[drNorm(j.nombre)]; return ca && ca !== 'Fuera de España' && ca !== 'Otros'; });
+    const cas = [...new Set(Object.values(AG_COMUNIDAD).filter(c => c !== 'Fuera de España' && c !== 'Otros'))];
+    if (pool.length < 4 || cas.length < 4) return null;
+    const j = qPick(pool); const correct = AG_COMUNIDAD[drNorm(j.nombre)];
+    return { q: `¿De qué <b>comunidad autónoma</b> es ${j.nombre}?`, correct, options: qOptions(correct, cas.filter(c => c !== correct)) };
+  },
+  D => { // ¿dónde nació? (ciudad de origen)
+    const org = j => (BIO[drNorm(j.nombre)] || {}).origen;
+    const pool = D.J.filter(org); const origenes = [...new Set(pool.map(org))];
+    if (pool.length < 4 || origenes.length < 4) return null;
+    const j = qPick(pool); const correct = org(j);
+    return { q: `¿Dónde <b>nació ${j.nombre}</b>?`, correct, options: qOptions(correct, origenes.filter(o => o !== correct)) };
+  },
+  D => { // año de nacimiento
+    const yr = j => { const m = String(j.nacimiento_fecha || j.nacimiento || '').match(/(\d{4})/); return m ? m[1] : null; };
+    const pool = D.J.filter(yr); const years = [...new Set(pool.map(yr))];
+    if (pool.length < 4 || years.length < 4) return null;
+    const j = qPick(pool); const correct = yr(j);
+    return { q: `¿En qué <b>año nació ${j.nombre}</b>?`, correct, options: qOptions(correct, years.filter(y => y !== correct)) };
+  },
+  D => { // quién es el más veterano (nació antes)
+    const yr = j => { const m = String(j.nacimiento_fecha || j.nacimiento || '').match(/(\d{4})/); return m ? +m[1] : null; };
+    const pool = D.J.filter(yr); if (pool.length < 4) return null;
+    const four = qSample(pool, 4);
+    const win = four.reduce((a, b) => yr(b) < yr(a) ? b : a);
+    if (four.filter(x => yr(x) === yr(win)).length > 1) return null;   // empate → descarta
+    return { q: '¿Cuál de estos jugadores es el <b>más veterano</b> (nació antes)?', correct: win.nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
+  D => { // quién es más alto
+    const h = j => { const b = BIO[drNorm(j.nombre)]; const m = b && b.altura && b.altura.match(/(\d)[,.](\d{2})/); return m ? +(m[1] + '.' + m[2]) : null; };
+    const pool = D.J.filter(h); if (pool.length < 4) return null;
+    const four = qSample(pool, 4);
+    const win = four.reduce((a, b) => h(b) > h(a) ? b : a);
+    if (four.filter(x => h(x) === h(win)).length > 1) return null;   // empate → descarta
+    return { q: '¿Cuál de estos jugadores es el <b>más alto</b>?', correct: win.nombre, options: qShuffle(four.map(x => x.nombre)) };
+  },
 ];
 
 async function initTestPage() {
