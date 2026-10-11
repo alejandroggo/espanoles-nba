@@ -3833,22 +3833,146 @@ function cmpRender() {
   const head = sides.length === 3
     ? `${scoreboard}<div class="cmp-head cmp-head--3">${sideHtml.join('')}</div>`
     : `<div class="cmp-head">${sideHtml[0]}${scoreboard}${sideHtml[1]}</div>`;
-  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + sections + cmpShareBar();
+  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + cmpShareBar() + sections;
 }
 
 function cmpShareBar() {
-  return `<div class="cmp-share-row"><button type="button" class="efm-share-btn" onclick="cmpShare()" aria-label="Compartir comparación en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir comparación</button></div>`;
+  return `<div class="cmp-share-row"><button type="button" class="efm-share-btn" onclick="cmpShare()" aria-label="Compartir comparación"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir comparación</button></div>`;
 }
-function cmpShare() {
-  if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // asegura que la URL refleja la comparación actual
-  const players = cmpPlayers();
-  if (players.length < 2) return;
-  const names = players.map(p => p.nombre);
+
+// Calcula el resultado por bloque y el total (misma lógica que cmpRender, estructurado)
+function cmpScoreData() {
+  const sides = cmpSides();
+  const players = sides.map(s => cmpCur(s));
+  if (players.some(p => !p)) return null;
+  const aggs = sides.map((s, i) => cmpAggFor(s, players[i]));
+  const prems = sides.map((s, i) => ({ nombre: players[i].nombre, premios: cmpPremiosList(players[i], s) }));
+  const total = sides.map(() => 0);
+  const partial = cmpMode !== 'career';
+  const blocks = [];
+  CMP_SECTIONS
+    .filter(s => !s.when || players.some(p => s.when(p, p)))
+    .filter(s => !(partial && s.career))
+    .forEach(s => {
+      const datas = sides.map((_, i) => (s.premios ? prems[i] : (s.ranged ? aggs[i] : players[i])));
+      let rows = s.rows.map(r => cmpRow(r, datas));
+      if (s.premios) rows = rows.filter(r => !r.empty);
+      if (!rows.length) return;
+      const sec = sides.map(() => 0);
+      rows.forEach(r => r.wins.forEach((w, i) => { if (w) { sec[i]++; total[i]++; } }));
+      blocks.push({ title: s.title, scores: sec });
+    });
+  const modoTxt = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : '') : (cmpMode === 'diff' ? 'tramos elegidos' : 'toda la carrera');
+  return { players, total, blocks, modoTxt };
+}
+
+// Dibuja la imagen-resumen de la comparación (caras + marcador total + por bloque)
+async function cmpBuildImage(d) {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const n = d.players.length;
+  const W = 1080;
+  const headH = 520, rowH = 70, totalH = 96, footH = 96;
+  const H = headH + d.blocks.length * rowH + totalH + footH;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const CO = { bg: '#0e0e10', panel: '#17171d', line: 'rgba(255,255,255,.08)', coral: '#f2545b', yellow: '#ffc400', text: '#e9e9ec', muted: '#9a9aa5', red: '#c60b1e' };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  // franjas de bandera
+  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 10); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 10); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 10); };
+  flag(0); flag(H - 10);
+  // kicker
+  x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif';
+  x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 70); x.restore();
+
+  // caras + nombres
+  const cols = n === 2 ? [W * 0.26, W * 0.74] : [W * 0.2, W * 0.5, W * 0.8];
+  const cy = 190, r = 92;
+  const drawFace = (cx, img, name) => {
+    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.closePath(); x.clip();
+    if (img) { const s = Math.max(2 * r / img.width, 2 * r / img.height); const w = img.width * s, h = img.height * s; x.drawImage(img, cx - w / 2, cy - h / 2 - r * 0.12, w, h); }
+    else { x.fillStyle = qntAvatarColor(name); x.fillRect(cx - r, cy - r, 2 * r, 2 * r); x.fillStyle = '#fff'; x.font = '700 56px Inter, sans-serif'; x.textBaseline = 'middle'; x.fillText(qntInitials(name), cx, cy); x.textBaseline = 'alphabetic'; }
+    x.restore();
+    x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.strokeStyle = 'rgba(255,255,255,.18)'; x.lineWidth = 3; x.stroke();
+  };
+  const imgs = await Promise.all(d.players.map(p => qntLoadImg(`img/players/${p.id}.jpg`)));
+  const mxTot = Math.max(...d.total);
+  const uniqueTop = d.total.filter(t => t === mxTot).length === 1;
+  d.players.forEach((p, i) => {
+    drawFace(cols[i], imgs[i], p.nombre);
+    x.fillStyle = CO.text; x.font = '800 ' + (n === 2 ? 32 : 26) + 'px Inter, sans-serif';
+    x.fillText(cmpShortName(p.nombre, n), cols[i], cy + r + 44);
+    x.fillStyle = CO.muted; x.font = '500 20px Inter, sans-serif';
+    x.fillText(p.draft ? `Draft ${p.draft_anio || ''} · #${p.draft_pick || '?'}` : 'No drafteado', cols[i], cy + r + 74);
+    // total por jugador bajo el nombre
+    x.fillStyle = (uniqueTop && d.total[i] === mxTot) ? CO.yellow : CO.muted;
+    x.font = '800 60px Inter, sans-serif';
+    x.fillText(String(d.total[i]), cols[i], cy + r + 185);
+  });
+  x.fillStyle = CO.muted; x.font = '600 20px Inter, sans-serif';
+  x.save(); x.letterSpacing = '3px'; x.fillText('CATEGORÍAS GANADAS', W / 2, cy + r + 120); x.restore();
+
+  // bloques
+  let y = headH + 6;
+  x.textBaseline = 'middle';
+  d.blocks.forEach((b, k) => {
+    if (k % 2 === 0) { x.fillStyle = CO.panel; x.fillRect(40, y - rowH / 2 + 4, W - 80, rowH - 8); }
+    x.fillStyle = CO.text; x.font = '700 26px Inter, sans-serif'; x.textAlign = 'left';
+    x.fillText(b.title, 70, y);
+    const mx = Math.max(...b.scores); const uniq = b.scores.filter(s => s === mx).length === 1;
+    x.textAlign = 'center'; x.font = '800 30px Inter, sans-serif';
+    const sx = n === 2 ? [W - 360, W - 130] : [W - 430, W - 280, W - 130];
+    b.scores.forEach((s, i) => {
+      x.fillStyle = (uniq && s === mx) ? CO.yellow : CO.muted;
+      x.fillText(String(s), sx[i], y);
+    });
+    if (n === 2) { x.fillStyle = CO.muted; x.font = '400 26px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, y); }
+    y += rowH;
+  });
+  // total
+  x.fillStyle = CO.coral; x.fillRect(40, y - rowH / 2 + 4, W - 80, totalH - 8);
+  x.fillStyle = '#fff'; x.font = '800 32px Inter, sans-serif'; x.textAlign = 'left';
+  x.fillText('TOTAL', 70, y + 6);
+  x.textAlign = 'center'; x.font = '800 44px Inter, sans-serif';
+  const sx = n === 2 ? [W - 360, W - 130] : [W - 430, W - 280, W - 130];
+  d.total.forEach((s, i) => { x.fillStyle = '#fff'; x.fillText(String(s), sx[i], y + 6); });
+  if (n === 2) { x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '400 34px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, y + 6); }
+
+  // footer
+  x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'left';
+  x.fillText('espanoles-nba.alejandroggo.com', 60, H - 40);
+  x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'right';
+  x.fillText('#EspañolesNBA', W - 60, H - 40);
+  return c;
+}
+function cmpShortName(nombre, n) {
+  if (n === 2 && nombre.length <= 18) return nombre;
+  const parts = String(nombre).trim().split(/\s+/);
+  if (parts.length < 2) return nombre;
+  return parts[0][0] + '. ' + parts.slice(1).join(' ');
+}
+
+async function cmpShare() {
+  if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // la URL refleja la comparación actual
+  const d = cmpScoreData();
+  if (!d || d.players.length < 2) return;
+  const names = d.players.map(p => p.nombre);
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
   const texto = `${vs} — cara a cara 🏀 #EspañolesNBA`;
-  const url = location.href;
-  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`;
-  window.open(intent, '_blank', 'noopener,noreferrer');
+  let bl;
+  try { const c = await cmpBuildImage(d); bl = await qntBlob(c); } catch (e) { bl = null; }
+  if (bl) {
+    const file = new File([bl], 'comparacion-espanoles-nba.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: `${texto} ${location.href}` }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    // Escritorio: descarga la imagen y abre X con el enlace (para adjuntarla)
+    const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'comparacion-espanoles-nba.png';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  }
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(location.href)}`, '_blank', 'noopener,noreferrer');
 }
 
 function cmpCur(side) {
