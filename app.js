@@ -388,7 +388,7 @@ function rwBuild(data) {
   const now = new Date();
   const endYear = now.getMonth() >= 7 ? now.getFullYear() + 1 : now.getFullYear();
   const maxYear = j => (j.temporadas_data || []).reduce((m, r) => Math.max(m, r.year || 0), 0);
-  const active = J.filter(j => maxYear(j) >= endYear && (j.partidos || 0) > 0);
+  const active = J.filter(j => maxYear(j) >= endYear);   // incluye rookies aún sin datos
   const STATS = [
     { tot: 'pts_total', pg: 'pts_g', label: 'puntos', step: 1000 },
     { tot: 'rbd_total', pg: 'rbd_g', label: 'rebotes', step: 500 },
@@ -398,27 +398,34 @@ function rwBuild(data) {
     { tot: 'stl_total', pg: 'stl_g', label: 'robos', step: 100 },
     { tot: 'partidos', pg: null, label: 'partidos', step: 100 },
   ];
-  const MAXGAMES = 82;   // solo marcas alcanzables en ~1 temporada
+  const MAXGAMES = 30;   // nada que esté a más de ~30 partidos
+  // Rookies sin ritmo fiable (0 partidos): umbral por diferencia absoluta en cada estadística.
+  const ROOKIE_ABS = { puntos: 50, rebotes: 25, asistencias: 25, triples: 10, robos: 10, tapones: 10 };
   const out = [];
   active.forEach(j => {
     STATS.forEach(s => {
       const mine = j[s.tot] || 0;
-      if (!mine) return;
-      const perg = s.pg ? (j[s.pg] || 0) : 1;
-      const games = gap => perg > 0 ? Math.ceil(gap / perg) : Infinity;
+      const perg = s.pg ? (j[s.pg] || 0) : 1;         // 'partidos' => 1 partido por partido
+      const hasRate = perg > 0;                        // ¿tenemos ritmo para estimar partidos?
+      const games = gap => hasRate ? Math.ceil(gap / perg) : Infinity;
+      const abs = ROOKIE_ABS[s.label];
+      const show = (gap, g) => hasRate ? (g <= MAXGAMES) : (abs != null && gap <= abs);
       // superar al siguiente español por encima
       let rival = null, rval = Infinity;
       J.forEach(x => { if (x !== j) { const v = x[s.tot] || 0; if (v > mine && v < rval) { rval = v; rival = x; } } });
       if (rival) {
         const gap = rval - mine, g = games(gap);
-        if (g <= MAXGAMES) out.push({ j, type: 'pass', stat: s.label, gap, games: g, rival: rival.nombre });
+        if (show(gap, g)) out.push({ j, type: 'pass', stat: s.label, gap, games: g, rival: rival.nombre });
       }
       // siguiente número redondo
       const nr = (Math.floor(mine / s.step) + 1) * s.step, gapr = nr - mine, gr = games(gapr);
-      if (gr <= MAXGAMES && gapr > 0) out.push({ j, type: 'round', stat: s.label, gap: gapr, games: gr, milestone: nr });
+      if (gapr > 0 && show(gapr, gr)) out.push({ j, type: 'round', stat: s.label, gap: gapr, games: gr, milestone: nr });
     });
   });
-  out.sort((a, b) => a.games - b.games || a.gap - b.gap);
+  out.sort((a, b) => {
+    const ga = isFinite(a.games) ? a.games : 1e9, gb = isFinite(b.games) ? b.games : 1e9;
+    return ga - gb || a.gap - b.gap;
+  });
   return out;
 }
 
@@ -453,7 +460,7 @@ function rwItemHtml(w) {
   const txt = w.type === 'pass'
     ? `A <b>${w.gap} ${sw}</b> de superar a ${w.rival}`
     : `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
-  const badge = `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}`;
+  const badge = isFinite(w.games) ? `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}` : 'Debutante';
   return `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(j.id)}"><span class="hw-thumb">${foto}</span><span class="hw-body"><span class="hw-name">${j.nombre}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></a></li>`;
 }
 
