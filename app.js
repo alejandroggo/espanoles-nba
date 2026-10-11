@@ -366,6 +366,7 @@ async function initHome() {
     renderHomeEfm(list, day, isToday);   // si sigue vacía, renderHomeEfm no muestra nada
   } catch (e) {}
   try { renderHomeWatch(data); } catch (e) {}
+  try { renderHomeRecent(data); } catch (e) {}
 }
 
 function renderHomeEfm(list, day, isToday) {
@@ -481,6 +482,40 @@ function renderHomeWatch(data) {
   el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><span class="home-efm-head-actions"><a class="home-efm-link" href="marcas.html">Ver todas →</a>${homeBoxMinBtn('home-watch')}</span></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
   el.hidden = false;
   applyHomeBoxState('home-watch');
+}
+
+// ── RECIÉN SUPERADAS (lo que ya ha pasado: lee data.superaciones, que escribe el bot) ──
+function rsBuild(data) {
+  const sup = data.superaciones || [];
+  if (!sup.length) return [];
+  const byName = {};
+  (data.jugadores || []).forEach(j => { byName[drNorm(j.nombre)] = j; });
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return sup.map(s => {
+    const j = byName[drNorm(s.jugador)] || { nombre: s.jugador };
+    const dt = new Date(String(s.fecha) + 'T00:00:00');
+    const days = Math.round((today - dt) / 86400000);
+    const rel = days <= 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    return { j, s, days, rel };
+  }).filter(x => isFinite(x.days)).sort((a, b) => a.days - b.days);
+}
+function renderHomeRecent(data) {
+  const el = document.getElementById('home-recent');
+  if (!el) return;
+  const all = rsBuild(data).filter(x => x.days <= 14).slice(0, 6);
+  if (!all.length) return;
+  const items = all.map(({ j, s, rel }) => {
+    const img = (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'hw-avatar');
+    const face = j.id ? `<a class="hw-face" href="${jugadorHref(j.id)}" aria-label="${j.nombre}">${img}</a>` : img;
+    const name = j.id ? `<a class="hw-name-link" href="${jugadorHref(j.id)}">${j.nombre}</a>` : j.nombre;
+    const txt = s.tipo === 'hito'
+      ? `Alcanzó los <b>${Number(s.hito).toLocaleString('es-ES')} ${s.campo}</b>`
+      : `Superó a ${s.rival} en <b>${s.campo}</b>`;
+    return `<li class="home-watch-item"><div class="hw-link"><span class="hw-thumb">${face}</span><span class="hw-body"><span class="hw-name">${name}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${rel}</span></div></li>`;
+  }).join('');
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🔥 Recién superadas</span>${homeBoxMinBtn('home-recent')}</div><ul class="home-efm-list home-watch-list">${items}</ul>`;
+  el.hidden = false;
+  applyHomeBoxState('home-recent');
 }
 
 // HTML de una marca (compartido por la home y la página de marcas).
