@@ -1,5 +1,6 @@
 {
-  "actualizado": "2026-10-11T01:47:14.282Z",
+  "actualizado": "2026-10-11T21:14:58.733Z",
+  "superaciones": [],
   "summer_league": [
     {
       "year": 1985,
@@ -2752,6 +2753,15 @@
       "etiquetas": ""
     },
     {
+      "fecha": "2016-11-08",
+      "jugador": "Marc Gasol",
+      "hito": "Anota el game winner para que los Grizzlies venzan ante Denver.",
+      "etiqueta": "GAME WINNER",
+      "video": "https://www.youtube.com/watch?v=FJEgcbdeLPU",
+      "data": "1108",
+      "etiquetas": ""
+    },
+    {
       "fecha": "2007-11-16",
       "jugador": "Juan Carlos Navarro",
       "hito": "Firma su máxima anotación en la NBA con 28 puntos y de triples anotados, con 8, ante Hornets (Grizzlies L 118-120 (OT)).",
@@ -2828,7 +2838,7 @@
       "jugador": "Sergio Rodríguez",
       "hito": "Firma su máxima anotación en la NBA con 24 puntos ante Hornets (Kings W 112-96).",
       "etiqueta": "CAREER-HIGH",
-      "video": "",
+      "video": "https://www.youtube.com/watch?v=ZfgfyMHHlVQ",
       "data": "1129",
       "etiquetas": ""
     },
@@ -2864,7 +2874,7 @@
       "jugador": "Rudy Fernández",
       "hito": "Firma su máxima anotación en la NBA con 26 puntos ante Timberwolves (Trail Blazers W 107-102).",
       "etiqueta": "CAREER-HIGH",
-      "video": "",
+      "video": "https://www.youtube.com/watch?v=G_s-dC_ZWzo",
       "data": "1217",
       "etiquetas": ""
     },
@@ -2902,15 +2912,6 @@
       "etiqueta": "PARTIDO DESTACADO",
       "video": "https://www.youtube.com/watch?v=3Z7F42VKaK4",
       "data": "1231",
-      "etiquetas": ""
-    },
-    {
-      "fecha": "2016-11-08",
-      "jugador": "Marc Gasol",
-      "hito": "Anota el game winner para que los Grizzlies venzan ante Denver.",
-      "etiqueta": "GAME WINNER",
-      "video": "https://www.youtube.com/watch?v=FJEgcbdeLPU",
-      "data": "1108",
       "etiquetas": ""
     }
   ],
@@ -2968,7 +2969,8 @@
         "fta": 2,
         "tov": 4,
         "pf": 3,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 56,
@@ -3902,7 +3904,8 @@
         "fta": 3,
         "tov": 2,
         "pf": 4,
-        "dd": "true"
+        "dd": "true",
+        "video": ""
       },
       "game_highs": {
         "min": 50,
@@ -4562,7 +4565,8 @@
         "fta": 2,
         "tov": 2,
         "pf": 2,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 49,
@@ -4966,7 +4970,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 46,
@@ -5692,7 +5697,8 @@
         "fta": 0,
         "tov": 4,
         "pf": 1,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 46,
@@ -5838,7 +5844,8 @@
         "fta": 2,
         "tov": 0,
         "pf": 4,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 49,
@@ -6276,7 +6283,8 @@
         "fta": 1,
         "tov": 0,
         "pf": 1,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 39,
@@ -6549,7 +6557,8 @@
         "fta": 3,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 44,
@@ -6821,7 +6830,8 @@
         "fta": 0,
         "tov": 1,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 53,
@@ -7414,7 +7424,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 43,
@@ -7586,7 +7597,8 @@
         "fta": 0,
         "tov": 1,
         "pf": 1,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 36,
@@ -7918,7 +7930,8 @@
         "fta": 0,
         "tov": 1,
         "pf": 1,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 38,
@@ -8071,7 +8084,8 @@
         "fta": 0,
         "tov": 2,
         "pf": 3,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 42,
@@ -8291,7 +8305,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 43,
@@ -8704,7 +8719,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 37,
@@ -8977,7 +8993,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 4,
-        "dd": "false"
+        "dd": "false",
+        "video": "https://www.youtube.com/watch?v=kRFvCDVbKeU"
       },
       "game_highs": {
         "min": 36,
@@ -9150,7 +9167,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 35,
@@ -9343,7 +9361,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 1,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 29,
@@ -9535,7 +9554,8 @@
         "fta": 0,
         "tov": 0,
         "pf": 0,
-        "dd": "false"
+        "dd": "false",
+        "video": ""
       },
       "game_highs": {
         "min": 16,
