@@ -426,8 +426,8 @@ function renderHomeWatch(data) {
   const el = document.getElementById('home-watch');
   if (!el) return;
   // En portada: superar a otro español solo si es inminente (~3 partidos);
-  // las cifras redondas (hitos) se anuncian con algo más de margen (~15 partidos).
-  const all = rwBuild(data).filter(w => w.type === 'pass' ? w.games <= 3 : w.games <= 15);
+  // las cifras redondas (hitos) se anuncian con algo más de margen (~7 partidos).
+  const all = rwBuild(data).filter(w => w.type === 'pass' ? w.games <= 3 : w.games <= 7);
   if (!all.length) return;
   // Variedad: máximo 3 marcas por jugador, hasta 6 en total.
   const perPlayer = {}, top = [];
