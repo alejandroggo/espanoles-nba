@@ -37,7 +37,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=9">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=9">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9">
-<link rel="stylesheet" href="style.css?v=139">
+<link rel="stylesheet" href="style.css?v=140">
 </head>
 <body>
 
@@ -63,10 +63,10 @@
   </section>
 
   <section class="controles" aria-label="Filtros">
-    <div class="mode-switch" id="mk-filter" role="tablist" aria-label="Tipo de marca">
-      <button type="button" class="mode-btn active" data-f="all" role="tab" aria-selected="true">Todas</button>
-      <button type="button" class="mode-btn" data-f="pass" role="tab" aria-selected="false">Superar a un español</button>
-      <button type="button" class="mode-btn" data-f="round" role="tab" aria-selected="false">Cifras redondas</button>
+    <div class="seg" id="mk-filter" role="group" aria-label="Tipo de marca">
+      <button type="button" class="toggle-chip active" data-f="all" aria-pressed="true">Todas</button>
+      <button type="button" class="toggle-chip" data-f="pass" aria-pressed="false">Superar a un español</button>
+      <button type="button" class="toggle-chip" data-f="round" aria-pressed="false">Cifras redondas</button>
     </div>
     <span class="results-count" id="mk-count"></span>
   </section>
@@ -102,7 +102,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=139"></script>
+<script src="app.js?v=140"></script>
 <script>initTheme(); initMarcasPage();</script>
 </body>
 </html>

@@ -471,10 +471,10 @@ async function initMarcasPage() {
   if (sub) sub.textContent = mkAll.length
     ? `${mkAll.length} marcas a tiro de ${jug} ${jug === 1 ? 'español en activo' : 'españoles en activo'} esta temporada`
     : 'Ahora mismo no hay marcas al alcance. Vuelve cuando haya más partidos jugados.';
-  document.querySelectorAll('#mk-filter .mode-btn').forEach(b => {
+  document.querySelectorAll('#mk-filter .toggle-chip').forEach(b => {
     b.addEventListener('click', () => {
       mkFilter = b.dataset.f;
-      document.querySelectorAll('#mk-filter .mode-btn').forEach(x => { const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      document.querySelectorAll('#mk-filter .toggle-chip').forEach(x => { const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
       renderMarcas();
     });
   });
