@@ -441,7 +441,10 @@ function rwBuild(data) {
       J.forEach(x => { if (x !== j) { const v = x[s.tot] || 0; if (v > mine && v < rval) { rval = v; rival = x; } } });
       if (rival) {
         const gap = rval - mine, g = games(gap);
-        if (show(gap, g)) out.push({ j, type: 'pass', stat: s.label, gap, games: g, rival: rival.nombre, rivalId: rival.id });
+        if (show(gap, g)) {
+          const rivalRank = J.filter(x => (x[s.tot] || 0) > rval).length + 1;   // posición que alcanzaría
+          out.push({ j, type: 'pass', stat: s.label, gap, games: g, rival: rival.nombre, rivalId: rival.id, rivalRank });
+        }
       }
       // siguiente número redondo
       const nr = (Math.floor(mine / s.step) + 1) * s.step, gapr = nr - mine, gr = games(gapr);
@@ -503,8 +506,9 @@ function rwRowHtml(g) {
   const multi = players.length > 1;
   const faces = players.slice(0, 3).map(rwFace).join('');
   const sw = g.gap === 1 ? (RW_SING[g.stat] || g.stat) : g.stat;
+  const rivalLink = g.rivalId ? `<a class="hw-rival" href="${jugadorHref(g.rivalId)}">${g.rival}</a>` : g.rival;
   const rivalHtml = g.type === 'pass'
-    ? (g.rivalId ? `<a class="hw-rival" href="${jugadorHref(g.rivalId)}">${g.rival}</a>` : g.rival)
+    ? `${rivalLink}${g.rivalRank ? ` <span class="hw-rank">(sería ${g.rivalRank}º)</span>` : ''}`
     : '';
   const txt = g.type === 'pass'
     ? `A <b>${g.gap} ${sw}</b> de superar a ${rivalHtml}`
@@ -2066,6 +2070,7 @@ async function initJugadorPage() {
     jugHeader(j),
     jugCrossLinks(j, trans),
     jugRankings(j),
+    jugMarcas(j, data),
     jugStats(j),
     jugDebut(j),
     jugGameHighs(j),
@@ -2136,6 +2141,24 @@ function jugHeader(j) {
       ${bref}
     </div>
   </header>`;
+}
+
+function jugMarcas(j, data) {
+  const marks = rwBuild(data).filter(w => (w.j.id || w.j.nombre) === (j.id || j.nombre));
+  if (!marks.length) return '';
+  const items = marks.map(w => {
+    const sw = w.gap === 1 ? (RW_SING[w.stat] || w.stat) : w.stat;
+    let txt;
+    if (w.type === 'pass') {
+      const rivalLink = w.rivalId ? `<a class="pl-link" href="${jugadorHref(w.rivalId)}">${w.rival}</a>` : w.rival;
+      txt = `A <b>${w.gap} ${sw}</b> de superar a ${rivalLink}${w.rivalRank ? ` <span class="hw-rank">(sería ${w.rivalRank}º)</span>` : ''}`;
+    } else {
+      txt = `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
+    }
+    const badge = isFinite(w.games) ? `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}` : 'Debutante';
+    return `<li class="jugmk-item"><span class="jugmk-txt">${txt}</span><span class="hw-badge">${badge}</span></li>`;
+  }).join('');
+  return jugSection('Marcas al alcance', `<ul class="jugmk-list">${items}</ul>`);
 }
 
 function jugStats(j) {
