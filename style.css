@@ -613,6 +613,12 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .hw-name, .hw-txt { font-size: 0.84rem; }
   .hw-badge { font-size: 0.66rem; padding: 2px 8px; }
 }
+/* Página de marcas al alcance */
+.mk-wrap { max-width: 900px; margin: 0 auto; padding: 0 var(--space-6) var(--space-10); }
+.mk-wrap .home-watch-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.mk-empty { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); }
+.mk-note { margin-top: var(--space-3); font-size: var(--font-xs); color: var(--text-dim); line-height: 1.5; }
+@media (max-width: 600px) { .mk-wrap { padding: 0 var(--space-4) var(--space-8); } }
 
 /* Home en móvil: tarjetas compactas, 2-3 por fila, sin la descripción */
 @media (max-width: 600px) {

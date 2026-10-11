@@ -139,7 +139,7 @@ function hsClose() {
 const NAV_LINKS = [
   ['Inicio', 'index.html'], ['Jugadores', 'jugadores.html'], ['Draft', 'draft.html'],
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Temporadas', 'temporadas.html'],
-  ['Career Highs', 'career-highs.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
+  ['Career Highs', 'career-highs.html'], ['Marcas al alcance', 'marcas.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
   ['Salarios', 'salarios.html'], ['Dorsales', 'dorsales.html'], ['Summer League', 'summer-league.html'],
   ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'],
   ['Efemérides', 'efemerides.html'], ['Quinteto', 'quinteto.html'], ['Test', 'test.html'],
@@ -437,21 +437,55 @@ function renderHomeWatch(data) {
     if (perPlayer[k] <= 3) top.push(w);
     if (top.length >= 6) break;
   }
-  const SING = { puntos: 'punto', rebotes: 'rebote', asistencias: 'asistencia', triples: 'triple', tapones: 'tapón', robos: 'robo', partidos: 'partido' };
-  const items = top.map(w => {
-    const j = w.j;
-    const foto = (j.id || j.foto_url || j.bref_id)
-      ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">`
-      : avatarHtml(j.nombre, 'hw-avatar');
-    const sw = w.gap === 1 ? (SING[w.stat] || w.stat) : w.stat;
-    const txt = w.type === 'pass'
-      ? `A <b>${w.gap} ${sw}</b> de superar a ${w.rival}`
-      : `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
-    const badge = `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}`;
-    return `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(j.id)}"><span class="hw-thumb">${foto}</span><span class="hw-body"><span class="hw-name">${j.nombre}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></a></li>`;
-  }).join('');
-  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><span class="home-watch-note">a su ritmo de carrera</span></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
+  const items = top.map(rwItemHtml).join('');
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><a class="home-efm-link" href="marcas.html">Ver todas →</a></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
   el.hidden = false;
+}
+
+// HTML de una marca (compartido por la home y la página de marcas).
+const RW_SING = { puntos: 'punto', rebotes: 'rebote', asistencias: 'asistencia', triples: 'triple', tapones: 'tapón', robos: 'robo', partidos: 'partido' };
+function rwItemHtml(w) {
+  const j = w.j;
+  const foto = (j.id || j.foto_url || j.bref_id)
+    ? `<img loading="lazy" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">`
+    : avatarHtml(j.nombre, 'hw-avatar');
+  const sw = w.gap === 1 ? (RW_SING[w.stat] || w.stat) : w.stat;
+  const txt = w.type === 'pass'
+    ? `A <b>${w.gap} ${sw}</b> de superar a ${w.rival}`
+    : `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
+  const badge = `~${w.games} ${w.games === 1 ? 'partido' : 'partidos'}`;
+  return `<li class="home-watch-item"><a class="hw-link" href="${jugadorHref(j.id)}"><span class="hw-thumb">${foto}</span><span class="hw-body"><span class="hw-name">${j.nombre}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></a></li>`;
+}
+
+// ── PÁGINA "MARCAS AL ALCANCE" (listado completo con filtro) ──
+let mkAll = [];
+let mkFilter = 'all';
+async function initMarcasPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
+  buildPlayerIds(data.jugadores);
+  mkAll = rwBuild(data);   // todo lo alcanzable esta temporada (~82 partidos)
+  const jug = new Set(mkAll.map(w => w.j.id || w.j.nombre)).size;
+  const sub = document.getElementById('hero-sub');
+  if (sub) sub.textContent = mkAll.length
+    ? `${mkAll.length} marcas a tiro de ${jug} ${jug === 1 ? 'español en activo' : 'españoles en activo'} esta temporada`
+    : 'Ahora mismo no hay marcas al alcance. Vuelve cuando haya más partidos jugados.';
+  document.querySelectorAll('#mk-filter .mode-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      mkFilter = b.dataset.f;
+      document.querySelectorAll('#mk-filter .mode-btn').forEach(x => { const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      renderMarcas();
+    });
+  });
+  renderMarcas();
+}
+function renderMarcas() {
+  const list = document.getElementById('mk-list'), empty = document.getElementById('mk-empty'), count = document.getElementById('mk-count');
+  const rows = mkFilter === 'all' ? mkAll : mkAll.filter(w => w.type === mkFilter);
+  list.innerHTML = rows.map(rwItemHtml).join('');
+  if (empty) empty.hidden = rows.length > 0;
+  if (count) count.textContent = `${rows.length} ${rows.length === 1 ? 'marca' : 'marcas'}`;
 }
 
 // ══════════════════════════════════════════════
