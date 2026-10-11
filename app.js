@@ -2177,11 +2177,10 @@ function jugStats(j) {
     statBox('FG%', fmtPct(j.fg_pct)), statBox('3P%', fmtPct(j.tres_pct)), statBox('FT%', fmtPct(j.ft_pct)),
   ].join('');
   const tot = [
-    statBox('GP', fmtEnt(j.partidos)),
-    statBox('PTS', fmtEnt(j.pts_total)), statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)),
-    statBox('ROB', fmtEnt(j.stl_total)), statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
-    statBox('TD', fmtEnt(j.td_total)), statBox('MIN', fmtEnt(j.min_total)),
-    statBox('TOV', fmtEnt(j.tov_total)), statBox('PF', fmtEnt(j.pf_total)),
+    statBox('GP', fmtEnt(j.partidos)), statBox('MIN', fmtEnt(j.min_total)), statBox('PTS', fmtEnt(j.pts_total)),
+    statBox('REB', fmtEnt(j.rbd_total)), statBox('AST', fmtEnt(j.ast_total)), statBox('ROB', fmtEnt(j.stl_total)),
+    statBox('TAP', fmtEnt(j.blk_total)), statBox('3PM', fmtEnt(j.tres_total)),
+    statBox('TOV', fmtEnt(j.tov_total)), statBox('PF', fmtEnt(j.pf_total)), statBox('TD', fmtEnt(j.td_total)),
   ].join('');
   return jugSection('Estadísticas de carrera',
     `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
@@ -2193,8 +2192,8 @@ function jugGameHighs(j) {
   const g = j.game_highs;
   if (!g) return '';
   const boxes = [
-    ['PTS', g.pts], ['REB', g.rbd], ['AST', g.ast], ['ROB', g.stl], ['TAP', g.blk],
-    ['MIN', g.min], ['FGM', g.fgm], ['3PM', g.tres_m], ['FTM', g.ftm], ['TOV', g.tov], ['PF', g.pf],
+    ['MIN', g.min], ['PTS', g.pts], ['REB', g.rbd], ['AST', g.ast], ['ROB', g.stl], ['TAP', g.blk],
+    ['FGM', g.fgm], ['3PM', g.tres_m], ['FTM', g.ftm], ['TOV', g.tov], ['PF', g.pf],
   ].filter(([, v]) => v != null).map(([l, v]) => statBox(l, fmtEnt(v))).join('');
   if (!boxes) return '';
   return jugSection('Máximos en un partido', `<div class="stat-grid">${boxes}</div>`);
@@ -2261,7 +2260,8 @@ function jugRankings(j) {
 
 // Efemérides del jugador (debut, draft, fichajes, hitos) enlazando a la página de Efemérides
 function jugEfemerides(j) {
-  const evs = jugEvents.filter(e => drNorm(e.player || '') === drNorm(j.nombre));
+  // Ocultamos las transacciones: ya aparecen en su propia sección justo debajo.
+  const evs = jugEvents.filter(e => drNorm(e.player || '') === drNorm(j.nombre) && e.kind !== 'trans');
   if (!evs.length) return '';
   evs.sort((a, b) => a.year - b.year || a.m - b.m || a.d - b.d);
   const items = evs.map(e => {
@@ -2270,9 +2270,11 @@ function jugEfemerides(j) {
     // En su propia ficha quitamos el nombre del jugador (redundante) y ponemos la frase en mayúscula
     let txt = e.html.replace(/^<b>[\s\S]*?<\/b>\s*/, '');
     txt = txt ? txt.charAt(0).toUpperCase() + txt.slice(1) : e.html;
+    const vid = efmYtId(e.video);
+    const videoBtn = vid ? `<button type="button" class="efm-video-btn jug-efm-video" onclick="efmPlayVideo(this,'${vid}')"><span class="efm-video-ico">▶</span> Ver vídeo</button>` : '';
     return `<li class="jug-efm-item">
       <a class="jug-efm-date" href="efemerides.html?m=${e.m}&d=${e.d}">${e.d} ${MESES[e.m - 1]} ${e.year}</a>
-      <div class="jug-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="jug-efm-txt">${txt}</span></div>
+      <div class="jug-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="jug-efm-txt">${txt}</span>${videoBtn}</div>
     </li>`;
   }).join('');
   return jugSection('Efemérides', `<ul class="jug-efm-list">${items}</ul>`);
@@ -2364,11 +2366,10 @@ function jugPlayoffs(j) {
       statBox('FG%', fmtPct(pt.fg_pct)), statBox('3P%', fmtPct(pt.tres_pct)), statBox('FT%', fmtPct(pt.ft_pct)),
     ].join('');
     const tot = [
-      statBox('GP', fmtEnt(pt.partidos)),
-      statBox('PTS', fmtEnt(pt.pts_total)), statBox('REB', fmtEnt(pt.rbd_total)), statBox('AST', fmtEnt(pt.ast_total)),
-      statBox('ROB', fmtEnt(pt.stl_total)), statBox('TAP', fmtEnt(pt.blk_total)), statBox('3PM', fmtEnt(pt.tres_total)),
-      statBox('TD', fmtEnt(pt.td_total)), statBox('MIN', fmtEnt(pt.min_total)),
-      statBox('TOV', fmtEnt(pt.tov_total)), statBox('PF', fmtEnt(pt.pf_total)),
+      statBox('GP', fmtEnt(pt.partidos)), statBox('MIN', fmtEnt(pt.min_total)), statBox('PTS', fmtEnt(pt.pts_total)),
+      statBox('REB', fmtEnt(pt.rbd_total)), statBox('AST', fmtEnt(pt.ast_total)), statBox('ROB', fmtEnt(pt.stl_total)),
+      statBox('TAP', fmtEnt(pt.blk_total)), statBox('3PM', fmtEnt(pt.tres_total)),
+      statBox('TOV', fmtEnt(pt.tov_total)), statBox('PF', fmtEnt(pt.pf_total)), statBox('TD', fmtEnt(pt.td_total)),
     ].join('');
     html += `<h3 class="jug-subh">Por partido</h3><div class="stat-grid">${pg}</div>
              <h3 class="jug-subh">Totales</h3><div class="stat-grid">${tot}</div>`;

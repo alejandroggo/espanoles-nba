@@ -1066,6 +1066,7 @@ body.drawer-lock { overflow: hidden; }
 .jug-efm-date:hover { text-decoration: underline; }
 .jug-efm-body { flex: 1; }
 .jug-efm-txt { display: block; margin-top: 3px; line-height: 1.45; font-size: 0.92rem; }
+.jug-efm-video { margin-top: 8px; }
 @media (max-width: 560px) {
   .jug-efm-item { flex-direction: column; gap: 4px; }
   .jug-efm-date { flex-basis: auto; }
