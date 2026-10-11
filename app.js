@@ -5399,8 +5399,28 @@ function efmPlayVideo(btn, id) {
 // Handles de X (Twitter) por jugador. Clave: nombre normalizado (drNorm). Valor: handle SIN @.
 // Rellenar solo con handles verificados — un handle equivocado etiquetaría a otra persona.
 const TW_HANDLES = {
-  // 'pau gasol': 'paugasol',
-  // 'marc gasol': 'MarcGasol',
+  'pau gasol': 'paugasol',
+  'marc gasol': 'MarcGasol',
+  'serge ibaka': 'sergeibaka',
+  'juan carlos navarro': 'jcnavarroworld',
+  'ricky rubio': 'rickyrubio9',
+  'santi aldama': 'santialdama',
+  'rudy fernandez': 'rudy5fernandez',
+  'jose m. calderon': 'JmCalderon',
+  'jorge garbajosa': 'jgarbajosa15',
+  'willy hernangomez': 'willyhg94',
+  'alex abrines': 'alexabrines',
+  'juancho hernangomez': 'juanchiviris41',
+  'sergio rodriguez': 'SergioRodriguez',
+  'hugo gonzalez': 'hugoglezz_',
+  'victor claver': 'Victor_Claver',
+  'usman garuba': 'Usmangaruba',
+  'baba miller': '_bmillxr_',
+  'sergio de larrea': 'Laaarry_14',
+  'albert miralles': 'Miralles10',
+  'sergio llull': '23Llull',
+  'dani diez': 'danidiez11',
+  'juan nunez': 'juaan_ng',
 };
 function efmHandle(nombre) {
   const h = TW_HANDLES[drNorm(nombre || '')];
