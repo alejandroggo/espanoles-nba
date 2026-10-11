@@ -400,13 +400,15 @@ function rwBuild(data) {
   ];
   const MAXGAMES = 30;   // nada que esté a más de ~30 partidos
   // Rookies sin ritmo fiable (0 partidos): umbral por diferencia absoluta en cada estadística.
-  const ROOKIE_ABS = { puntos: 50, rebotes: 25, asistencias: 25, triples: 10, robos: 10, tapones: 10 };
+  const ROOKIE_ABS = { puntos: 50, rebotes: 25, asistencias: 25, triples: 10, robos: 10, tapones: 10, partidos: 30 };
   const out = [];
   active.forEach(j => {
     STATS.forEach(s => {
       const mine = j[s.tot] || 0;
       const perg = s.pg ? (j[s.pg] || 0) : 1;         // 'partidos' => 1 partido por partido
-      const hasRate = perg > 0;                        // ¿tenemos ritmo para estimar partidos?
+      // Sin partidos NBA no hay ritmo fiable en NINGUNA estadística (tampoco 'partidos'):
+      // esos jugadores van como "Debutante" y por umbral absoluto.
+      const hasRate = (j.partidos || 0) > 0 && perg > 0;
       const games = gap => hasRate ? Math.ceil(gap / perg) : Infinity;
       const abs = ROOKIE_ABS[s.label];
       const show = (gap, g) => hasRate ? (g <= MAXGAMES) : (abs != null && gap <= abs);
