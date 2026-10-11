@@ -425,7 +425,8 @@ function rwBuild(data) {
 function renderHomeWatch(data) {
   const el = document.getElementById('home-watch');
   if (!el) return;
-  const all = rwBuild(data);
+  // En portada mostramos solo lo inminente: marcas a ~3 partidos o menos.
+  const all = rwBuild(data).filter(w => w.games <= 3);
   if (!all.length) return;
   // Variedad: máximo 3 marcas por jugador, hasta 6 en total.
   const perPlayer = {}, top = [];
