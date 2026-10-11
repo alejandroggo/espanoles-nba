@@ -581,6 +581,13 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 /* Widget "Un día como hoy" en la home */
 .home-efm { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-8); }
 .home-efm-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-3); }
+.home-efm-head-actions { display: inline-flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+.home-box-min { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: inline-flex; align-items: center; border-radius: var(--radius-sm); line-height: 0; }
+.home-box-min:hover { color: var(--text); background: var(--surface-2); }
+.home-box-min svg { transition: transform .2s; }
+.collapsed .home-box-min svg { transform: rotate(-90deg); }
+.collapsed .home-efm-list { display: none; }
+.collapsed .home-efm-head { margin-bottom: 0; }
 .home-efm-kicker { font-family: var(--display); font-size: 1.15rem; letter-spacing: 0.03em; color: var(--text); }
 .home-efm-link { font-size: var(--font-sm); color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
 .home-efm-link:hover { text-decoration: underline; }

@@ -375,8 +375,32 @@ function renderHomeEfm(list, day, isToday) {
     return `<li class="home-efm-item"><span class="home-efm-year">${e.year}<small>${ago > 0 ? `hace ${ago}` : 'este año'}</small></span><div class="home-efm-body"><span class="efm-tags">${tagsHtml}</span><span class="home-efm-txt">${e.html}</span></div></li>`;
   }).join('');
   const kicker = isToday ? 'Un día como hoy' : `Próxima efeméride · ${day.d} de ${MESES_LARGOS[day.m - 1]}`;
-  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">📅 ${kicker}</span><a class="home-efm-link" href="efemerides.html?m=${day.m}&d=${day.d}">Ver Efemérides →</a></div><ul class="home-efm-list">${items}</ul>`;
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">📅 ${kicker}</span><span class="home-efm-head-actions"><a class="home-efm-link" href="efemerides.html?m=${day.m}&d=${day.d}">Ver Efemérides →</a>${homeBoxMinBtn('home-efm')}</span></div><ul class="home-efm-list">${items}</ul>`;
   el.hidden = false;
+  applyHomeBoxState('home-efm');
+}
+
+// ── MINIMIZAR CAJAS DE LA HOME (efemérides / marcas) ──
+function homeBoxMinBtn(id) {
+  return `<button type="button" class="home-box-min" aria-label="Minimizar" aria-expanded="true" onclick="toggleHomeBox('${id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
+}
+function toggleHomeBox(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const collapsed = el.classList.toggle('collapsed');
+  const btn = el.querySelector('.home-box-min');
+  if (btn) { btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true'); btn.setAttribute('aria-label', collapsed ? 'Expandir' : 'Minimizar'); }
+  try { localStorage.setItem('ag-min-' + id, collapsed ? '1' : '0'); } catch (e) { }
+}
+function applyHomeBoxState(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let c = false; try { c = localStorage.getItem('ag-min-' + id) === '1'; } catch (e) { }
+  if (c) {
+    el.classList.add('collapsed');
+    const btn = el.querySelector('.home-box-min');
+    if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Expandir'); }
+  }
 }
 
 // ── MARCAS AL ALCANCE (record watch) ──────────────────
@@ -447,8 +471,9 @@ function renderHomeWatch(data) {
     if (top.length >= 6) break;
   }
   const items = rwGroup(top).map(rwRowHtml).join('');
-  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><a class="home-efm-link" href="marcas.html">Ver todas →</a></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
+  el.innerHTML = `<div class="home-efm-head"><span class="home-efm-kicker">🎯 Marcas al alcance</span><span class="home-efm-head-actions"><a class="home-efm-link" href="marcas.html">Ver todas →</a>${homeBoxMinBtn('home-watch')}</span></div><ul class="home-efm-list home-watch-list">${items}</ul>`;
   el.hidden = false;
+  applyHomeBoxState('home-watch');
 }
 
 // HTML de una marca (compartido por la home y la página de marcas).
