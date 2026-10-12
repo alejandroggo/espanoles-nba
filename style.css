@@ -977,6 +977,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
   white-space: nowrap;
+  text-transform: uppercase; letter-spacing: 0.03em;
 }
 .tt-draft  { background: rgba(245,197,24,0.15);  color: #a67c00; }
 .tt-trade  { background: rgba(234,88,12,0.14);   color: #c2410c; }
