@@ -224,6 +224,16 @@ const FOTO_OVERRIDES = {
   'dani diez':    `${BREF_HEADSHOTS}/daniel-diez-1.jpg`,
 };
 
+// Corrección de acentuación/ortografía de nombres (la fuente los trae sin alguna
+// tilde). Se aplica al cargar los datos para que toda la web muestre el nombre
+// correcto. Clave = nombre tal cual viene en data.json; valor = nombre correcto.
+const NAME_FIX = {
+  'Alex Abrines': 'Álex Abrines',
+  'Raül Lopez': 'Raül López',
+  'Juan Nuñez': 'Juan Núñez',
+  'Sergio De Larrea': 'Sergio de Larrea',
+};
+
 let AG_DATA_PROMISE = null;
 async function loadData() {
   // Una sola descarga por carga de página (dedupe de llamadas concurrentes), pero
@@ -239,7 +249,13 @@ async function loadData() {
   (data.jugadores || []).forEach(j => {
     const ov = FOTO_OVERRIDES[drNorm(j.nombre)];
     if (ov) j.foto_url = ov;
+    if (NAME_FIX[j.nombre]) j.nombre = NAME_FIX[j.nombre];
   });
+  // Corrige el nombre también donde aparece como jugador/rival (transacciones, dorsales, etc.)
+  ['transacciones', 'dorsales', 'summer_league', 'superaciones'].forEach(k => (data[k] || []).forEach(r => {
+    if (r.jugador && NAME_FIX[r.jugador]) r.jugador = NAME_FIX[r.jugador];
+    if (r.rival && NAME_FIX[r.rival]) r.rival = NAME_FIX[r.rival];
+  }));
   setLastUpdate(data.actualizado);
   hideLoadBar();
   return data;
@@ -746,7 +762,7 @@ const SAL_COLS = [
   { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
 
-const ROOKIES_CONTRATO = ['Sergio De Larrea', 'Baba Miller', 'Aday Mara'];
+const ROOKIES_CONTRATO = ['Sergio de Larrea', 'Baba Miller', 'Aday Mara'];
 
 function fmtDinero(n) {
   if (!n) return '—';
@@ -2204,7 +2220,7 @@ function jugHeader(j) {
 async function jugShareCard() {
   const j = jugCurrent; if (!j) return;
   const who = (typeof efmHandle === 'function' && efmHandle(j.nombre)) || j.nombre;
-  const texto = `${who} en la NBA 🏀 #EspañolesNBA`;
+  const texto = `${who} en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)`;
   const url = location.href;
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
@@ -2957,7 +2973,7 @@ function retoShowResult(already) {
 function retoShare() {
   const score = retoResults.filter(Boolean).length;
   const grid = retoResults.map(r => r ? '🟩' : '🟥').join('');
-  const texto = `Reto #${retoNum()} · Españoles en la NBA\n${score}/${RETO_N} ${grid}\n\n¿Lo superas? #EspañolesNBA`;
+  const texto = `Reto #${retoNum()} · Españoles en la NBA\n${score}/${RETO_N} ${grid}\n\n¿Lo superas? #EspañolesNBA (vía @alejandroggo)`;
   const url = 'https://espanoles-nba.alejandroggo.com/test.html';
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
@@ -4255,7 +4271,7 @@ async function cmpBuildImage(d) {
   x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'left';
   x.fillText('espanoles-nba.alejandroggo.com', 60, H - 40);
   x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'right';
-  x.fillText('#EspañolesNBA', W - 60, H - 40);
+  x.fillText('@alejandroggo · #EspañolesNBA', W - 60, H - 40);
   return c;
 }
 function cmpShortName(nombre, n) {
@@ -4276,7 +4292,7 @@ async function cmpShare() {
   const names = d.players.map(p => efmHandle(p.nombre) || p.nombre);   // @ de X si lo tenemos, si no el nombre
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
   const modo = d.modoTxt === 'toda la carrera' ? '' : (d.modoTxt === 'tramos elegidos' ? ' (tramos elegidos)' : ` (${d.modoTxt})`);
-  const texto = `${vs} — cara a cara${modo} 🏀 #EspañolesNBA`;
+  const texto = `${vs} — cara a cara${modo} 🏀 #EspañolesNBA (vía @alejandroggo)`;
   const url = location.href;
   const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto + '\n\n' + url)}`;
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
@@ -6249,7 +6265,7 @@ async function qntBuildImage() {
   x.fillStyle = CO.text; x.font = "600 25px Inter"; x.fillText(`${sum('rings')} anillos · ${sum('allstars')} All-Star · ${L.length}/5`, W / 2, fy + 92);
   // Pie: web (izq.) + hashtag (dcha.)
   x.textAlign = 'left'; x.fillStyle = CO.text; x.font = "700 22px Inter, sans-serif"; x.fillText('espanoles-nba.alejandroggo.com', 60, H - 42);
-  x.textAlign = 'right'; x.fillStyle = CO.accent; x.font = "700 22px Inter, sans-serif"; x.fillText('#EspañolesNBA', W - 60, H - 42);
+  x.textAlign = 'right'; x.fillStyle = CO.accent; x.font = "700 22px Inter, sans-serif"; x.fillText('@alejandroggo · #EspañolesNBA', W - 60, H - 42);
   x.textAlign = 'center';
   return c;
 }
@@ -6267,7 +6283,7 @@ function qntDescargaImagen(bl) {
 }
 async function qntShare() {
   if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
-  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA\n\n' + location.href;
+  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)\n\n' + location.href;
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt);
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
