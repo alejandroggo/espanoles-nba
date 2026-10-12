@@ -668,6 +668,7 @@ async function initDraftPage() {
   renderDraftKpis();
   renderDraftTable();
   renderUndrafted(undrafted);
+  renderOrigenes(draftRows, 'draft-origenes', `Los ${draftRows.length} españoles drafteados, por comunidad de nacimiento.`);
 }
 
 function renderDraftKpis() {
@@ -3295,6 +3296,7 @@ async function initDebutPage() {
   renderDebutKpis();
   document.getElementById('debut-search').addEventListener('input', e => { debutSearch = e.target.value.trim().toLowerCase(); renderDebutTable(); });
   renderDebutTable();
+  renderOrigenes(debutRows, 'debut-origenes', `Los ${debutRows.length} españoles que han debutado en la NBA, por comunidad de nacimiento.`);
 }
 
 function renderDebutKpis() {
@@ -3392,7 +3394,6 @@ async function initJugadoresPage() {
   document.getElementById('hero-sub').textContent = `${jugsAll.length} jugadores · pulsa para ver su ficha`;
   document.getElementById('jug-search').addEventListener('input', e => { jugsSearch = e.target.value.trim().toLowerCase(); renderJugs(); });
   renderJugs();
-  renderOrigenes(jugsAll);
 }
 
 // Comunidad autónoma de nacimiento por jugador (clave: nombre normalizado).
@@ -3405,8 +3406,8 @@ const AG_COMUNIDAD = {
   'sergio de larrea': 'Castilla y León', 'aday mara': 'Aragón', 'fran vazquez': 'Galicia',
   'nikola mirotic': 'Fuera de España', 'serge ibaka': 'Fuera de España',
 };
-function renderOrigenes(jugadores) {
-  const el = document.getElementById('jug-origenes');
+function renderOrigenes(jugadores, containerId, subtitle) {
+  const el = document.getElementById(containerId || 'jug-origenes');
   if (!el) return;
   const groups = {};
   jugadores.forEach(j => { const ca = AG_COMUNIDAD[drNorm(j.nombre)] || 'Otros'; (groups[ca] = groups[ca] || []).push(j); });
@@ -3422,7 +3423,8 @@ function renderOrigenes(jugadores) {
     }).join('');
     return `<div class="orig-card"><div class="orig-head"><span class="orig-region">${ca}</span><span class="orig-count">${js.length}</span></div><div class="orig-players">${chips}</div></div>`;
   };
-  el.innerHTML = `<h2 class="orig-title">¿De dónde son?</h2><p class="orig-sub">Los ${jugadores.length} españoles en la NBA por comunidad de nacimiento.</p><div class="orig-grid">${entries.map(card).join('')}</div>`;
+  const sub = subtitle || `Los ${jugadores.length} españoles en la NBA por comunidad de nacimiento.`;
+  el.innerHTML = `<h2 class="orig-title">¿De dónde son?</h2><p class="orig-sub">${sub}</p><div class="orig-grid">${entries.map(card).join('')}</div>`;
 }
 
 // Año de draft, o de debut si no fue drafteado (sin posición)
