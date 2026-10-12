@@ -2206,26 +2206,38 @@ const BIO = {
 };
 
 function jugHeader(j) {
-  const pills = [];
-  const nac = j.nacimiento_fecha || j.nacimiento;
   const bio = BIO[drNorm(j.nombre)] || {};
-  if (nac) pills.push('Nacido: ' + nac);
+  const nac = j.nacimiento_fecha || j.nacimiento;
   const fisico = [bio.altura, bio.peso].filter(Boolean).join(' · ');
-  if (fisico) pills.push(fisico);
-  if (bio.origen) pills.push('Origen: ' + bio.origen);
-  pills.push(j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'} ${j.draft_equipo || ''}`.trim() : 'No drafteado');
-  if (j.primer_partido && j.primer_partido.fecha) pills.push('Debut: ' + j.primer_partido.fecha);
-  if (j.equipos_nba) pills.push('Equipos: ' + j.equipos_nba);
+  const draftVal = j.draft
+    ? `${j.draft_anio || ''} · #${j.draft_pick || '?'}${j.draft_equipo ? ' · ' + j.draft_equipo : ''}`.trim()
+    : 'No drafteado';
+  const debut = (j.primer_partido && j.primer_partido.fecha) ? j.primer_partido.fecha : '';
+  const equipos = j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : '';
+  const fact = (label, val) => val ? `<div class="jug-fact"><dt>${label}</dt><dd>${escapeHtml(val)}</dd></div>` : '';
+  const facts = [
+    fact('Nacido', nac),
+    fact('Físico', fisico),
+    fact('Draft', draftVal),
+    fact('Debut', debut),
+    fact('Equipos', equipos),
+  ].join('');
+  const pin = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const origin = bio.origen ? `<p class="jug-origin">${pin}<span>${escapeHtml(bio.origen)}</span></p>` : '';
   const bref = j.bref_id
-    ? `<a class="jug-bref" href="https://www.basketball-reference.com/players/${j.bref_id[0]}/${j.bref_id}.html" target="_blank" rel="noopener noreferrer">Ver perfil en Basketball Reference<span aria-hidden="true"> ↗</span></a>`
+    ? `<a class="jug-act-btn jug-act-ghost" href="https://www.basketball-reference.com/players/${j.bref_id[0]}/${j.bref_id}.html" target="_blank" rel="noopener noreferrer">Basketball Reference<span aria-hidden="true"> ↗</span></a>`
     : '';
-  const shareBtn = `<button type="button" class="efm-share-btn jug-share-btn" onclick="jugShareCard()" aria-label="Compartir ficha en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir ficha</button>`;
-  return `<header class="jug-header">
-    ${jugPhoto(j, 'jug-photo--big')}
-    <div class="jug-headinfo">
-      <h1 class="jug-name">${j.nombre}</h1>
-      <div class="jug-pills">${pills.map(p => `<span class="jug-pill">${p}</span>`).join('')}</div>
-      <div class="jug-actions">${shareBtn}${bref}</div>
+  const shareBtn = `<button type="button" class="jug-act-btn jug-act-primary" onclick="jugShareCard()" aria-label="Compartir ficha en X"><span class="jug-act-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir ficha</button>`;
+  return `<header class="jug-hero">
+    <h1 class="jug-name">${escapeHtml(j.nombre)}</h1>
+    <span class="jug-hero-accent" aria-hidden="true"></span>
+    <div class="jug-hero-body">
+      ${jugPhoto(j, 'jug-photo--hero')}
+      <div class="jug-hero-info">
+        ${origin}
+        <dl class="jug-facts">${facts}</dl>
+        <div class="jug-actions">${shareBtn}${bref}</div>
+      </div>
     </div>
   </header>`;
 }
