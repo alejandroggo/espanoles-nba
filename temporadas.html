@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=168">
+<link rel="stylesheet" href="style.css?v=169">
 </head>
 <body>
 
@@ -69,8 +69,14 @@
   </section>
 
   <section class="controles tmp-controles" aria-label="Filtros">
-    <div class="search-wrap tmp-search-wrap">
-      <input type="text" id="tmp-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+    <div class="tmp-search-row">
+      <div class="search-wrap tmp-search-wrap">
+        <input type="text" id="tmp-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
+      </div>
+      <div class="tmp-legend" aria-label="Leyenda">
+        <span class="tmp-lg"><span class="tmp-sw tmp-sw-parcial"></span> Traspasado</span>
+        <span class="tmp-lg"><span class="tmp-sw tmp-sw-cut"></span> Cortado</span>
+      </div>
     </div>
     <div class="tmp-filtros">
       <label class="tmp-field">
@@ -105,11 +111,6 @@
 
   <section class="tmp-filterbar" id="tmp-filterbar" aria-label="Filtros avanzados" hidden></section>
 
-  <div class="tmp-legend" aria-label="Leyenda">
-    <span class="tmp-lg"><span class="tmp-sw tmp-sw-parcial"></span> Traspasado</span>
-    <span class="tmp-lg"><span class="tmp-sw tmp-sw-cut"></span> Cortado</span>
-  </div>
-
   <section class="tabla-wrap" aria-label="Todas las temporadas">
     <table id="tmp-table">
       <thead id="tmp-thead"></thead>
@@ -142,7 +143,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=168"></script>
+<script src="app.js?v=169"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
