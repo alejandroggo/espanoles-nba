@@ -2096,7 +2096,7 @@ function statBox(label, val) {
   return `<div class="stat-box"><div class="stat-box-val">${val}</div><div class="stat-box-lbl">${label}</div></div>`;
 }
 
-let jugAll = [], jugEvents = [];
+let jugAll = [], jugEvents = [], jugCurrent = null;
 async function initJugadorPage() {
   let id = new URLSearchParams(location.search).get('id');
   if (!id) { const m = location.pathname.match(/jugador-([^/]+?)\.html$/); if (m) id = decodeURIComponent(m[1]); }
@@ -2107,6 +2107,7 @@ async function initJugadorPage() {
 
   const j = (data.jugadores || []).find(p => p.id === id);
   if (!j) { el.innerHTML = '<p class="td-muted" style="padding:2rem">Jugador no encontrado.</p>'; return; }
+  jugCurrent = j;
   document.title = `${j.nombre} · Españoles en la NBA`;
 
   buildPlayerIds(data.jugadores);
@@ -2187,14 +2188,99 @@ function jugHeader(j) {
   const bref = j.bref_id
     ? `<a class="jug-bref" href="https://www.basketball-reference.com/players/${j.bref_id[0]}/${j.bref_id}.html" target="_blank" rel="noopener noreferrer">Ver perfil en Basketball Reference<span aria-hidden="true"> ↗</span></a>`
     : '';
+  const shareBtn = `<button type="button" class="efm-share-btn jug-share-btn" onclick="jugShareCard()" aria-label="Compartir ficha en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir ficha</button>`;
   return `<header class="jug-header">
     ${jugPhoto(j, 'jug-photo--big')}
     <div class="jug-headinfo">
       <h1 class="jug-name">${j.nombre}</h1>
       <div class="jug-pills">${pills.map(p => `<span class="jug-pill">${p}</span>`).join('')}</div>
-      ${bref}
+      <div class="jug-actions">${shareBtn}${bref}</div>
     </div>
   </header>`;
+}
+
+// Imagen-resumen de la ficha del jugador para compartir (foto + stats clave + logros)
+async function jugBuildImage(j) {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const CO = { bg: '#0e0e10', text: '#e9e9ec', muted: '#9a9aa5', yellow: '#ffc400', red: '#c60b1e' };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 12); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 12); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 12); };
+  flag(0); flag(H - 12);
+  x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.yellow; x.font = '700 26px Inter, sans-serif'; x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 84); x.restore();
+  // Foto
+  const cy = 360, r = 172;
+  const img = await qntLoadImg(`img/players/${j.id}.jpg`);
+  x.save(); x.beginPath(); x.arc(W / 2, cy, r, 0, 7); x.closePath(); x.clip();
+  if (img) { const s = Math.max(2 * r / img.naturalWidth, 2 * r / img.naturalHeight); const w = img.naturalWidth * s, h = img.naturalHeight * s; x.drawImage(img, W / 2 - w / 2, cy - h / 2 - r * 0.12, w, h); }
+  else { x.fillStyle = qntAvatarColor(j.nombre); x.fillRect(W / 2 - r, cy - r, 2 * r, 2 * r); x.fillStyle = '#fff'; x.font = '800 96px Inter, sans-serif'; x.textBaseline = 'middle'; x.fillText(qntInitials(j.nombre), W / 2, cy); x.textBaseline = 'alphabetic'; }
+  x.restore();
+  x.beginPath(); x.arc(W / 2, cy, r, 0, 7); x.strokeStyle = 'rgba(255,255,255,.18)'; x.lineWidth = 4; x.stroke();
+  // Nombre + subtítulo
+  x.fillStyle = CO.text; x.font = '800 58px Inter, sans-serif'; x.fillText(j.nombre, W / 2, cy + r + 72);
+  const ca = AG_COMUNIDAD[drNorm(j.nombre)];
+  const origen = (ca && ca !== 'Fuera de España' && ca !== 'Otros') ? ca : (BIO[drNorm(j.nombre)] || {}).origen;
+  const sub = [origen, j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'}` : 'No drafteado'].filter(Boolean).join('   ·   ');
+  x.fillStyle = CO.muted; x.font = '500 28px Inter, sans-serif'; x.fillText(sub, W / 2, cy + r + 118);
+  // Stats
+  let yy = cy + r + 240;
+  if (j.partidos > 0) {
+    [['PTS', fmtDec1(j.pts_g)], ['REB', fmtDec1(j.rbd_g)], ['AST', fmtDec1(j.ast_g)]].forEach((s, i) => {
+      const colx = W / 2 + (i - 1) * 310;
+      x.fillStyle = CO.yellow; x.font = "400 118px 'Bebas Neue', sans-serif"; x.fillText(s[1], colx, yy);
+      x.fillStyle = CO.muted; x.font = '600 27px Inter, sans-serif'; x.fillText(s[0], colx, yy + 44);
+    });
+    yy += 150;
+    [['Partidos', fmtEnt(j.partidos)], ['FG%', fmtPct(j.fg_pct)], ['3P%', fmtPct(j.tres_pct)]].forEach((s, i) => {
+      const colx = W / 2 + (i - 1) * 310;
+      x.fillStyle = CO.text; x.font = '800 46px Inter, sans-serif'; x.fillText(s[1], colx, yy);
+      x.fillStyle = CO.muted; x.font = '600 25px Inter, sans-serif'; x.fillText(s[0], colx, yy + 38);
+    });
+    yy += 110;
+  } else {
+    x.fillStyle = CO.muted; x.font = '500 36px Inter, sans-serif'; x.fillText('Recién llegado a la NBA', W / 2, yy); yy += 70;
+  }
+  // Logros
+  const rings = Object.keys(TL_ANILLOS[drNorm(j.nombre)] || {}).length;
+  const allstars = (j.premios || []).filter(p => /all[\s-]?star/i.test(p.tipo) && !/concurso/i.test(p.tipo)).length;
+  const temps = new Set((j.temporadas_data || []).map(t => t.year).filter(Boolean)).size;
+  const logros = [];
+  if (rings) logros.push(`🏆 ${rings} ${rings === 1 ? 'anillo' : 'anillos'}`);
+  if (allstars) logros.push(`⭐ ${allstars} All-Star`);
+  if (temps) logros.push(`${temps} ${temps === 1 ? 'temporada' : 'temporadas'}`);
+  if (logros.length) { x.fillStyle = CO.text; x.font = '600 34px Inter, sans-serif'; x.fillText(logros.join('     '), W / 2, yy + 50); yy += 100; }
+  if (j.game_highs && j.game_highs.pts) { x.fillStyle = CO.muted; x.font = '500 27px Inter, sans-serif'; x.fillText(`Máximo: ${j.game_highs.pts} puntos en un partido`, W / 2, yy + 46); }
+  // Pie
+  x.textAlign = 'left'; x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.fillText('espanoles-nba.alejandroggo.com', 60, H - 44);
+  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.fillText('#EspañolesNBA', W - 60, H - 44);
+  x.textAlign = 'center';
+  return c;
+}
+function jugDescargaImagen(bl, j) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = `ficha-${(j && j.id) || 'jugador'}-espanoles-nba.png`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+async function jugShareCard() {
+  const j = jugCurrent; if (!j) return;
+  const who = (typeof efmHandle === 'function' && efmHandle(j.nombre)) || j.nombre;
+  const texto = `${who} en la NBA 🏀 #EspañolesNBA`;
+  const url = location.href;
+  const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await jugBuildImage(j); jugDescargaImagen(await qntBlob(c), j); } catch (e) { }
+    return;
+  }
+  try {
+    const c = await jugBuildImage(j); const bl = await qntBlob(c);
+    const file = new File([bl], `ficha-${j.id}.png`, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: texto + '\n\n' + url }); return; }
+    jugDescargaImagen(bl, j);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 
 function jugMarcas(j, data) {
