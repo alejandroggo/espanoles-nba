@@ -589,7 +589,7 @@ function rwRowHtml(g) {
 
 // ── PÁGINA "MARCAS AL ALCANCE" (listado completo con filtro) ──
 let mkAll = [];
-let mkFilter = 'all';
+let mkFilter = 'all', mkPlayer = '';
 async function initMarcasPage() {
   let data;
   try { data = await loadData(); }
@@ -609,11 +609,21 @@ async function initMarcasPage() {
       renderMarcas();
     });
   });
+  // Selector de jugador: solo los que tienen alguna marca al alcance
+  const psel = document.getElementById('mk-player');
+  if (psel) {
+    const seen = new Map();
+    mkAll.forEach(w => { const key = w.j.id || w.j.nombre; if (!seen.has(key)) seen.set(key, w.j.nombre); });
+    const opts = [...seen.entries()].sort((a, b) => a[1].localeCompare(b[1], 'es'));
+    psel.innerHTML = '<option value="">Todos los jugadores</option>' + opts.map(([k, nombre]) => `<option value="${escapeHtml(k)}">${escapeHtml(nombre)}</option>`).join('');
+    psel.addEventListener('change', e => { mkPlayer = e.target.value; renderMarcas(); });
+  }
   renderMarcas();
 }
 function renderMarcas() {
   const list = document.getElementById('mk-list'), empty = document.getElementById('mk-empty'), count = document.getElementById('mk-count');
-  const rows = mkFilter === 'all' ? mkAll : mkAll.filter(w => w.type === mkFilter);
+  let rows = mkFilter === 'all' ? mkAll : mkAll.filter(w => w.type === mkFilter);
+  if (mkPlayer) rows = rows.filter(w => (w.j.id || w.j.nombre) === mkPlayer);
   const grouped = rwGroup(rows);
   list.innerHTML = grouped.map(rwRowHtml).join('');
   if (empty) empty.hidden = grouped.length > 0;
@@ -2890,11 +2900,9 @@ function retoToday() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-function retoNum() {   // nº de reto (días desde el lanzamiento)
-  const base = Date.UTC(2026, 9, 12);   // 12 oct 2026 = reto #1
-  const t = new Date();
-  const today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
-  return Math.max(1, Math.round((today - base) / 86400000) + 1);
+function retoDate(long) {   // etiqueta de fecha del reto de hoy
+  const d = new Date(), dd = d.getDate(), mm = d.getMonth(), yy = d.getFullYear();
+  return long ? `${dd} de ${MESES_LARGOS[mm]} de ${yy}` : `${dd} ${MESES[mm]} ${yy}`;
 }
 function retoMulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function retoSeed(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -2938,7 +2946,7 @@ function retoRenderQ() {
   retoAnswered = false;
   document.getElementById('quiz-next').hidden = true;
   const fb = document.getElementById('quiz-feedback'); fb.textContent = ''; fb.className = 'quiz-feedback';
-  document.getElementById('quiz-q').innerHTML = `<span class="reto-qnum">Reto #${retoNum()} · Pregunta ${retoIdx + 1}/${RETO_N}</span>${q.q}`;
+  document.getElementById('quiz-q').innerHTML = `<span class="reto-qnum">Reto del día · ${retoDate(false)} · Pregunta ${retoIdx + 1}/${RETO_N}</span>${q.q}`;
   document.getElementById('quiz-options').innerHTML = q.options.map((o, i) => `<button class="quiz-opt" onclick="retoAnswer(${i})">${o}</button>`).join('');
   retoRenderProgress();
 }
@@ -2992,21 +3000,69 @@ function retoShowResult(already) {
     <div class="reto-result-score">${score}<span>/${RETO_N}</span></div>
     <div class="reto-result-grid">${grid}</div>
     <div class="reto-result-msg">${msg}</div>
-    <p class="reto-result-sub">Reto #${retoNum()}${already ? ' · Ya lo jugaste hoy' : ''} · Vuelve mañana para uno nuevo.</p>
+    <p class="reto-result-sub">${retoDate(true)}${already ? ' · Ya lo jugaste hoy' : ''} · Vuelve mañana para uno nuevo.</p>
     <div class="reto-result-actions">
       <button type="button" class="efm-share-btn reto-share-btn" onclick="retoShare()"><span class="efm-share-ico">${xico}</span> Compartir resultado</button>
       <button type="button" class="reto-free-link" onclick="setQuizMode('free')">Seguir con práctica libre →</button>
     </div>
   </div>`;
 }
-function retoShare() {
+// Imagen-resultado del reto del día (cuadros de color según los aciertos)
+async function retoBuildImage(results) {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const score = results.filter(Boolean).length, N = results.length;
+  const W = 1080, H = 1080, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const CO = { bg: '#0e0e10', text: '#e9e9ec', muted: '#9a9aa5', yellow: '#ffc400', red: '#c60b1e', green: '#22c55e', ko: '#e23b3b', coral: '#f2545b' };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 12); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 12); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 12); };
+  flag(0); flag(H - 12);
+  x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.yellow; x.font = '700 26px Inter, sans-serif'; x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 98); x.restore();
+  x.fillStyle = CO.text; x.font = "italic 700 76px 'DM Serif Display', serif"; x.fillText('Reto del día', W / 2, 206);
+  x.fillStyle = CO.muted; x.font = '600 30px Inter, sans-serif'; x.save(); x.letterSpacing = '1px'; x.fillText(retoDate(true), W / 2, 256); x.restore();
+  const pleno = score === N;
+  x.fillStyle = pleno ? CO.yellow : CO.coral; x.font = "400 250px 'Bebas Neue', sans-serif";
+  x.fillText(`${score}/${N}`, W / 2, 560);
+  // Cuadros de aciertos/fallos
+  const sq = 108, gap = 24, totalW = N * sq + (N - 1) * gap, sx = (W - totalW) / 2, sy = 636;
+  results.forEach((r, i) => {
+    const px = sx + i * (sq + gap);
+    x.fillStyle = r ? CO.green : CO.ko;
+    x.beginPath(); x.roundRect(px, sy, sq, sq, 18); x.fill();
+  });
+  const msg = pleno ? '¡Pleno! Lo clavaste 🏆' : score >= 3 ? '¡Bien jugado! 👏' : 'Mañana hay revancha 💪';
+  x.fillStyle = CO.text; x.font = '700 44px Inter, sans-serif'; x.fillText(msg, W / 2, 858);
+  x.fillStyle = CO.muted; x.font = '500 30px Inter, sans-serif'; x.fillText('¿Cuántas aciertas tú?', W / 2, 912);
+  x.textAlign = 'left'; x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.fillText('espanoles-nba.alejandroggo.com', 60, H - 46);
+  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.fillText('@alejandroggo · #EspañolesNBA', W - 60, H - 46);
+  x.textAlign = 'center';
+  return c;
+}
+function retoDescargaImagen(bl) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'reto-diario-espanoles-nba.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+async function retoShare() {
   const score = retoResults.filter(Boolean).length;
   const grid = retoResults.map(r => r ? '🟩' : '🟥').join('');
-  const texto = `Reto #${retoNum()} · Españoles en la NBA\n${score}/${RETO_N} ${grid}\n\n¿Lo superas? #EspañolesNBA (vía @alejandroggo)`;
+  const texto = `Reto del día · ${retoDate(false)}\n${score}/${RETO_N} ${grid}\n\n¿Cuántas aciertas tú? #EspañolesNBA (vía @alejandroggo)`;
   const url = 'https://espanoles-nba.alejandroggo.com/test.html';
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-  if (isTouch && navigator.share) { navigator.share({ text: texto, url }).catch(() => { }); return; }
+  // Escritorio: abrir X dentro del gesto + descargar la imagen aparte.
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await retoBuildImage(retoResults); retoDescargaImagen(await qntBlob(c)); } catch (e) { }
+    return;
+  }
+  // Móvil: menú nativo con la imagen adjunta.
+  try {
+    const c = await retoBuildImage(retoResults); const bl = await qntBlob(c);
+    const file = new File([bl], 'reto-diario-espanoles-nba.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: texto + '\n\n' + url }); return; }
+    retoDescargaImagen(bl);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
   window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 

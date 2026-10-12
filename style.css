@@ -284,6 +284,17 @@ main { flex: 1; }
   font-size: var(--font-sm);
   color: var(--text-muted);
 }
+.hero-cta { margin-top: var(--space-6); }
+.hero-cta-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 26px; border-radius: var(--radius-full);
+  background: var(--accent); color: var(--accent-contrast);
+  font-family: inherit; font-size: var(--font-md); font-weight: 700;
+  text-decoration: none; box-shadow: var(--shadow-sm);
+  transition: background var(--transition), transform var(--transition);
+}
+.hero-cta-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.hero-cta-ico { font-size: 1.15em; }
 
 .hero--page { padding: var(--space-12) var(--space-6) var(--space-8); }
 .hero-top {

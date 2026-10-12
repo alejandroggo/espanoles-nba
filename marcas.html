@@ -42,7 +42,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=178">
+<link rel="stylesheet" href="style.css?v=179">
 </head>
 <body>
 
@@ -73,6 +73,10 @@
       <button type="button" class="toggle-chip" data-f="pass" aria-pressed="false">Superar a un español</button>
       <button type="button" class="toggle-chip" data-f="round" aria-pressed="false">Cifras redondas</button>
     </div>
+    <label class="sel-wrap">
+      <span class="sr-only">Filtrar por jugador</span>
+      <select id="mk-player" class="sel"></select>
+    </label>
     <span class="results-count" id="mk-count"></span>
   </section>
 
@@ -107,7 +111,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=178"></script>
+<script src="app.js?v=179"></script>
 <script>initTheme(); initMarcasPage();</script>
 </body>
 </html>
