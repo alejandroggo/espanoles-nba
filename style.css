@@ -725,6 +725,9 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
      tapada por la cabecera del sitio (el overflow horizontal rompía el sticky). */
   .tabla-wrap { padding: 0 var(--space-4) var(--space-6); overflow-x: auto; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
+  /* Cada registro en una sola línea: con scroll horizontal, nunca se parte hacia abajo */
+  .tabla-wrap td, .tabla-wrap th,
+  .tabla-scroll td, .tabla-scroll th { white-space: nowrap; }
   /* El overflow-x rompe el sticky de la cabecera de tabla y acababa tapando la 1ª fila:
      en móvil la dejamos estática (se desplaza con el contenido, nada queda oculto). */
   thead th { position: static; }
