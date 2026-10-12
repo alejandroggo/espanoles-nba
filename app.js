@@ -4527,11 +4527,8 @@ function sortTmp(col) {
 }
 
 function tmpSyncModeButtons() {
-  ['total', 'pg'].forEach(x => {
-    const btn = document.getElementById('tmp-mode-' + x);
-    btn.classList.toggle('active', x === tmpMode);
-    btn.setAttribute('aria-pressed', String(x === tmpMode));
-  });
+  const sel = document.getElementById('tmp-mode');
+  if (sel) sel.value = tmpMode;
 }
 
 function setTmpMode(m) {
@@ -4570,10 +4567,7 @@ function setTmpDim(d) {
   if (tmpDim === d) return;
   tmpDim = d;
   tmpRows = d === 'po' ? tmpRowsPo : tmpRowsReg;
-  ['reg', 'po'].forEach(x => {
-    const btn = document.getElementById('tmp-dim-' + x);
-    if (btn) { btn.classList.toggle('active', x === d); btn.setAttribute('aria-pressed', String(x === d)); }
-  });
+  const dimSel = document.getElementById('tmp-dim'); if (dimSel) dimSel.value = d;
   // Equipos y años difieren entre dimensiones → se reinician los filtros
   tmpFilterTeam = ''; tmpFilterYear = '';
   updateUrlParam('equipo', ''); updateUrlParam('anio', '');
@@ -4597,10 +4591,7 @@ async function initTemporadasPage() {
   const params = new URLSearchParams(location.search);
   if (params.get('tipo') === 'po' && tmpRowsPo.length) {
     tmpDim = 'po';
-    ['reg', 'po'].forEach(x => {
-      const btn = document.getElementById('tmp-dim-' + x);
-      if (btn) { btn.classList.toggle('active', x === 'po'); btn.setAttribute('aria-pressed', String(x === 'po')); }
-    });
+    const dimSel = document.getElementById('tmp-dim'); if (dimSel) dimSel.value = 'po';
     const legend = document.querySelector('.tmp-legend'); if (legend) legend.style.display = 'none';
     const hideBtn = document.getElementById('tmp-hide'); if (hideBtn) hideBtn.style.display = 'none';
   }

@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=167">
+<link rel="stylesheet" href="style.css?v=168">
 </head>
 <body>
 
@@ -68,30 +68,39 @@
     </div>
   </section>
 
-  <section class="controles" aria-label="Filtros">
-    <div class="search-wrap">
+  <section class="controles tmp-controles" aria-label="Filtros">
+    <div class="search-wrap tmp-search-wrap">
       <input type="text" id="tmp-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
     </div>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por equipo</span>
-      <select id="tmp-team" class="sel"></select>
-    </label>
-    <label class="sel-wrap">
-      <span class="sr-only">Filtrar por temporada</span>
-      <select id="tmp-year" class="sel"></select>
-    </label>
-    <span class="results-count" id="tmp-count"></span>
-    <div class="controles-break"></div>
-    <div class="seg" role="group" aria-label="Temporada regular o playoffs">
-      <button type="button" id="tmp-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setTmpDim('reg')">Temporada regular</button>
-      <button type="button" id="tmp-dim-po" class="toggle-chip" aria-pressed="false" onclick="setTmpDim('po')">Playoffs</button>
+    <div class="tmp-filtros">
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Temporada</span>
+        <select id="tmp-year" class="sel"></select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Tipo</span>
+        <select id="tmp-dim" class="sel" onchange="setTmpDim(this.value)">
+          <option value="reg">Temporada regular</option>
+          <option value="po">Playoffs</option>
+        </select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Modo</span>
+        <select id="tmp-mode" class="sel" onchange="setTmpMode(this.value)">
+          <option value="total">Totales</option>
+          <option value="pg">Por partido</option>
+        </select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Equipo</span>
+        <select id="tmp-team" class="sel"></select>
+      </label>
     </div>
-    <div class="seg" role="group" aria-label="Totales o por partido">
-      <button type="button" id="tmp-mode-total" class="toggle-chip active" aria-pressed="true" onclick="setTmpMode('total')">Totales</button>
-      <button type="button" id="tmp-mode-pg" class="toggle-chip" aria-pressed="false" onclick="setTmpMode('pg')">Por partido</button>
+    <div class="tmp-controles-foot">
+      <button type="button" id="tmp-hide" class="toggle-chip" aria-pressed="false" onclick="toggleTmpPartials()">Ocultar parciales</button>
+      <span class="results-count" id="tmp-count"></span>
+      <button type="button" id="tmp-adv" class="tmp-adv-link" aria-expanded="false" onclick="toggleTmpAdv()">Filtros avanzados <span class="tmp-adv-caret">▾</span></button>
     </div>
-    <button type="button" id="tmp-hide" class="toggle-chip" aria-pressed="false" onclick="toggleTmpPartials()">Ocultar parciales</button>
-    <button type="button" id="tmp-adv" class="toggle-chip" aria-expanded="false" onclick="toggleTmpAdv()">Filtros avanzados <span class="tmp-adv-caret">▾</span></button>
   </section>
 
   <section class="tmp-filterbar" id="tmp-filterbar" aria-label="Filtros avanzados" hidden></section>
@@ -133,7 +142,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=167"></script>
+<script src="app.js?v=168"></script>
 <script>initTheme(); initTemporadasPage();</script>
 </body>
 </html>
