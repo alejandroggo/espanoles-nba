@@ -2,16 +2,26 @@
 // TEMA
 // ══════════════════════════════════════════════
 function initTheme() {
-  const stored = localStorage.getItem('ag-theme') || 'auto';
+  let stored = 'auto';
+  try { stored = localStorage.getItem('ag-theme') || 'auto'; } catch (e) { }
   renderTheme(stored);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if ((localStorage.getItem('ag-theme') || 'auto') === 'auto') renderTheme('auto');
+    let cur = 'auto';
+    try { cur = localStorage.getItem('ag-theme') || 'auto'; } catch (e) { }
+    if (cur === 'auto') renderTheme('auto');
   });
   buildNav();
   buildHeaderSearch();
   buildShareButton();
   // buildChatWidget();   // Pregúntame oculto por ahora
   buildCookieBanner();
+  // Cabeceras ordenables operables por teclado (Enter/Espacio)
+  document.addEventListener('keydown', e => {
+    const th = e.target;
+    if ((e.key === 'Enter' || e.key === ' ') && th && th.classList && th.classList.contains('th-sortable')) {
+      e.preventDefault(); th.click();
+    }
+  });
   showLoadBar();
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
@@ -209,8 +219,13 @@ function renderTheme(pref) {
 function cycleTheme() {
   const cur = document.getElementById('theme-toggle')?.dataset.themePref || 'auto';
   const next = { auto: 'dark', dark: 'light', light: 'auto' }[cur] || 'auto';
-  localStorage.setItem('ag-theme', next);
+  try { localStorage.setItem('ag-theme', next); } catch (e) { }
   renderTheme(next);
+}
+
+// Escapa texto libre (notas, "otros"…) antes de inyectarlo con innerHTML.
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 // ══════════════════════════════════════════════
@@ -318,7 +333,7 @@ function buildPlayerIds(jugadores) {
 // Envuelve `inner` (o el nombre) en un enlace a la ficha si el jugador existe
 function plLink(name, inner) {
   const id = PLAYER_IDS[drNorm(name)];
-  const content = inner == null ? name : inner;
+  const content = inner == null ? escapeHtml(name) : inner;
   return id ? `<a class="pl-link" href="${jugadorHref(id)}">${content}</a>` : content;
 }
 
@@ -708,7 +723,7 @@ function renderDraftTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = draftSortCol === c.key;
       const ariaSort = active ? (draftSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (draftSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortDraft('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -722,7 +737,7 @@ function renderDraftTable() {
       <td class="td-num">${j.draft_equipo || '—'}</td>
       <td class="td-num">${j.draft_anio}</td>
       <td class="td-num td-muted">${j.draft_fecha || '—'}</td>
-      <td class="td-muted td-notas">${j.draft_notas || j.notas || '—'}</td>
+      <td class="td-muted td-notas">${escapeHtml(j.draft_notas || j.notas || '—')}</td>
     </tr>`).join('');
 }
 
@@ -840,7 +855,7 @@ function renderSalariosTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = salSortCol === c.key;
       const ariaSort = active ? (salSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (salSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (salSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortSal('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -1027,7 +1042,7 @@ function renderSlHead(cols) {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = slSortCol === c.key;
       const ariaSort = active ? (slSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (slSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (slSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortSl('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -1225,7 +1240,7 @@ function renderPrKpis() {
 function buildPrFilters() {
   const tipos = [...new Set(prAll.map(p => p.tipo))].sort();
   document.getElementById('pr-tipo').innerHTML =
-    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
   const years = [...new Set(prAll.map(p => p.year).filter(Boolean))].sort((a, b) => b - a);
   document.getElementById('pr-year').innerHTML =
     '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
@@ -1262,7 +1277,7 @@ function renderPrHead(cols, sortCol, sortAsc) {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = sortCol === c.key;
       const ariaSort = active ? (sortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (sortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (sortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortPr('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -1287,9 +1302,9 @@ function renderPrFlat(rows) {
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-nombre">${plLink(p.jugador, p.jugador)}</td>
       <td class="td-num">${p.year || '—'}</td>
-      <td class="td-center">${p.team || '—'}</td>
-      <td>${p.tipo}</td>
-      <td class="td-muted td-notas">${p.notas || '—'}</td>
+      <td class="td-center">${escapeHtml(p.team || '—')}</td>
+      <td>${escapeHtml(p.tipo)}</td>
+      <td class="td-muted td-notas">${escapeHtml(p.notas || '—')}</td>
     </tr>`).join('') || `<tr><td colspan="6" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
 
@@ -1367,7 +1382,7 @@ function renderPrGroupedTipo(entries) {
     const jl = g.jugadores.map(([jug, n]) => `${plLink(jug, jug)}${n > 1 ? ` ×${n}` : ''}`).join(', ');
     return `<tr class="${premioRowClass(g.tipo)}">
       <td class="td-rank td-muted">${i + 1}</td>
-      <td>${g.tipo}</td>
+      <td>${escapeHtml(g.tipo)}</td>
       <td class="td-num">${g.count}</td>
       <td>${jl}</td>
     </tr>`;
@@ -1546,7 +1561,7 @@ function renderRkTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = rkSortCol === c.key;
       const ariaSort = active ? (rkSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (rkSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (rkSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortRk('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -1952,14 +1967,14 @@ function renderTrKpis() {
 
   document.getElementById('tr-kpis').innerHTML = `
     <div class="kpi"><div class="kpi-num">${total}</div><div class="kpi-label">Movimientos</div></div>
-    <div class="kpi"><div class="kpi-num">${topTipo[1]}</div><div class="kpi-label">Más común · ${topTipo[0]}</div></div>
-    <div class="kpi"><div class="kpi-num">${topJug[1]}</div><div class="kpi-label">Más movido · ${topJug[0]}</div></div>`;
+    <div class="kpi"><div class="kpi-num">${topTipo[1]}</div><div class="kpi-label">Más común · ${escapeHtml(topTipo[0])}</div></div>
+    <div class="kpi"><div class="kpi-num">${topJug[1]}</div><div class="kpi-label">Más movido · ${escapeHtml(topJug[0])}</div></div>`;
 }
 
 function buildTrFilters() {
   const tipos = [...new Set(trAll.map(t => t.tipo))].sort();
   document.getElementById('tr-tipo').innerHTML =
-    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+    '<option value="">Todos los tipos</option>' + tipos.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
   const years = [...new Set(trAll.map(t => trYearOf(t.fecha)).filter(Boolean))].sort((a, b) => b - a);
   document.getElementById('tr-year').innerHTML =
     '<option value="">Todos los años</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
@@ -1991,22 +2006,22 @@ function renderTrTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = trSortCol === c.key;
       const ariaSort = active ? (trSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (trSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (trSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortTr('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
 
   document.getElementById('tr-body').innerHTML = rows.map((t, i) => `
-    <tr class="tr-row" tabindex="0" role="button" aria-label="Ver detalle de la transacción de ${t.jugador}"
+    <tr class="tr-row" tabindex="0" role="button" aria-label="Ver detalle de la transacción de ${escapeHtml(t.jugador)}"
         onclick="openTrDrawer('${t._id}')"
         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
-      <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, t.jugador)}</td>
-      <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
+      <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, escapeHtml(t.jugador))}</td>
+      <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${escapeHtml(t.tipo)}</span></td>
       <td class="td-center">${trTeamCell(t.equipo1)}</td>
       <td class="td-center">${trTeamCell(t.equipo2)}</td>
-      <td class="td-center td-muted">${trContrato(t) || '—'}</td>
+      <td class="td-center td-muted">${escapeHtml(trContrato(t) || '—')}</td>
       <td class="td-chevron" aria-hidden="true">›</td>
     </tr>`).join('') || `<tr><td colspan="${TR_COLS.length}" class="td-muted" style="padding:2rem;text-align:center">Sin resultados.</td></tr>`;
 }
@@ -2042,21 +2057,21 @@ function openTrDrawer(id) {
   // Campo CONTRATO (solo firmas). Cae a las notas si el sheet no exporta un campo propio.
   const contrato = trContrato(t);
   const filas = [
-    ['Jugador', plLink(t.jugador, t.jugador)],
-    contrato ? ['Contrato', contrato] : null,
+    ['Jugador', plLink(t.jugador, escapeHtml(t.jugador))],
+    contrato ? ['Contrato', escapeHtml(contrato)] : null,
     t.equipo1 ? ['Equipo', teamFull(t.equipo1)] : null,
     t.equipo2 ? ['Segundo equipo', teamFull(t.equipo2)] : null,
-    t.otros ? ['Otros jugadores', t.otros] : null,
+    t.otros ? ['Otros jugadores', escapeHtml(t.otros)] : null,
   ].filter(Boolean);
 
   document.getElementById('tr-drawer-content').innerHTML = `
-    <span class="tr-tipo ${trTipoClass(t.tipo)} drawer-tag">${t.tipo}</span>
-    <h2 class="drawer-title" id="tr-drawer-title">${t.jugador}</h2>
+    <span class="tr-tipo ${trTipoClass(t.tipo)} drawer-tag">${escapeHtml(t.tipo)}</span>
+    <h2 class="drawer-title" id="tr-drawer-title">${escapeHtml(t.jugador)}</h2>
     <p class="drawer-sub">${trFechaDisplay(t.fecha)}</p>
     <dl class="drawer-dl">
       ${filas.map(([k, v]) => `<div class="drawer-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
     </dl>
-    ${(t.notas && t.notas !== contrato) ? `<div class="drawer-notas"><h3>Notas</h3><p>${t.notas}</p></div>` : ''}`;
+    ${(t.notas && t.notas !== contrato) ? `<div class="drawer-notas"><h3>Notas</h3><p>${escapeHtml(t.notas)}</p></div>` : ''}`;
 
   document.getElementById('tr-overlay').hidden = false;
   const d = document.getElementById('tr-drawer');
@@ -2483,8 +2498,8 @@ function jugPremios(j) {
   const items = [...p].sort((a, b) => (b.year || 0) - (a.year || 0)).map(a => {
     const hito = a.tipo === 'ROY' || a.tipo === 'DPOY' || /campe/i.test(a.tipo);
     return `<li class="jug-award">
-      <span class="jug-award-tipo${hito ? ' jug-award-hito' : ''}">${a.tipo}</span>
-      <span class="td-muted">${[a.year, a.team, a.notas].filter(Boolean).join(' · ')}</span>
+      <span class="jug-award-tipo${hito ? ' jug-award-hito' : ''}">${escapeHtml(a.tipo)}</span>
+      <span class="td-muted">${escapeHtml([a.year, a.team, a.notas].filter(Boolean).join(' · '))}</span>
     </li>`;
   }).join('');
   return jugSection(`Premios (${p.length})`, `<ul class="jug-awards">${items}</ul>`);
@@ -2530,7 +2545,7 @@ function jugTransSec(trans) {
   const rows = [...trans].sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || ''))).map(t => `<tr class="tr-row" tabindex="0" role="button" aria-label="Ver detalle de la transacción"
       onclick="openTrDrawer('${t._id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
     <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
-    <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${t.tipo}</span></td>
+    <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${escapeHtml(t.tipo)}</span></td>
     <td class="td-center">${trTeamCell(t.equipo1)}</td><td class="td-center">${trTeamCell(t.equipo2)}</td>
     <td class="td-chevron" aria-hidden="true">›</td>
   </tr>`).join('');
@@ -2731,7 +2746,8 @@ const QUIZ_GENS = [
     const teams = [...new Set(D.trans.map(t => t.equipo2).filter(Boolean))];
     if (trades.length < 4 || teams.length < 4) return null;
     const t = qPick(trades); const m = String(t.fecha).match(/^(\d{4})-(\d{2})/);
-    const cuando = `${MESES_LARGOS[parseInt(m[2]) - 1]} de ${m[1]}`;
+    const mes = MESES_LARGOS[parseInt(m[2]) - 1]; if (!mes) return null;   // fecha con mes inválido → descarta
+    const cuando = `${mes} de ${m[1]}`;
     return { q: `¿A qué equipo fue <b>traspasado ${t.jugador}</b> en ${cuando}?`, correct: t.equipo2, options: qOptions(t.equipo2, teams) };
   },
   D => { // equipo con el que jugó la Summer League
@@ -3187,7 +3203,7 @@ function renderHighs() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = highsSortCol === c.key;
       const ariaSort = active ? (highsSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (highsSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (highsSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortHighs('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -3309,7 +3325,7 @@ function renderDebutTable() {
       if (!c.sortable) return `<th scope="col" class="${c.cls || ''}">${c.label}</th>`;
       const active = debutSortCol === c.key;
       const ariaSort = active ? (debutSortAsc ? 'ascending' : 'descending') : 'none';
-      return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (debutSortAsc ? ' asc' : '') : ''}"
+      return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (debutSortAsc ? ' asc' : '') : ''}"
         aria-sort="${ariaSort}" onclick="sortDebut('${c.key}')">${c.label}</th>`;
     }).join('')}
   </tr>`;
@@ -4665,7 +4681,7 @@ function renderTmpTable() {
   document.getElementById('tmp-thead').innerHTML = `<tr>${cols.map(c => {
     const active = tmpSortCol === c.key;
     const ariaSort = active ? (tmpSortAsc ? 'ascending' : 'descending') : 'none';
-    return `<th scope="col" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (tmpSortAsc ? ' asc' : '') : ''}" aria-sort="${ariaSort}" onclick="sortTmp('${c.key}')">${c.label}</th>`;
+    return `<th scope="col" tabindex="0" class="th-sortable ${c.cls || ''} ${active ? 'sorted' + (tmpSortAsc ? ' asc' : '') : ''}" aria-sort="${ariaSort}" onclick="sortTmp('${c.key}')">${c.label}</th>`;
   }).join('')}</tr>`;
 
   document.getElementById('tmp-tbody').innerHTML = rows.map(r => {
@@ -5917,13 +5933,13 @@ function efmShowDetail(i) {
   const rows = [];
   const add = (label, val) => { if (val) rows.push(`<div class="efm-md-row"><span class="efm-md-k">${label}</span><span class="efm-md-v">${val}</span></div>`); };
   const esTraspaso = /traspas/i.test(d.tipo || '');
-  add('Jugador', d.jugador ? `<b>${plLink(d.jugador, d.jugador)}</b>` : '');
+  add('Jugador', d.jugador ? `<b>${plLink(d.jugador, escapeHtml(d.jugador))}</b>` : '');
   add('Fecha', efmFullDate(d.fecha));
-  add('Tipo', d.tipo);
+  add('Tipo', escapeHtml(d.tipo));
   add(esTraspaso && d.equipo2 ? 'Desde' : 'Equipo', efmTeamName(d.equipo1));
   if (d.equipo2) add(esTraspaso ? 'Hacia' : 'Equipo 2', efmTeamName(d.equipo2));
-  add('Otros implicados', d.otros);
-  add('Notas', d.notas);
+  add('Otros implicados', escapeHtml(d.otros));
+  add('Notas', escapeHtml(d.notas));
 
   const modal = document.createElement('div');
   modal.className = 'efm-modal';
