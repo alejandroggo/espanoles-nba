@@ -6070,7 +6070,10 @@ async function qntBuildImage() {
     x.fillStyle = CO.muted; x.font = "600 22px Inter"; x.fillText(cc[0], colx, fy + 34);
   });
   x.fillStyle = CO.text; x.font = "600 25px Inter"; x.fillText(`${sum('rings')} anillos · ${sum('allstars')} All-Star · ${L.length}/5`, W / 2, fy + 92);
-  x.fillStyle = CO.muted; x.font = "500 22px Inter"; x.fillText('alejandroggo.github.io/espanoles-nba', W / 2, H - 42);
+  // Pie: web (izq.) + hashtag (dcha.)
+  x.textAlign = 'left'; x.fillStyle = CO.text; x.font = "700 22px Inter, sans-serif"; x.fillText('espanoles-nba.alejandroggo.com', 60, H - 42);
+  x.textAlign = 'right'; x.fillStyle = CO.accent; x.font = "700 22px Inter, sans-serif"; x.fillText('#EspañolesNBA', W - 60, H - 42);
+  x.textAlign = 'center';
   return c;
 }
 
@@ -6081,16 +6084,32 @@ async function qntDownload() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'mi-quinteto-espanol.png';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
-async function qntShare() {
-  if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
-  const c = await qntBuildImage(), bl = await qntBlob(c);
-  const file = new File([bl], 'mi-quinteto-espanol.png', { type: 'image/png' });
-  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA\n\n' + location.href;
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], text: txt }); return; }
-    catch (e) { if (e && e.name === 'AbortError') return; }
-  }
+function qntDescargaImagen(bl) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'mi-quinteto-espanol.png';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+}
+async function qntShare() {
+  if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
+  const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA\n\n' + location.href;
+  const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt);
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+  // Escritorio: abrir X dentro del gesto (si no, el navegador bloquea el popup) y descargar la imagen aparte.
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await qntBuildImage(); qntDescargaImagen(await qntBlob(c)); } catch (e) { }
+    return;
+  }
+
+  // Móvil/táctil: menú nativo con la imagen adjunta (permite elegir X con la foto).
+  try {
+    const c = await qntBuildImage(); const bl = await qntBlob(c);
+    const file = new File([bl], 'mi-quinteto-espanol.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], text: txt });
+      return;
+    }
+    qntDescargaImagen(bl);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
