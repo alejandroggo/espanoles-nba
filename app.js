@@ -976,13 +976,12 @@ async function initSummerPage() {
   renderSlKpis();
   buildSlYearFilter();
 
-  // Agrupación desde la URL (?grupo=player|year)
+  // Por defecto, agrupado por jugador (cada español una fila con sus Summer Leagues).
+  // ?grupo=year para agrupar por año, ?grupo=none para la lista plana.
   const grupo = new URLSearchParams(location.search).get('grupo');
-  if (grupo === 'player' || grupo === 'year') {
-    slGroup = grupo;
-    slSortCol = 'count';
-    syncSlGroupButtons();
-  }
+  slGroup = grupo === 'year' ? 'year' : grupo === 'none' ? '' : 'player';
+  slSortCol = slGroup ? 'count' : 'year';
+  syncSlGroupButtons();
 
   document.getElementById('sl-search').addEventListener('input', e => { slSearch = e.target.value.trim().toLowerCase(); renderSlTable(); });
   document.getElementById('sl-year').addEventListener('change', e => { slYear = e.target.value; renderSlTable(); });
