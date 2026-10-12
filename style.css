@@ -709,7 +709,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   /* Si el total es impar, la última tarjeta ocupa el ancho completo (no queda coja) */
   .home-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .home-card-desc { display: none; }
-  .home-card-title { font-size: 1.4rem; line-height: 1.05; overflow-wrap: break-word; hyphens: auto; }
+  .home-card-title { font-size: 1.4rem; line-height: 1.05; overflow-wrap: break-word; -webkit-hyphens: none; hyphens: none; }
   .home-card-num { font-size: 0.72rem; }
   .home-card-arrow { font-size: var(--font-md); }
 }
