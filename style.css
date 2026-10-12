@@ -1218,6 +1218,26 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 }
 .quiz-next:hover { background: var(--accent-hover); }
 
+/* ── RETO DEL DÍA ────────────────────────────── */
+.quiz-modes { margin-bottom: var(--space-5); }
+.reto-qnum { display: block; font-size: var(--font-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: var(--space-2); }
+.reto-progress { display: flex; justify-content: center; gap: 10px; margin-top: var(--space-5); }
+.reto-progress[hidden] { display: none; }
+.reto-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border-strong); }
+.reto-dot.cur { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+.reto-dot.ok { background: var(--success); border-color: var(--success); }
+.reto-dot.ko { background: var(--danger); border-color: var(--danger); }
+.reto-result { text-align: center; padding: var(--space-4) 0; }
+.reto-result-score { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 1; color: var(--accent); }
+.reto-result-score span { color: var(--text-muted); font-size: 2.6rem; }
+.reto-result-grid { font-size: 2rem; letter-spacing: 6px; margin: var(--space-3) 0; }
+.reto-result-msg { font-size: var(--font-lg); font-weight: 700; }
+.reto-result-sub { font-size: var(--font-sm); color: var(--text-muted); margin-top: var(--space-2); }
+.reto-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-5); }
+.reto-share-btn { font-size: var(--font-sm); }
+.reto-free-link { background: none; border: 0; color: var(--accent); font-family: inherit; font-size: var(--font-sm); font-weight: 600; cursor: pointer; }
+.reto-free-link:hover { text-decoration: underline; }
+
 /* ── CAREER HIGHS ────────────────────────────── */
 .highs-wrap { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6) var(--space-16); }
 .highs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }

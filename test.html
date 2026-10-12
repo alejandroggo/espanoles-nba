@@ -15,13 +15,13 @@
   gtag('config', 'G-NCR152YQ9F');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test · Españoles en la NBA</title>
-<meta name="description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA: test de preguntas aleatorias con 4 opciones.">
+<title>Test y Reto del día · Españoles en la NBA</title>
+<meta name="description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA. Juega el Reto del día (5 preguntas iguales para todos) o la práctica libre sin fin.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Españoles en la NBA">
 <meta property="og:locale" content="es_ES">
 <meta property="og:title" content="Test · Españoles en la NBA">
-<meta property="og:description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA: test de preguntas aleatorias con 4 opciones.">
+<meta property="og:description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA. Juega el Reto del día (5 preguntas iguales para todos) o la práctica libre sin fin.">
 <meta property="og:url" content="https://espanoles-nba.alejandroggo.com/test.html">
 <link rel="canonical" href="https://espanoles-nba.alejandroggo.com/test.html">
 <meta property="og:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
@@ -29,7 +29,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Test · Españoles en la NBA">
-<meta name="twitter:description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA: test de preguntas aleatorias con 4 opciones.">
+<meta name="twitter:description" content="Pon a prueba tus conocimientos sobre los españoles en la NBA. Juega el Reto del día (5 preguntas iguales para todos) o la práctica libre sin fin.">
 <meta name="twitter:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=172">
+<link rel="stylesheet" href="style.css?v=173">
 </head>
 <body>
 
@@ -67,6 +67,10 @@
         <span class="quiz-streak" id="quiz-streak"></span>
       </div>
     </div>
+    <div class="seg quiz-modes" role="group" aria-label="Modo de juego">
+      <button type="button" id="qmode-reto" class="toggle-chip active" aria-pressed="true" onclick="setQuizMode('reto')">Reto del día</button>
+      <button type="button" id="qmode-free" class="toggle-chip" aria-pressed="false" onclick="setQuizMode('free')">Práctica libre</button>
+    </div>
     <div class="quiz-card">
       <p class="quiz-q" id="quiz-q">Cargando…</p>
       <div class="quiz-options" id="quiz-options"></div>
@@ -75,6 +79,7 @@
         <button class="quiz-next" id="quiz-next" onclick="quizNext()" hidden>Siguiente →</button>
       </div>
     </div>
+    <div class="reto-progress" id="reto-progress" hidden></div>
   </section>
 </main>
 
@@ -102,7 +107,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=172"></script>
+<script src="app.js?v=173"></script>
 <script>initTheme(); initTestPage();</script>
 </body>
 </html>

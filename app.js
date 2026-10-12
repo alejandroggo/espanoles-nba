@@ -2785,13 +2785,10 @@ const QUIZ_GENS = [
   },
 ];
 
-async function initTestPage() {
-  let data;
-  try { data = await loadData(); }
-  catch (e) { document.getElementById('quiz-q').textContent = 'Error al cargar los datos'; return; }
+function quizBuildData(data) {
   const J = data.jugadores || [];
   J.forEach(j => { j._seasons = new Set((j.temporadas_data || []).map(t => t.year).filter(Boolean)).size; });
-  quizData = {
+  return {
     J,
     drafted: J.filter(j => j.draft && j.draft_anio),
     stat: J.filter(j => (j.partidos || 0) > 0),
@@ -2804,7 +2801,168 @@ async function initTestPage() {
     trans: (data.transacciones || []),
     byTeam: qBuildByTeam(J),
   };
-  quizNext();
+}
+
+let quizMode = 'reto';
+async function initTestPage() {
+  let data;
+  try { data = await loadData(); }
+  catch (e) { document.getElementById('quiz-q').textContent = 'Error al cargar los datos'; return; }
+  quizData = quizBuildData(data);
+  const params = new URLSearchParams(location.search);
+  setQuizMode(params.get('modo') === 'libre' ? 'free' : 'reto');
+}
+
+function setQuizMode(m) {
+  quizMode = m;
+  ['reto', 'free'].forEach(x => {
+    const btn = document.getElementById('qmode-' + x);
+    if (btn) { btn.classList.toggle('active', x === m); btn.setAttribute('aria-pressed', String(x === m)); }
+  });
+  const scoreEl = document.querySelector('.quiz-score');
+  const nb = document.getElementById('quiz-next');
+  if (m === 'free') {
+    if (scoreEl) scoreEl.style.display = '';
+    const pr = document.getElementById('reto-progress'); if (pr) pr.hidden = true;
+    quizScore = 0; quizTotal = 0; quizStreak = 0;
+    document.getElementById('quiz-score').textContent = '0 / 0';
+    document.getElementById('quiz-streak').textContent = '';
+    if (nb) { nb.onclick = quizNext; nb.textContent = 'Siguiente →'; }
+    quizNext();
+  } else {
+    if (scoreEl) scoreEl.style.display = 'none';
+    retoStart();
+  }
+}
+
+// ══════════════════════════════════════════════
+// RETO DEL DÍA — mismas preguntas para todos cada día (semilla = fecha)
+// ══════════════════════════════════════════════
+const RETO_N = 5;
+let retoQs = [], retoIdx = 0, retoResults = [], retoAnswered = false;
+
+function retoToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function retoNum() {   // nº de reto (días desde el lanzamiento)
+  const base = Date.UTC(2026, 9, 12);   // 12 oct 2026 = reto #1
+  const t = new Date();
+  const today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.max(1, Math.round((today - base) / 86400000) + 1);
+}
+function retoMulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function retoSeed(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+// Genera las preguntas del día de forma determinista (sustituye Math.random por
+// un PRNG sembrado con la fecha mientras se generan, y lo restaura después).
+function retoGenerate() {
+  const rnd = retoMulberry32(retoSeed(retoToday()));
+  const orig = Math.random; Math.random = rnd;
+  const qs = [], stems = new Set(); let guard = 0;
+  try {
+    while (qs.length < RETO_N && guard < 500) {
+      guard++;
+      const gen = QUIZ_GENS[Math.floor(rnd() * QUIZ_GENS.length)];
+      const q = gen(quizData);
+      if (!q) continue;
+      const stem = q.q.replace(/<[^>]+>/g, '');
+      if (stems.has(stem)) continue;   // sin preguntas repetidas en el mismo reto
+      stems.add(stem); qs.push(q);
+    }
+  } finally { Math.random = orig; }
+  return qs;
+}
+function retoKey() { return 'ag-reto-' + retoToday(); }
+
+function retoStart() {
+  retoQs = retoGenerate();
+  if (!retoQs.length) { document.getElementById('quiz-q').textContent = 'No hay datos suficientes para el reto de hoy.'; return; }
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(retoKey()) || 'null'); } catch (e) { }
+  if (saved && Array.isArray(saved.results) && saved.results.length === retoQs.length) {
+    retoResults = saved.results; retoShowResult(true);
+    return;
+  }
+  retoIdx = 0; retoResults = []; retoAnswered = false;
+  retoRenderQ();
+}
+
+function retoRenderQ() {
+  const q = retoQs[retoIdx];
+  retoAnswered = false;
+  document.getElementById('quiz-next').hidden = true;
+  const fb = document.getElementById('quiz-feedback'); fb.textContent = ''; fb.className = 'quiz-feedback';
+  document.getElementById('quiz-q').innerHTML = `<span class="reto-qnum">Reto #${retoNum()} · Pregunta ${retoIdx + 1}/${RETO_N}</span>${q.q}`;
+  document.getElementById('quiz-options').innerHTML = q.options.map((o, i) => `<button class="quiz-opt" onclick="retoAnswer(${i})">${o}</button>`).join('');
+  retoRenderProgress();
+}
+function retoRenderProgress() {
+  const pr = document.getElementById('reto-progress'); if (!pr) return;
+  pr.hidden = false;
+  pr.innerHTML = retoQs.map((_, i) => {
+    let cls = 'reto-dot';
+    if (i < retoResults.length) cls += retoResults[i] ? ' ok' : ' ko';
+    else if (i === retoIdx) cls += ' cur';
+    return `<span class="${cls}"></span>`;
+  }).join('');
+}
+function retoAnswer(i) {
+  if (retoAnswered) return;
+  retoAnswered = true;
+  const q = retoQs[retoIdx];
+  const ok = String(q.options[i]) === String(q.correct);
+  retoResults.push(ok);
+  [...document.querySelectorAll('.quiz-opt')].forEach((b, k) => {
+    b.disabled = true;
+    if (String(q.options[k]) === String(q.correct)) b.classList.add('quiz-ok');
+    else if (k === i) b.classList.add('quiz-ko');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  fb.innerHTML = ok ? '¡Correcto!' : `Respuesta: <b>${q.correct}</b>`;
+  fb.className = 'quiz-feedback ' + (ok ? 'fb-ok' : 'fb-ko');
+  retoRenderProgress();
+  const nb = document.getElementById('quiz-next');
+  nb.hidden = false;
+  nb.textContent = retoIdx + 1 < RETO_N ? 'Siguiente →' : 'Ver resultado →';
+  nb.onclick = retoNext;
+}
+function retoNext() {
+  if (retoIdx + 1 < RETO_N) { retoIdx++; retoRenderQ(); }
+  else {
+    try { localStorage.setItem(retoKey(), JSON.stringify({ results: retoResults })); } catch (e) { }
+    retoShowResult(false);
+  }
+}
+function retoShowResult(already) {
+  const score = retoResults.filter(Boolean).length;
+  const grid = retoResults.map(r => r ? '🟩' : '🟥').join('');
+  document.getElementById('quiz-options').innerHTML = '';
+  document.getElementById('quiz-next').hidden = true;
+  document.getElementById('quiz-feedback').textContent = '';
+  const pr = document.getElementById('reto-progress'); if (pr) pr.hidden = true;
+  const msg = score === RETO_N ? '¡Pleno! 🏆' : score >= 3 ? '¡Bien jugado! 👏' : 'Mañana hay revancha 💪';
+  const xico = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+  document.getElementById('quiz-q').innerHTML = `<div class="reto-result">
+    <div class="reto-result-score">${score}<span>/${RETO_N}</span></div>
+    <div class="reto-result-grid">${grid}</div>
+    <div class="reto-result-msg">${msg}</div>
+    <p class="reto-result-sub">Reto #${retoNum()}${already ? ' · Ya lo jugaste hoy' : ''} · Vuelve mañana para uno nuevo.</p>
+    <div class="reto-result-actions">
+      <button type="button" class="efm-share-btn reto-share-btn" onclick="retoShare()"><span class="efm-share-ico">${xico}</span> Compartir resultado</button>
+      <button type="button" class="reto-free-link" onclick="setQuizMode('free')">Seguir con práctica libre →</button>
+    </div>
+  </div>`;
+}
+function retoShare() {
+  const score = retoResults.filter(Boolean).length;
+  const grid = retoResults.map(r => r ? '🟩' : '🟥').join('');
+  const texto = `Reto #${retoNum()} · Españoles en la NBA\n${score}/${RETO_N} ${grid}\n\n¿Lo superas? #EspañolesNBA`;
+  const url = 'https://espanoles-nba.alejandroggo.com/test.html';
+  const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  if (isTouch && navigator.share) { navigator.share({ text: texto, url }).catch(() => { }); return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 
 function quizNext() {
