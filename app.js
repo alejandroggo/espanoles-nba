@@ -155,7 +155,7 @@ const NAV_LINKS = [
   ['Career Highs', 'career-highs.html'], ['Marcas al alcance', 'marcas.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
   ['Salarios', 'salarios.html'], ['Dorsales', 'dorsales.html'], ['Summer League', 'summer-league.html'],
   ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'],
-  ['Efemérides', 'efemerides.html'], ['Quinteto', 'quinteto.html'], ['Test', 'test.html'],
+  ['Efemérides', 'efemerides.html'], ['Quinteto ideal', 'quinteto.html'], ['Test', 'test.html'],
   // ['Pregúntame', 'preguntas.html'],   // oculto por ahora
 ];
 function buildNav() {
@@ -6220,7 +6220,7 @@ function qntRenderPool(filter) {
 function qntRenderStats() {
   const L = qntStatsList(), n = L.length, el = document.getElementById('qnt-stats');
   if (!n) {
-    el.innerHTML = `<div class="qnt-stats-empty"><h2>Tu quinteto</h2><p>Arrastra (o toca) jugadores a cada posición de la pista. Podrás elegir su carrera o una temporada concreta, y calcularé las estadísticas combinadas.</p></div>`;
+    el.innerHTML = `<div class="qnt-stats-empty"><h2>Tu quinteto ideal</h2><p>Arrastra (o toca) jugadores a cada posición de la pista. Podrás elegir su carrera o una temporada concreta, y calcularé las estadísticas combinadas.</p></div>`;
     return;
   }
   const sum = k => L.reduce((s, v) => s + (v[k] || 0), 0);
@@ -6231,7 +6231,7 @@ function qntRenderStats() {
     const j = qntById[qntState[s.key]], y = qntYear[s.key];
     return `<li><span class="qnt-lu-pos">${s.label}</span> ${plLink(j.nombre, j.nombre)}${y ? ` <span class="qnt-lu-yr">${drSeason(y)}</span>` : ''}</li>`;
   }).join('');
-  el.innerHTML = `<div class="qnt-stats-head"><h2>Tu quinteto</h2><span class="qnt-stats-n">${n}/5</span></div>
+  el.innerHTML = `<div class="qnt-stats-head"><h2>Tu quinteto ideal</h2><span class="qnt-stats-n">${n}/5</span></div>
     <p class="qnt-stats-lead">Este quinteto promediaría <b>${fmtDec1(sum('pts_g'))} puntos</b>, ${fmtDec1(sum('rbd_g'))} rebotes y ${fmtDec1(sum('ast_g'))} asistencias por partido.</p>
     <h3 class="qnt-stats-sub">Promedios combinados</h3><div class="stat-grid qnt-grid">${pg}</div>
     <h3 class="qnt-stats-sub">Palmarés</h3><div class="stat-grid qnt-grid">${tot}</div>
