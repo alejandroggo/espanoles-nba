@@ -681,7 +681,7 @@ async function initDraftPage() {
   // Filtro por franquicia
   const teams = [...new Set(draftRows.map(j => j.draft_equipo).filter(Boolean))].sort();
   document.getElementById('draft-team').innerHTML =
-    '<option value="">Todas las franquicias</option>' + teams.map(t => `<option value="${t}">${t}</option>`).join('');
+    '<option value="">Todos los equipos</option>' + teams.map(t => `<option value="${t}">${t}</option>`).join('');
   document.getElementById('draft-search').addEventListener('input', e => { draftSearch = e.target.value.trim().toLowerCase(); renderDraftTable(); });
   document.getElementById('draft-team').addEventListener('change', e => { draftTeam = e.target.value; renderDraftTable(); });
   document.getElementById('draft-round').addEventListener('change', e => { draftRound = e.target.value; renderDraftTable(); });
@@ -2795,7 +2795,7 @@ const QUIZ_GENS = [
     const tot = Object.entries(D.byTeam).map(([tm, v]) => [tm, Object.values(v).reduce((s, n) => s + n, 0)]).sort((a, b) => b[1] - a[1]);
     if (tot.length < 4 || tot.filter(x => x[1] === tot[0][1]).length > 1) return null;
     const correct = teamInfo(tot[0][0]).name;
-    return { q: '¿En qué franquicia han jugado <b>más partidos</b> los españoles (en total)?', correct, options: qOptions(correct, tot.slice(1).map(([tm]) => teamInfo(tm).name)) };
+    return { q: '¿En qué equipo han jugado <b>más partidos</b> los españoles (en total)?', correct, options: qOptions(correct, tot.slice(1).map(([tm]) => teamInfo(tm).name)) };
   },
   D => { // quién ha jugado más partidos con X equipo
     const cands = Object.entries(D.byTeam).filter(([, v]) => Object.keys(v).length >= 3);
@@ -4031,7 +4031,7 @@ const CMP_SECTIONS = [
     { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: '% titular',         get: j => j.partidos ? (j.partidos_titular || 0) / j.partidos : null, fmt: fmtPct, dir: 'high', bar: true },
     { label: 'Equipos NBA',       get: j => cmpNTeams(j), fmt: fmtEnt, dir: 'high' },
-    { label: 'Franquicias',       get: j => j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : null, fmt: v => v, dir: 'neutral', cls: 'cmp-row-teams' },
+    { label: 'Equipos',             get: j => j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : null, fmt: v => v, dir: 'neutral', cls: 'cmp-row-teams' },
     { label: 'Año de draft',      get: j => j.draft_anio || null, fmt: v => String(v), dir: 'neutral' },
     { label: 'Nº de draft',       get: j => j.draft ? (j.draft_pick || null) : 'undr', fmt: v => v === 'undr' ? 'No drafteado' : ('#' + v), dir: 'low' },
   ]},
@@ -5012,10 +5012,10 @@ function renderPorEquipo() {
   rows.forEach(r => teams.forEach(t => { if (r.bt[t]) { teamTot[t] += r.bt[t]; teamPl[t]++; } }));
 
   document.getElementById('hero-sub').textContent =
-    `${rows.length} españoles · ${grand.toLocaleString('es-ES')} partidos ${poeqMode === 'reg' ? 'de temporada regular' : 'de playoffs'} repartidos por ${teams.length} franquicias`;
+    `${rows.length} españoles · ${grand.toLocaleString('es-ES')} partidos ${poeqMode === 'reg' ? 'de temporada regular' : 'de playoffs'} repartidos por ${teams.length} equipos`;
   document.getElementById('poeq-count').innerHTML = poeqMode === 'reg'
     ? '<b>En negrita</b>, jugadores en activo · • equipo actual'
-    : 'Partidos de playoffs por franquicia';
+    : 'Partidos de playoffs por equipo';
 
   const head = `<tr><th class="poeq-name-h">Jugador</th>${teams.map(t => {
     const info = teamInfo(t);
