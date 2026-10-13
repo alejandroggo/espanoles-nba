@@ -15,6 +15,7 @@ function initTheme() {
   buildShareButton();
   // buildChatWidget();   // Pregúntame oculto por ahora
   buildCookieBanner();
+  agTableTopScroll();
   // Cabeceras ordenables operables por teclado (Enter/Espacio)
   document.addEventListener('keydown', e => {
     const th = e.target;
@@ -62,6 +63,30 @@ function buildShareButton() {
   btn.textContent = 'Compartir';
   btn.onclick = sharePage;
   right.appendChild(btn);
+}
+
+// Barra de desplazamiento horizontal ARRIBA de cada tabla, sincronizada con su scroll.
+// Útil en móvil, donde la barra nativa suele estar oculta y no se ve que la tabla se desplaza.
+function agTableTopScroll() {
+  document.querySelectorAll('.tabla-wrap').forEach(wrap => {
+    if (wrap.dataset.topscroll) return;
+    wrap.dataset.topscroll = '1';
+    const bar = document.createElement('div'); bar.className = 'tbl-topscroll';
+    const inner = document.createElement('div'); inner.className = 'tbl-topscroll-inner';
+    bar.appendChild(inner); wrap.parentNode.insertBefore(bar, wrap);
+    const sync = () => {
+      const table = wrap.querySelector('table');
+      const sw = table ? table.scrollWidth : 0;
+      inner.style.width = sw + 'px';
+      bar.style.display = (sw > wrap.clientWidth + 2) ? 'block' : 'none';
+    };
+    let lock = false;
+    bar.addEventListener('scroll', () => { if (lock) return; lock = true; wrap.scrollLeft = bar.scrollLeft; lock = false; });
+    wrap.addEventListener('scroll', () => { if (lock) return; lock = true; bar.scrollLeft = wrap.scrollLeft; lock = false; });
+    try { new MutationObserver(sync).observe(wrap, { childList: true, subtree: true }); } catch (e) { }
+    window.addEventListener('resize', sync);
+    sync();
+  });
 }
 
 function sharePage() {
@@ -1872,8 +1897,8 @@ let trNatural = false;   // ordenar por fecha del año natural (ignora el año)
 
 const TR_COLS = [
   { key: 'rank',    label: '#',        sortable: false, cls: 'td-rank' },
-  { key: 'fecha',   label: 'Fecha',    sortable: true,  cls: 'td-center' },
   { key: 'jugador', label: 'Jugador',  sortable: true,  cls: 'td-nombre' },
+  { key: 'fecha',   label: 'Fecha',    sortable: true,  cls: 'td-center' },
   { key: 'tipo',    label: 'Tipo',     sortable: true },
   { key: 'equipo1', label: 'Equipo',   sortable: true,  cls: 'td-center' },
   { key: 'equipo2', label: 'Equipo 2', sortable: true,  cls: 'td-center' },
@@ -2034,8 +2059,8 @@ function renderTrTable() {
         onclick="openTrDrawer('${t._id}')"
         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrDrawer('${t._id}');}">
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
       <td class="td-nombre" onclick="event.stopPropagation()">${plLink(t.jugador, escapeHtml(t.jugador))}</td>
+      <td class="td-center td-muted">${trFechaDisplay(t.fecha)}</td>
       <td><span class="tr-tipo ${trTipoClass(t.tipo)}">${escapeHtml(t.tipo)}</span></td>
       <td class="td-center">${trTeamCell(t.equipo1)}</td>
       <td class="td-center">${trTeamCell(t.equipo2)}</td>
@@ -3108,7 +3133,7 @@ function quizAnswer(i) {
 // PÁGINA CAREER HIGHS
 // ══════════════════════════════════════════════
 let highsJ = [];
-let highsMode = 'total';    // 'total' | 'pg' | 'game'
+let highsMode = 'game';     // 'total' | 'pg' | 'game' — por defecto "En un partido" (lo más importante)
 let highsSortCol = 'pts_g';
 let highsSortAsc = false;
 const HIGHS_MIN_G = 55;     // mínimo de partidos para "por partido en temporada"

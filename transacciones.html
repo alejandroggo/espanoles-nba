@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=189">
+<link rel="stylesheet" href="style.css?v=190">
 </head>
 <body>
 
@@ -81,9 +81,11 @@
       <span class="sr-only">Filtrar por año</span>
       <select id="tr-year" class="sel"></select>
     </label>
-    <button type="button" id="tr-natural" class="toggle-chip" aria-pressed="false" title="Ordenar de enero a diciembre ignorando el año" onclick="toggleTrNatural()">Año natural</button>
+    <button type="button" id="tr-natural" class="toggle-chip" aria-pressed="false" title="Ordenar de enero a diciembre ignorando el año" onclick="toggleTrNatural()">Ordenar por año natural</button>
     <span class="results-count" id="tr-count"></span>
   </section>
+
+  <p class="section-hint" aria-hidden="false">Pulsa una fila para ver el detalle de la operación.</p>
 
   <section class="tabla-wrap" aria-label="Transacciones">
     <table id="tr-table">
@@ -124,7 +126,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=189"></script>
+<script src="app.js?v=190"></script>
 <script>initTheme(); initTransaccionesPage();</script>
 </body>
 </html>

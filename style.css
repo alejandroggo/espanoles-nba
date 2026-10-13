@@ -441,6 +441,13 @@ td.td-leader { color: var(--dorado); font-weight: 700; }
 }
 
 /* ── TABLAS ──────────────────────────────────── */
+.section-hint { max-width: 1400px; margin: calc(-1 * var(--space-2)) auto var(--space-3); padding: 0 var(--space-6); font-size: var(--font-sm); color: var(--text-muted); }
+/* Barra de desplazamiento horizontal arriba de las tablas (sincronizada con el scroll) */
+.tbl-topscroll { display: none; max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.tbl-topscroll-inner { height: 1px; }
+.tbl-topscroll::-webkit-scrollbar { height: 10px; -webkit-appearance: none; }
+.tbl-topscroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+.tbl-topscroll::-webkit-scrollbar-track { background: transparent; }
 .tabla-wrap {
   max-width: 1400px; margin: 0 auto;
   padding: 0 var(--space-6) var(--space-8);
@@ -487,6 +494,8 @@ td {
 .td-foto { width: 44px; padding-right: 0; }
 .td-notas { white-space: nowrap; }
 .td-center { text-align: center; white-space: nowrap; }
+/* Lista de equipos del jugador en una sola línea; si es muy larga, se recorta con "…" (en escritorio no hay scroll) */
+.td-equipos { white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
 .team-abbr { display: none; }   /* abreviatura de equipo: solo en móvil */
 
 /* Filas destacadas (premios hito) */
@@ -725,6 +734,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
      tapada por la cabecera del sitio (el overflow horizontal rompía el sticky). */
   /* Sin padding lateral: la columna fija del jugador queda pegada al borde (sin hueco al scrollear) */
   .tabla-wrap { padding: 0 0 var(--space-6); overflow-x: auto; }
+  .tbl-topscroll { padding: 0; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
   /* Cada registro en una sola línea: con scroll horizontal, nunca se parte hacia abajo */
   .tabla-wrap td, .tabla-wrap th,
@@ -736,7 +746,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .team-full { display: none; }
   .team-abbr { display: inline; }
   /* Salarios: la lista de equipos del jugador en una sola línea */
-  .td-equipos { white-space: nowrap; }
+  .td-equipos { white-space: nowrap; max-width: none; overflow: visible; }   /* en móvil la tabla scrollea: se ve la lista completa */
   /* Columna de jugador fija al hacer scroll horizontal en tablas anchas */
   td.td-nombre {
     position: sticky; left: 0; z-index: 3;
@@ -1133,6 +1143,8 @@ body.drawer-lock { overflow: hidden; }
 @media (max-width: 560px) {
   .jug-efm-item { flex-direction: column; gap: 4px; }
   .jug-efm-date { flex-basis: auto; }
+  /* El texto del tag (no la caja) se alinea con la fecha: se compensa el padding de la píldora */
+  .jug-efm-top { margin-left: calc(-1 * var(--space-2)); }
 }
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-2); }
