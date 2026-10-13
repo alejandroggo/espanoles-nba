@@ -64,16 +64,11 @@ function buildShareButton() {
   right.appendChild(btn);
 }
 
-async function sharePage() {
-  const btn = document.getElementById('share-btn');
-  const data = { title: document.title, url: location.href };
-  if (navigator.share) {
-    try { await navigator.share(data); return; } catch (e) { /* cancelado → fallback */ }
-  }
-  try {
-    await navigator.clipboard.writeText(location.href);
-    if (btn) { const t = btn.textContent; btn.textContent = '¡Copiado!'; setTimeout(() => { btn.textContent = t; }, 1600); }
-  } catch (e) { /* sin permisos de portapapeles */ }
+function sharePage() {
+  // Compartir siempre en X (el texto describe la página + enlace).
+  const texto = `${document.title} #EspañolesNBA (vía @alejandroggo)`;
+  const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + location.href);
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 
 // ── BUSCADOR GLOBAL (cabecera, en todas las páginas) ──
@@ -2273,12 +2268,7 @@ async function jugShareCard() {
   const texto = `${who} en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)`;
   const url = location.href;
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
-  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-  // Móvil: menú nativo (texto + enlace, sin adjuntar imagen → sale la tarjeta de acción).
-  if (isTouch && navigator.share) {
-    try { await navigator.share({ title: j.nombre, text: texto, url }); return; }
-    catch (e) { if (e && e.name === 'AbortError') return; }
-  }
+  // Siempre a X. No adjuntamos imagen, así que X muestra la tarjeta de acción del jugador.
   window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
 
