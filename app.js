@@ -261,15 +261,26 @@ async function loadData() {
   let data;
   try { data = await AG_DATA_PROMISE; }
   catch (e) { AG_DATA_PROMISE = null; throw e; }
+  // Brooklyn: la fuente (Basketball Reference) usa "BRK"; unificamos al código oficial NBA "BKN"
+  const fixTeam = c => (c === 'BRK' ? 'BKN' : c);
   (data.jugadores || []).forEach(j => {
     const ov = FOTO_OVERRIDES[drNorm(j.nombre)];
     if (ov) j.foto_url = ov;
     if (NAME_FIX[j.nombre]) j.nombre = NAME_FIX[j.nombre];
+    if (j.draft_equipo) j.draft_equipo = fixTeam(j.draft_equipo);
+    if (j.equipos_nba) j.equipos_nba = j.equipos_nba.replace(/\bBRK\b/g, 'BKN');
+    (j.temporadas_data || []).forEach(t => { if (t.team) t.team = fixTeam(t.team); });
+    const pp = j.primer_partido;
+    if (pp) { if (pp.equipo) pp.equipo = fixTeam(pp.equipo); if (pp.rival) pp.rival = fixTeam(pp.rival); }
   });
-  // Corrige el nombre también donde aparece como jugador/rival (transacciones, dorsales, etc.)
+  // Corrige el nombre también donde aparece como jugador/rival y el código de equipo
   ['transacciones', 'dorsales', 'summer_league', 'superaciones'].forEach(k => (data[k] || []).forEach(r => {
     if (r.jugador && NAME_FIX[r.jugador]) r.jugador = NAME_FIX[r.jugador];
     if (r.rival && NAME_FIX[r.rival]) r.rival = NAME_FIX[r.rival];
+    if (r.equipo) r.equipo = fixTeam(r.equipo);
+    if (r.team) r.team = fixTeam(r.team);
+    if (r.equipo1) r.equipo1 = fixTeam(r.equipo1);
+    if (r.equipo2) r.equipo2 = fixTeam(r.equipo2);
   }));
   setLastUpdate(data.actualizado);
   hideLoadBar();
@@ -846,7 +857,7 @@ function renderSalariosKpis() {
     </div>
     ${kpi2}
     <div class="kpi">
-      <div class="kpi-num">${pctGasol}%</div>
+      <div class="kpi-num">${fmtPctN(pctGasol)}</div>
       <div class="kpi-label">De la familia Gasol</div>
     </div>`;
 }
@@ -886,7 +897,7 @@ function renderSalariosTable() {
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
       <td class="td-num${maxSpj && j.sueldo_pj === maxSpj ? ' td-leader' : ''}">${fmtDinero(j.sueldo_pj)}</td>
       <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
-      <td class="td-muted td-equipos">${j.equipos_nba || '—'}</td>
+      <td class="td-muted td-equipos">${j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : '—'}</td>
     </tr>`).join('');
 
   // Pie: totales
@@ -912,7 +923,7 @@ function renderPct(pct, barWidth) {
   if (pct === null || pct === undefined) return '<span class="td-muted">—</span>';
   const w = barWidth === undefined ? pct : barWidth;
   return `<div class="pct-wrap">
-    <span class="pct-val">${pct.toFixed(1)}%</span>
+    <span class="pct-val">${fmtPctN(pct)}</span>
     <span class="pct-bar"><span class="pct-fill" style="width:${w}%"></span></span>
   </div>`;
 }
@@ -1459,6 +1470,8 @@ const RK_COLS_TOT = [
 function fmtEnt(n)  { return (n || n === 0) ? Math.round(n).toLocaleString('es-ES') : '—'; }
 function fmtDec1(n) { return (n || n === 0) ? n.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—'; }
 function fmtPct(n)  { return (n || n === 0) ? (n * 100).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'; }
+// Igual que fmtPct pero el valor ya viene en escala 0-100 (no 0-1). Usa coma decimal (es-ES).
+function fmtPctN(n) { return (n || n === 0) ? Number(n).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'; }
 
 async function initRankingPage() {
   let data;
@@ -2331,9 +2344,9 @@ function jugDebut(j) {
   const vs = `${teamInfo(p.equipo).name}${p.rival ? ` vs ${teamInfo(p.rival).name}` : ''}`;
   const boxes = [
     ['MIN', p.min], ['PTS', p.pts], ['REB', p.rbd], ['AST', p.ast], ['ROB', p.stl], ['TAP', p.blk],
-    ['TC', (p.fgm != null && p.fga != null) ? `${p.fgm}/${p.fga}` : null],
-    ['T3', (p.tres_m != null && p.tres_a != null) ? `${p.tres_m}/${p.tres_a}` : null],
-    ['TL', (p.ftm != null && p.fta != null) ? `${p.ftm}/${p.fta}` : null],
+    ['FG', (p.fgm != null && p.fga != null) ? `${p.fgm}/${p.fga}` : null],
+    ['3P', (p.tres_m != null && p.tres_a != null) ? `${p.tres_m}/${p.tres_a}` : null],
+    ['FT', (p.ftm != null && p.fta != null) ? `${p.ftm}/${p.fta}` : null],
     ['TOV', p.tov], ['PF', p.pf],
   ].filter(([, v]) => v != null && v !== '').map(([l, v]) => statBox(l, v)).join('');
   const vid = efmYtId(p.video);
@@ -4018,7 +4031,7 @@ const CMP_SECTIONS = [
     { label: 'Partidos titular',  get: j => j.partidos_titular ?? null, fmt: fmtEnt, dir: 'high', bar: true },
     { label: '% titular',         get: j => j.partidos ? (j.partidos_titular || 0) / j.partidos : null, fmt: fmtPct, dir: 'high', bar: true },
     { label: 'Equipos NBA',       get: j => cmpNTeams(j), fmt: fmtEnt, dir: 'high' },
-    { label: 'Franquicias',       get: j => j.equipos_nba || null, fmt: v => v, dir: 'neutral', cls: 'cmp-row-teams' },
+    { label: 'Franquicias',       get: j => j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : null, fmt: v => v, dir: 'neutral', cls: 'cmp-row-teams' },
     { label: 'Año de draft',      get: j => j.draft_anio || null, fmt: v => String(v), dir: 'neutral' },
     { label: 'Nº de draft',       get: j => j.draft ? (j.draft_pick || null) : 'undr', fmt: v => v === 'undr' ? 'No drafteado' : ('#' + v), dir: 'low' },
   ]},
@@ -5026,12 +5039,12 @@ function renderPorEquipo() {
       <th scope="row" class="poeq-name${r.active ? ' poeq-active' : ''}"><span class="poeq-player">${thumb}${plLink(r.nombre, nombreResp(r.nombre))}</span></th>
       ${cells}
       <td class="poeq-tot">${r.total}</td>
-      <td class="poeq-pct">${grand ? (r.total / grand * 100).toFixed(1) + '%' : '—'}</td>
+      <td class="poeq-pct">${grand ? fmtPctN(r.total / grand * 100) : "—"}</td>
     </tr>`;
   }).join('');
 
   const footTot = teams.map(t => `<td class="poeq-foot-num">${teamTot[t]}</td>`).join('');
-  const footPct = teams.map(t => `<td class="poeq-foot-sub">${grand ? (teamTot[t] / grand * 100).toFixed(1) + '%' : ''}</td>`).join('');
+  const footPct = teams.map(t => `<td class="poeq-foot-sub">${grand ? fmtPctN(teamTot[t] / grand * 100) : ""}</td>`).join('');
   const footPl = teams.map(t => `<td class="poeq-foot-sub">${teamPl[t] || ''}</td>`).join('');
   const footTeams = teams.map(t => `<td class="poeq-foot-team" title="${teamInfo(t).name}" style="box-shadow: inset 0 3px 0 ${teamInfo(t).color}">${t}</td>`).join('');
   document.getElementById('poeq-tfoot').innerHTML =
