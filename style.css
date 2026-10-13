@@ -723,7 +723,8 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   .home-grid { padding: 0 var(--space-4) var(--space-8); }
   /* Tabla con scroll propio y cabecera/columna fijas: así la 1ª fila no queda
      tapada por la cabecera del sitio (el overflow horizontal rompía el sticky). */
-  .tabla-wrap { padding: 0 var(--space-4) var(--space-6); overflow-x: auto; }
+  /* Sin padding lateral: la columna fija del jugador queda pegada al borde (sin hueco al scrollear) */
+  .tabla-wrap { padding: 0 0 var(--space-6); overflow-x: auto; }
   .undrafted-wrap { padding: 0 var(--space-4) var(--space-8); }
   /* Cada registro en una sola línea: con scroll horizontal, nunca se parte hacia abajo */
   .tabla-wrap td, .tabla-wrap th,
@@ -792,9 +793,9 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   text-align: right;
 }
 @media (max-width: 768px) {
-  .header-inner { padding: 0 var(--space-4); height: 48px; }
-  /* Cabecera no fija en móvil: al hacer scroll no tapa la 1ª fila de las tablas */
-  .site-header { position: static; }
+  .header-inner { padding: 0 var(--space-4); height: 52px; }
+  /* Cabecera fija y con fondo sólido (blanco en claro) */
+  .site-header { position: sticky; top: 0; background: var(--surface); backdrop-filter: none; }
   .ag-footer {
     grid-template-columns: 1fr;
     gap: var(--space-6);
@@ -832,12 +833,18 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
   #share-btn { display: none; }          /* compartir: se usa el del navegador */
   .tt-lbl { display: none; }             /* tema: solo icono */
   .theme-toggle { padding: var(--space-1) var(--space-2); }
+  .hero-cta-btn { padding: 11px 20px; font-size: var(--font-sm); }   /* botón del reto un poco más pequeño */
 }
 /* En móviles (hasta 430px: iPhone 14/15 Pro Max incluidos) el menú se reduce a ☰ para que la cabecera no desborde */
 @media (max-width: 430px) {
   .logo { font-size: 0.95rem; }
-  .nav-toggle { font-size: 0; padding: var(--space-1) var(--space-2); }  /* solo el icono ☰ */
-  .nav-toggle::after { content: '☰'; font-size: 1rem; }
+  .nav-toggle { font-size: 0; }
+  .nav-toggle::after { content: '☰'; font-size: 1.05rem; }
+  /* Buscar, menú y tema: los tres botones del mismo tamaño */
+  .hsearch-toggle, .nav-toggle, .theme-toggle {
+    width: 40px; height: 36px; min-height: 0; padding: 0; box-sizing: border-box;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
 }
 
 /* ── DORSALES ────────────────────────────────── */
@@ -934,7 +941,7 @@ tr.row-verde td:nth-child(2) { box-shadow: inset 3px 0 var(--success); font-weig
 .dp-team { display: flex; align-items: center; gap: var(--space-2); }
 .dp-team-code {
   flex-shrink: 0;
-  min-width: 34px; text-align: center;
+  min-width: 46px; text-align: center;
   font-weight: 700; font-size: var(--font-xs);
   padding: 2px 6px; border-radius: var(--radius-sm);
   background: var(--surface-2); color: var(--text);
@@ -1106,7 +1113,9 @@ body.drawer-lock { overflow: hidden; }
 .jug-rank-chip b { color: var(--text); }
 .jug-rank-chip.top { border-color: var(--accent); background: var(--accent-light); }
 .jug-rank-chip.top b { color: var(--accent); }
-.jug-rank-note { font-size: var(--font-xs); color: var(--text-muted); margin: var(--space-2) 0 0; }
+.jug-rank-chip.first { border-color: var(--dorado); background: color-mix(in srgb, var(--dorado) 18%, transparent); }
+.jug-rank-chip.first b { color: #a67c00; }
+.jug-rank-note { font-size: var(--font-xs); color: var(--text-muted); margin: 0 0 var(--space-3); }
 
 /* Efemérides del jugador */
 .jug-efm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -1164,8 +1173,8 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .tmp-sw-cut { background: rgba(217,119,6,0.35); border-color: rgba(217,119,6,0.5); }
 
 .jug-awards { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-2) var(--space-6); }
-.jug-award { display: flex; align-items: baseline; gap: var(--space-3); }
-.jug-award-tipo { font-weight: 700; min-width: 120px; }
+.jug-award { display: flex; align-items: flex-start; gap: var(--space-3); }
+.jug-award-tipo { font-weight: 700; flex: 0 0 130px; }
 .jug-award-hito { color: var(--dorado); }
 .jug-seas-switch { margin-bottom: var(--space-3); }
 
@@ -1185,7 +1194,7 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
 .jug-act-ico { display: inline-flex; }
 
 /* Enlaces cruzados del perfil */
-.jug-xlinks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 auto var(--space-8); max-width: 1400px; padding: 0 var(--space-6); }
+.jug-xlinks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-8); }
 .jug-xlinks-lbl { font-size: var(--font-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: var(--space-1); }
 .jug-xlink { font-size: var(--font-sm); font-weight: 600; padding: 6px 14px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-full); color: var(--text); text-decoration: none; transition: border-color var(--transition), color var(--transition), background var(--transition); }
 .jug-xlink:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
@@ -1216,6 +1225,9 @@ tr.tmp-cut td { background: rgba(217,119,6,0.12); }
   .jug-facts { grid-template-columns: 1fr 1fr; }
   /* si el nº de datos es impar, el último ocupa toda la fila (sin hueco gris) */
   .jug-facts .jug-fact:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* Dorsales: todas las cajas del mismo ancho (una por fila) */
+  .jug-dorsals { flex-direction: column; }
+  .jug-dorsal { width: 100%; }
 }
 
 /* ── TEST / TRIVIA ───────────────────────────── */

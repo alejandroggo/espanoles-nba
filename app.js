@@ -2362,7 +2362,7 @@ function jugRankings(j) {
   // Los porcentajes solo se rankean con un mínimo de partidos (evita cifras engañosas con pocas muestras)
   const pctPool = pool.filter(p => p.partidos >= 20 && p.fg_pct != null);
   const rankPct = key => (j.partidos >= 20 && j[key] != null ? rankIn(pctPool, key) : null);
-  const chip = (rank, label) => rank ? `<span class="jug-rank-chip${rank <= 3 ? ' top' : ''}"><b>#${rank}</b> en ${label}</span>` : '';
+  const chip = (rank, label) => rank ? `<span class="jug-rank-chip${rank === 1 ? ' first' : rank <= 3 ? ' top' : ''}"><b>#${rank}</b> en ${label}</span>` : '';
 
   const fijas = [chip(rankTot('pts_total'), 'puntos'), chip(rankTot('rbd_total'), 'rebotes'), chip(rankTot('ast_total'), 'asistencias')];
 
@@ -2381,8 +2381,8 @@ function jugRankings(j) {
   const chips = [...fijas, ...extras].filter(Boolean).join('');
   if (!chips) return '';
   return jugSection('Entre los españoles',
-    `<div class="jug-ranks">${chips}</div>
-     <p class="jug-rank-note">Puesto histórico entre los ${N} españoles que han debutado en la NBA.</p>`);
+    `<p class="jug-rank-note">Puesto histórico entre los ${N} españoles que han debutado en la NBA.</p>
+     <div class="jug-ranks">${chips}</div>`);
 }
 
 // Efemérides del jugador (debut, draft, fichajes, hitos) enlazando a la página de Efemérides
