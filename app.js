@@ -610,6 +610,8 @@ function renderHomeRecent(data) {
     const name = j.id ? `<a class="hw-name-link" href="${jugadorHref(j.id)}">${j.nombre}</a>` : j.nombre;
     const txt = s.tipo === 'hito'
       ? `Alcanzó los <b>${Number(s.hito).toLocaleString('es-ES')} ${s.campo}</b>`
+      : s.tipo === 'record_temp'
+      ? `Batió el <b>récord español de ${s.campo} en una temporada</b>${s.rival ? ` (antes ${s.rival}${s.record_ano ? ', ' + drSeason(s.record_ano) : ''})` : ''}`
       : `Superó a ${s.rival} en <b>${s.campo}</b>`;
     return `<li class="home-watch-item"><div class="hw-link"><span class="hw-thumb">${face}</span><span class="hw-body"><span class="hw-name">${name}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${rel}</span></div></li>`;
   }).join('');
