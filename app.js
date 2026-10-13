@@ -518,6 +518,35 @@ function rwBuild(data) {
       if (gapr > 0 && show(gapr, gr)) out.push({ j, type: 'round', stat: s.label, gap: gapr, games: gr, milestone: nr });
     });
   });
+  // Récord español de TOTAL en una sola temporada (solo temporadas completas, año < endYear)
+  const seasonRec = {};
+  STATS.forEach(s => { if (s.pg) seasonRec[s.label] = { val: 0, player: null, year: null }; });
+  J.forEach(j => {
+    const by = cmpYearRows(j);
+    Object.entries(by).forEach(([yr, t]) => {
+      const y = +yr; if (y >= endYear) return;                 // la temporada en curso no cuenta como récord
+      const g = t.g || 0; if (!g) return;
+      STATS.forEach(s => {
+        if (!s.pg) return;
+        const total = Math.round((t[s.pg] || 0) * g);
+        if (total > seasonRec[s.label].val) seasonRec[s.label] = { val: total, player: j.nombre, year: y };
+      });
+    });
+  });
+  // Para cada activo, su temporada en curso contra ese récord
+  active.forEach(j => {
+    const cur = cmpYearRows(j)[endYear];
+    if (!cur || !(cur.g > 0)) return;
+    STATS.forEach(s => {
+      if (!s.pg) return;
+      const rec = seasonRec[s.label]; if (!rec.player) return;
+      const mine = Math.round((cur[s.pg] || 0) * cur.g), rate = cur[s.pg] || 0;
+      const gap = rec.val - mine;
+      if (gap <= 0 || rate <= 0) return;
+      const g = Math.ceil(gap / rate);
+      if (g <= MAXGAMES) out.push({ j, type: 'season', stat: s.label, gap, games: g, recPlayer: rec.player, recYear: rec.year, recVal: rec.val });
+    });
+  });
   out.sort((a, b) => {
     const ga = isFinite(a.games) ? a.games : 1e9, gb = isFinite(b.games) ? b.games : 1e9;
     return ga - gb || a.gap - b.gap;
@@ -586,7 +615,7 @@ const RW_SING = { puntos: 'punto', rebotes: 'rebote', asistencias: 'asistencia',
 function rwGroup(ws) {
   const map = new Map(), order = [];
   ws.forEach(w => {
-    const key = [w.type, w.stat, w.gap, w.type === 'pass' ? w.rival : w.milestone, w.games].join('|');
+    const key = [w.type, w.stat, w.gap, w.type === 'pass' ? w.rival : (w.type === 'season' ? 'rec' : w.milestone), w.games].join('|');
     if (map.has(key)) map.get(key).players.push(w.j);
     else { map.set(key, { ...w, players: [w.j] }); order.push(key); }
   });
@@ -613,6 +642,8 @@ function rwRowHtml(g) {
     : '';
   const txt = g.type === 'pass'
     ? `A <b>${g.gap} ${sw}</b> de superar a ${rivalHtml}`
+    : g.type === 'season'
+    ? `A <b>${g.gap.toLocaleString('es-ES')} ${sw}</b> de batir el récord español en una temporada (${g.recPlayer}, ${drSeason(g.recYear)})`
     : `A <b>${g.gap} ${sw}</b> de los ${g.milestone.toLocaleString('es-ES')}`;
   const badge = isFinite(g.games) ? `~${g.games} ${g.games === 1 ? 'partido' : 'partidos'}` : 'Debutante';
   return `<li class="home-watch-item"><div class="hw-link"><span class="hw-thumb${multi ? ' hw-thumb-multi' : ''}">${faces}</span><span class="hw-body"><span class="hw-name">${rwNameLinks(players)}</span><span class="hw-txt">${txt}</span></span><span class="hw-badge">${badge}</span></div></li>`;
@@ -2297,6 +2328,8 @@ function jugMarcas(j, data) {
     if (w.type === 'pass') {
       const rivalLink = w.rivalId ? `<a class="pl-link" href="${jugadorHref(w.rivalId)}">${w.rival}</a>` : w.rival;
       txt = `A <b>${w.gap} ${sw}</b> de superar a ${rivalLink}${w.rivalRank ? ` <span class="hw-rank">(sería ${w.rivalRank}º)</span>` : ''}`;
+    } else if (w.type === 'season') {
+      txt = `A <b>${w.gap.toLocaleString('es-ES')} ${sw}</b> de batir el récord español en una temporada (${w.recPlayer}, ${drSeason(w.recYear)})`;
     } else {
       txt = `A <b>${w.gap} ${sw}</b> de los ${w.milestone.toLocaleString('es-ES')}`;
     }
