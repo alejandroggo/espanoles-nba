@@ -52,6 +52,14 @@ function buildCookieBanner() {
   document.getElementById('cookie-no').addEventListener('click', () => agSetConsent('denied'));
 }
 
+// ── EVENTOS GA4 (fallan en silencio; respetan Consent Mode) ──
+// Si el usuario no aceptó cookies, analytics_storage está 'denied' y GA4 no
+// registra nada aunque llamemos a gtag: no hay fuga de datos. Y si gtag no
+// está cargado (bloqueadores, offline), el try/catch evita cualquier error.
+function track(evento, params) {
+  try { if (typeof gtag === 'function') gtag('event', evento, params || {}); } catch (e) { }
+}
+
 // ── BOTÓN COMPARTIR (cabecera, todas las páginas) ──
 function buildShareButton() {
   const right = document.querySelector('.header-right');
@@ -91,6 +99,7 @@ function agTableTopScroll() {
 
 function sharePage() {
   // Compartir siempre en X (el texto describe la página + enlace).
+  track('compartir', { metodo: 'twitter', origen: 'cabecera', pagina: location.pathname });
   const texto = `${document.title} #EspañolesNBA (vía @alejandroggo)`;
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + location.href);
   window.open(xIntent, '_blank', 'noopener,noreferrer');
@@ -2311,6 +2320,7 @@ function jugHeader(j) {
 // de acción (og:image) del jugador como preview (no adjuntamos imagen propia).
 async function jugShareCard() {
   const j = jugCurrent; if (!j) return;
+  track('compartir', { metodo: 'twitter', origen: 'ficha_jugador', jugador: j.nombre });
   const who = (typeof efmHandle === 'function' && efmHandle(j.nombre)) || j.nombre;
   const texto = `${who} en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)`;
   const url = location.href;
@@ -3035,6 +3045,7 @@ function retoNext() {
   if (retoIdx + 1 < RETO_N) { retoIdx++; retoRenderQ(); }
   else {
     try { localStorage.setItem(retoKey(), JSON.stringify({ results: retoResults })); } catch (e) { }
+    track('reto_completado', { aciertos: retoResults.filter(Boolean).length, total: RETO_N });
     retoShowResult(false);
   }
 }
@@ -3096,6 +3107,7 @@ function retoDescargaImagen(bl) {
 }
 async function retoShare() {
   const score = retoResults.filter(Boolean).length;
+  track('compartir', { metodo: 'twitter', origen: 'reto', aciertos: score });
   const grid = retoResults.map(r => r ? '🟩' : '🟥').join('');
   const texto = `Reto del día · ${retoDate(false)}\n${score}/${RETO_N} ${grid}\n\n¿Cuántas aciertas tú? #EspañolesNBA (vía @alejandroggo)`;
   const url = 'https://espanoles-nba.alejandroggo.com/test.html';
@@ -4421,6 +4433,7 @@ async function cmpShare() {
   if (typeof cmpSyncUrl === 'function') cmpSyncUrl();   // la URL refleja la comparación actual
   const d = cmpScoreData();
   if (!d || d.players.length < 2) return;
+  track('compartir', { metodo: 'twitter', origen: 'comparador', jugadores: d.players.map(p => p.nombre).sort().join(' vs ') });
   const names = d.players.map(p => efmHandle(p.nombre) || p.nombre);   // @ de X si lo tenemos, si no el nombre
   const vs = names.length <= 2 ? names.join(' vs ') : names.slice(0, -1).join(', ') + ' vs ' + names[names.length - 1];
   const modo = d.modoTxt === 'toda la carrera' ? '' : (d.modoTxt === 'tramos elegidos' ? ' (tramos elegidos)' : ` (${d.modoTxt})`);
@@ -4536,6 +4549,7 @@ function cmpUpdate() {
   });
   const players = cmpPlayers();
   if (players.length < 2) return;
+  track('comparar_jugadores', { jugadores: players.map(p => p.nombre).sort().join(' vs '), n: players.length });
   if (cmpMode === 'same') {
     const common = cmpCommon(players);
     if (!common.length) { cmpMode = 'career'; cmpSame = null; }
@@ -5888,6 +5902,7 @@ function efmHandle(nombre) {
 function efmShare(btn, i) {
   const e = (efmCurrentList || [])[i];
   if (!e) return;
+  track('compartir', { metodo: 'twitter', origen: 'efemerides', tipo: e.type || e.tipo || '' });
   const tmp = document.createElement('div');
   tmp.innerHTML = e.html || '';
   let texto = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
@@ -6211,10 +6226,13 @@ function qntStat(id, year) {
 function qntStatsList() { return QNT_SLOTS.filter(s => qntState[s.key]).map(s => qntStat(qntState[s.key], qntYear[s.key])); }
 
 function qntAssign(slot, id) {
+  const eraCompleto = QNT_SLOTS.every(s => qntState[s.key]);
   // si el jugador ya está en otra posición, se mueve (y suelta su temporada)
   QNT_SLOTS.forEach(s => { if (qntState[s.key] === id) { qntState[s.key] = null; qntYear[s.key] = null; } });
   qntState[slot] = id; qntYear[slot] = null;
   qntSel = null;
+  // Solo al pasar de incompleto a completo: señal de que acaba de montar una alineación.
+  if (!eraCompleto && QNT_SLOTS.every(s => qntState[s.key])) track('montar_quinteto', { completo: true });
   qntSyncUrl(); qntRender();
 }
 function qntClear(slot) { qntState[slot] = null; qntYear[slot] = null; qntSyncUrl(); qntRender(); }
@@ -6412,6 +6430,7 @@ function qntDescargaImagen(bl) {
 }
 async function qntShare() {
   if (!qntPlayers().length) { alert('Añade algún jugador a la pista primero.'); return; }
+  track('compartir', { metodo: 'twitter', origen: 'quinteto', jugadores: qntPlayers().length });
   const txt = 'Mi quinteto histórico de españoles en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)\n\n' + location.href;
   const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt);
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
