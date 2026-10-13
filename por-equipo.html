@@ -68,11 +68,14 @@
     </div>
   </section>
 
-  <section class="controles" aria-label="Temporada regular o playoffs">
-    <div class="mode-switch" role="group" aria-label="Competición">
-      <button type="button" id="poeq-reg" class="toggle-chip active" aria-pressed="true" onclick="setPoeqMode('reg')">Temporada regular</button>
-      <button type="button" id="poeq-po" class="toggle-chip" aria-pressed="false" onclick="setPoeqMode('po')">Playoffs</button>
-    </div>
+  <section class="controles" aria-label="Filtros">
+    <label class="tmp-field">
+      <span class="tmp-field-lbl">Competición</span>
+      <select id="poeq-mode" class="sel" onchange="setPoeqMode(this.value)">
+        <option value="reg">Temporada regular</option>
+        <option value="po">Playoffs</option>
+      </select>
+    </label>
     <span class="results-count" id="poeq-count"></span>
   </section>
 

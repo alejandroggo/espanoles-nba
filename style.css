@@ -347,6 +347,8 @@ main { flex: 1; }
   display: flex; align-items: center; gap: var(--space-3);
   flex-wrap: wrap;
 }
+/* Cuando los controles mezclan buscador y campos con etiqueta (formato Temporadas), alinear por abajo */
+.controles:has(.tmp-field) { align-items: flex-end; }
 .search-wrap { flex: 0 1 280px; }
 .search-wrap input,
 .sel {

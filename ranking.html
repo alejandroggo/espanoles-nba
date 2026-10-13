@@ -73,14 +73,20 @@
     <div class="search-wrap">
       <input type="text" id="rk-search" placeholder="Buscar jugador…" aria-label="Buscar jugador">
     </div>
-    <div class="mode-switch" role="group" aria-label="Temporada regular o playoffs">
-      <button type="button" id="rk-dim-reg" class="toggle-chip active" aria-pressed="true" onclick="setRkDim('reg')">Temporada regular</button>
-      <button type="button" id="rk-dim-po" class="toggle-chip" aria-pressed="false" onclick="setRkDim('po')">Playoffs</button>
-    </div>
-    <div class="mode-switch" role="group" aria-label="Modo de estadísticas">
-      <button type="button" id="rk-mode-pg" class="toggle-chip active" aria-pressed="true" onclick="setRkMode('pg')">Por partido</button>
-      <button type="button" id="rk-mode-tot" class="toggle-chip" aria-pressed="false" onclick="setRkMode('tot')">Totales</button>
-    </div>
+    <label class="tmp-field">
+      <span class="tmp-field-lbl">Tipo</span>
+      <select id="rk-dim" class="sel" onchange="setRkDim(this.value)">
+        <option value="reg">Temporada regular</option>
+        <option value="po">Playoffs</option>
+      </select>
+    </label>
+    <label class="tmp-field">
+      <span class="tmp-field-lbl">Modo</span>
+      <select id="rk-mode" class="sel" onchange="setRkMode(this.value)">
+        <option value="pg">Por partido</option>
+        <option value="tot">Totales</option>
+      </select>
+    </label>
     <span class="results-count" id="rk-count"></span>
   </section>
 

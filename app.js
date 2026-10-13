@@ -1516,10 +1516,7 @@ async function initRankingPage() {
   const params = new URLSearchParams(location.search);
   if (params.get('tipo') === 'po' && rkPoAll.length) {
     rkDim = 'po';
-    ['reg', 'po'].forEach(x => {
-      const btn = document.getElementById('rk-dim-' + x);
-      if (btn) { btn.classList.toggle('active', x === 'po'); btn.setAttribute('aria-pressed', String(x === 'po')); }
-    });
+    const dsel = document.getElementById('rk-dim'); if (dsel) dsel.value = 'po';
   }
   rkAll = rkDim === 'po' ? rkPoAll : rkRegAll;
   buildRkRanks();
@@ -1550,10 +1547,7 @@ function renderRkKpis() {
 }
 
 function syncRkModeButtons() {
-  const pg = document.getElementById('rk-mode-pg'), tot = document.getElementById('rk-mode-tot');
-  if (!pg || !tot) return;
-  pg.classList.toggle('active', rkMode === 'pg'); pg.setAttribute('aria-pressed', String(rkMode === 'pg'));
-  tot.classList.toggle('active', rkMode === 'tot'); tot.setAttribute('aria-pressed', String(rkMode === 'tot'));
+  const s = document.getElementById('rk-mode'); if (s) s.value = rkMode;
 }
 
 function setRkMode(mode) {
@@ -1576,10 +1570,7 @@ function setRkDim(d) {
   if (rkDim === d) return;
   rkDim = d;
   rkAll = d === 'po' ? rkPoAll : rkRegAll;
-  ['reg', 'po'].forEach(x => {
-    const btn = document.getElementById('rk-dim-' + x);
-    if (btn) { btn.classList.toggle('active', x === d); btn.setAttribute('aria-pressed', String(x === d)); }
-  });
+  const dsel = document.getElementById('rk-dim'); if (dsel) dsel.value = d;
   updateUrlParam('tipo', d === 'po' ? 'po' : '');
   buildRkRanks();
   rkUpdateHero();
@@ -3200,12 +3191,7 @@ async function initHighsPage() {
 }
 
 function syncHighsButtons() {
-  ['total', 'pg', 'game'].forEach(x => {
-    const btn = document.getElementById('hi-mode-' + x);
-    if (!btn) return;
-    btn.classList.toggle('active', x === highsMode);
-    btn.setAttribute('aria-pressed', String(x === highsMode));
-  });
+  const s = document.getElementById('hi-mode'); if (s) s.value = highsMode;
 }
 
 function setHighsMode(m) {
@@ -4983,10 +4969,7 @@ async function initPorEquipoPage() {
 }
 
 function poeqSyncButtons() {
-  [['reg', 'poeq-reg'], ['po', 'poeq-po']].forEach(([m, id]) => {
-    const b = document.getElementById(id);
-    if (b) { b.classList.toggle('active', poeqMode === m); b.setAttribute('aria-pressed', String(poeqMode === m)); }
-  });
+  const s = document.getElementById('poeq-mode'); if (s) s.value = poeqMode;
 }
 function setPoeqMode(m) {
   if (poeqMode === m) return;
