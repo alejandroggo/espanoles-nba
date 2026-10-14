@@ -5349,6 +5349,27 @@ function botEfeMD(f) {
   if (m && BOT_MON[m[2]]) return [parseInt(m[1], 10), BOT_MON[m[2]]];
   return null;
 }
+// Fecha de nacimiento → {d, mo, y} (admite "6 jul 1980" y "1980-07-06"); si solo hay año, {y}.
+function botBirth(j) {
+  const s = String(j.nacimiento_fecha || '').toLowerCase().trim();
+  let m = s.match(/^(\d{1,2})\s+([a-z]{3})\.?\s+(\d{4})/);
+  if (m && BOT_MON[m[2]]) return { d: +m[1], mo: BOT_MON[m[2]], y: +m[3] };
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return { d: +m[3], mo: +m[2], y: +m[1] };
+  if (j.nacimiento) return { d: null, mo: null, y: +j.nacimiento };
+  return null;
+}
+// Fallecidos: no se calcula una "edad actual" (único caso: Fernando Martín, 1962–1989)
+const BOT_FALLECIDOS = { 'fernando-martin': 1989 };
+function botAge(j) {
+  if (BOT_FALLECIDOS[j.id]) return null;
+  const b = botBirth(j);
+  if (!b || !b.y || !b.mo) return null;
+  const t = new Date();
+  let a = t.getFullYear() - b.y;
+  if (t.getMonth() + 1 < b.mo || (t.getMonth() + 1 === b.mo && t.getDate() < b.d)) a--;
+  return a;
+}
 
 // Respuesta a una pregunta. Devuelve HTML o null (no entendido). Se explaya con contexto.
 function botAnswer(raw) {
@@ -5432,6 +5453,31 @@ function botAnswer(raw) {
   // 2) DINERO / SALARIO
   if (/dinero|cuanto (ha )?gan|ganad|salario|sueldo|cobr|euros|dolar|\$/.test(q) && !stat) {
     const ranked = botPlayers.filter(j => j.ganancias).sort((a, b) => b.ganancias - a.ganancias);
+    const salPend = /pendiente|por cobrar|le queda|falta por cobrar|firmad|por ganar|\bfuturo\b/.test(q);
+    const salCob = /cobrad|ha cobrado|\bcobro\b|realmente (ha )?gan|de verdad/.test(q);
+    // dinero pendiente de cobrar (contrato firmado)
+    if (salPend) {
+      if (players.length) {
+        return players.map(j => {
+          const fut = j.ganancias_futuro || 0;
+          if (!fut) return `<b>${j.nombre}</b> no tiene dinero pendiente de cobrar: ya ha cobrado todo lo firmado${j.ganancias ? ` (<b>${fmtDinero(j.ganancias_ganado != null ? j.ganancias_ganado : j.ganancias)}</b>)` : ''}. ${botPlayerChip(j)}`;
+          return `A <b>${j.nombre}</b> le quedan por cobrar <b>${fmtDinero(fut)}</b> de contrato firmado (ya ha cobrado ${fmtDinero(j.ganancias_ganado || 0)}). ${botPlayerChip(j)}`;
+        }).join('<hr class="bot-hr">');
+      }
+      const pend = botPlayers.filter(j => (j.ganancias_futuro || 0) > 0).sort((a, b) => b.ganancias_futuro - a.ganancias_futuro);
+      if (!pend.length) return `Ningún español tiene dinero pendiente de cobrar registrado.`;
+      const top = pend[0], second = pend[1];
+      return `El español con más dinero <b>pendiente de cobrar</b> es <b>${top.nombre}</b>, con <b>${fmtDinero(top.ganancias_futuro)}</b> firmados${second ? `, por delante de <b>${second.nombre}</b> (${fmtDinero(second.ganancias_futuro)})` : ''}. ${botPlayerChip(top)}${botMore(`<ol class="bot-rank">${pend.slice(0, 5).map(j => `<li><span>${j.nombre}</span><b>${fmtDinero(j.ganancias_futuro)}</b></li>`).join('')}</ol>`)}`;
+    }
+    // dinero realmente cobrado
+    if (salCob && players.length) {
+      return players.map(j => {
+        const cob = j.ganancias_ganado != null ? j.ganancias_ganado : j.ganancias;
+        if (cob == null) return `No tengo datos de salario de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+        const fut = j.ganancias_futuro || 0;
+        return `<b>${j.nombre}</b> ha cobrado <b>${fmtDinero(cob)}</b> en su carrera NBA.${fut ? ` Le quedan <b>${fmtDinero(fut)}</b> por cobrar de contrato firmado.` : ''} ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
     if (superl && !players.length) {
       if (!ranked.length) return null;
       const top3 = ranked.slice(0, 3);
@@ -5643,6 +5689,56 @@ function botAnswer(raw) {
     }
   }
 
+  // E7) EDAD / NACIMIENTO
+  {
+    const bornQ = /nacio|nacimiento|cuando nacio|fecha de nacimiento|cumpleanos/.test(q);
+    const ageQ = /\bedad\b|cuantos anos|que anos tiene|anos tiene/.test(q);
+    const youngQ = /mas joven|menor edad|\bbenjamin\b/.test(q);
+    const oldQ = /mas viejo|mas veterano|mayor edad|mas mayor/.test(q);
+    if ((ageQ || bornQ) && players.length) {
+      return players.map(j => {
+        const b = botBirth(j), age = botAge(j);
+        if (BOT_FALLECIDOS[j.id]) {
+          return `<b>${j.nombre}</b> nació ${b && b.d && b.mo ? `el <b>${j.nacimiento_fecha}</b>` : `en <b>${b ? b.y : '?'}</b>`} y falleció en <b>${BOT_FALLECIDOS[j.id]}</b>. ${botPlayerChip(j)}`;
+        }
+        if (bornQ && !ageQ) {
+          if (!b) return `No tengo la fecha de nacimiento de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+          return `<b>${j.nombre}</b> nació ${b.d && b.mo ? `el <b>${j.nacimiento_fecha}</b>` : `en <b>${b.y}</b>`}${age != null ? ` (tiene ${age} años)` : ''}. ${botPlayerChip(j)}`;
+        }
+        if (age == null) return `No tengo la edad de <b>${j.nombre}</b>${b && b.y ? ` (nació en ${b.y})` : ''}. ${botPlayerChip(j)}`;
+        return `<b>${j.nombre}</b> tiene <b>${age} años</b> (nació el ${j.nacimiento_fecha}). ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
+    if ((youngQ || oldQ) && !players.length) {
+      const withAge = botPlayers.map(j => ({ j, a: botAge(j) })).filter(x => x.a != null);
+      if (withAge.length) {
+        withAge.sort((x, y) => youngQ ? x.a - y.a : y.a - x.a);
+        const top = withAge[0];
+        return `El español <b>${youngQ ? 'más joven' : 'más veterano'}</b> (de los que tengo fecha de nacimiento) es <b>${top.j.nombre}</b>, con <b>${top.a} años</b>. ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${withAge.slice(0, 5).map(x => `<li><span>${x.j.nombre}</span><b>${x.a} años</b></li>`).join('')}</ol>`)}`;
+      }
+    }
+  }
+
+  // E8) SUMMER LEAGUE
+  if (/summer league|liga de verano/.test(q) && botExtra.summer_league.length) {
+    const SL = botExtra.summer_league;
+    if (players.length) {
+      return players.map(j => {
+        const mine = SL.filter(s => botSameName(s.jugador, j.nombre)).sort((a, b) => (a.year || 0) - (b.year || 0));
+        if (!mine.length) return `No me consta que <b>${j.nombre}</b> haya jugado la Summer League. ${botPlayerChip(j)}`;
+        const parts = mine.map(s => `${s.year} (${s.equipo ? teamInfo(s.equipo).name : '—'})`);
+        return `<b>${j.nombre}</b> jugó la Summer League en ${parts.join(', ')}. ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
+    if (team) {
+      const who = [...new Set(SL.filter(s => s.equipo === team).map(s => s.jugador))];
+      if (!who.length) return `No me consta ningún español en la Summer League de <b>${teamInfo(team).name}</b>.`;
+      return `Españoles que han jugado la Summer League con <b>${teamInfo(team).name}</b>: <b>${who.join('</b>, <b>')}</b>. <div class="bot-sub"><a href="summer-league.html">Ver Summer League →</a></div>`;
+    }
+    const all = [...new Set(SL.map(s => s.jugador))];
+    return `<b>${all.length}</b> españoles han disputado la Summer League de la NBA. <div class="bot-sub"><a href="summer-league.html">Ver el listado completo →</a></div>`;
+  }
+
   // 4.5) TEMPORALES: preguntas sobre una temporada concreta (año detectado)
   if (year) {
     const teamQ = /equipo|franquicia|jugaba|milita|donde jug/.test(q);
@@ -5679,6 +5775,19 @@ function botAnswer(raw) {
     // Jugador + año
     if (players.length) {
       return players.map(j => {
+        // Playoffs de una temporada concreta (usa playoffs_temporadas)
+        if (dim === 'po') {
+          const po = (j.playoffs_temporadas || []).find(t => t.year === year);
+          if (!po) return `<b>${j.nombre}</b> no disputó playoffs en <b>${drSeason(year)}</b> (o no hay registro). ${botPlayerChip(j)}`;
+          const tn = po.team ? ` con ${teamInfo(po.team).name}` : '';
+          if (stat && stat.total === 'partidos') return `En los playoffs de <b>${drSeason(year)}</b>, <b>${j.nombre}</b> disputó <b>${fmtEnt(po.g)} partidos</b>${tn}. ${botPlayerChip(j)}`;
+          if (stat && stat.kind !== 'count' && stat.pg && po[stat.pg] != null) {
+            if (stat.kind === 'pct') return `En los playoffs de <b>${drSeason(year)}</b>, <b>${j.nombre}</b> promedió un <b>${fmtPct(po[stat.pg])}</b> en ${stat.label}${tn} (${fmtEnt(po.g)} partidos). ${botPlayerChip(j)}`;
+            const tot = po.g ? Math.round(po[stat.pg] * po.g) : null;
+            return `En los playoffs de <b>${drSeason(year)}</b>, <b>${j.nombre}</b> promedió <b>${fmtDec1(po[stat.pg])} ${stat.label} por partido</b>${tot != null ? ` (<b>${fmtEnt(tot)}</b> en total)` : ''} en ${fmtEnt(po.g)} partidos${tn}. ${botPlayerChip(j)}`;
+          }
+          return `En los playoffs de <b>${drSeason(year)}</b>, <b>${j.nombre}</b> promedió <b>${fmtDec1(po.pts_g)} puntos</b>, ${fmtDec1(po.rbd_g)} rebotes y ${fmtDec1(po.ast_g)} asistencias en ${fmtEnt(po.g)} partidos${tn}. ${botPlayerChip(j)}`;
+        }
         const main = botSeasonMain(j, year);
         if (!main) return `<b>${j.nombre}</b> no jugó en la NBA en la temporada <b>${drSeason(year)}</b>. ${botPlayerChip(j)}`;
         const teams = botSeasonTeams(j, year);
