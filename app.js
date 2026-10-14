@@ -5111,9 +5111,11 @@ function renderPorEquipo() {
 // ══════════════════════════════════════════════
 let botPlayers = [];
 let botCtx = null, botPending = null;   // memoria conversacional (seguimiento)
+let botExtra = { dorsales: [], transacciones: [], efemerides: [], summer_league: [] };   // datos globales (no por jugador)
 // Prepara la lista de jugadores para el motor (deriva el nº de temporadas)
-function botPrepPlayers(list) {
+function botPrepPlayers(list, data) {
   botPlayers = list || [];
+  if (data) botExtra = { dorsales: data.dorsales || [], transacciones: data.transacciones || [], efemerides: data.efemerides || [], summer_league: data.summer_league || [] };
   botPlayers.forEach(j => {
     if (j._temporadas == null) {
       const yrs = new Set((j.temporadas_data || []).filter(t => t.year && (t.team || '').toUpperCase() !== 'TOT').map(t => t.year));
@@ -5132,6 +5134,9 @@ const BOT_EXAMPLES = [
   '¿Cuánto ha ganado Ricky Rubio?',
   '¿Quién ha jugado en los Lakers?',
   'Triples de Sergio Rodríguez en playoffs',
+  '¿Récord de puntos de Pau en un partido?',
+  '¿Quién tiene más All-Star?',
+  '¿Qué dorsal lleva Ricky Rubio?',
 ];
 
 // Diccionario de estadísticas. El orden importa (triple-doble antes que triples).
@@ -5307,6 +5312,44 @@ function botRankSentence(j, field, dim, label, minGames) {
   return ` Ocupa el <b>${r.rank}º</b> puesto entre los españoles en ${label}${poTxt}.`;
 }
 
+// ── Soporte para temas nuevos (career highs, premios por tipo, dorsales, transacciones, efemérides, posición) ──
+function botSameName(a, b) { return botNorm(a) === botNorm(b); }
+// Máximo en un partido → clave dentro de game_highs
+const BOT_GH = { puntos: 'pts', rebotes: 'rbd', asistencias: 'ast', robos: 'stl', tapones: 'blk', triples: 'tres_m', minutos: 'min' };
+// Tipos de premio reconocibles por su nombre coloquial (orden: lo más específico primero)
+const BOT_AWARDS = [
+  { re: /concurso|three ?point|mates|skills|habilidad(es)?/, tipo: 'All Star – Concursos', label: 'concursos del All-Star' },
+  { re: /all[- ]?star|partido de las estrellas/, tipo: 'All Star', label: 'All-Star' },
+  { re: /all[- ]?nba|mejor quinteto(?!.*defens)/, tipo: 'All NBA', label: 'All-NBA' },
+  { re: /all[- ]?rookie|quinteto de (rookie|novato)/, tipo: 'All Rookie', label: 'All-Rookie' },
+  { re: /all[- ]?defens|quinteto defensivo|mejor defensa/, tipo: 'All Defense', label: 'All-Defense' },
+  { re: /\broy\b|rookie of the year|rookie del a[nñ]o|novato del a[nñ]o|mejor novato/, tipo: 'ROY', label: 'Rookie del Año' },
+  { re: /\bdpoy\b|defensive player|defensor del a[nñ]o|mejor defensor/, tipo: 'DPOY', label: 'Mejor Defensor del Año' },
+  { re: /\bmvp\b|jugador mas valioso/, tipo: 'MVP (votos)', label: 'candidato al MVP' },
+  { re: /jugador del mes|player of the month/, tipo: 'Player of the Month', label: 'Jugador del Mes' },
+  { re: /novato del mes|rookie of the month/, tipo: 'Rookie of the Month', label: 'Novato del Mes' },
+  { re: /rising star/, tipo: 'Rising Stars', label: 'Rising Stars' },
+];
+function botAwards(j, tipo) { return (j.premios || []).filter(a => a.tipo === tipo); }
+// Posiciones (sin dígitos sueltos para no confundir con "top 3", "3 triples"…)
+const BOT_POS = [
+  { re: /\bpivots?\b|\bcenter\b/, pos: 'Pívot', label: 'pívot' },
+  { re: /ala[- ]?pivots?|power forward/, pos: 'Ala-Pívot', label: 'ala-pívot' },
+  { re: /\baleros?\b|small forward/, pos: 'Alero', label: 'alero' },
+  { re: /\bescoltas?\b|shooting guard/, pos: 'Escolta', label: 'escolta' },
+  { re: /\bbases?\b|point guard/, pos: 'Base', label: 'base' },
+];
+// Fecha de efeméride: admite "1 jan 2015" y "2015-02-08". Devuelve [día, mes] o null.
+const BOT_MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12, ene: 1, abr: 4, ago: 8, dic: 12 };
+function botEfeMD(f) {
+  const s = String(f || '').toLowerCase().trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return [parseInt(m[3], 10), parseInt(m[2], 10)];
+  m = s.match(/^(\d{1,2})\s+([a-z]{3})/);
+  if (m && BOT_MON[m[2]]) return [parseInt(m[1], 10), BOT_MON[m[2]]];
+  return null;
+}
+
 // Respuesta a una pregunta. Devuelve HTML o null (no entendido). Se explaya con contexto.
 function botAnswer(raw) {
   const text = raw.trim();
@@ -5428,6 +5471,176 @@ function botAnswer(raw) {
       const stats = linea.length ? ` En su estreno firmó <b>${linea.join(', ')}</b>${p.min ? ` en ${p.min} minutos` : ''}.` : '';
       return `<b>${j.nombre}</b> debutó en la NBA el <b>${p.fecha}</b>${edad} con <b>${p.equipo ? teamInfo(p.equipo).name : '—'}</b>${rival}.${stats} ${botPlayerChip(j)}`;
     }).join('<hr class="bot-hr">');
+  }
+
+  // E1) PREMIO CONCRETO (All-Star, All-NBA, ROY, DPOY, MVP…): conteo por jugador y ranking por tipo
+  {
+    const aw = BOT_AWARDS.find(a => a.re.test(q));
+    if (aw) {
+      const held = botPlayers.map(j => ({ j, list: botAwards(j, aw.tipo) })).filter(x => x.list.length);
+      if (players.length) {
+        return players.map(j => {
+          const list = botAwards(j, aw.tipo);
+          if (!list.length) return `No me consta que <b>${j.nombre}</b> haya sido <b>${aw.label}</b>. ${botPlayerChip(j)}`;
+          const years = list.map(a => a.year).filter(Boolean).sort((p, r) => p - r);
+          const ref = held.slice().sort((p, r) => r.list.length - p.list.length);
+          const pos = ref.findIndex(x => x.j.id === j.id) + 1;
+          const liderTxt = (pos === 1 && (ref.length < 2 || list.length > ref[1].list.length)) ? ` Es el español con <b>más ${aw.label}</b>.` : (pos ? ` Es el <b>${pos}º</b> español con más ${aw.label}.` : '');
+          const yrTxt = years.length ? ` (${years.map(drSeason).join(', ')})` : '';
+          return `<b>${j.nombre}</b> fue <b>${aw.label}</b> <b>${list.length}</b> ${list.length === 1 ? 'vez' : 'veces'}${yrTxt}.${liderTxt} ${botPlayerChip(j)}`;
+        }).join('<hr class="bot-hr">');
+      }
+      if (!held.length) return `No me consta ningún español que haya sido <b>${aw.label}</b>.`;
+      const ranked = held.slice().sort((p, r) => r.list.length - p.list.length);
+      if (['ROY', 'DPOY'].includes(aw.tipo) || ranked.every(x => x.list.length === 1)) {
+        const quienes = ranked.map(x => `<b>${x.j.nombre}</b>${x.list[0] && x.list[0].year ? ` (${drSeason(x.list[0].year)})` : ''}`);
+        return `${ranked.length === 1 ? 'El único español que ha sido' : 'Los españoles que han sido'} <b>${aw.label}</b>: ${quienes.join(', ')}. ${botPlayerChip(ranked[0].j)}`;
+      }
+      const top = ranked[0], second = ranked[1];
+      const cola = second ? ` Le sigue <b>${second.j.nombre}</b> (${second.list.length}).` : '';
+      return `El español con más <b>${aw.label}</b> es <b>${top.j.nombre}</b>, con <b>${top.list.length}</b>.${cola} ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${ranked.map(x => `<li><span>${x.j.nombre}</span><b>${x.list.length}</b></li>`).join('')}</ol>`)}`;
+    }
+  }
+
+  // E2) MÁXIMO EN UN PARTIDO (career high): "récord de puntos de Pau en un partido"
+  if (/career ?high|en un (solo )?partido|en un (solo )?encuentro|en un (solo )?choque|en un mismo partido/.test(q) && stat && BOT_GH[stat.label]) {
+    const key = BOT_GH[stat.label];
+    const ghList = botPlayers.map(j => ({ j, v: j.game_highs ? j.game_highs[key] : null })).filter(x => x.v != null);
+    if (players.length) {
+      return players.map(j => {
+        const v = j.game_highs ? j.game_highs[key] : null;
+        if (v == null) return `No tengo el máximo de <b>${stat.label}</b> en un partido de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+        const ref = ghList.slice().sort((a, b) => b.v - a.v);
+        const pos = ref.findIndex(x => x.j.id === j.id) + 1;
+        const posTxt = pos === 1 ? ' Es el <b>mejor registro</b> de un español.' : (pos ? ` Es el <b>${pos}º</b> mejor registro de un español.` : '');
+        return `El máximo de <b>${j.nombre}</b> en un partido NBA es de <b>${fmtEnt(v)} ${stat.label}</b>.${posTxt} ${botPlayerChip(j)}`;
+      }).join('<hr class="bot-hr">');
+    }
+    if (!ghList.length) return null;
+    const ranked = ghList.sort((a, b) => asc ? a.v - b.v : b.v - a.v).slice(0, 5);
+    const top = ranked[0], second = ranked[1];
+    return `El récord de un español en <b>${stat.label}</b> en un solo partido lo tiene <b>${top.j.nombre}</b>, con <b>${fmtEnt(top.v)}</b>${second ? `, por delante de <b>${second.j.nombre}</b> (${fmtEnt(second.v)})` : ''}. ${botPlayerChip(top.j)}${botMore(`<ol class="bot-rank">${ranked.map(x => `<li><span>${x.j.nombre}</span><b>${fmtEnt(x.v)}</b></li>`).join('')}</ol>`)}`;
+  }
+
+  // E3) DORSALES
+  {
+    const wearVerb = /(llev|llevo|llevaba|lleva|llevaron|uso|usa|usaba|usado|lucia|luce|viste|vistio|gasta|porta|porto)/.test(q);
+    const dorsalWord = /dorsal|camiseta/.test(q) || (/\bnumeros?\b/.test(q) && wearVerb);
+    const numMatch = q.match(/(?:numero|dorsal|el|con|llev\w*|us\w*|luc\w*|vist\w*|gast\w*|port\w*)\s+(?:el\s+)?(\d{1,2})\b/);
+    if ((dorsalWord || (wearVerb && numMatch)) && botExtra.dorsales.length) {
+      const num = numMatch ? parseInt(numMatch[1], 10) : null;
+      if (num != null && !players.length) {
+        const who = [];
+        botExtra.dorsales.filter(d => d.numero === num).forEach(d => { if (!who.some(w => botSameName(w, d.jugador))) who.push(d.jugador); });
+        if (!who.length) return `No me consta ningún español con el dorsal <b>${num}</b>. <div class="bot-sub"><a href="dorsales.html">Ver todos los dorsales →</a></div>`;
+        return `${who.length === 1 ? 'Ha llevado' : 'Han llevado'} el dorsal <b>${num}</b> en la NBA: <b>${who.join('</b>, <b>')}</b>. <div class="bot-sub"><a href="dorsales.html">Ver dorsales →</a></div>`;
+      }
+      if (players.length) {
+        return players.map(j => {
+          const mine = botExtra.dorsales.filter(d => botSameName(d.jugador, j.nombre));
+          if (!mine.length) return `No tengo el dorsal de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+          const byNum = {};
+          mine.forEach(d => { (byNum[d.numero] = byNum[d.numero] || []).push(d.team); });
+          const nums = Object.keys(byNum).map(n => +n).sort((a, b) => a - b);
+          const parts = nums.map(n => `<b>${n}</b> (${[...new Set(byNum[n])].map(t => teamInfo(t).name).join(', ')})`);
+          const txt = parts.length === 1 ? parts[0] : parts.slice(0, -1).join(', ') + ' y ' + parts[parts.length - 1];
+          return `<b>${j.nombre}</b> ha lucido ${parts.length === 1 ? 'el dorsal' : 'los dorsales'} ${txt} en la NBA. ${botPlayerChip(j)}`;
+        }).join('<hr class="bot-hr">');
+      }
+    }
+  }
+
+  // E4) TRANSACCIONES / MOVIMIENTOS DE MERCADO
+  {
+    const trxWord = /transaccion|traspas|fichaj|ficho|ficharon|cortad|\bcorto\b|cortaron|waiver|agente libre|renovacion|renovo|extension|movimientos?|renuncia de derechos/.test(q);
+    if (trxWord && botExtra.transacciones.length) {
+      const T = botExtra.transacciones;
+      const TRX = [
+        { re: /traspas/, tipo: 'Traspasado', label: 'traspasado', noun: 'traspasos' },
+        { re: /cortad|\bcorto\b|cortaron/, tipo: 'Cortado', label: 'cortado', noun: 'cortes' },
+        { re: /waiver/, tipo: 'Waivers', label: 'pasado por waivers', noun: 'waivers' },
+        { re: /agente libre/, tipo: 'Agente libre', label: 'firmado como agente libre', noun: 'fichajes como agente libre' },
+        { re: /renovacion|renovo|renova/, tipo: 'Renovación', label: 'renovado', noun: 'renovaciones' },
+        { re: /extension|extendi/, tipo: 'Extensión', label: 'con extensión', noun: 'extensiones' },
+      ];
+      const trx = TRX.find(t => t.re.test(q));
+      if (superl && !players.length && trx) {
+        const c = {};
+        T.filter(r => r.tipo === trx.tipo).forEach(r => { c[r.jugador] = (c[r.jugador] || 0) + 1; });
+        const ranked = Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (!ranked.length) return `No tengo movimientos de tipo <b>${trx.label}</b> de españoles.`;
+        const [n0, v0] = ranked[0], nx = ranked[1];
+        return `El español con más <b>${trx.noun}</b> es <b>${n0}</b> (${v0})${nx ? `, seguido de <b>${nx[0]}</b> (${nx[1]})` : ''}.${botMore(`<ol class="bot-rank">${ranked.map(([n, v]) => `<li><span>${n}</span><b>${v}</b></li>`).join('')}</ol>`)}`;
+      }
+      if (trx && !players.length) {
+        const who = [...new Set(T.filter(r => r.tipo === trx.tipo).map(r => r.jugador))];
+        if (!who.length) return `No tengo españoles con movimiento de tipo <b>${trx.label}</b>.`;
+        return `Españoles que han sido <b>${trx.label}</b> alguna vez en la NBA: <b>${who.join('</b>, <b>')}</b>. <div class="bot-sub"><a href="transacciones.html">Ver todas las transacciones →</a></div>`;
+      }
+      if (players.length) {
+        return players.map(j => {
+          const mine = T.filter(r => botSameName(r.jugador, j.nombre)).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+          if (!mine.length) return `No tengo movimientos de mercado de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+          const byType = {};
+          mine.forEach(r => { byType[r.tipo] = (byType[r.tipo] || 0) + 1; });
+          const resumen = Object.entries(byType).sort((a, b) => b[1] - a[1]).map(([t, n]) => `${n} ${t.toLowerCase()}`).join(', ');
+          const last = mine[0], dest = last.equipo2 || last.equipo1;
+          return `<b>${j.nombre}</b> registra <b>${mine.length}</b> movimiento${mine.length === 1 ? '' : 's'} en la NBA (${resumen}). El más reciente: <b>${last.tipo}</b>${dest ? ` — ${dest}` : ''} (${last.fecha}). ${botPlayerChip(j)}`;
+        }).join('<hr class="bot-hr">');
+      }
+    }
+  }
+
+  // E5) EFEMÉRIDES
+  {
+    const gameWinner = /game ?winner|canasta ganadora|tiro ganador|sobre la bocina/.test(q);
+    const efeWord = gameWinner || /efemerid|un dia como hoy|tal dia como hoy|dia como hoy|on this day|\bhitos?\b|que paso (un|el) /.test(q);
+    if (efeWord && botExtra.efemerides.length) {
+      const E = botExtra.efemerides;
+      if (players.length) {
+        return players.map(j => {
+          let mine = E.filter(e => botSameName(e.jugador, j.nombre));
+          if (gameWinner) mine = mine.filter(e => /GAME WINNER/.test(String(e.etiqueta || '')));
+          if (!mine.length) return `No tengo ${gameWinner ? 'canastas ganadoras' : 'efemérides'} de <b>${j.nombre}</b>. ${botPlayerChip(j)}`;
+          const items = mine.slice(0, 4).map(e => `<li><b>${e.fecha}</b> — ${e.hito}</li>`).join('');
+          return `${gameWinner ? 'Canastas ganadoras' : 'Hitos'} de <b>${j.nombre}</b>: <ul class="bot-list">${items}</ul>${mine.length > 4 ? `<div class="bot-sub">…y ${mine.length - 4} más. <a href="efemerides.html">Ver efemérides →</a></div>` : `<div class="bot-sub"><a href="efemerides.html">Ver efemérides →</a></div>`} ${botPlayerChip(j)}`;
+        }).join('<hr class="bot-hr">');
+      }
+      if (gameWinner) {
+        const gw = E.filter(e => /GAME WINNER/.test(String(e.etiqueta || '')));
+        if (!gw.length) return `No tengo canastas ganadoras registradas.`;
+        return `Canastas ganadoras de españoles en la NBA: <ul class="bot-list">${gw.slice(0, 6).map(e => `<li><b>${e.jugador}</b> · ${e.fecha} — ${e.hito}</li>`).join('')}</ul><div class="bot-sub"><a href="efemerides.html">Ver todas →</a></div>`;
+      }
+      const today = new Date(), hits = E.filter(e => { const p = botEfeMD(e.fecha); return p && p[0] === today.getDate() && p[1] === today.getMonth() + 1; });
+      if (!hits.length) return `No tengo ninguna efeméride de españoles para un día como hoy. <div class="bot-sub"><a href="efemerides.html">Ver todas las efemérides →</a></div>`;
+      return `Un día como hoy en la historia de los españoles en la NBA: <ul class="bot-list">${hits.slice(0, 6).map(e => `<li><b>${e.jugador}</b> — ${e.hito}</li>`).join('')}</ul><div class="bot-sub"><a href="efemerides.html">Ver efemérides →</a></div>`;
+    }
+  }
+
+  // E6) POSICIÓN / QUINTETO
+  {
+    const posEntry = BOT_POS.find(p => p.re.test(q));
+    const askPos = /posicion|de que juega|en que posicion|juega de|que puesto|\bes (un |una )?(base|escolta|alero|pivot|ala[- ]?pivot)/.test(q);
+    if (players.length && askPos) {
+      return players.map(j => j.posicion
+        ? `<b>${j.nombre}</b> juega de <b>${j.posicion}</b>. ${botPlayerChip(j)}`
+        : `No tengo la posición de <b>${j.nombre}</b>. ${botPlayerChip(j)}`).join('<hr class="bot-hr">');
+    }
+    if (posEntry && !players.length) {
+      const group = botPlayers.filter(j => j.posicion === posEntry.pos);
+      if (!group.length) return `No tengo españoles catalogados como <b>${posEntry.label}</b>.`;
+      if (superl) {
+        const s = (stat && stat.kind !== 'count') ? stat : BOT_STATS.find(x => x.label === 'puntos');
+        const pg = perGame || s.kind === 'pct';
+        const field = pg ? s.pg : s.total;
+        const ranked = group.map(j => ({ j, v: j[field] })).filter(x => x.v != null).sort((a, b) => asc ? a.v - b.v : b.v - a.v);
+        if (ranked.length) {
+          const top = ranked[0];
+          return `El mejor <b>${posEntry.label}</b> español por <b>${s.label}</b> es <b>${top.j.nombre}</b> (${botFmt(s, top.v, pg)}).${botMore(`<ol class="bot-rank">${ranked.slice(0, 5).map(x => `<li><span>${x.j.nombre}</span><b>${botFmt(s, x.v, pg)}</b></li>`).join('')}</ol>`)} ${botPlayerChip(top.j)}`;
+        }
+      }
+      return `Españoles que juegan o han jugado de <b>${posEntry.label}</b> en la NBA: <b>${group.map(j => j.nombre).join('</b>, <b>')}</b>. <div class="bot-chips">${group.map(botPlayerChip).join('')}</div>`;
+    }
   }
 
   // 4.5) TEMPORALES: preguntas sobre una temporada concreta (año detectado)
@@ -5713,7 +5926,7 @@ async function initPreguntasPage() {
   try { data = await loadData(); }
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   buildPlayerIds(data.jugadores);
-  botPrepPlayers(data.jugadores);
+  botPrepPlayers(data.jugadores, data);
   document.getElementById('hero-sub').textContent = `Escribe una pregunta y te respondo con los datos de los ${botPlayers.length} españoles de la NBA.`;
 
   const sug = document.getElementById('bot-suggest');
@@ -5773,7 +5986,7 @@ function buildChatWidget() {
 
 async function cwEnsureData() {
   if (botPlayers.length) return;
-  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPrepPlayers(d.jugadores); } catch (e) { botPlayers = []; }
+  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPrepPlayers(d.jugadores, d); } catch (e) { botPlayers = []; }
 }
 
 async function cwToggle() {
