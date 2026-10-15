@@ -6005,11 +6005,15 @@ function botRoute(q) { return BOT_PAGES.find(p => p.re.test(q)) || null; }
 
 function botReply(raw) {
   if (!botPlayers || !botPlayers.length) return `Estoy cargando los datos… dame un segundo y vuelve a preguntar. 🙂`;
+  // Tracking: registra cada consulta con su resultado y el texto, para ver uso y fallos en GA4
+  const qTxt = String(raw || '').trim().slice(0, 100);
+  const origen = location.pathname.indexOf('preguntas') >= 0 ? 'pagina' : 'widget';
   const html = botAnswer(raw);
-  if (html) { botCtx = botPending; return html; }   // recuerda el contexto solo si hubo respuesta
+  if (html) { botCtx = botPending; track('bot_pregunta', { resultado: 'respondida', pregunta: qTxt, origen }); return html; }   // recuerda el contexto solo si hubo respuesta
   // Si no hay respuesta con datos, intento llevar a la página adecuada
   const r = botRoute(botNorm(raw));
-  if (r) return `Para eso, tu mejor sitio es la página de <b>${r.label}</b>. <div class="bot-sub"><a href="${r.page}">Ir a ${r.label} →</a></div>`;
+  if (r) { track('bot_pregunta', { resultado: 'derivada', pregunta: qTxt, destino: r.label, origen }); return `Para eso, tu mejor sitio es la página de <b>${r.label}</b>. <div class="bot-sub"><a href="${r.page}">Ir a ${r.label} →</a></div>`; }
+  track('bot_pregunta', { resultado: 'sin_respuesta', pregunta: qTxt, origen });
   return `No he sabido responder a eso 🤔. Puedo darte <b>estadísticas</b> (puntos, rebotes, triples…), <b>rankings</b> ("¿quién tiene más…?"), <b>anillos</b>, <b>salario</b>, <b>draft</b>, <b>debut</b>, <b>equipos</b> y <b>comparaciones</b> — o llevarte a la sección que busques. También puedes encadenar: "¿y la siguiente temporada?", "¿y Marc Gasol?", "¿y en playoffs?".`;
 }
 
