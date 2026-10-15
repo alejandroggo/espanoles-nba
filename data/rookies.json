@@ -1,0 +1,62 @@
+[
+ {
+  "nombre": "Aday Mara",
+  "bref_id": "maraad01",
+  "posicion": "Pívot",
+  "nacimiento_fecha": "7 abr 2005",
+  "nacimiento_lugar": "Zaragoza",
+  "altura": "7-2 (2,18 m)",
+  "peso_lb": 255,
+  "universidad": [
+   "UCLA",
+   "Michigan"
+  ],
+  "draft": {
+   "anio": 2026,
+   "ronda": 1,
+   "pick": 12,
+   "equipo": "OKC"
+  },
+  "dorsal": 15,
+  "ultimo_curso": "Michigan 2025-26: 11,5 pts · 6,3 reb · 2,5 ast · 66,8% TC · 103 tapones · Big Ten DPOY · campeón NCAA"
+ },
+ {
+  "nombre": "Baba Miller",
+  "bref_id": "milleba01",
+  "posicion": "Ala-pívot",
+  "nacimiento_fecha": "7 feb 2004",
+  "nacimiento_lugar": "Palma de Mallorca",
+  "altura": "6-11 (2,11 m)",
+  "peso_lb": 204,
+  "universidad": [
+   "Florida State",
+   "Florida Atlantic",
+   "Cincinnati"
+  ],
+  "draft": {
+   "anio": 2026,
+   "ronda": 2,
+   "pick": 36,
+   "equipo": "LAC"
+  },
+  "ultimo_curso": "Cincinnati 2025-26: 13,3 pts · 9,3 reb · 4,2 ast (18 partidos)"
+ },
+ {
+  "nombre": "Sergio de Larrea",
+  "apodo": "Larry",
+  "bref_id": "delarse01",
+  "posicion": "Base",
+  "nacimiento_fecha": "4 dic 2005",
+  "nacimiento_lugar": "Valladolid",
+  "altura": "6-5 (1,96 m)",
+  "peso_lb": 175,
+  "procedencia": "Valencia Basket (ACB)",
+  "draft": {
+   "anio": 2026,
+   "ronda": 1,
+   "pick": 25,
+   "equipo": "LAL",
+   "nota": "traspasado a Dallas"
+  }
+ }
+]
