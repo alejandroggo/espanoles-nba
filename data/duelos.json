@@ -526,5 +526,205 @@
    "Víctor Claver": "3.0/4.3/1.0"
   },
   "nota": "Ambos muy fríos de tiro; Calderón pasador (¡13 asistencias y 0 puntos en un partido!). Claver ganó 2 de 3."
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Raül López",
+  "g": 4,
+  "rec": "Igualado 2-2",
+  "av": {
+   "Pau Gasol": "14.0/6.2/0.5",
+   "Raül López": "5.8/1.8/3.0"
+  }
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Pau Gasol",
+  "g": 13,
+  "rec": "Pau 8-5",
+  "av": {
+   "Rudy Fernández": "8.5/2.8/2.5",
+   "Pau Gasol": "16.2/10.5/3.1"
+  }
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Marc Gasol",
+  "g": 12,
+  "rec": "Rudy 8-4",
+  "av": {
+   "Rudy Fernández": "6.6/1.3/1.3",
+   "Marc Gasol": "12.8/9.1/2.4"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Rudy Fernández",
+  "g": 6,
+  "rec": "Rudy 6-0",
+  "av": {
+   "José M. Calderón": "9.5/2.2/7.2",
+   "Rudy Fernández": "15.7/3.7/1.8"
+  }
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Serge Ibaka",
+  "g": 7,
+  "rec": "Ibaka 4-3",
+  "av": {
+   "Rudy Fernández": "5.7/1.9/2.0",
+   "Serge Ibaka": "9.3/5.7/0.1"
+  }
+ },
+ {
+  "a": "Nikola Mirotic",
+  "b": "Ricky Rubio",
+  "g": 9,
+  "rec": "Ricky 6-3",
+  "av": {
+   "Nikola Mirotic": "10.6/5.6/1.0",
+   "Ricky Rubio": "15.2/5.7/9.3"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Ricky Rubio",
+  "g": 12,
+  "rec": "Ricky 7-5",
+  "av": {
+   "José M. Calderón": "8.3/3.1/3.9",
+   "Ricky Rubio": "11.2/5.5/8.9"
+  }
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Ricky Rubio",
+  "g": 17,
+  "rec": "Pau 12-5",
+  "av": {
+   "Pau Gasol": "14.8/8.4/2.8",
+   "Ricky Rubio": "12.1/5.2/9.3"
+  }
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Ricky Rubio",
+  "g": 21,
+  "rec": "Marc 15-6",
+  "av": {
+   "Marc Gasol": "15.4/7.6/4.0",
+   "Ricky Rubio": "11.8/4.7/6.3"
+  }
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Ricky Rubio",
+  "g": 21,
+  "rec": "Ibaka 15-6",
+  "av": {
+   "Serge Ibaka": "10.6/6.5/1.0",
+   "Ricky Rubio": "10.6/3.8/7.2"
+  }
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Serge Ibaka",
+  "g": 30,
+  "rec": "Pau 16-14 (RS 11-8 · PO 5-6)",
+  "av": {
+   "Pau Gasol": "15.7/8.4/2.9 RS · 15.3/11.2/3.3 PO",
+   "Serge Ibaka": "12.5/9.5/0.7 RS · 8.3/6.1/0.5 PO"
+  }
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Serge Ibaka",
+  "g": 47,
+  "rec": "Ibaka 25-22 (RS 16-12 · PO 9-10)",
+  "av": {
+   "Marc Gasol": "14.4/6.9/2.2 RS · 17.3/8.8/3.1 PO",
+   "Serge Ibaka": "10.8/6.2/0.5 RS · 11.5/7.4/0.4 PO"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Serge Ibaka",
+  "g": 18,
+  "rec": "Calderón 10-8 (RS 9-8 · PO 1-0)",
+  "av": {
+   "José M. Calderón": "9.5/2.5/6.1 RS · 2.0/1.0/1.0 PO",
+   "Serge Ibaka": "11.9/7.1/1.2 RS · 12.0/1.0/0.0 PO"
+  }
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Nikola Mirotic",
+  "g": 12,
+  "rec": "Mirotić 7-5 (RS 5-2 · PO 2-3)",
+  "av": {
+   "Serge Ibaka": "14.7/7.1/1.3 RS · 8.0/7.8/1.2 PO",
+   "Nikola Mirotic": "10.3/4.7/1.1 RS · 9.8/4.0/0.4 PO"
+  }
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Nikola Mirotic",
+  "g": 5,
+  "rec": "Pau 3-2",
+  "av": {
+   "Pau Gasol": "8.2/6.6/2.2",
+   "Nikola Mirotic": "13.8/10.4/1.2"
+  }
+ },
+ {
+  "a": "Jorge Garbajosa",
+  "b": "Pau Gasol",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "Jorge Garbajosa": "7.5/4.0/0.5",
+   "Pau Gasol": "19.0/7.5/4.0"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Pau Gasol",
+  "g": 24,
+  "rec": "Pau 16-8",
+  "av": {
+   "José M. Calderón": "10.5/2.7/5.9",
+   "Pau Gasol": "16.6/8.2/3.3"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Marc Gasol",
+  "g": 19,
+  "rec": "Marc 13-6",
+  "av": {
+   "José M. Calderón": "9.2/2.4/4.4",
+   "Marc Gasol": "16.1/6.7/3.7"
+  }
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Nikola Mirotic",
+  "g": 12,
+  "rec": "Marc 7-5 (RS 4-3 · PO 3-2)",
+  "av": {
+   "Marc Gasol": "15.4/6.1/4.9 RS · 9.0/8.0/4.0 PO",
+   "Nikola Mirotic": "16.0/6.0/1.1 RS · 9.8/4.0/0.4 PO"
+  }
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Nikola Mirotic",
+  "g": 14,
+  "rec": "Calderón 10-4 (RS 7-4 · PO 3-0)",
+  "av": {
+   "José M. Calderón": "7.8/2.6/4.4 RS · 0.0/0.0/1.7 PO",
+   "Nikola Mirotic": "13.4/5.6/2.2 RS · 6.0/2.0/1.0 PO"
+  }
  }
 ]
