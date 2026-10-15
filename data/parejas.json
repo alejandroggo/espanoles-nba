@@ -1,0 +1,275 @@
+[
+ {
+  "a": "Marc Gasol",
+  "b": "Serge Ibaka",
+  "equipo": "Toronto Raptors",
+  "era": "2019",
+  "campeones": true,
+  "partidos_juntos": 53,
+  "victorias_pct": 74,
+  "record": "39-14",
+  "min": {
+   "Marc Gasol": 25.3,
+   "Serge Ibaka": 23.3,
+   "juntos": 241
+  },
+  "pts": {
+   "Marc Gasol": 8.7,
+   "Serge Ibaka": 12.7,
+   "juntos": 21.4
+  },
+  "reb": {
+   "Marc Gasol": 6.3,
+   "Serge Ibaka": 8.1,
+   "juntos": 14.4
+  },
+  "ast": {
+   "Marc Gasol": 3.3,
+   "Serge Ibaka": 1.3,
+   "juntos": 4.6
+  },
+  "oncourt": {
+   "min": 241,
+   "off": 111.7,
+   "def": 99.0,
+   "net": 12.7
+  },
+  "asist_entre": {
+   "Marc→Ibaka": 10,
+   "Ibaka→Marc": 2
+  },
+  "oncourt_nota": "Apenas 241 min juntos en 123 partidos, pero con los dos en pista Toronto era un +12,7",
+  "playoffs": "35 juntos · 23-12 · el anillo de 2019",
+  "facts": [
+   "15 victorias seguidas juntos — la racha más larga de todas las parejas"
+  ]
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Rudy Fernández",
+  "equipo": "Portland",
+  "era": "2008-09",
+  "campeones": false,
+  "partidos_juntos": 76,
+  "victorias_pct": 66,
+  "record": "50-26",
+  "min": {
+   "Chacho": 15.4,
+   "Rudy": 25.6,
+   "juntos": 865
+  },
+  "pts": {
+   "Chacho": 4.6,
+   "Rudy": 10.5,
+   "juntos": 15.1
+  },
+  "reb": {
+   "Chacho": 1.6,
+   "Rudy": 2.7,
+   "juntos": 4.3
+  },
+  "ast": {
+   "Chacho": 3.6,
+   "Rudy": 2.1,
+   "juntos": 5.7
+  },
+  "oncourt": {
+   "min": 865,
+   "off": 109.0,
+   "def": 104.2,
+   "net": 4.9
+  },
+  "asist_entre": {
+   "Chacho→Rudy": 78,
+   "Rudy→Chacho": 9
+  },
+  "oncourt_nota": "La conexión récord: 43 de los 78 pases del Chacho acabaron en triple de un Rudy novato",
+  "playoffs": "5 juntos · 2-3 vs Houston",
+  "facts": [
+   "Aquel Portland joven fue 54-28, de los mejores equipos que compartieron"
+  ]
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Nikola Mirotić",
+  "equipo": "Chicago + Milwaukee",
+  "era": "2014-19",
+  "campeones": false,
+  "partidos_juntos": 127,
+  "victorias_pct": 60,
+  "record": "76-51",
+  "min": {
+   "Pau": 32.4,
+   "Mirotić": 23.2,
+   "juntos": 1582
+  },
+  "pts": {
+   "Pau": 17.1,
+   "Mirotić": 11.5,
+   "juntos": 28.6
+  },
+  "reb": {
+   "Pau": 11.1,
+   "Mirotić": 5.6,
+   "juntos": 16.7
+  },
+  "ast": {
+   "Pau": 3.0,
+   "Mirotić": 1.4,
+   "juntos": 4.4
+  },
+  "oncourt": {
+   "min": 1582,
+   "equipo": "Chicago",
+   "off": 107.7,
+   "def": 104.3,
+   "net": 3.4
+  },
+  "asist_entre": {
+   "Pau→Mirotić": 53,
+   "Mirotić→Pau": 37
+  },
+  "oncourt_nota": "La conexión más recíproca: dos interiores que sí se buscaban en Chicago",
+  "playoffs": "Playoffs 2015: 9 juntos · 5-4",
+  "facts": [
+   "La pareja más longeva: 127 partidos juntos, la que más coincidió"
+  ]
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Jorge Garbajosa",
+  "equipo": "Toronto Raptors",
+  "era": "2006-08",
+  "campeones": false,
+  "partidos_juntos": 70,
+  "victorias_pct": 56,
+  "record": "39-31",
+  "min": {
+   "Calderón": 20.8,
+   "Garba": 26.8,
+   "juntos": 735
+  },
+  "pts": {
+   "Calderón": 8.9,
+   "Garba": 8.2,
+   "juntos": 17.1
+  },
+  "reb": {
+   "Calderón": 2.0,
+   "Garba": 4.6,
+   "juntos": 6.6
+  },
+  "ast": {
+   "Calderón": 5.1,
+   "Garba": 1.7,
+   "juntos": 6.8
+  },
+  "oncourt": {
+   "min": 735,
+   "off": 111.8,
+   "def": 107.2,
+   "net": 4.6
+  },
+  "asist_entre": {
+   "Calderón→Garba": 50,
+   "Garba→Calderón": 10
+  },
+  "oncourt_nota": "Calderón, el base, alimentaba a Garbajosa (50 a 10)",
+  "playoffs": null,
+  "facts": [
+   "La primera pareja de españoles de la historia de la NBA (2006)",
+   "La grave lesión de Garbajosa (nov. 2007) cortó la pareja"
+  ]
+ },
+ {
+  "a": "Ricky Rubio",
+  "b": "Juancho Hernangómez",
+  "equipo": "Minnesota",
+  "era": "2020-21",
+  "campeones": false,
+  "partidos_juntos": 50,
+  "victorias_pct": 38,
+  "record": "19-31",
+  "min": {
+   "Ricky": 26.3,
+   "Juancho": 17.6,
+   "juntos": 259
+  },
+  "pts": {
+   "Ricky": 8.6,
+   "Juancho": 7.4,
+   "juntos": 16.0
+  },
+  "reb": {
+   "Ricky": 3.2,
+   "Juancho": 4.0,
+   "juntos": 7.2
+  },
+  "ast": {
+   "Ricky": 6.0,
+   "Juancho": 0.7,
+   "juntos": 6.7
+  },
+  "oncourt": {
+   "min": 259,
+   "off": 123.0,
+   "def": 117.6,
+   "net": 5.4
+  },
+  "asist_entre": {
+   "Ricky→Juancho": 24,
+   "Juancho→Ricky": 1
+  },
+  "oncourt_nota": "Ricky dirigía, Juancho finalizaba (24 a 1)",
+  "playoffs": null,
+  "facts": [
+   "Mejor noche: 35 pts vs Golden State (Ricky 26)"
+  ]
+ },
+ {
+  "a": "Juan Carlos Navarro",
+  "b": "Pau Gasol",
+  "equipo": "Memphis Grizzlies",
+  "era": "2007-08",
+  "campeones": false,
+  "partidos_juntos": 39,
+  "victorias_pct": 26,
+  "record": "10-29",
+  "min": {
+   "Navarro": 23.0,
+   "Pau": 36.7,
+   "juntos": 623
+  },
+  "pts": {
+   "Navarro": 10.3,
+   "Pau": 18.9,
+   "juntos": 29.2
+  },
+  "reb": {
+   "Navarro": 2.1,
+   "Pau": 8.8,
+   "juntos": 10.8
+  },
+  "ast": {
+   "Navarro": 2.1,
+   "Pau": 3.0,
+   "juntos": 5.1
+  },
+  "oncourt": {
+   "min": 623,
+   "off": 111.8,
+   "def": 111.5,
+   "net": 0.2
+  },
+  "asist_entre": {
+   "Navarro→Pau": 25,
+   "Pau→Navarro": 11
+  },
+  "oncourt_nota": "Las 11 de Pau a Navarro, todas para triples de la Bomba",
+  "playoffs": null,
+  "facts": [
+   "Mejor noche: 63 pts combinados vs Golden State (¡Pau 43!) — récord de todas",
+   "El traspaso de Pau a los Lakers (feb. 2008) cortó la pareja ese mismo año"
+  ]
+ }
+]
