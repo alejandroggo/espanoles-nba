@@ -9,22 +9,22 @@
   "victorias_pct": null,
   "record": null,
   "min": {
-   "Aldama": 23.4,
+   "Aldama": null,
    "De Larrea": null,
    "juntos": null
   },
   "pts": {
-   "Aldama": 10.4,
+   "Aldama": null,
    "De Larrea": null,
    "juntos": null
   },
   "reb": {
-   "Aldama": 5.4,
+   "Aldama": null,
    "De Larrea": null,
    "juntos": null
   },
   "ast": {
-   "Aldama": 2.1,
+   "Aldama": null,
    "De Larrea": null,
    "juntos": null
   },
@@ -33,7 +33,7 @@
    "Aldama→De Larrea": 0,
    "De Larrea→Aldama": 0
   },
-  "oncourt_nota": "Columnas individuales = promedios de carrera (De Larrea aún sin debutar). Los datos como dúo se llenarán cuando compartan pista.",
+  "oncourt_nota": "Sin datos todavía: aún no han compartido pista. La ficha se llenará cuando jueguen juntos.",
   "playoffs": null,
   "facts": [
    "La primera pareja de españoles en los Dallas Mavericks — y la única en activo.",
