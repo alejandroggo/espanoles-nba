@@ -1,5 +1,46 @@
 [
  {
+  "a": "Santi Aldama",
+  "b": "Sergio de Larrea",
+  "equipo": "Dallas Mavericks",
+  "era": "ahora mismo",
+  "en_activo": true,
+  "partidos_juntos": 0,
+  "victorias_pct": null,
+  "record": null,
+  "min": {
+   "Aldama": 23.4,
+   "De Larrea": null,
+   "juntos": null
+  },
+  "pts": {
+   "Aldama": 10.4,
+   "De Larrea": null,
+   "juntos": null
+  },
+  "reb": {
+   "Aldama": 5.4,
+   "De Larrea": null,
+   "juntos": null
+  },
+  "ast": {
+   "Aldama": 2.1,
+   "De Larrea": null,
+   "juntos": null
+  },
+  "oncourt": null,
+  "asist_entre": {
+   "Aldama→De Larrea": 0,
+   "De Larrea→Aldama": 0
+  },
+  "oncourt_nota": "Columnas individuales = promedios de carrera (De Larrea aún sin debutar). Los datos como dúo se llenarán cuando compartan pista.",
+  "playoffs": null,
+  "facts": [
+   "La primera pareja de españoles en los Dallas Mavericks — y la única en activo.",
+   "De Larrea aún por debutar: la ficha se llena en cuanto jueguen juntos."
+  ]
+ },
+ {
   "a": "Marc Gasol",
   "b": "Serge Ibaka",
   "equipo": "Toronto Raptors",
