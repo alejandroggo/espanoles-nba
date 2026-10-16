@@ -183,7 +183,7 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Temporadas', 'temporadas.html'],
   ['Career Highs', 'career-highs.html'], ['Marcas al alcance', 'marcas.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
   ['Salarios', 'salarios.html'], ['Dorsales', 'dorsales.html'], ['Summer League', 'summer-league.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Gráficos', 'graficos.html'],
   ['Efemérides', 'efemerides.html'], ['Quinteto ideal', 'quinteto.html'], ['Test', 'test.html'],
   // ['Pregúntame', 'preguntas.html'],   // oculto por ahora
 ];
@@ -6781,4 +6781,1001 @@ async function qntShare() {
     qntDescargaImagen(bl);
   } catch (e) { if (e && e.name === 'AbortError') return; }
   window.open(xIntent, '_blank', 'noopener,noreferrer');
+}
+
+// ══════════════════════════════════════════════
+// GRÁFICOS — creador de gráficos (líneas y dispersión) sobre data.json
+// ══════════════════════════════════════════════
+// Capas: datos (funciones puras, testeadas en tools/test-graficos.mjs) → escena
+// (series/puntos en unidades de datos) → maquetación en píxeles (grLayout) →
+// dibujo en SVG (pantalla) o canvas (PNG). Nada se interpola ni se inventa: una
+// temporada sin partidos no se dibuja y un % sin muestra suficiente se oculta.
+
+const GR_MAX = 6;   // jugadores destacados a la vez (6 colores distinguibles + 6 formas)
+const GR_SHAPES = ['circle', 'square', 'triangle', 'diamond', 'tri-down', 'plus'];
+// Colores del PNG (siempre fondo oscuro, como el resto de imágenes). En pantalla
+// salen de las variables --gr-c1…6 de style.css (claro/oscuro).
+const GR_PNG_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300'];
+
+// Catálogo: solo campos que existen en data.json. kind: pg (por partido),
+// pct (porcentaje 0-1), tot (total de temporada/carrera), count (partidos), age.
+const GR_METRICS = [
+  { key: 'pts_g', short: 'PTS', name: 'Puntos por partido', kind: 'pg', tot: 'pts_total' },
+  { key: 'rbd_g', short: 'REB', name: 'Rebotes por partido', kind: 'pg', tot: 'rbd_total' },
+  { key: 'ast_g', short: 'AST', name: 'Asistencias por partido', kind: 'pg', tot: 'ast_total' },
+  { key: 'stl_g', short: 'ROB', name: 'Robos por partido', kind: 'pg', tot: 'stl_total' },
+  { key: 'blk_g', short: 'TAP', name: 'Tapones por partido', kind: 'pg', tot: 'blk_total' },
+  { key: 'tres_g', short: '3PM', name: 'Triples anotados por partido', kind: 'pg', tot: 'tres_total' },
+  { key: 'min_g', short: 'MIN', name: 'Minutos por partido', kind: 'pg', tot: 'min_total' },
+  { key: 'tov_g', short: 'TOV', name: 'Pérdidas por partido', kind: 'pg', tot: 'tov_total' },
+  { key: 'pf_g', short: 'PF', name: 'Faltas personales por partido', kind: 'pg', tot: 'pf_total' },
+  { key: 'fg_pct', short: 'FG%', name: 'Porcentaje de tiros de campo', kind: 'pct', made: 'fgm_g', minAtt: 50, minAttCar: 150 },
+  { key: 'tres_pct', short: '3P%', name: 'Porcentaje de triples', kind: 'pct', made: 'tres_g', minAtt: 20, minAttCar: 50 },
+  { key: 'ft_pct', short: 'FT%', name: 'Porcentaje de tiros libres', kind: 'pct', made: 'ftm_g', minAtt: 20, minAttCar: 50 },
+  { key: 'g', short: 'PJ', name: 'Partidos jugados', kind: 'count' },
+  { key: 'pts_tot', short: 'PTS', name: 'Puntos totales', kind: 'tot', src: 'pts_g', tot: 'pts_total' },
+  { key: 'rbd_tot', short: 'REB', name: 'Rebotes totales', kind: 'tot', src: 'rbd_g', tot: 'rbd_total' },
+  { key: 'ast_tot', short: 'AST', name: 'Asistencias totales', kind: 'tot', src: 'ast_g', tot: 'ast_total' },
+];
+const GR_EDAD = { key: 'edad', short: 'Edad', name: 'Edad', kind: 'age' };   // solo eje X (temporadas)
+function grMetric(key) { return key === 'edad' ? GR_EDAD : (GR_METRICS.find(m => m.key === key) || null); }
+
+function grFmt(m, v) {
+  if (v == null || !isFinite(v)) return '—';
+  if (m.kind === 'pct') return fmtPct(v);
+  if (m.kind === 'pg') return fmtDec1(v);
+  return fmtEnt(v);
+}
+
+// ── Datos por temporada ──
+// Una fila por temporada (la TOT en años con traspaso, nunca la suma de parciales).
+// Descarta filas sin año (year 0) y sin partidos (g 0: temporada aún sin empezar).
+function grSeasonRows(j, comp) {
+  const src = (comp === 'po' ? j.playoffs_temporadas : j.temporadas_data) || [];
+  const by = {}, teams = {};
+  src.forEach(t => {
+    const y = t && t.year;
+    if (!y) return;
+    const isTot = String(t.team || '').toUpperCase() === 'TOT';
+    if (!isTot && t.team) (teams[y] = teams[y] || []).push(t.team);
+    if (!(y in by) || isTot) by[y] = t;
+  });
+  return Object.keys(by).map(Number).sort((a, b) => a - b)
+    .filter(y => (by[y].g || 0) > 0)
+    .map(y => ({ year: y, g: by[y].g, teams: (teams[y] || []).join(' / ') || by[y].team || '', t: by[y] }));
+}
+
+// Nº de temporada en la NBA (temporada regular) para cada año: {year: 1, 2, …}
+function grSeasonIndex(j) {
+  const idx = {};
+  grSeasonRows(j, 'reg').forEach((r, i) => { idx[r.year] = i + 1; });
+  return idx;
+}
+
+// Fecha de nacimiento "6 jul 1980" → {y, m (0-11), d}
+function grBirth(j) {
+  const m = String(j.nacimiento_fecha || '').trim().toLowerCase().match(/^(\d{1,2})\s+([a-zñ]{3})[a-z]*\.?\s+(\d{4})$/);
+  if (!m) return null;
+  const mes = MESES.indexOf(m[2]);
+  return mes < 0 ? null : { y: +m[3], m: mes, d: +m[1] };
+}
+// Edad en la temporada (criterio Basketball Reference: edad a 1 de febrero del año en que termina)
+function grAge(j, year) {
+  const b = grBirth(j);
+  if (!b || !year) return null;
+  return year - b.y - ((b.m > 1 || (b.m === 1 && b.d > 1)) ? 1 : 0);
+}
+
+// Intentos estimados de una fila = anotados/partido × partidos / %. Null si no se puede saber.
+function grEstAttempts(t, m) {
+  const pct = t[m.key], made = t[m.made];
+  if (pct == null || made == null || !t.g) return null;
+  if (pct === 0) return null;   // 0 anotados: no hay forma de saber cuántos intentó
+  return made * t.g / pct;
+}
+
+// Valor de una métrica en una fila de temporada → { value, hidden } (hidden = % con muestra pequeña)
+function grSeasonValue(r, m, opts) {
+  const t = r.t;
+  if (m.kind === 'count') return { value: r.g };
+  if (m.kind === 'tot') return { value: t[m.src] != null ? Math.round(t[m.src] * r.g) : null };
+  const v = t[m.key];
+  if (v == null) return { value: null };
+  if (m.kind === 'pct' && opts && opts.muestra) {
+    const att = grEstAttempts(t, m);
+    if (att == null || att < m.minAtt) return { value: null, hidden: true };
+  }
+  return { value: v };
+}
+
+// ── Datos de carrera (o de un tramo) ──
+// Reutiliza cmpAgg (comparador) sobre las temporadas válidas: con la carrera completa usa
+// los totales oficiales; con un tramo, totales = Σ(por partido × partidos) y % = anotados/intentos.
+function grCareerAgg(j, comp, from, to) {
+  const rows = grSeasonRows(j, comp);
+  if (!rows.length) return null;
+  const inR = rows.filter(r => (!from || r.year >= from) && (!to || r.year <= to));
+  if (!inR.length) return null;
+  const off = comp === 'po' ? j.playoffs_totales : j;
+  const pseudo = Object.assign({}, off || {}, { temporadas_data: rows.map(r => r.t) });
+  // Sin totales oficiales (no debería pasar) → forzar cálculo desde temporadas
+  const full = !!off && inR.length === rows.length;
+  const agg = cmpAgg(pseudo, full ? null : inR[0].year, full ? null : inR[inR.length - 1].year);
+  const att = {};
+  GR_METRICS.filter(m => m.kind === 'pct').forEach(m => {
+    let a = 0, ok = false;
+    inR.forEach(r => { const x = grEstAttempts(r.t, m); if (x != null) { a += x; ok = true; } });
+    att[m.key] = ok ? a : null;
+  });
+  return { agg, g: agg.partidos || 0, n: inR.length, from: inR[0].year, to: inR[inR.length - 1].year, full, att };
+}
+
+// Valor de carrera: los "por partido" salen de total ÷ partidos (nunca de sumar promedios)
+function grCareerValue(c, m, opts) {
+  const a = c.agg, G = c.g;
+  if (!G) return { value: null };
+  if (m.kind === 'count') return { value: G };
+  if (m.kind === 'tot') return { value: a[m.tot] != null ? Math.round(a[m.tot]) : null };
+  if (m.kind === 'pg') return { value: a[m.tot] != null ? a[m.tot] / G : null };
+  if (m.kind === 'pct') {
+    const v = a[m.key];
+    if (v == null) return { value: null };
+    if (opts && opts.muestra) { const at = c.att[m.key]; if (at == null || at < m.minAttCar) return { value: null, hidden: true }; }
+    return { value: v };
+  }
+  return { value: null };
+}
+
+// Jugadores con al menos una temporada NBA con partidos (los que se pueden graficar)
+function grEligible(jugadores) {
+  return (jugadores || []).filter(j => grSeasonRows(j, 'reg').length)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+}
+// Temporadas disponibles (unión de todos los jugadores) en la competición
+function grYears(players, comp) {
+  const s = new Set();
+  (players || []).forEach(j => grSeasonRows(j, comp).forEach(r => s.add(r.year)));
+  return [...s].sort((a, b) => a - b);
+}
+
+// ── Estado (configuración del gráfico) y URL ──
+const GR_TIPOS = ['lineas', 'dispersion'];
+const GR_EJES_X = ['temp', 'n', 'edad'];
+function grDefaults() {
+  return {
+    tipo: 'lineas', comp: 'reg', ids: ['pau-gasol', 'marc-gasol'],
+    m: 'pts_g', ex: 'temp',                    // líneas
+    u: 'carrera', x: 'ast_g', y: 'pts_g',      // dispersión
+    desde: null, hasta: null, ming: null,      // ming null = valor por defecto del contexto
+    ctx: true, nom: true, ley: true, muestra: true, t: '',
+  };
+}
+// Opciones de mínimo de partidos según unidad (temporada/carrera) y competición
+function grMinOptions(st) {
+  const carrera = st.tipo === 'dispersion' && st.u === 'carrera';
+  if (carrera) return st.comp === 'po' ? [0, 10, 25, 50, 100] : [0, 50, 100, 250, 500];
+  return st.comp === 'po' ? [0, 3, 5, 10, 15] : [0, 10, 20, 41, 58];
+}
+function grMinDefault(st) {
+  if (st.tipo === 'dispersion' && st.u === 'temporada') return st.comp === 'po' ? 5 : 20;
+  return 0;
+}
+function grMinG(st) { return st.ming == null ? grMinDefault(st) : st.ming; }
+
+// Valida y completa un estado (de la URL o de la interfaz). Nunca lanza: lo inválido vuelve al defecto.
+function grNormalize(raw, players) {
+  const d = grDefaults(), s = Object.assign({}, d, raw || {});
+  if (!GR_TIPOS.includes(s.tipo)) s.tipo = d.tipo;
+  if (s.comp !== 'po') s.comp = 'reg';
+  if (s.u !== 'temporada') s.u = 'carrera';
+  if (!GR_EJES_X.includes(s.ex)) s.ex = d.ex;
+  const ids = new Set((players || []).map(j => j.id));
+  s.ids = [...new Set((Array.isArray(s.ids) ? s.ids : []).filter(id => ids.has(id)))].slice(0, GR_MAX);
+  if (!grMetric(s.m) || s.m === 'edad') s.m = d.m;
+  if (!grMetric(s.y) || s.y === 'edad') s.y = d.y;
+  if (!grMetric(s.x) || (s.x === 'edad' && s.u !== 'temporada')) s.x = d.x;
+  if (s.x === s.y) s.y = s.x === 'pts_g' ? 'ast_g' : 'pts_g';
+  const years = grYears(players, s.comp);
+  const yr = v => { const n = Number(v); return v != null && v !== '' && years.includes(n) ? n : null; };
+  s.desde = yr(s.desde); s.hasta = yr(s.hasta);
+  if (s.desde && s.hasta && s.desde > s.hasta) { const t = s.desde; s.desde = s.hasta; s.hasta = t; }
+  const mg = s.ming == null || s.ming === '' ? null : Number(s.ming);
+  s.ming = grMinOptions(s).includes(mg) ? mg : null;
+  ['ctx', 'nom', 'ley', 'muestra'].forEach(k => { s[k] = s[k] !== false; });
+  s.t = String(s.t || '').replace(/\s+/g, ' ').trim().slice(0, 90);
+  return s;
+}
+
+function grParseState(params, players) {
+  const g = k => params.get(k);
+  const flag = k => g(k) === '0' ? false : true;
+  return grNormalize({
+    tipo: g('tipo'), comp: g('comp'),
+    ids: params.has('j') ? String(g('j') || '').split(',').map(x => x.trim()).filter(Boolean) : grDefaults().ids,
+    m: g('m'), ex: g('ex'), u: g('u'), x: g('x'), y: g('y'),
+    desde: g('desde'), hasta: g('hasta'), ming: g('min'),
+    ctx: flag('ctx'), nom: flag('nom'), ley: flag('ley'), muestra: flag('muestra'), t: g('t'),
+  }, players);
+}
+
+// Solo escribe en la URL lo que difiere del defecto (más jugadores y tipo siempre)
+const GR_URL_KEYS = ['tipo', 'j', 'comp', 'm', 'ex', 'u', 'x', 'y', 'desde', 'hasta', 'min', 'ctx', 'nom', 'ley', 'muestra', 't'];
+function grStateToParams(s) {
+  const d = grDefaults(), p = new URLSearchParams();
+  p.set('tipo', s.tipo);
+  p.set('j', s.ids.join(','));
+  if (s.comp !== d.comp) p.set('comp', s.comp);
+  if (s.tipo === 'lineas') {
+    if (s.m !== d.m) p.set('m', s.m);
+    if (s.ex !== d.ex) p.set('ex', s.ex);
+  } else {
+    p.set('u', s.u); p.set('x', s.x); p.set('y', s.y);
+    if (!s.ctx) p.set('ctx', '0');
+    if (!s.nom && s.u === 'carrera') p.set('nom', '0');
+  }
+  if (s.desde) p.set('desde', s.desde);
+  if (s.hasta) p.set('hasta', s.hasta);
+  if (s.ming != null) p.set('min', s.ming);
+  if (!s.ley) p.set('ley', '0');
+  if (!s.muestra) p.set('muestra', '0');
+  if (s.t) p.set('t', s.t);
+  return p;
+}
+
+// ── Escena: lo que se dibuja, en unidades de datos ──
+function grSeasonLbl(y) { return drSeason(y); }
+function grRangeTxt(st, players) {
+  const ys = grYears(players, st.comp);
+  if (!st.desde && !st.hasta) return '';
+  const a = st.desde || ys[0], b = st.hasta || ys[ys.length - 1];
+  return a === b ? `Temporada ${grSeasonLbl(a)}` : `${grSeasonLbl(a)} a ${grSeasonLbl(b)}`;
+}
+function grAutoTitle(st, sel) {
+  const names = sel.map(j => j.nombre);
+  const vs = names.length <= 3 ? names.join(' vs ') : `${names.length} jugadores`;
+  if (st.tipo === 'lineas') return `${grMetric(st.m).name}${vs ? ' · ' + vs : ''}`;
+  const x = grMetric(st.x), y = grMetric(st.y);
+  return `${y.name} frente a ${x.name.charAt(0).toLowerCase() + x.name.slice(1)}`;
+}
+
+// slots: {id: 0-5} (color y forma fijos por jugador); si falta, el orden de selección
+function grBuildScene(st, players, slots) {
+  const sel = st.ids.map(id => players.find(p => p.id === id)).filter(Boolean);
+  const slotOf = (j, i) => (slots && slots[j.id] != null) ? slots[j.id] : i;
+  const warnings = [], compTxt = st.comp === 'po' ? 'Playoffs' : 'Temporada regular';
+  const inRange = y => (!st.desde || y >= st.desde) && (!st.hasta || y <= st.hasta);
+  const ming = grMinG(st);
+  const opts = { muestra: st.muestra };
+  let hidden = 0;
+  const noData = j => `${j.nombre} no ${st.comp === 'po' ? 'disputó playoffs' : 'jugó'} en la NBA`;
+  const rangeTxt = grRangeTxt(st, players);
+  const notes = [];
+  if (st.comp === 'reg') notes.push('En temporadas con traspaso se usa el total de la temporada (TOT), no la suma de promedios.');
+  const scene = { tipo: st.tipo, title: st.t || grAutoTitle(st, sel), autoTitle: !st.t, warnings, notes, series: [], points: [], legend: [] };
+
+  if (st.tipo === 'lineas') {
+    const m = grMetric(st.m);
+    const xName = st.ex === 'edad' ? 'Edad (a 1 de febrero de cada temporada)' : st.ex === 'n' ? 'Nº de temporada en la NBA' : 'Temporada';
+    sel.forEach((j, i) => {
+      const rows = grSeasonRows(j, st.comp);
+      const slot = slotOf(j, i), shape = GR_SHAPES[slot % GR_SHAPES.length];
+      scene.legend.push({ id: j.id, name: j.nombre, slot, shape });
+      if (!rows.length) { warnings.push(noData(j)); scene.series.push({ id: j.id, name: j.nombre, slot, shape, points: [], segs: [] }); return; }
+      const idx = grSeasonIndex(j);
+      const pts = [];
+      rows.filter(r => inRange(r.year) && r.g >= ming).forEach(r => {
+        const v = grSeasonValue(r, m, opts);
+        if (v.hidden) hidden++;
+        if (v.value == null) return;
+        const x = st.ex === 'edad' ? grAge(j, r.year) : st.ex === 'n' ? idx[r.year] : r.year;
+        if (x == null) return;
+        pts.push({ x, y: v.value, year: r.year, teams: r.teams, g: r.g, id: j.id, name: j.nombre, slot, shape });
+      });
+      if (st.ex === 'edad' && !grBirth(j)) warnings.push(`${j.nombre}: falta su fecha de nacimiento`);
+      else if (!pts.length) warnings.push(`${j.nombre}: sin temporadas con datos en este filtro`);
+      // Temporadas sin participación → la línea se corta (no se interpola)
+      const segs = [];
+      pts.forEach((p, k) => { if (!k || p.x - pts[k - 1].x > 1) segs.push([]); segs[segs.length - 1].push(p); });
+      scene.series.push({ id: j.id, name: j.nombre, slot, shape, points: pts, segs });
+    });
+    const all = scene.series.flatMap(s => s.points);
+    scene.x = { kind: 'int', metric: { key: st.ex, kind: st.ex === 'temp' ? 'season' : 'int' }, name: xName,
+      fmt: st.ex === 'temp' ? grSeasonLbl : (v => String(v)), vals: all.map(p => p.x) };
+    scene.y = { kind: 'num', metric: m, name: m.name, fmt: v => grFmt(m, v), vals: all.map(p => p.y), zero: m.kind !== 'pct' };
+    const unit = 'Cada punto = una temporada' + (ming ? ` (mín. ${ming} PJ)` : '');
+    scene.subtitle = [compTxt, rangeTxt, unit].filter(Boolean).join(' · ');
+    if (gaps(scene.series)) notes.push('Las líneas se cortan en las temporadas sin partidos.');
+    if (st.ex === 'edad') notes.push('Edad a 1 de febrero de cada temporada (criterio de Basketball Reference).');
+    if (!sel.length) scene.empty = 'Añade al menos un jugador para dibujar el gráfico.';
+    else if (!all.length) scene.empty = 'No hay datos para esta combinación.';
+  } else {
+    const mx = grMetric(st.x), my = grMetric(st.y);
+    const selIds = new Map(sel.map((j, i) => [j.id, j]));
+    sel.forEach((j, i) => { const slot = slotOf(j, i); scene.legend.push({ id: j.id, name: j.nombre, slot, shape: GR_SHAPES[slot % GR_SHAPES.length] }); });
+    const pool = st.ctx ? players : sel;
+    const ctxPts = [], selPts = [];
+    pool.forEach(j => {
+      const isSel = selIds.has(j.id);
+      const li = scene.legend.find(l => l.id === j.id);
+      const slot = isSel ? li.slot : null, shape = isSel ? li.shape : 'circle';
+      const push = p => (isSel ? selPts : ctxPts).push(Object.assign(p, { id: j.id, name: j.nombre, slot, shape, sel: isSel }));
+      if (st.u === 'carrera') {
+        const c = grCareerAgg(j, st.comp, st.desde, st.hasta);
+        if (!c || c.g < ming) { if (isSel) warnings.push(c ? `${j.nombre}: no llega al mínimo de ${ming} partidos` : (grSeasonRows(j, st.comp).length ? `${j.nombre}: sin temporadas en el periodo elegido` : noData(j))); return; }
+        const vx = grCareerValue(c, mx, opts), vy = grCareerValue(c, my, opts);
+        if (vx.hidden || vy.hidden) hidden++;
+        if (vx.value == null || vy.value == null) return;
+        push({ x: vx.value, y: vy.value, g: c.g, n: c.n, from: c.from, to: c.to, label: abrevNombre(j.nombre) });
+      } else {
+        const rows = grSeasonRows(j, st.comp);
+        if (!rows.length) { if (isSel) warnings.push(noData(j)); return; }
+        let any = false;
+        rows.filter(r => inRange(r.year) && r.g >= ming).forEach(r => {
+          const vx = mx.kind === 'age' ? { value: grAge(j, r.year) } : grSeasonValue(r, mx, opts);
+          const vy = grSeasonValue(r, my, opts);
+          if (vx.hidden || vy.hidden) hidden++;
+          if (vx.value == null || vy.value == null) return;
+          any = true;
+          push({ x: vx.value, y: vy.value, g: r.g, year: r.year, teams: r.teams });
+        });
+        if (isSel && !any) warnings.push(`${j.nombre}: sin temporadas con datos en este filtro`);
+      }
+    });
+    scene.points = ctxPts.concat(selPts);   // los destacados se dibujan encima
+    scene.ctx = st.ctx && ctxPts.length > 0;
+    scene.labels = st.u === 'carrera' && st.nom;
+    const ax = (m, vals) => ({ kind: 'num', metric: m, name: m.name, fmt: v => grFmt(m, v), vals, zero: m.kind !== 'pct' && m.kind !== 'age' });
+    scene.x = ax(mx, scene.points.map(p => p.x));
+    scene.y = ax(my, scene.points.map(p => p.y));
+    if (mx.kind === 'age') scene.x.name = 'Edad (a 1 de febrero de cada temporada)';
+    const unit = st.u === 'carrera'
+      ? (st.desde || st.hasta ? 'Cada punto = lo jugado por un jugador en el periodo' : 'Cada punto = la carrera de un jugador')
+      : 'Cada punto = una temporada de un jugador';
+    scene.subtitle = [compTxt, rangeTxt, unit + (ming ? ` (mín. ${ming} PJ)` : '')].filter(Boolean).join(' · ');
+    if (st.u === 'carrera' && !st.desde && !st.hasta) notes.push('Carrera: promedios = totales ÷ partidos de la carrera.');
+    if (st.u === 'carrera' && (st.desde || st.hasta)) notes.push('Periodo: promedios ponderados por partidos; los % se calculan con intentos estimados.');
+    if (mx.kind === 'age') notes.push('Edad a 1 de febrero de cada temporada (criterio de Basketball Reference).');
+    if (!scene.points.length) scene.empty = sel.length || st.ctx ? 'No hay datos para esta combinación.' : 'Añade jugadores o activa «Resto de españoles».';
+  }
+  if (hidden) notes.push(`Se ocultan ${hidden} valor${hidden === 1 ? '' : 'es'} de % con muestra pequeña (menos de ${pctThresholds(st)} intentos estimados).`);
+  return scene;
+
+  function gaps(series) { return series.some(s => s.segs.length > 1); }
+  function pctThresholds(s) {
+    const keys = s.tipo === 'lineas' ? [s.m] : [s.x, s.y];
+    const car = s.tipo === 'dispersion' && s.u === 'carrera';
+    return keys.map(grMetric).filter(m => m && m.kind === 'pct').map(m => `${car ? m.minAttCar : m.minAtt} en ${m.short}`).join(' / ');
+  }
+}
+
+// ── Escalas y marcas de eje ──
+function grNiceStep(raw) {
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw / mag;
+  return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
+}
+function grNiceTicks(min, max, count) {
+  if (!isFinite(min) || !isFinite(max)) return [0, 1];
+  if (min === max) { const pad = Math.abs(min) * 0.1 || 1; min -= pad; max += pad; }
+  const step = grNiceStep((max - min) / Math.max(1, count));
+  const t0 = Math.floor(min / step + 1e-9) * step, t1 = Math.ceil(max / step - 1e-9) * step;
+  const out = [];
+  for (let v = t0; v <= t1 + step / 2; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+// Paso de las marcas enteras (temporadas/edad) para que las etiquetas quepan
+function grIntStep(span, plotW, labelW) {
+  for (const s of [1, 2, 3, 4, 5, 10]) if (plotW / Math.max(1, span / s) >= labelW + 10) return s;
+  return 10;
+}
+function grTickFmt(axis, step) {
+  const m = axis.metric;
+  if (m.kind === 'pct') { const d = step < 0.01 ? 1 : 0; return v => (v * 100).toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%'; }
+  const d = step < 1 ? (step < 0.1 ? 2 : 1) : 0;
+  return v => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+// ── Maquetación en píxeles (compartida por SVG y PNG) ──
+// s = escala de fuente (1 en pantalla). Devuelve ejes, marcas y posiciones de cada punto.
+function grLayout(scene, W, H, s) {
+  s = s || 1;
+  const fs = 12 * s, cw = 6.7 * s;   // ancho aprox. de un carácter
+  const ax = scene.x, ay = scene.y;
+  const ext = (vals, zero) => {
+    let lo = vals.length ? Math.min(...vals) : 0, hi = vals.length ? Math.max(...vals) : 1;
+    if (zero) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
+    return [lo, hi];
+  };
+  // Eje Y (siempre numérico)
+  const [ylo, yhi] = ext(ay.vals, ay.zero);
+  const plotH0 = H - (12 + 18 + 22 + 16) * s;
+  const yTicks = grNiceTicks(ylo, yhi, Math.max(3, Math.min(8, Math.floor(plotH0 / (46 * s)))));
+  const yStep = yTicks.length > 1 ? yTicks[1] - yTicks[0] : 1;
+  const yFmt = grTickFmt(ay, yStep);
+  const yLabW = Math.max(...yTicks.map(v => yFmt(v).length)) * cw;
+  const m = { t: 12 * s, r: 18 * s, b: (18 + 22 + 14) * s, l: 22 * s + yLabW + 10 * s };
+  const plot = { x: m.l, y: m.t, w: Math.max(40, W - m.l - m.r), h: Math.max(40, H - m.t - m.b) };
+  const yd = [yTicks[0], yTicks[yTicks.length - 1]];
+  // Eje X
+  let xTicks, xd, xFmt;
+  if (ax.kind === 'int') {
+    const [lo, hi] = ext(ax.vals, false);
+    const span = Math.max(1, hi - lo);
+    xFmt = ax.fmt;
+    const labW = Math.max(...[lo, hi].map(v => String(xFmt(v)).length)) * cw;
+    const step = grIntStep(span, plot.w, labW);
+    xTicks = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) xTicks.push(v);
+    if (!xTicks.length) xTicks = [lo];
+    const pad = Math.max(0.35, span * 0.03);
+    xd = [lo - pad, hi + pad];
+  } else {
+    const [lo, hi] = ext(ax.vals, ax.zero);
+    xTicks = grNiceTicks(lo, hi, Math.max(3, Math.min(9, Math.floor(plot.w / (64 * s)))));
+    xFmt = grTickFmt(ax, xTicks.length > 1 ? xTicks[1] - xTicks[0] : 1);
+    xd = [xTicks[0], xTicks[xTicks.length - 1]];
+  }
+  const sx = v => plot.x + (v - xd[0]) / ((xd[1] - xd[0]) || 1) * plot.w;
+  const sy = v => plot.y + plot.h - (v - yd[0]) / ((yd[1] - yd[0]) || 1) * plot.h;
+  const L = {
+    W, H, s, fs, plot, sx, sy,
+    xTicks: xTicks.map(v => ({ v, p: sx(v), label: String(xFmt(v)) })),
+    yTicks: yTicks.map(v => ({ v, p: sy(v), label: yFmt(v) })),
+    xName: ax.name, yName: ay.name,
+    xZero: ax.kind === 'num' && xd[0] < 0 && xd[1] > 0 ? sx(0) : null,
+  };
+  if (scene.tipo === 'lineas') {
+    L.series = scene.series.map(se => ({
+      se, segs: se.segs.map(seg => seg.map(p => ({ px: sx(p.x), py: sy(p.y), p }))),
+      pts: se.points.map(p => ({ px: sx(p.x), py: sy(p.y), p })),
+    }));
+    L.xs = [...new Set(scene.series.flatMap(se => se.points.map(p => p.x)))].sort((a, b) => a - b);
+  } else {
+    L.pts = scene.points.map(p => ({ px: sx(p.x), py: sy(p.y), p }));
+    L.labels = scene.labels ? grPlaceLabels(L.pts, plot, s, cw) : [];
+  }
+  return L;
+}
+
+// Etiquetas de nombre sin solapes (greedy): destacados primero, cuatro posiciones candidatas
+function grPlaceLabels(pts, plot, s, cw) {
+  const boxes = pts.map(q => ({ x: q.px - 5 * s, y: q.py - 5 * s, w: 10 * s, h: 10 * s }));
+  const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  const out = [];
+  const order = pts.slice().sort((a, b) => (b.p.sel ? 1 : 0) - (a.p.sel ? 1 : 0));
+  order.forEach(q => {
+    const txt = q.p.label || '';
+    const w = txt.length * cw * 0.95, h = 13 * s, gap = 7 * s;
+    const cands = [
+      { x: q.px + gap, y: q.py - h / 2, anchor: 'start' },
+      { x: q.px - gap - w, y: q.py - h / 2, anchor: 'end' },
+      { x: q.px - w / 2, y: q.py - gap - h, anchor: 'middle' },
+      { x: q.px - w / 2, y: q.py + gap, anchor: 'middle' },
+    ];
+    for (const c of cands) {
+      const b = { x: c.x, y: c.y, w, h };
+      if (b.x < plot.x || b.x + w > plot.x + plot.w || b.y < plot.y || b.y + h > plot.y + plot.h) continue;
+      if (boxes.some(o => hit(b, o))) continue;
+      boxes.push(b);
+      const tx = c.anchor === 'start' ? b.x : c.anchor === 'end' ? b.x + w : b.x + w / 2;
+      out.push({ x: tx, y: b.y + h / 2, text: txt, anchor: c.anchor, sel: q.p.sel });
+      break;
+    }
+  });
+  return out;
+}
+
+// Forma de un marcador como path SVG (también vale para canvas vía Path2D)
+function grShapePath(shape, cx, cy, r) {
+  const f = n => (+n).toFixed(2);
+  switch (shape) {
+    case 'square': { const a = r * 0.86; return `M${f(cx - a)} ${f(cy - a)}h${f(2 * a)}v${f(2 * a)}h${f(-2 * a)}Z`; }
+    case 'triangle': { const a = r * 1.2; return `M${f(cx)} ${f(cy - a)}L${f(cx + a * 0.95)} ${f(cy + a * 0.65)}L${f(cx - a * 0.95)} ${f(cy + a * 0.65)}Z`; }
+    case 'tri-down': { const a = r * 1.2; return `M${f(cx)} ${f(cy + a)}L${f(cx + a * 0.95)} ${f(cy - a * 0.65)}L${f(cx - a * 0.95)} ${f(cy - a * 0.65)}Z`; }
+    case 'diamond': { const a = r * 1.22; return `M${f(cx)} ${f(cy - a)}L${f(cx + a)} ${f(cy)}L${f(cx)} ${f(cy + a)}L${f(cx - a)} ${f(cy)}Z`; }
+    case 'plus': { const a = r * 1.1, b = r * 0.42; return `M${f(cx - b)} ${f(cy - a)}h${f(2 * b)}v${f(a - b)}h${f(a - b)}v${f(2 * b)}h${f(b - a)}v${f(a - b)}h${f(-2 * b)}v${f(b - a)}h${f(b - a)}v${f(-2 * b)}h${f(a - b)}Z`; }
+    default: return `M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0Z`;
+  }
+}
+
+// Filas de la tabla de datos (accesible y verificable sin pasar el ratón)
+function grTableData(scene) {
+  if (scene.tipo === 'lineas') {
+    const xs = [...new Set(scene.series.flatMap(s => s.points.map(p => p.x)))].sort((a, b) => a - b);
+    const head = [scene.x.name.replace(/ \(.*\)$/, ''), ...scene.series.map(s => s.name)];
+    const rows = xs.map(x => [scene.x.fmt(x), ...scene.series.map(s => {
+      const p = s.points.find(q => q.x === x);
+      return p ? `${scene.y.fmt(p.y)}${scene.x.metric.key !== 'temp' ? ` (${grSeasonLbl(p.year)})` : ''}` : '—';
+    })]);
+    return { head, rows };
+  }
+  const season = scene.points.some(p => p.year);
+  const head = ['Jugador', season ? 'Temporada' : 'Periodo', 'PJ', scene.x.metric.name || scene.x.name, scene.y.metric.name];
+  const rows = scene.points.slice().sort((a, b) => (b.sel - a.sel) || a.name.localeCompare(b.name, 'es') || (a.year || 0) - (b.year || 0))
+    .map(p => [p.name, season ? `${grSeasonLbl(p.year)}${p.teams ? ' · ' + p.teams : ''}` : (p.from === p.to ? grSeasonLbl(p.from) : `${grSeasonLbl(p.from)} a ${grSeasonLbl(p.to)}`),
+      fmtEnt(p.g), scene.x.fmt(p.x), scene.y.fmt(p.y)]);
+  return { head, rows };
+}
+
+// ── Dibujo en SVG (pantalla) ──
+function grSwatch(slot, shape, lineas, ctx) {
+  const cls = ctx ? 'gr-ctx' : `gr-s${slot + 1}`;
+  return `<svg class="gr-sw ${cls}" width="${lineas ? 22 : 14}" height="14" viewBox="0 0 ${lineas ? 22 : 14} 14" aria-hidden="true">`
+    + (lineas ? '<path class="gr-line" d="M1 7H21"/>' : '')
+    + `<path class="gr-mk" d="${grShapePath(shape, lineas ? 11 : 7, 7, 4)}"/></svg>`;
+}
+
+function grSvg(L, scene) {
+  const p = L.plot, f = n => (+n).toFixed(1);
+  let g = '';
+  // rejilla y ejes (recesivos)
+  L.yTicks.forEach(t => {
+    g += `<line class="gr-grid" x1="${f(p.x)}" x2="${f(p.x + p.w)}" y1="${f(t.p)}" y2="${f(t.p)}"/>`;
+    g += `<text class="gr-tick" x="${f(p.x - 8)}" y="${f(t.p)}" text-anchor="end" dominant-baseline="middle">${escapeHtml(t.label)}</text>`;
+  });
+  L.xTicks.forEach(t => {
+    if (scene.tipo === 'dispersion') g += `<line class="gr-grid" x1="${f(t.p)}" x2="${f(t.p)}" y1="${f(p.y)}" y2="${f(p.y + p.h)}"/>`;
+    g += `<text class="gr-tick" x="${f(t.p)}" y="${f(p.y + p.h + 18)}" text-anchor="middle">${escapeHtml(t.label)}</text>`;
+  });
+  g += `<line class="gr-axis" x1="${f(p.x)}" x2="${f(p.x + p.w)}" y1="${f(p.y + p.h)}" y2="${f(p.y + p.h)}"/>`;
+  g += `<text class="gr-axname" x="${f(p.x + p.w / 2)}" y="${f(L.H - 6)}" text-anchor="middle">${escapeHtml(L.xName)}</text>`;
+  g += `<text class="gr-axname" transform="translate(13 ${f(p.y + p.h / 2)}) rotate(-90)" text-anchor="middle">${escapeHtml(L.yName)}</text>`;
+  g += `<line id="gr-cross" class="gr-cross" x1="0" x2="0" y1="${f(p.y)}" y2="${f(p.y + p.h)}" visibility="hidden"/>`;
+  if (scene.tipo === 'lineas') {
+    L.series.forEach(se => {
+      const c = `gr-s${se.se.slot + 1}`;
+      se.segs.forEach(seg => { if (seg.length > 1) g += `<path class="gr-line ${c}" d="${seg.map((q, i) => (i ? 'L' : 'M') + f(q.px) + ' ' + f(q.py)).join('')}"/>`; });
+      se.pts.forEach(q => { g += `<path class="gr-mk ${c}" d="${grShapePath(se.se.shape, q.px, q.py, 4)}"/>`; });
+    });
+  } else {
+    L.pts.forEach(q => {
+      g += q.p.sel ? `<path class="gr-mk gr-s${q.p.slot + 1}" d="${grShapePath(q.p.shape, q.px, q.py, 5)}"/>`
+        : `<circle class="gr-ctx" cx="${f(q.px)}" cy="${f(q.py)}" r="3.5"/>`;
+    });
+    (L.labels || []).forEach(l => {
+      g += `<text class="gr-lbl${l.sel ? ' sel' : ''}" x="${f(l.x)}" y="${f(l.y)}" text-anchor="${l.anchor}" dominant-baseline="middle">${escapeHtml(l.text)}</text>`;
+    });
+  }
+  g += '<g id="gr-hl"></g>';
+  const aria = `${scene.title}. ${scene.subtitle}`;
+  return `<svg id="gr-svg" class="gr-svg" width="${L.W}" height="${L.H}" viewBox="0 0 ${L.W} ${L.H}" role="img" tabindex="0" aria-label="${escapeHtml(aria)}">${g}</svg>`;
+}
+
+// ── Dibujo en canvas (PNG para redes y artículos, 1600×900, estética de la web) ──
+async function grBuildImage(scene, legend) {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const W = 1600, H = 900, PAD = 64;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const CO = { bg: '#0e0e10', grid: 'rgba(255,255,255,.08)', axis: 'rgba(255,255,255,.22)', yellow: '#ffc400', text: '#e9e9ec', muted: '#9a9aa5', red: '#c60b1e', ctx: 'rgba(233,233,236,.28)' };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 10); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 10); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 10); };
+  flag(0); flag(H - 10);
+  x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+  x.fillStyle = CO.yellow; x.font = '700 20px Inter, sans-serif';
+  x.save(); x.letterSpacing = '5px'; x.fillText('ESPAÑOLES EN LA NBA', PAD, 58); x.restore();
+  // título (se reduce si no cabe)
+  let tf = 44;
+  x.font = `800 ${tf}px Inter, sans-serif`;
+  while (x.measureText(scene.title).width > W - 2 * PAD && tf > 28) { tf -= 2; x.font = `800 ${tf}px Inter, sans-serif`; }
+  x.fillStyle = CO.text; x.fillText(scene.title, PAD, 112);
+  x.fillStyle = CO.muted; x.font = '500 22px Inter, sans-serif'; x.fillText(scene.subtitle, PAD, 148);
+  // leyenda
+  let ly = 190, lx = PAD;
+  const lineas = scene.tipo === 'lineas';
+  const items = (legend || []).map(l => ({ name: l.name, color: GR_PNG_COLORS[l.slot % GR_PNG_COLORS.length], shape: l.shape }));
+  if (scene.tipo === 'dispersion' && scene.ctx) items.push({ name: 'Resto de españoles', color: CO.ctx, shape: 'circle', ctx: true });
+  x.font = '600 21px Inter, sans-serif'; x.textBaseline = 'middle';
+  items.forEach(it => {
+    const w = (lineas ? 34 : 18) + 10 + x.measureText(it.name).width + 30;
+    if (lx + w > W - PAD) { lx = PAD; ly += 34; }
+    x.strokeStyle = it.color; x.fillStyle = it.color; x.lineWidth = 3;
+    if (lineas) { x.beginPath(); x.moveTo(lx, ly); x.lineTo(lx + 34, ly); x.stroke(); }
+    x.fill(new Path2D(grShapePath(it.shape, lx + (lineas ? 17 : 8), ly, 7)));
+    x.fillStyle = CO.text; x.fillText(it.name, lx + (lineas ? 34 : 18) + 10, ly + 1);
+    lx += w;
+  });
+  if (!items.length) ly -= 34;
+  // notas al pie (hasta dos líneas) → el área del gráfico se ajusta a ellas
+  x.font = '400 17px Inter, sans-serif';
+  const noteLines = [];
+  ['Fuente: Basketball Reference.'].concat(scene.notes).join(' ').split(' ').forEach(w => {
+    const last = noteLines[noteLines.length - 1];
+    if (last != null && x.measureText(last + ' ' + w).width <= W - 2 * PAD) noteLines[noteLines.length - 1] = last + ' ' + w;
+    else noteLines.push(w);
+  });
+  if (noteLines.length > 2) { noteLines.length = 2; noteLines[1] = noteLines[1].replace(/\s*\S*$/, '…'); }
+  // área del gráfico
+  const top = ly + 30, bottom = H - 104 - (noteLines.length - 1) * 22;
+  const L = grLayout(scene, W - 2 * PAD + 10, bottom - top, 1.65);
+  x.save(); x.translate(PAD - 10, top);
+  const p = L.plot, s = L.s;
+  x.lineWidth = 1;
+  L.yTicks.forEach(t => {
+    x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(p.x, t.p); x.lineTo(p.x + p.w, t.p); x.stroke();
+    x.fillStyle = CO.muted; x.font = `500 ${L.fs}px Inter, sans-serif`; x.textAlign = 'right'; x.textBaseline = 'middle';
+    x.fillText(t.label, p.x - 10, t.p);
+  });
+  L.xTicks.forEach(t => {
+    if (scene.tipo === 'dispersion') { x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(t.p, p.y); x.lineTo(t.p, p.y + p.h); x.stroke(); }
+    x.fillStyle = CO.muted; x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillText(t.label, t.p, p.y + p.h + 26 * s * 0.8);
+  });
+  x.strokeStyle = CO.axis; x.beginPath(); x.moveTo(p.x, p.y + p.h); x.lineTo(p.x + p.w, p.y + p.h); x.stroke();
+  x.fillStyle = CO.text; x.font = `600 ${L.fs}px Inter, sans-serif`; x.textAlign = 'center';
+  x.fillText(L.xName, p.x + p.w / 2, L.H - 4);
+  x.save(); x.translate(14 * s, p.y + p.h / 2); x.rotate(-Math.PI / 2); x.textBaseline = 'middle'; x.fillText(L.yName, 0, 0); x.restore();
+  const col = slot => GR_PNG_COLORS[slot % GR_PNG_COLORS.length];
+  const mark = (shape, px, py, r, color) => {
+    const path = new Path2D(grShapePath(shape, px, py, r));
+    x.lineWidth = 2.5; x.strokeStyle = CO.bg; x.stroke(path); x.fillStyle = color; x.fill(path);
+  };
+  if (lineas) {
+    L.series.forEach(se => {
+      x.strokeStyle = col(se.se.slot); x.lineWidth = 3.2; x.lineJoin = 'round'; x.lineCap = 'round';
+      se.segs.forEach(seg => { if (seg.length < 2) return; x.beginPath(); seg.forEach((q, i) => i ? x.lineTo(q.px, q.py) : x.moveTo(q.px, q.py)); x.stroke(); });
+      se.pts.forEach(q => mark(se.se.shape, q.px, q.py, 6, col(se.se.slot)));
+    });
+  } else {
+    L.pts.forEach(q => {
+      if (q.p.sel) mark(q.p.shape, q.px, q.py, 8, col(q.p.slot));
+      else { x.fillStyle = CO.ctx; x.beginPath(); x.arc(q.px, q.py, 5.5, 0, Math.PI * 2); x.fill(); }
+    });
+    x.textBaseline = 'middle';
+    (L.labels || []).forEach(l => {
+      x.font = `${l.sel ? 700 : 500} ${Math.round(11.5 * s)}px Inter, sans-serif`;
+      x.fillStyle = l.sel ? CO.text : CO.muted; x.textAlign = l.anchor === 'middle' ? 'center' : l.anchor === 'end' ? 'right' : 'left';
+      x.fillText(l.text, l.x, l.y);
+    });
+  }
+  x.restore();
+  // notas + pie
+  x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.muted; x.font = '400 17px Inter, sans-serif';
+  noteLines.forEach((l, i) => x.fillText(l, PAD, H - 66 - (noteLines.length - 1 - i) * 22));
+  x.fillStyle = CO.text; x.font = '700 22px Inter, sans-serif';
+  x.fillText('espanoles-nba.alejandroggo.com', PAD, H - 30);
+  x.fillStyle = CO.yellow; x.textAlign = 'right';
+  x.fillText('@alejandroggo · #EspañolesNBA', W - PAD, H - 30);
+  return c;
+}
+
+// ── Interfaz ──
+let grPlayers = [], grState = null, grSlots = {}, grScene = null, grL = null, grHover = null, grSuggIdx = -1, grSuggList = [];
+
+// Color/forma fijos por jugador: los que siguen conservan el suyo; los nuevos toman el primero libre
+function grAssignSlots() {
+  Object.keys(grSlots).forEach(id => { if (!grState.ids.includes(id)) delete grSlots[id]; });
+  grState.ids.forEach(id => {
+    if (grSlots[id] != null) return;
+    const used = new Set(Object.values(grSlots)); let k = 0; while (used.has(k)) k++;
+    grSlots[id] = k;
+  });
+}
+
+async function initGraficosPage() {
+  const sub = document.getElementById('hero-sub');
+  let data;
+  try { data = await loadData(); }
+  catch (e) { sub.textContent = 'Error al cargar los datos'; grShowEmpty('No se pudieron cargar los datos. Recarga la página para intentarlo de nuevo.'); return; }
+  buildPlayerIds(data.jugadores);
+  grPlayers = grEligible(data.jugadores);
+  sub.textContent = `Construye gráficos de líneas y de dispersión con las estadísticas de los ${grPlayers.length} españoles que han jugado en la NBA`;
+  grState = grParseState(new URLSearchParams(location.search), grPlayers);
+  grAssignSlots();
+  grBindUI();
+  grUpdate();
+  const chart = document.getElementById('gr-chart');
+  let lastW = chart.clientWidth;
+  const onResize = () => { if (chart.clientWidth !== lastW) { lastW = chart.clientWidth; grDraw(); } };
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(chart); else window.addEventListener('resize', onResize);
+}
+
+function grSet(patch) {
+  grState = grNormalize(Object.assign({}, grState, patch), grPlayers);
+  grAssignSlots();
+  grUpdate();
+}
+
+function grBindUI() {
+  const $ = id => document.getElementById(id);
+  const opt = (v, l) => `<option value="${escapeHtml(v)}">${escapeHtml(l)}</option>`;
+  const metricOpts = GR_METRICS.map(m => opt(m.key, m.kind === 'tot' ? m.name : `${m.name} (${m.short})`)).join('');
+  $('gr-m').innerHTML = metricOpts;
+  $('gr-y').innerHTML = metricOpts;
+  $('gr-x').innerHTML = metricOpts + opt('edad', 'Edad');
+  [['gr-tipo', 'tipo'], ['gr-comp', 'comp'], ['gr-m', 'm'], ['gr-ex', 'ex'], ['gr-u', 'u'], ['gr-x', 'x'], ['gr-y', 'y'], ['gr-desde', 'desde'], ['gr-hasta', 'hasta'], ['gr-min', 'ming']]
+    .forEach(([id, k]) => { $(id).addEventListener('change', e => grSet({ [k]: e.target.value })); });
+  ['ley', 'ctx', 'nom', 'muestra'].forEach(k => {
+    $('gr-' + k).addEventListener('click', () => grSet({ [k]: !grState[k] }));
+  });
+  let tTimer = null;
+  $('gr-t').addEventListener('input', e => { clearTimeout(tTimer); tTimer = setTimeout(() => grSet({ t: e.target.value }), 250); });
+  // Buscador de jugadores (selección múltiple)
+  const q = $('gr-q');
+  q.addEventListener('focus', () => grSuggRender());
+  q.addEventListener('input', () => { grSuggIdx = -1; grSuggRender(); });
+  q.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { grSuggClose(); return; }
+    if (e.key === 'Backspace' && !q.value && grState.ids.length) { grRemove(grState.ids[grState.ids.length - 1]); return; }
+    if (!grSuggList.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); grSuggIdx = Math.min(grSuggIdx + 1, grSuggList.length - 1); grSuggRender(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); grSuggIdx = Math.max(grSuggIdx - 1, 0); grSuggRender(); }
+    else if (e.key === 'Enter') { e.preventDefault(); const j = grSuggList[grSuggIdx >= 0 ? grSuggIdx : 0]; if (j) grAdd(j.id); }
+  });
+  document.addEventListener('click', e => { const w = $('gr-picker'); if (w && !w.contains(e.target)) grSuggClose(); });
+}
+
+function grAdd(id) {
+  if (grState.ids.includes(id) || grState.ids.length >= GR_MAX) return;
+  const q = document.getElementById('gr-q');
+  q.value = ''; grSuggIdx = -1;
+  grSet({ ids: grState.ids.concat(id) });
+  if (grState.ids.length < GR_MAX) { q.focus(); grSuggRender(); } else grSuggClose();
+}
+function grRemove(id) { grSet({ ids: grState.ids.filter(x => x !== id) }); }
+
+function grSuggRender() {
+  const q = document.getElementById('gr-q'), panel = document.getElementById('gr-sugg');
+  const nq = drNorm(q.value);
+  grSuggList = grPlayers.filter(j => !grState.ids.includes(j.id) && (!nq || drNorm(j.nombre).includes(nq)));
+  if (grState.ids.length >= GR_MAX || !grSuggList.length) { panel.hidden = true; q.setAttribute('aria-expanded', 'false'); return; }
+  panel.innerHTML = '';
+  grSuggList.forEach((j, i) => {
+    const rows = grSeasonRows(j, grState.comp);
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'gr-sugg-item' + (i === grSuggIdx ? ' active' : '');
+    b.setAttribute('role', 'option');
+    const n = document.createElement('span'); n.textContent = j.nombre;
+    const m = document.createElement('span'); m.className = 'gr-sugg-meta';
+    m.textContent = rows.length ? (rows.length === 1 ? grSeasonLbl(rows[0].year) : `${grSeasonLbl(rows[0].year)} – ${grSeasonLbl(rows[rows.length - 1].year)}`) : (grState.comp === 'po' ? 'sin playoffs' : 'sin partidos');
+    b.append(n, m);
+    b.addEventListener('mousedown', e => e.preventDefault());   // no perder el foco del input
+    b.addEventListener('click', () => grAdd(j.id));
+    panel.appendChild(b);
+  });
+  panel.hidden = false; q.setAttribute('aria-expanded', 'true');
+  const act = panel.querySelector('.active'); if (act) act.scrollIntoView({ block: 'nearest' });
+}
+function grSuggClose() {
+  const panel = document.getElementById('gr-sugg'), q = document.getElementById('gr-q');
+  if (panel) panel.hidden = true; if (q) q.setAttribute('aria-expanded', 'false');
+}
+
+function grSyncControls() {
+  const st = grState, $ = id => document.getElementById(id);
+  const opt = (v, l) => `<option value="${escapeHtml(v)}">${escapeHtml(l)}</option>`;
+  const years = grYears(grPlayers, st.comp);
+  $('gr-desde').innerHTML = opt('', 'Desde el inicio') + years.map(y => opt(y, grSeasonLbl(y))).join('');
+  $('gr-hasta').innerHTML = opt('', 'Hasta hoy') + years.slice().reverse().map(y => opt(y, grSeasonLbl(y))).join('');
+  $('gr-min').innerHTML = grMinOptions(st).map(v => opt(v, v ? `${v} o más` : 'Sin mínimo')).join('');
+  [['gr-tipo', st.tipo], ['gr-comp', st.comp], ['gr-m', st.m], ['gr-ex', st.ex], ['gr-u', st.u], ['gr-x', st.x], ['gr-y', st.y],
+    ['gr-desde', st.desde || ''], ['gr-hasta', st.hasta || ''], ['gr-min', grMinG(st)]].forEach(([id, v]) => { $(id).value = String(v); });
+  // Combinaciones incompatibles: misma métrica en ambos ejes / edad solo en temporadas
+  [...$('gr-x').options].forEach(o => { o.disabled = o.value === st.y || (o.value === 'edad' && st.u !== 'temporada'); o.hidden = o.value === 'edad' && st.u !== 'temporada'; });
+  [...$('gr-y').options].forEach(o => { o.disabled = o.value === st.x; });
+  document.querySelectorAll('[data-gr]').forEach(el => {
+    const need = el.getAttribute('data-gr');
+    const pctUsed = (st.tipo === 'lineas' ? [st.m] : [st.x, st.y]).some(k => (grMetric(k) || {}).kind === 'pct');
+    const show = need === st.tipo || (need === 'carrera' && st.tipo === 'dispersion' && st.u === 'carrera') || (need === 'pct' && pctUsed);
+    el.hidden = !show;
+  });
+  ['ley', 'ctx', 'nom', 'muestra'].forEach(k => { const b = $('gr-' + k); b.classList.toggle('active', !!st[k]); b.setAttribute('aria-pressed', st[k] ? 'true' : 'false'); });
+  const t = $('gr-t');
+  if (document.activeElement !== t) t.value = st.t;
+  const q = $('gr-q');
+  q.disabled = st.ids.length >= GR_MAX;
+  q.placeholder = st.ids.length >= GR_MAX ? `Máximo ${GR_MAX} jugadores` : (st.ids.length ? 'Añadir otro jugador…' : 'Buscar jugador…');
+  $('gr-count').textContent = `${st.ids.length}/${GR_MAX}`;
+}
+
+function grRenderChips() {
+  const box = document.getElementById('gr-chips');
+  const lineas = grState.tipo === 'lineas';
+  box.innerHTML = grState.ids.map(id => {
+    const j = grPlayers.find(p => p.id === id), slot = grSlots[id];
+    return `<span class="gr-chip">${grSwatch(slot, GR_SHAPES[slot % GR_SHAPES.length], lineas)}<span class="gr-chip-name">${escapeHtml(j.nombre)}</span>`
+      + `<button type="button" class="gr-chip-x" aria-label="Quitar a ${escapeHtml(j.nombre)}" onclick="grRemove('${escapeHtml(id)}')">×</button></span>`;
+  }).join('');
+}
+
+function grRenderMeta() {
+  const sc = grScene, $ = id => document.getElementById(id);
+  $('gr-title').textContent = sc.title;
+  $('gr-sub').textContent = sc.subtitle;
+  $('gr-t').placeholder = grAutoTitle(grState, grState.ids.map(id => grPlayers.find(p => p.id === id)));
+  const lineas = sc.tipo === 'lineas';
+  const leg = $('gr-legend');
+  const items = sc.legend.map(l => `<span class="gr-leg-item">${grSwatch(l.slot, l.shape, lineas)}${escapeHtml(l.name)}</span>`);
+  if (!lineas && sc.ctx) items.push(`<span class="gr-leg-item">${grSwatch(0, 'circle', false, true)}Resto de españoles</span>`);
+  leg.innerHTML = items.join('');
+  leg.hidden = !grState.ley || !items.length;
+  const w = $('gr-warn');
+  w.innerHTML = sc.warnings.map(t => `<li>${escapeHtml(t)}</li>`).join('');
+  w.hidden = !sc.warnings.length;
+  $('gr-note').textContent = ['Fuente: Basketball Reference.'].concat(sc.notes).join(' ');
+}
+
+function grShowEmpty(msg) {
+  const el = document.getElementById('gr-chart');
+  if (el) el.innerHTML = `<p class="gr-empty">${escapeHtml(msg)}</p>`;
+  grL = null;
+}
+
+function grDraw() {
+  const el = document.getElementById('gr-chart');
+  if (!el || !grScene) return;
+  if (grScene.empty) { grShowEmpty(grScene.empty); return; }
+  const w = Math.max(280, el.clientWidth);
+  const h = w < 560 ? Math.round(w * 0.92) : Math.round(Math.min(560, Math.max(360, w * 0.56)));
+  grL = grLayout(grScene, w, h, 1);
+  el.innerHTML = grSvg(grL, grScene) + '<div class="gr-tip" id="gr-tip" role="status" aria-live="polite" hidden></div>';
+  grHover = null;
+  const svg = document.getElementById('gr-svg');
+  svg.addEventListener('pointermove', grPointer);
+  svg.addEventListener('pointerdown', grPointer);
+  svg.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') grHideTip(); });
+  svg.addEventListener('keydown', grKey);
+  svg.addEventListener('focus', () => { if (grHover == null) grShowAt(grScene.tipo === 'lineas' ? grL.xs.length - 1 : grOrderedPts().length - 1); });
+  svg.addEventListener('blur', grHideTip);
+}
+
+// Puntos de dispersión ordenados por X (navegación con teclado)
+function grOrderedPts() { return grL && grL.pts ? grL.pts.map((q, i) => i).sort((a, b) => grL.pts[a].px - grL.pts[b].px) : []; }
+
+function grPointer(e) {
+  if (!grL) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top, p = grL.plot;
+  if (mx < p.x - 24 || mx > p.x + p.w + 24 || my < p.y - 24 || my > p.y + p.h + 24) { grHideTip(); return; }
+  if (grScene.tipo === 'lineas') {
+    let best = -1, bd = Infinity;
+    grL.xs.forEach((v, i) => { const d = Math.abs(grL.sx(v) - mx); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) grShowAt(best);
+  } else {
+    let best = -1, bd = 28 * 28;   // área de acierto mayor que el punto
+    grL.pts.forEach((q, i) => { const d = (q.px - mx) ** 2 + (q.py - my) ** 2; if (d < bd || (d === bd && q.p.sel)) { bd = d; best = i; } });
+    if (best >= 0) grShowAt(grOrderedPts().indexOf(best)); else grHideTip();
+  }
+}
+
+function grKey(e) {
+  if (!grL) return;
+  const n = grScene.tipo === 'lineas' ? grL.xs.length : grL.pts.length;
+  if (e.key === 'Escape') { grHideTip(); return; }
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  e.preventDefault();
+  const cur = grHover == null ? -1 : grHover;
+  grShowAt(Math.max(0, Math.min(n - 1, cur + (e.key === 'ArrowRight' ? 1 : -1))));
+}
+
+function grHideTip() {
+  grHover = null;
+  const t = document.getElementById('gr-tip'), c = document.getElementById('gr-cross'), h = document.getElementById('gr-hl');
+  if (t) t.hidden = true; if (c) c.setAttribute('visibility', 'hidden'); if (h) h.innerHTML = '';
+}
+
+// Tooltip: el valor manda, el nombre acompaña. Todo con textContent.
+function grShowAt(i) {
+  if (!grL || i == null || i < 0) return;
+  grHover = i;
+  const tip = document.getElementById('gr-tip'), hl = document.getElementById('gr-hl'), cross = document.getElementById('gr-cross');
+  const sc = grScene;
+  tip.innerHTML = '';
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  let ax, ay, hlHtml = '';
+  if (sc.tipo === 'lineas') {
+    const xv = grL.xs[i];
+    ax = grL.sx(xv);
+    cross.setAttribute('x1', ax); cross.setAttribute('x2', ax); cross.setAttribute('visibility', 'visible');
+    const key = sc.x.metric.key;
+    tip.appendChild(el('div', 'gr-tip-h', key === 'temp' ? `Temporada ${grSeasonLbl(xv)}` : key === 'n' ? `Temporada nº ${xv} en la NBA` : `${xv} años`));
+    const ys = [];
+    grL.series.forEach(se => {
+      const q = se.pts.find(o => o.p.x === xv);
+      const row = el('div', 'gr-tip-r');
+      row.appendChild(el('span', `gr-tip-k gr-s${se.se.slot + 1}`));
+      if (q) {
+        ys.push(q.py);
+        hlHtml += `<path class="gr-mk-hl gr-s${se.se.slot + 1}" d="${grShapePath(se.se.shape, q.px, q.py, 6)}"/>`;
+        row.appendChild(el('strong', null, sc.y.fmt(q.p.y)));
+        row.appendChild(el('span', 'gr-tip-n', se.se.name));
+        row.appendChild(el('span', 'gr-tip-m', `${key !== 'temp' ? grSeasonLbl(q.p.year) + ' · ' : ''}${q.p.teams ? q.p.teams + ' · ' : ''}${q.p.g} PJ`));
+      } else {
+        row.appendChild(el('strong', 'gr-tip-na', '—'));
+        row.appendChild(el('span', 'gr-tip-n', se.se.name));
+        row.appendChild(el('span', 'gr-tip-m', 'sin datos'));
+      }
+      tip.appendChild(row);
+    });
+    ay = ys.length ? Math.min(...ys) : grL.plot.y + grL.plot.h / 2;
+  } else {
+    const q = grL.pts[grOrderedPts()[i]];
+    if (!q) return;
+    ax = q.px; ay = q.py;
+    hlHtml = `<path class="gr-mk-hl ${q.p.sel ? 'gr-s' + (q.p.slot + 1) : 'gr-ctx-hl'}" d="${grShapePath(q.p.shape, q.px, q.py, q.p.sel ? 7 : 6)}"/>`;
+    tip.appendChild(el('div', 'gr-tip-h', q.p.name));
+    tip.appendChild(el('div', 'gr-tip-s', q.p.year ? `${grSeasonLbl(q.p.year)}${q.p.teams ? ' · ' + q.p.teams : ''} · ${q.p.g} PJ`
+      : `${q.p.from === q.p.to ? grSeasonLbl(q.p.from) : grSeasonLbl(q.p.from) + ' a ' + grSeasonLbl(q.p.to)} · ${q.p.n} temp. · ${fmtEnt(q.p.g)} PJ`));
+    [[sc.y, q.p.y], [sc.x, q.p.x]].forEach(([a, v]) => {
+      const row = el('div', 'gr-tip-r');
+      row.appendChild(el('strong', null, a.fmt(v)));
+      row.appendChild(el('span', 'gr-tip-n', a.name.replace(/ \(.*\)$/, '')));
+      tip.appendChild(row);
+    });
+  }
+  hl.innerHTML = hlHtml;
+  tip.hidden = false;
+  // Posición: a la derecha del punto, o a la izquierda si no cabe
+  const box = document.getElementById('gr-chart'), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = ax + 14; if (left + tw > box.clientWidth - 4) left = ax - 14 - tw; if (left < 4) left = 4;
+  let top = ay - th / 2; top = Math.max(4, Math.min(top, grL.H - th - 4));
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}
+
+function grRenderTable() {
+  const box = document.getElementById('gr-table');
+  if (!grScene || grScene.empty) { box.innerHTML = '<p class="td-muted">Sin datos.</p>'; return; }
+  const d = grTableData(grScene);
+  box.innerHTML = `<table><thead><tr>${d.head.map((h, i) => `<th class="${i ? 'td-num' : ''}">${escapeHtml(h)}</th>`).join('')}</tr></thead>`
+    + `<tbody>${d.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? 'td-num' : 'td-nombre'}">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+function grSyncUrl() {
+  const url = new URL(location.href);
+  GR_URL_KEYS.forEach(k => url.searchParams.delete(k));
+  grStateToParams(grState).forEach((v, k) => url.searchParams.set(k, v));
+  history.replaceState(null, '', url);
+}
+
+function grUpdate() {
+  grSyncControls();
+  grRenderChips();
+  grScene = grBuildScene(grState, grPlayers, grSlots);
+  grRenderMeta();
+  grDraw();
+  grRenderTable();
+  grSyncUrl();
+}
+
+// ── Exportar / compartir ──
+function grTrackInfo() { return { tipo: grState.tipo, unidad: grState.tipo === 'lineas' ? 'temporada' : grState.u, metrica: grState.tipo === 'lineas' ? grState.m : `${grState.y}~${grState.x}`, n: grState.ids.length }; }
+function grDescargaImagen(bl) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'grafico-espanoles-nba.png';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+async function grDownload() {
+  if (!grScene || grScene.empty) return;
+  track('grafico_descargar', grTrackInfo());
+  try { const c = await grBuildImage(grScene, grScene.legend); grDescargaImagen(await qntBlob(c)); }
+  catch (e) { alert('No se pudo generar la imagen.'); }
+}
+async function grShare() {
+  if (!grScene || grScene.empty) return;
+  grSyncUrl();
+  track('compartir', Object.assign({ metodo: 'twitter', origen: 'graficos' }, grTrackInfo()));
+  const texto = `${grScene.title} 📈 #EspañolesNBA (vía @alejandroggo)`;
+  const url = location.href;
+  const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto + '\n\n' + url)}`;
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await grBuildImage(grScene, grScene.legend); grDescargaImagen(await qntBlob(c)); } catch (e) { }
+    return;
+  }
+  try {
+    const c = await grBuildImage(grScene, grScene.legend); const bl = await qntBlob(c);
+    const file = new File([bl], 'grafico-espanoles-nba.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `${texto}\n\n${url}` }); return; }
+    grDescargaImagen(bl);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
+}
+async function grCopyLink(btn) {
+  grSyncUrl();
+  track('compartir', Object.assign({ metodo: 'enlace', origen: 'graficos' }, grTrackInfo()));
+  let ok = false;
+  try { await navigator.clipboard.writeText(location.href); ok = true; } catch (e) { }
+  if (!ok) { window.prompt('Copia el enlace del gráfico:', location.href); return; }
+  const prev = btn.textContent; btn.textContent = '¡Enlace copiado!';
+  setTimeout(() => { btn.textContent = prev; }, 2000);
 }
