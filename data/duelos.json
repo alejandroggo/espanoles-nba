@@ -539,7 +539,9 @@
   "min": {
    "Pau Gasol": "29.8",
    "Raül Lopez": "17.0"
-  }
+  },
+  "primer": "8 nov 2003",
+  "ultimo": "22 ene 2005"
  },
  {
   "a": "Rudy Fernández",
@@ -553,7 +555,9 @@
   "min": {
    "Rudy Fernández": "24.6",
    "Pau Gasol": "36.1"
-  }
+  },
+  "primer": "28 oct 2008",
+  "ultimo": "3 feb 2012"
  },
  {
   "a": "Rudy Fernández",
@@ -567,7 +571,9 @@
   "min": {
    "Rudy Fernández": "21.0",
    "Marc Gasol": "36.2"
-  }
+  },
+  "primer": "18 feb 2009",
+  "ultimo": "17 feb 2012"
  },
  {
   "a": "José M. Calderón",
@@ -581,7 +587,9 @@
   "min": {
    "José M. Calderón": "32.3",
    "Rudy Fernández": "27.3"
-  }
+  },
+  "primer": "7 dic 2008",
+  "ultimo": "27 ene 2012"
  },
  {
   "a": "Rudy Fernández",
@@ -595,7 +603,9 @@
   "min": {
    "Rudy Fernández": "22.3",
    "Serge Ibaka": "28.0"
-  }
+  },
+  "primer": "9 feb 2010",
+  "ultimo": "15 mar 2012"
  },
  {
   "a": "Nikola Mirotic",
@@ -609,7 +619,9 @@
   "min": {
    "Nikola Mirotic": "25.0",
    "Ricky Rubio": "32.1"
-  }
+  },
+  "primer": "1 nov 2014",
+  "ultimo": "2 mar 2019"
  },
  {
   "a": "José M. Calderón",
@@ -623,7 +635,9 @@
   "min": {
    "José M. Calderón": "27.8",
    "Ricky Rubio": "32.8"
-  }
+  },
+  "primer": "9 ene 2012",
+  "ultimo": "5 ene 2019"
  },
  {
   "a": "Pau Gasol",
@@ -637,7 +651,9 @@
   "min": {
    "Pau Gasol": "28.8",
    "Ricky Rubio": "34.2"
-  }
+  },
+  "primer": "29 ene 2012",
+  "ultimo": "9 feb 2019"
  },
  {
   "a": "Marc Gasol",
@@ -651,7 +667,9 @@
   "min": {
    "Marc Gasol": "33.0",
    "Ricky Rubio": "30.1"
-  }
+  },
+  "primer": "4 ene 2012",
+  "ultimo": "16 feb 2021"
  },
  {
   "a": "Serge Ibaka",
@@ -665,7 +683,9 @@
   "min": {
    "Serge Ibaka": "29.0",
    "Ricky Rubio": "28.8"
-  }
+  },
+  "primer": "26 dic 2011",
+  "ultimo": "10 feb 2021"
  },
  {
   "a": "Pau Gasol",
@@ -679,7 +699,9 @@
   "min": {
    "Pau Gasol": "32.8 RS · 36.8 PO",
    "Serge Ibaka": "32.5 RS · 26.1 PO"
-  }
+  },
+  "primer": "22 nov 2009",
+  "ultimo": "19 ene 2018"
  },
  {
   "a": "Marc Gasol",
@@ -693,7 +715,9 @@
   "min": {
    "Marc Gasol": "34.2 RS · 41.3 PO",
    "Serge Ibaka": "27.2 RS · 33.1 PO"
-  }
+  },
+  "primer": "11 dic 2009",
+  "ultimo": "22 dic 2020"
  },
  {
   "a": "José M. Calderón",
@@ -707,7 +731,9 @@
   "min": {
    "José M. Calderón": "27.0 RS · 8.0 PO",
    "Serge Ibaka": "28.6 RS · 18.0 PO"
-  }
+  },
+  "primer": "28 feb 2010",
+  "ultimo": "7 may 2018"
  },
  {
   "a": "Serge Ibaka",
@@ -721,7 +747,9 @@
   "min": {
    "Serge Ibaka": "33.6 RS · 20.2 PO",
    "Nikola Mirotic": "22.6 RS · 22.2 PO"
-  }
+  },
+  "primer": "5 mar 2015",
+  "ultimo": "23 may 2019"
  },
  {
   "a": "Pau Gasol",
@@ -735,7 +763,9 @@
   "min": {
    "Pau Gasol": "18.4",
    "Nikola Mirotic": "30.6"
-  }
+  },
+  "primer": "8 dic 2016",
+  "ultimo": "3 nov 2018"
  },
  {
   "a": "Jorge Garbajosa",
@@ -749,7 +779,9 @@
   "min": {
    "Jorge Garbajosa": "22.0",
    "Pau Gasol": "32.5"
-  }
+  },
+  "primer": "30 dic 2006",
+  "ultimo": "7 mar 2007"
  },
  {
   "a": "José M. Calderón",
@@ -763,7 +795,9 @@
   "min": {
    "José M. Calderón": "26.1",
    "Pau Gasol": "31.2"
-  }
+  },
+  "primer": "30 nov 2005",
+  "ultimo": "7 ene 2019"
  },
  {
   "a": "José M. Calderón",
@@ -777,7 +811,9 @@
   "min": {
    "José M. Calderón": "26.2",
    "Marc Gasol": "33.5"
-  }
+  },
+  "primer": "7 feb 2009",
+  "ultimo": "2 ene 2019"
  },
  {
   "a": "Marc Gasol",
@@ -791,7 +827,9 @@
   "min": {
    "Marc Gasol": "32.3 RS · 32.8 PO",
    "Nikola Mirotic": "25.9 RS · 22.2 PO"
-  }
+  },
+  "primer": "19 dic 2014",
+  "ultimo": "23 may 2019"
  },
  {
   "a": "José M. Calderón",
@@ -805,6 +843,8 @@
   "min": {
    "José M. Calderón": "24.5 RS · 3.3 PO",
    "Nikola Mirotic": "27.5 RS · 15.7 PO"
-  }
+  },
+  "primer": "18 dic 2014",
+  "ultimo": "22 abr 2019"
  }
 ]
