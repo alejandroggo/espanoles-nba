@@ -239,6 +239,13 @@ test('caras: al final de cada línea y en dispersión por carreras; no por tempo
   assert.ok(!grStateToParams(grNormalize({ tipo: 'dispersion', u: 'temporada', caras: false }, players)).has('caras'), 'no se escribe donde no aplica');
 });
 
+test('PNG: título partido en parte fija + cursiva, sin repetir «por partido»', () => {
+  const tp = G('grTitleParts');
+  assert.equal(JSON.stringify(tp(grBuildScene(base, players))), JSON.stringify(['Puntos por partido,', 'Pau Gasol vs Marc Gasol']));
+  assert.equal(JSON.stringify(tp(grBuildScene(grNormalize({ tipo: 'dispersion' }, players), players))), JSON.stringify(['Puntos por partido,', 'frente a asistencias']));
+  assert.equal(tp(grBuildScene(grNormalize({ t: 'Mi título' }, players), players))[1], '', 'un título propio no se parte');
+});
+
 console.log('Datos · coherencia (avisos, no bloquean)');
 J.forEach(j => {
   const rows = grSeasonRows(j, 'reg');

@@ -7212,7 +7212,7 @@ function grLayout(scene, W, H, s) {
     const span = Math.max(1, hi - lo);
     xFmt = ax.fmt;
     const labW = Math.max(...[lo, hi].map(v => String(xFmt(v)).length)) * cw;
-    const step = grIntStep(span, plot.w, labW);
+    const step = grIntStep(span, plot.w, labW + 8 * s);
     xTicks = [];
     for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) xTicks.push(v);
     if (!xTicks.length) xTicks = [lo];
@@ -7269,7 +7269,7 @@ function grPlaceLabels(pts, plot, s, cw) {
       if (boxes.some(o => hit(b, o))) continue;
       boxes.push(b);
       const tx = c.anchor === 'start' ? b.x : c.anchor === 'end' ? b.x + w : b.x + w / 2;
-      out.push({ x: tx, y: b.y + h / 2, text: txt, anchor: c.anchor, sel: q.p.sel });
+      out.push({ x: tx, y: b.y + h / 2, text: txt, anchor: c.anchor, sel: q.p.sel, p: q.p });
       break;
     }
   });
@@ -7365,128 +7365,260 @@ function grSvg(L, scene) {
   return `<svg id="gr-svg" class="gr-svg" width="${L.W}" height="${L.H}" viewBox="0 0 ${L.W} ${L.H}" role="img" tabindex="0" aria-label="${escapeHtml(aria)}">${g}</svg>`;
 }
 
-// ── Dibujo en canvas (PNG para redes y artículos, 1600×900, estética de la web) ──
-async function grBuildImage(scene, legend) {
-  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
-  const W = 1600, H = 900, PAD = 64;
+// ── Dibujo en canvas (PNG para redes y artículos) ──
+// Plantilla «Españoles NBA · Gráficos» (diseñada en el lienzo de Claude Design): franja
+// de bandera, antetítulo en Bebas Neue, título en DM Serif Display con la parte variable
+// en cursiva de acento, tarjetas de jugador con cara, máximos anotados y pie de marca.
+const GR_PNG_FMT = {
+  h: { W: 1600, H: 900, PAD: 64, flag: 8, top: 38, s: 1.4, title: 64, sub: 22, kick: 26, chip: 52, foot: 74, faceL: 32, faceS: 32, faceC: 18 },
+  v: { W: 1080, H: 1350, PAD: 56, flag: 10, top: 46, s: 1.55, title: 60, sub: 24, kick: 28, chip: 56, foot: 120, faceL: 36, faceS: 34, faceC: 20, twoLines: true },
+};
+const GR_PNG_CO = { bg: '#0e0e10', grid: 'rgba(255,255,255,.07)', axis: 'rgba(255,255,255,.28)', yellow: '#ffc400', red: '#c60b1e', text: '#f4f4f6', muted: '#9a9aa5', dim: '#8a8a94', accent: '#f2545b', sep: '#3a3a44', ctxRing: '#55555f', ctxFill: '#2a2a31', face: '#1c1c22' };
+
+// Título automático → [parte fija, parte en cursiva]: «Métrica · Jugadores» o «Y frente a X»
+function grTitleParts(scene) {
+  const t = scene.title;
+  if (!scene.autoTitle) return [t, ''];
+  let i = t.indexOf(' · ');
+  if (i > 0) return [t.slice(0, i) + ',', t.slice(i + 3)];
+  i = t.indexOf(' frente a ');
+  if (i > 0) {   // «Puntos por partido, frente a asistencias» (sin repetir «por partido»)
+    const a = t.slice(0, i), b = t.slice(i + 1), suf = ' por partido';
+    return [a + ',', a.endsWith(suf) && b.endsWith(suf) ? b.slice(0, -suf.length) : b];
+  }
+  return [t, ''];
+}
+// Línea de datos de cada tarjeta de jugador
+function grLegendStat(scene, l) {
+  const unit = m => m.short.replace('%', '');
+  const val = (a, v) => `${a.fmt(v)}${a.metric.kind === 'pct' ? '' : ' ' + unit(a.metric)}`;
+  if (scene.tipo === 'lineas') {
+    const se = scene.series.find(s => s.id === l.id);
+    if (!se || !se.points.length) return 'Sin datos en este filtro';
+    const m = se.points.reduce((a, b) => (b.y > a.y ? b : a));
+    return `Máx. ${val(scene.y, m.y)} · ${grSeasonLbl(m.year)}`;
+  }
+  const pts = scene.points.filter(p => p.id === l.id);
+  if (!pts.length) return 'Sin datos en este filtro';
+  if (pts[0].year) return `${pts.length} temporada${pts.length === 1 ? '' : 's'}`;
+  const p = pts[0];
+  return `${val(scene.y, p.y)} · ${val(scene.x, p.x)} · ${fmtEnt(p.g)} PJ`;
+}
+function grWrap(x, text, maxW, maxLines) {
+  const lines = [];
+  String(text).split(' ').forEach(w => {
+    const last = lines[lines.length - 1];
+    if (last != null && x.measureText(last + ' ' + w).width <= maxW) lines[lines.length - 1] = last + ' ' + w;
+    else lines.push(w);
+  });
+  if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '…'); }
+  return lines;
+}
+function grMedian(a) { const s = a.slice().sort((p, q) => p - q), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+
+async function grBuildImage(scene, legend, fmt) {
+  const F = GR_PNG_FMT[fmt] || GR_PNG_FMT.h, CO = GR_PNG_CO, { W, H, PAD } = F;
+  try {
+    if (document.fonts) {
+      await Promise.all([`400 ${F.title}px "DM Serif Display"`, `italic 400 ${F.title}px "DM Serif Display"`, `400 ${F.kick}px "Bebas Neue"`, '700 20px Inter', '800 20px Inter']
+        .map(f => document.fonts.load(f).catch(() => null)));
+      await document.fonts.ready;
+    }
+  } catch (e) { }
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const x = c.getContext('2d');
-  const CO = { bg: '#0e0e10', grid: 'rgba(255,255,255,.08)', axis: 'rgba(255,255,255,.22)', yellow: '#ffc400', text: '#e9e9ec', muted: '#9a9aa5', red: '#c60b1e', ctx: 'rgba(233,233,236,.28)' };
-  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
-  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 10); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 10); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 10); };
-  flag(0); flag(H - 10);
-  x.textBaseline = 'alphabetic'; x.textAlign = 'left';
-  x.fillStyle = CO.yellow; x.font = '700 20px Inter, sans-serif';
-  x.save(); x.letterSpacing = '5px'; x.fillText('ESPAÑOLES EN LA NBA', PAD, 58); x.restore();
-  // título (se reduce si no cabe)
-  let tf = 44;
-  x.font = `800 ${tf}px Inter, sans-serif`;
-  while (x.measureText(scene.title).width > W - 2 * PAD && tf > 28) { tf -= 2; x.font = `800 ${tf}px Inter, sans-serif`; }
-  x.fillStyle = CO.text; x.fillText(scene.title, PAD, 112);
-  x.fillStyle = CO.muted; x.font = '500 22px Inter, sans-serif'; x.fillText(scene.subtitle, PAD, 148);
-  // leyenda
-  let ly = 190, lx = PAD;
   const lineas = scene.tipo === 'lineas';
-  const ring = scene.faces && !lineas;
-  const items = (legend || []).map(l => ({ name: l.name, color: GR_PNG_COLORS[l.slot % GR_PNG_COLORS.length], shape: l.shape }));
-  if (scene.tipo === 'dispersion' && scene.ctx) items.push({ name: 'Resto de españoles', color: CO.ctx, shape: 'circle', ctx: true });
-  x.font = '600 21px Inter, sans-serif'; x.textBaseline = 'middle';
-  items.forEach(it => {
-    const w = (lineas ? 34 : 18) + 10 + x.measureText(it.name).width + 30;
-    if (lx + w > W - PAD) { lx = PAD; ly += 34; }
-    x.strokeStyle = it.color; x.fillStyle = it.color; x.lineWidth = 3;
-    if (lineas) { x.beginPath(); x.moveTo(lx, ly); x.lineTo(lx + 34, ly); x.stroke(); }
-    if (ring) { x.beginPath(); x.arc(lx + 8, ly, 7, 0, Math.PI * 2); x.stroke(); }
-    else x.fill(new Path2D(grShapePath(it.shape, lx + (lineas ? 17 : 8), ly, 7)));
-    x.fillStyle = CO.text; x.fillText(it.name, lx + (lineas ? 34 : 18) + 10, ly + 1);
-    lx += w;
-  });
-  if (!items.length) ly -= 34;
-  // notas al pie (hasta dos líneas) → el área del gráfico se ajusta a ellas
-  x.font = '400 17px Inter, sans-serif';
-  const noteLines = [];
-  ['Fuente: Basketball Reference.'].concat(scene.notes).join(' ').split(' ').forEach(w => {
-    const last = noteLines[noteLines.length - 1];
-    if (last != null && x.measureText(last + ' ' + w).width <= W - 2 * PAD) noteLines[noteLines.length - 1] = last + ' ' + w;
-    else noteLines.push(w);
-  });
-  if (noteLines.length > 2) { noteLines.length = 2; noteLines[1] = noteLines[1].replace(/\s*\S*$/, '…'); }
-  // área del gráfico
-  const top = ly + 30, bottom = H - 104 - (noteLines.length - 1) * 22;
-  const L = grLayout(scene, W - 2 * PAD + 10, bottom - top, 1.65);
-  const faceIds = scene.faces ? [...new Set(scene.tipo === 'lineas' ? scene.series.map(se => se.id) : scene.points.map(q => q.id))] : [];
-  const imgs = {};
-  await Promise.all(faceIds.map(async id => { imgs[id] = await qntLoadImg(`img/players/${id}.jpg`); }));
-  x.save(); x.translate(PAD - 10, top);
-  const p = L.plot, s = L.s;
-  x.lineWidth = 1;
-  L.yTicks.forEach(t => {
-    x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(p.x, t.p); x.lineTo(p.x + p.w, t.p); x.stroke();
-    x.fillStyle = CO.muted; x.font = `500 ${L.fs}px Inter, sans-serif`; x.textAlign = 'right'; x.textBaseline = 'middle';
-    x.fillText(t.label, p.x - 10, t.p);
-  });
-  L.xTicks.forEach(t => {
-    if (scene.tipo === 'dispersion') { x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(t.p, p.y); x.lineTo(t.p, p.y + p.h); x.stroke(); }
-    x.fillStyle = CO.muted; x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillText(t.label, t.p, p.y + p.h + 26 * s * 0.8);
-  });
-  x.strokeStyle = CO.axis; x.beginPath(); x.moveTo(p.x, p.y + p.h); x.lineTo(p.x + p.w, p.y + p.h); x.stroke();
-  x.fillStyle = CO.text; x.font = `600 ${L.fs}px Inter, sans-serif`; x.textAlign = 'center';
-  x.fillText(L.xName, p.x + p.w / 2, L.H - 4);
-  x.save(); x.translate(14 * s, p.y + p.h / 2); x.rotate(-Math.PI / 2); x.textBaseline = 'middle'; x.fillText(L.yName, 0, 0); x.restore();
   const col = slot => GR_PNG_COLORS[slot % GR_PNG_COLORS.length];
-  const mark = (shape, px, py, r, color) => {
-    const path = new Path2D(grShapePath(shape, px, py, r));
-    x.lineWidth = 2.5; x.strokeStyle = CO.bg; x.stroke(path); x.fillStyle = color; x.fill(path);
-  };
-  // Cara recortada en círculo (respaldo: iniciales); el resto de españoles, en gris y atenuado
-  const face = (q, ring, ctx) => {
-    const r = q.r, img = imgs[q.p.id];
+  const spaced = (px, fn) => { x.save(); try { x.letterSpacing = px + 'px'; } catch (e) { } fn(); x.restore(); };
+  // Fotos: las de las tarjetas siempre; en dispersión por carreras, también las del resto
+  const ids = new Set((legend || []).map(l => l.id));
+  if (scene.faces && !lineas) scene.points.forEach(p => ids.add(p.id));
+  const imgs = {};
+  await Promise.all([...ids].map(async id => { imgs[id] = await qntLoadImg(`img/players/${id}.jpg`); }));
+
+  // Cara recortada en círculo (respaldo: iniciales); ctx = resto de españoles, en gris y atenuado
+  const face = (id, name, cx, cy, r, ring, ringW, ctx) => {
+    const img = imgs[id];
     x.save();
-    x.beginPath(); x.arc(q.px, q.py, r + 2, 0, Math.PI * 2); x.fillStyle = CO.bg; x.fill();
-    x.save(); x.beginPath(); x.arc(q.px, q.py, r, 0, Math.PI * 2); x.clip();
-    x.fillStyle = qntAvatarColor(q.p.name); x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r);
+    x.beginPath(); x.arc(cx, cy, r + 3, 0, Math.PI * 2); x.fillStyle = CO.bg; x.fill();
+    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip();
+    x.fillStyle = img ? CO.face : qntAvatarColor(name); x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
     if (img) {
       const sc = 2 * r / GR_FACE.s;
-      x.drawImage(img, q.px - r - GR_FACE.x * sc, q.py - r - GR_FACE.y * sc, GR_FACE.w * sc, img.height * sc * (GR_FACE.w / img.width));
-      if (ctx) {   // desaturar con modo de fusión (ctx.filter no existe en Safari)
-        x.globalAlpha = 1; x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080';
-        x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r); x.globalCompositeOperation = 'source-over';
+      x.drawImage(img, cx - r - GR_FACE.x * sc, cy - r - GR_FACE.y * sc, GR_FACE.w * sc, img.height * sc * (GR_FACE.w / img.width));
+      if (ctx) {   // desaturar con modo de fusión (ctx.filter no existe en Safari) y atenuar
+        x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080'; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+        x.globalCompositeOperation = 'source-over'; x.fillStyle = 'rgba(14,14,16,.42)'; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
       }
-    } else { x.fillStyle = '#fff'; x.font = `700 ${Math.round(r * 0.75)}px Inter, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(qntInitials(q.p.name), q.px, q.py); }
-    if (ctx) { x.fillStyle = 'rgba(14,14,16,.5)'; x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r); }   // atenuar
+    } else { x.fillStyle = '#fff'; x.font = `700 ${Math.round(r * 0.75)}px Inter, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(qntInitials(name), cx, cy); }
     x.restore();
-    x.beginPath(); x.arc(q.px, q.py, r, 0, Math.PI * 2); x.strokeStyle = ring; x.lineWidth = ctx ? 2 : 4; x.stroke();
+    x.beginPath(); x.arc(cx, cy, r - ringW / 2, 0, Math.PI * 2); x.strokeStyle = ring; x.lineWidth = ringW; x.stroke();
     x.restore();
   };
+  const mark = (shape, px, py, r, color) => {
+    const path = new Path2D(grShapePath(shape, px, py, r));
+    x.lineWidth = 3; x.strokeStyle = CO.bg; x.stroke(path); x.fillStyle = color; x.fill(path);
+  };
+
+  // Fondo y franja de bandera
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  x.fillStyle = CO.red; x.fillRect(0, 0, W, F.flag);
+  x.fillStyle = CO.yellow; x.fillRect(W * 0.3, 0, W * 0.4, F.flag);
+
+  // Antetítulo
+  let y = F.flag + F.top;
+  x.textBaseline = 'top'; x.textAlign = 'left';
+  x.font = `400 ${F.kick}px "Bebas Neue", Inter, sans-serif`;
+  let kx = PAD;
+  spaced(5, () => { x.fillStyle = CO.yellow; x.fillText('ESPAÑOLES EN LA NBA', kx, y); kx += x.measureText('ESPAÑOLES EN LA NBA').width + 14; });
+  x.fillStyle = CO.sep; x.fillRect(kx, y + F.kick * 0.36, 28, 2); kx += 42;
+  spaced(5, () => { x.fillStyle = CO.dim; x.fillText('GRÁFICOS', kx, y); });
+  y += F.kick + 12;
+
+  // Título: parte fija + parte variable en cursiva de acento (una o dos líneas)
+  const [ta, tb] = grTitleParts(scene), maxW = W - 2 * PAD;
+  const fA = sz => `400 ${sz}px "DM Serif Display", Georgia, serif`, fB = sz => `italic 400 ${sz}px "DM Serif Display", Georgia, serif`;
+  const wA = sz => { x.font = fA(sz); return x.measureText(ta).width; }, wB = sz => { x.font = fB(sz); return x.measureText(tb).width; };
+  let T = F.title, two = !!tb && !!F.twoLines;
+  if (!two && tb && wA(T) + 16 + wB(T) > maxW) two = true;
+  const fits = sz => two ? Math.max(wA(sz), wB(sz)) <= maxW : wA(sz) + (tb ? 16 + wB(sz) : 0) <= maxW;
+  while (!fits(T) && T > 38) T -= 2;
+  x.fillStyle = CO.text; x.font = fA(T);
+  const fitTxt = (t, w) => { if (x.measureText(t).width <= w) return t; while (t.length > 1 && x.measureText(t + '…').width > w) t = t.slice(0, -1); return t + '…'; };
+  x.fillText(fitTxt(ta, maxW), PAD, y);
+  if (tb) {
+    const bx = two ? PAD : PAD + wA(T) + 16, by = two ? y + T * 1.05 : y;
+    x.font = fB(T); x.fillStyle = CO.accent; x.fillText(fitTxt(tb, maxW - (bx - PAD)), bx, by);
+  }
+  y += T * 1.05 * (two ? 2 : 1) + 8;
+  x.fillStyle = CO.muted; x.font = `400 ${F.sub}px Inter, sans-serif`;
+  x.fillText(fitTxt(scene.subtitle, maxW), PAD, y);
+  y += F.sub * 1.2 + 22;
+
+  // Tarjetas de jugador (cara + nombre + dato clave)
+  const cards = (legend || []).map(l => ({ l, stat: grLegendStat(scene, l) }));
+  let cx0 = PAD, rowY = y;
+  const ch = F.chip, nameF = `700 ${Math.round(ch * 0.42)}px Inter, sans-serif`, statF = `400 ${Math.round(ch * 0.31)}px Inter, sans-serif`;
+  const place = w => { if (cx0 > PAD && cx0 + w > W - PAD) { cx0 = PAD; rowY += ch + 16; } const at = cx0; cx0 += w + 44; return at; };
+  cards.forEach(({ l, stat }) => {
+    x.font = nameF; const nw = x.measureText(l.name).width; x.font = statF; const sw = x.measureText(stat).width;
+    const at = place(ch + 14 + Math.max(nw, sw));
+    face(l.id, l.name, at + ch / 2, rowY + ch / 2, ch / 2, col(l.slot), 3, false);
+    x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+    x.fillStyle = CO.text; x.font = nameF; x.fillText(l.name, at + ch + 14, rowY + ch * 0.46);
+    x.fillStyle = CO.muted; x.font = statF; x.fillText(stat, at + ch + 14, rowY + ch * 0.86);
+  });
+  if (!lineas && scene.ctx) {
+    x.font = `600 ${Math.round(ch * 0.35)}px Inter, sans-serif`;
+    const txt = 'Resto de españoles', at = place(22 + 12 + x.measureText(txt).width);
+    x.beginPath(); x.arc(at + 11, rowY + ch / 2, 10, 0, Math.PI * 2); x.fillStyle = CO.ctxFill; x.fill(); x.lineWidth = 2; x.strokeStyle = CO.ctxRing; x.stroke();
+    x.fillStyle = CO.muted; x.textBaseline = 'middle'; x.fillText(txt, at + 34, rowY + ch / 2);
+  }
+  y = rowY + (cards.length || scene.ctx ? ch : 0);
+
+  // Área del gráfico
+  const top = y + 58, bottom = H - F.foot - 8;
+  const L = grLayout(scene, W - 2 * PAD + 20, bottom - top, F.s);
+  const p = L.plot, s = L.s, fs = L.fs;
+  if (L.series) L.series.forEach(se => se.pts.forEach(q => { if (q.face) q.r = F.faceL; }));
+  if (L.pts && scene.faces) {
+    L.pts.forEach(q => { q.r = q.p.sel ? F.faceS : F.faceC; });
+    if (scene.labels) L.labels = grPlaceLabels(L.pts, p, s, 6.7 * s);
+  }
+  x.save(); x.translate(PAD - 20, top);
+  x.textBaseline = 'alphabetic';
+  // nombre del eje Y, en horizontal sobre el gráfico
+  x.font = `600 ${Math.round(fs * 0.9)}px Inter, sans-serif`; x.fillStyle = CO.dim; x.textAlign = 'left';
+  spaced(2, () => x.fillText(L.yName.replace(/ \(.*\)$/, '').toUpperCase(), p.x, p.y - 18));
+  x.lineWidth = 1;
+  L.yTicks.forEach(t => {
+    if (t.p < p.y + p.h - 0.5) { x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(p.x, t.p); x.lineTo(p.x + p.w, t.p); x.stroke(); }
+    x.fillStyle = CO.dim; x.font = `400 ${fs}px Inter, sans-serif`; x.textAlign = 'right'; x.textBaseline = 'middle';
+    x.fillText(t.label, p.x - 14, t.p);
+  });
+  x.textBaseline = 'alphabetic';
+  L.xTicks.forEach(t => {
+    if (!lineas && t.p > p.x + 0.5) { x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(t.p, p.y); x.lineTo(t.p, p.y + p.h); x.stroke(); }
+    x.fillStyle = CO.dim; x.font = `400 ${fs}px Inter, sans-serif`; x.textAlign = 'center'; x.fillText(t.label, t.p, p.y + p.h + fs * 2);
+  });
+  x.strokeStyle = CO.axis; x.lineWidth = 1.5; x.beginPath(); x.moveTo(p.x, p.y + p.h); x.lineTo(p.x + p.w, p.y + p.h); x.stroke();
+  if (scene.x.metric.key !== 'temp') {
+    x.font = `600 ${Math.round(fs * 0.82)}px Inter, sans-serif`; x.fillStyle = CO.dim; x.textAlign = 'right';
+    spaced(2, () => x.fillText(L.xName.replace(/ \(.*\)$/, '').toUpperCase(), p.x + p.w, L.H - 2));
+  }
+
+  let median = null;
   if (lineas) {
     L.series.forEach(se => {
-      x.strokeStyle = col(se.se.slot); x.lineWidth = 3.2; x.lineJoin = 'round'; x.lineCap = 'round';
+      x.strokeStyle = col(se.se.slot); x.lineWidth = 2.9 * s; x.lineJoin = 'round'; x.lineCap = 'round';
       se.segs.forEach(seg => { if (seg.length < 2) return; x.beginPath(); seg.forEach((q, i) => i ? x.lineTo(q.px, q.py) : x.moveTo(q.px, q.py)); x.stroke(); });
-      se.pts.forEach(q => { if (!q.face) mark(se.se.shape, q.px, q.py, 6, col(se.se.slot)); });
+      se.pts.forEach(q => { if (!q.face) mark(se.se.shape, q.px, q.py, 4.6 * s, col(se.se.slot)); });
     });
-    L.series.forEach(se => se.pts.forEach(q => { if (q.face) face(q, col(se.se.slot)); }));
+    // Máximo de cada jugador anotado (si no coincide con la cara final); con más de 3 líneas se saturaría
+    if (L.series.length <= 3) L.series.forEach(se => {
+      if (!se.pts.length) return;
+      const m = se.pts.reduce((a, b) => (b.p.y > a.p.y ? b : a));
+      if (m.face) return;
+      x.beginPath(); x.arc(m.px, m.py, 13, 0, Math.PI * 2); x.strokeStyle = CO.text; x.lineWidth = 1.5; x.stroke();
+      const v = scene.y.fmt(m.p.y), sub = ' MÁX.';
+      x.font = `800 ${Math.round(fs * 1.18)}px Inter, sans-serif`; const vw = x.measureText(v).width;
+      x.font = `600 ${Math.round(fs * 0.82)}px Inter, sans-serif`; const sw = x.measureText(sub).width;
+      const lx = Math.min(Math.max(m.px - (vw + sw) / 2, p.x), p.x + p.w - vw - sw), ly = m.py - 24;
+      x.textAlign = 'left'; x.fillStyle = CO.text; x.font = `800 ${Math.round(fs * 1.18)}px Inter, sans-serif`; x.fillText(v, lx, ly);
+      x.fillStyle = CO.muted; x.font = `600 ${Math.round(fs * 0.82)}px Inter, sans-serif`; x.fillText(sub, lx + vw, ly);
+    });
+    L.series.forEach(se => se.pts.forEach(q => { if (q.face) face(q.p.id, q.p.name, q.px, q.py, q.r, col(se.se.slot), 4, false); }));
   } else {
+    // Medianas de los puntos dibujados como referencia
+    if (scene.points.length >= 5) {
+      median = { x: grMedian(scene.points.map(q => q.x)), y: grMedian(scene.points.map(q => q.y)) };
+      const mx = L.sx(median.x), my = L.sy(median.y);
+      x.save(); x.setLineDash([6, 6]); x.strokeStyle = CO.ctxRing; x.lineWidth = 1.5;
+      x.beginPath(); x.moveTo(mx, p.y); x.lineTo(mx, p.y + p.h); x.moveTo(p.x, my); x.lineTo(p.x + p.w, my); x.stroke(); x.restore();
+      const unit = m => m.kind === 'pct' ? '' : m.kind === 'age' ? ' años' : ' ' + m.short.replace('%', '');
+      x.font = `600 ${Math.round(fs * 0.82)}px Inter, sans-serif`; x.fillStyle = CO.dim;
+      x.textAlign = 'left'; x.fillText(`Mediana: ${scene.x.fmt(median.x)}${unit(scene.x.metric)}`, mx + 10, p.y + 18);
+      x.textAlign = 'right'; x.fillText(`Mediana: ${scene.y.fmt(median.y)}${unit(scene.y.metric)}`, p.x + p.w - 8, my - 9);
+    }
     L.pts.forEach(q => {
-      if (q.face) face(q, q.p.sel ? col(q.p.slot) : 'rgba(233,233,236,.45)', !q.p.sel);
-      else if (q.p.sel) mark(q.p.shape, q.px, q.py, 8, col(q.p.slot));
-      else { x.fillStyle = CO.ctx; x.beginPath(); x.arc(q.px, q.py, 5.5, 0, Math.PI * 2); x.fill(); }
+      if (q.face) face(q.p.id, q.p.name, q.px, q.py, q.r, q.p.sel ? col(q.p.slot) : CO.ctxRing, q.p.sel ? 4 : 2, !q.p.sel);
+      else if (q.p.sel) mark(q.p.shape, q.px, q.py, 5.6 * s, col(q.p.slot));
+      else { x.fillStyle = 'rgba(233,233,236,.28)'; x.beginPath(); x.arc(q.px, q.py, 3.9 * s, 0, Math.PI * 2); x.fill(); }
     });
     x.textBaseline = 'middle';
     (L.labels || []).forEach(l => {
-      x.font = `${l.sel ? 700 : 500} ${Math.round(11.5 * s)}px Inter, sans-serif`;
-      x.fillStyle = l.sel ? CO.text : CO.muted; x.textAlign = l.anchor === 'middle' ? 'center' : l.anchor === 'end' ? 'right' : 'left';
-      x.fillText(l.text, l.x, l.y);
+      x.textAlign = l.anchor === 'middle' ? 'center' : l.anchor === 'end' ? 'right' : 'left';
+      if (l.sel) {
+        const pt = l.p;
+        x.font = `800 ${Math.round(fs * 1.18)}px Inter, sans-serif`; x.fillStyle = CO.text; x.fillText(l.text, l.x, l.y - 6);
+        if (pt) { x.font = `500 ${Math.round(fs * 0.88)}px Inter, sans-serif`; x.fillStyle = CO.muted; x.fillText(`${scene.y.fmt(pt.y)} · ${scene.x.fmt(pt.x)}`, l.x, l.y + fs * 0.95); }
+      } else { x.font = `500 ${Math.round(fs * 0.88)}px Inter, sans-serif`; x.fillStyle = CO.muted; x.fillText(l.text, l.x, l.y); }
     });
   }
   x.restore();
-  // notas + pie
-  x.textAlign = 'left'; x.textBaseline = 'alphabetic';
-  x.fillStyle = CO.muted; x.font = '400 17px Inter, sans-serif';
-  noteLines.forEach((l, i) => x.fillText(l, PAD, H - 66 - (noteLines.length - 1 - i) * 22));
-  x.fillStyle = CO.text; x.font = '700 22px Inter, sans-serif';
-  x.fillText('espanoles-nba.alejandroggo.com', PAD, H - 30);
-  x.fillStyle = CO.yellow; x.textAlign = 'right';
-  x.fillText('@alejandroggo · #EspañolesNBA', W - PAD, H - 30);
+
+  // Pie: fuente y notas a la izquierda (o arriba en vertical), marca a la derecha
+  const fy = H - F.foot;
+  x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(PAD, fy, W - 2 * PAD, 1);
+  const notes = ['Fuente: Basketball Reference.'].concat(scene.notes)
+    .concat(median ? [`Líneas discontinuas: mediana de los ${scene.points.length} ${scene.points[0].year ? 'puntos' : 'jugadores'}.`] : []).join(' ');
+  const brandF = `700 ${F.foot > 100 ? 22 : 19}px Inter, sans-serif`;
+  x.font = brandF; const siteW = x.measureText('espanoles-nba.alejandroggo.com').width, handW = x.measureText('@alejandroggo').width;
+  x.textBaseline = 'middle';
+  if (F.foot > 100) {
+    x.font = '400 16px Inter, sans-serif'; x.fillStyle = CO.dim; x.textAlign = 'left';
+    grWrap(x, notes, W - 2 * PAD, 2).forEach((ln, i) => x.fillText(ln, PAD, fy + 30 + i * 21));
+    x.font = brandF; x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', PAD, H - 34);
+    x.fillStyle = CO.yellow; x.textAlign = 'right'; x.fillText('@alejandroggo', W - PAD, H - 34);
+  } else {
+    const nw = W - 2 * PAD - siteW - handW - 18 - 32;
+    x.font = '400 15px Inter, sans-serif'; x.fillStyle = CO.dim; x.textAlign = 'left';
+    const ls = grWrap(x, notes, nw, 2);
+    ls.forEach((ln, i) => x.fillText(ln, PAD, fy + F.foot / 2 + (i - (ls.length - 1) / 2) * 19));
+    x.font = brandF; x.textAlign = 'right';
+    x.fillStyle = CO.yellow; x.fillText('@alejandroggo', W - PAD, fy + F.foot / 2);
+    x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', W - PAD - handW - 18, fy + F.foot / 2);
+  }
   return c;
 }
 
@@ -7791,6 +7923,7 @@ function grUpdate() {
 
 // ── Exportar / compartir ──
 function grTrackInfo() { return { tipo: grState.tipo, unidad: grState.tipo === 'lineas' ? 'temporada' : grState.u, metrica: grState.tipo === 'lineas' ? grState.m : `${grState.y}~${grState.x}`, n: grState.ids.length }; }
+function grPngFmt() { const el = document.getElementById('gr-fmt'); return el && el.value === 'v' ? 'v' : 'h'; }
 function grDescargaImagen(bl) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'grafico-espanoles-nba.png';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
@@ -7798,7 +7931,7 @@ function grDescargaImagen(bl) {
 async function grDownload() {
   if (!grScene || grScene.empty) return;
   track('grafico_descargar', grTrackInfo());
-  try { const c = await grBuildImage(grScene, grScene.legend); grDescargaImagen(await qntBlob(c)); }
+  try { const c = await grBuildImage(grScene, grScene.legend, grPngFmt()); grDescargaImagen(await qntBlob(c)); }
   catch (e) { alert('No se pudo generar la imagen.'); }
 }
 async function grShare() {
@@ -7811,11 +7944,11 @@ async function grShare() {
   const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   if (!isTouch) {
     window.open(xIntent, '_blank', 'noopener,noreferrer');
-    try { const c = await grBuildImage(grScene, grScene.legend); grDescargaImagen(await qntBlob(c)); } catch (e) { }
+    try { const c = await grBuildImage(grScene, grScene.legend, grPngFmt()); grDescargaImagen(await qntBlob(c)); } catch (e) { }
     return;
   }
   try {
-    const c = await grBuildImage(grScene, grScene.legend); const bl = await qntBlob(c);
+    const c = await grBuildImage(grScene, grScene.legend, grPngFmt()); const bl = await qntBlob(c);
     const file = new File([bl], 'grafico-espanoles-nba.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `${texto}\n\n${url}` }); return; }
     grDescargaImagen(bl);

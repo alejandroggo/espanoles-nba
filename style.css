@@ -2068,3 +2068,4 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .gr-face-hl { fill: none; stroke: var(--text); stroke-width: 2; pointer-events: none; }
 .gr-sw .gr-ring { fill: none; stroke: var(--c); stroke-width: 2.5; }
 .gr-sw.gr-ctx .gr-ring { stroke: var(--gr-ctx); }
+.gr-fmt .sel { min-height: 36px; min-width: 0; width: auto; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; }
