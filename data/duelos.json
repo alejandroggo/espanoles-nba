@@ -8,7 +8,15 @@
    "Pau Gasol": "12.4/9.9/3.0 RS · 6.5/5.7/1.2 PO",
    "Marc Gasol": "13.0/8.8/4.3 RS · 19.3/6.5/4.2 PO"
   },
-  "nota": "Pau ganaba los partidos; Marc el mano a mano (anotación 15-14 en RS, 6-0 en PO). Solo se vieron en playoffs en 2017. Mejor: Marc 32 (G1 2017), Pau 24 (2009)."
+  "nota": "Pau ganaba los partidos; Marc el mano a mano (anotación 15-14 en RS, 6-0 en PO). Solo se vieron en playoffs en 2017. Mejor: Marc 32 (G1 2017), Pau 24 (2009).",
+  "playoffs": [
+   {
+    "temporada": "2017",
+    "ronda": "1ª ronda Oeste",
+    "serie": "San Antonio 4-2 Memphis",
+    "gana": "Pau Gasol"
+   }
+  ]
  },
  {
   "a": "Sergio Rodríguez",
@@ -305,7 +313,15 @@
    "Ricky Rubio": "9.7/4.0/7.6 RS · 14.0/7.3/7.0 PO",
    "Alex Abrines": "4.1/1.8/0.2 RS · 4.0/2.7/0.3 PO"
   },
-  "nota": "OKC dominó a Ricky en RS; Ricky se vengó en PO 2018 (Utah 4-2) con triple-doble 26-11-10."
+  "nota": "OKC dominó a Ricky en RS; Ricky se vengó en PO 2018 (Utah 4-2) con triple-doble 26-11-10.",
+  "playoffs": [
+   {
+    "temporada": "2018",
+    "ronda": "1ª ronda Oeste",
+    "serie": "Utah 4-2 Oklahoma City",
+    "gana": "Ricky Rubio"
+   }
+  ]
  },
  {
   "a": "Alex Abrines",
@@ -701,7 +717,21 @@
    "Serge Ibaka": "32.5 RS · 26.1 PO"
   },
   "primer": "22 nov 2009",
-  "ultimo": "19 ene 2018"
+  "ultimo": "19 ene 2018",
+  "playoffs": [
+   {
+    "temporada": "2010",
+    "ronda": "1ª ronda Oeste",
+    "serie": "L.A. Lakers 4-2 Oklahoma City",
+    "gana": "Pau Gasol"
+   },
+   {
+    "temporada": "2012",
+    "ronda": "Semifinales Oeste",
+    "serie": "Oklahoma City 4-1 L.A. Lakers",
+    "gana": "Serge Ibaka"
+   }
+  ]
  },
  {
   "a": "Marc Gasol",
@@ -717,7 +747,27 @@
    "Serge Ibaka": "27.2 RS · 33.1 PO"
   },
   "primer": "11 dic 2009",
-  "ultimo": "22 dic 2020"
+  "ultimo": "22 dic 2020",
+  "playoffs": [
+   {
+    "temporada": "2011",
+    "ronda": "Semifinales Oeste",
+    "serie": "Oklahoma City 4-3 Memphis",
+    "gana": "Serge Ibaka"
+   },
+   {
+    "temporada": "2013",
+    "ronda": "Semifinales Oeste",
+    "serie": "Memphis 4-1 Oklahoma City",
+    "gana": "Marc Gasol"
+   },
+   {
+    "temporada": "2014",
+    "ronda": "1ª ronda Oeste",
+    "serie": "Oklahoma City 4-3 Memphis",
+    "gana": "Serge Ibaka"
+   }
+  ]
  },
  {
   "a": "José M. Calderón",
@@ -733,7 +783,15 @@
    "Serge Ibaka": "28.6 RS · 18.0 PO"
   },
   "primer": "28 feb 2010",
-  "ultimo": "7 may 2018"
+  "ultimo": "7 may 2018",
+  "playoffs": [
+   {
+    "temporada": "2018",
+    "ronda": "Semifinales Este",
+    "serie": "Cleveland 4-0 Toronto",
+    "gana": "José M. Calderón"
+   }
+  ]
  },
  {
   "a": "Serge Ibaka",
@@ -749,7 +807,15 @@
    "Nikola Mirotic": "22.6 RS · 22.2 PO"
   },
   "primer": "5 mar 2015",
-  "ultimo": "23 may 2019"
+  "ultimo": "23 may 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "Finales Este",
+    "serie": "Toronto 4-2 Milwaukee",
+    "gana": "Serge Ibaka"
+   }
+  ]
  },
  {
   "a": "Pau Gasol",
@@ -829,13 +895,21 @@
    "Nikola Mirotic": "25.9 RS · 22.2 PO"
   },
   "primer": "19 dic 2014",
-  "ultimo": "23 may 2019"
+  "ultimo": "23 may 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "Finales Este",
+    "serie": "Toronto 4-2 Milwaukee",
+    "gana": "Marc Gasol"
+   }
+  ]
  },
  {
   "a": "José M. Calderón",
   "b": "Nikola Mirotic",
   "g": 14,
-  "rec": "Calderón 10-4 (RS 7-4 · PO 3-0)",
+  "rec": "Igualado 7-7 (RS 7-4 Calderón · PO 3-0 Mirotić)",
   "av": {
    "José M. Calderón": "7.8/2.6/4.4 RS · 0.0/0.0/1.7 PO",
    "Nikola Mirotic": "13.4/5.6/2.2 RS · 6.0/2.0/1.0 PO"
@@ -845,6 +919,14 @@
    "Nikola Mirotic": "27.5 RS · 15.7 PO"
   },
   "primer": "18 dic 2014",
-  "ultimo": "22 abr 2019"
+  "ultimo": "22 abr 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "1ª ronda Este",
+    "serie": "Milwaukee 4-0 Detroit",
+    "gana": "Nikola Mirotic"
+   }
+  ]
  }
 ]
