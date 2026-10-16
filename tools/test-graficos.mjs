@@ -226,6 +226,19 @@ test('tabla de datos: una fila por temporada y una columna por jugador', () => {
   assert.equal(d.rows.length, new Set([...grSeasonRows(P('pau-gasol'), 'reg'), ...grSeasonRows(P('marc-gasol'), 'reg')].map(r => r.year)).size);
 });
 
+test('caras: al final de cada línea y en dispersión por carreras; no por temporadas', () => {
+  const lin = grBuildScene(base, players), L = grLayout(lin, 1000, 500, 1);
+  assert.ok(lin.faces);
+  L.series.forEach(se => { const f = se.pts.filter(q => q.face); assert.equal(f.length, 1); assert.equal(f[0], se.pts[se.pts.length - 1]); });
+  const car = grBuildScene(grNormalize({ tipo: 'dispersion', u: 'carrera' }, players), players);
+  assert.ok(car.faces); assert.ok(grLayout(car, 1000, 500, 1).pts.every(q => q.face && q.r > 0));
+  assert.ok(!grBuildScene(grNormalize({ tipo: 'dispersion', u: 'temporada' }, players), players).faces);
+  const off = grNormalize({ caras: false }, players);
+  assert.ok(!grBuildScene(off, players).faces);
+  assert.equal(grParseState(grStateToParams(off), players).caras, false);
+  assert.ok(!grStateToParams(grNormalize({ tipo: 'dispersion', u: 'temporada', caras: false }, players)).has('caras'), 'no se escribe donde no aplica');
+});
+
 console.log('Datos · coherencia (avisos, no bloquean)');
 J.forEach(j => {
   const rows = grSeasonRows(j, 'reg');

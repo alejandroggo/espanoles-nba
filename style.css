@@ -2058,3 +2058,13 @@ circle.gr-ctx { fill: var(--gr-ctx); }
   .gr-title { font-size: 1.4rem; }
   .gr-tick, .gr-axname { font-size: 11px; }
 }
+/* Caras de los jugadores como marcas */
+.gr-face-gap { fill: none; stroke: var(--surface); stroke-width: 3; }
+.gr-face-ring { fill: none; stroke: var(--c); stroke-width: 2.5; }
+.gr-face-ini { fill: #fff; font-weight: 700; }
+.gr-face.ctx { opacity: 0.55; }
+.gr-face.ctx image { filter: grayscale(1); }
+.gr-face.ctx .gr-face-ring { stroke: var(--border-strong); stroke-width: 1.5; }
+.gr-face-hl { fill: none; stroke: var(--text); stroke-width: 2; pointer-events: none; }
+.gr-sw .gr-ring { fill: none; stroke: var(--c); stroke-width: 2.5; }
+.gr-sw.gr-ctx .gr-ring { stroke: var(--gr-ctx); }

@@ -6940,6 +6940,11 @@ function grYears(players, comp) {
 
 // ── Estado (configuración del gráfico) y URL ──
 const GR_TIPOS = ['lineas', 'dispersion'];
+// Caras de los jugadores como marcas: en líneas, al final de cada línea; en dispersión,
+// solo cuando cada punto es una carrera (por temporadas se repetiría la misma cara decenas de veces)
+function grUsesFaces(st) { return !!st.caras && (st.tipo === 'lineas' || st.u === 'carrera'); }
+// Recorte de las fotos locales (img/players/<id>.jpg, 420×560): cuadrado centrado en la cara
+const GR_FACE = { x: 45, y: 55, s: 330, w: 420, h: 560 };
 const GR_EJES_X = ['temp', 'n', 'edad'];
 function grDefaults() {
   return {
@@ -6947,7 +6952,7 @@ function grDefaults() {
     m: 'pts_g', ex: 'temp',                    // líneas
     u: 'carrera', x: 'ast_g', y: 'pts_g',      // dispersión
     desde: null, hasta: null, ming: null,      // ming null = valor por defecto del contexto
-    ctx: true, nom: true, ley: true, muestra: true, t: '',
+    ctx: true, nom: true, ley: true, muestra: true, caras: true, t: '',
   };
 }
 // Opciones de mínimo de partidos según unidad (temporada/carrera) y competición
@@ -6981,7 +6986,7 @@ function grNormalize(raw, players) {
   if (s.desde && s.hasta && s.desde > s.hasta) { const t = s.desde; s.desde = s.hasta; s.hasta = t; }
   const mg = s.ming == null || s.ming === '' ? null : Number(s.ming);
   s.ming = grMinOptions(s).includes(mg) ? mg : null;
-  ['ctx', 'nom', 'ley', 'muestra'].forEach(k => { s[k] = s[k] !== false; });
+  ['ctx', 'nom', 'ley', 'muestra', 'caras'].forEach(k => { s[k] = s[k] !== false; });
   s.t = String(s.t || '').replace(/\s+/g, ' ').trim().slice(0, 90);
   return s;
 }
@@ -6994,12 +6999,12 @@ function grParseState(params, players) {
     ids: params.has('j') ? String(g('j') || '').split(',').map(x => x.trim()).filter(Boolean) : grDefaults().ids,
     m: g('m'), ex: g('ex'), u: g('u'), x: g('x'), y: g('y'),
     desde: g('desde'), hasta: g('hasta'), ming: g('min'),
-    ctx: flag('ctx'), nom: flag('nom'), ley: flag('ley'), muestra: flag('muestra'), t: g('t'),
+    ctx: flag('ctx'), nom: flag('nom'), ley: flag('ley'), muestra: flag('muestra'), caras: flag('caras'), t: g('t'),
   }, players);
 }
 
 // Solo escribe en la URL lo que difiere del defecto (más jugadores y tipo siempre)
-const GR_URL_KEYS = ['tipo', 'j', 'comp', 'm', 'ex', 'u', 'x', 'y', 'desde', 'hasta', 'min', 'ctx', 'nom', 'ley', 'muestra', 't'];
+const GR_URL_KEYS = ['tipo', 'j', 'comp', 'm', 'ex', 'u', 'x', 'y', 'desde', 'hasta', 'min', 'ctx', 'nom', 'ley', 'muestra', 'caras', 't'];
 function grStateToParams(s) {
   const d = grDefaults(), p = new URLSearchParams();
   p.set('tipo', s.tipo);
@@ -7018,6 +7023,7 @@ function grStateToParams(s) {
   if (s.ming != null) p.set('min', s.ming);
   if (!s.ley) p.set('ley', '0');
   if (!s.muestra) p.set('muestra', '0');
+  if (!s.caras && grUsesFaces(Object.assign({}, s, { caras: true }))) p.set('caras', '0');
   if (s.t) p.set('t', s.t);
   return p;
 }
@@ -7055,6 +7061,7 @@ function grBuildScene(st, players, slots) {
 
   if (st.tipo === 'lineas') {
     const m = grMetric(st.m);
+    scene.faces = grUsesFaces(st);
     const xName = st.ex === 'edad' ? 'Edad (a 1 de febrero de cada temporada)' : st.ex === 'n' ? 'Nº de temporada en la NBA' : 'Temporada';
     sel.forEach((j, i) => {
       const rows = grSeasonRows(j, st.comp);
@@ -7124,6 +7131,7 @@ function grBuildScene(st, players, slots) {
     scene.points = ctxPts.concat(selPts);   // los destacados se dibujan encima
     scene.ctx = st.ctx && ctxPts.length > 0;
     scene.labels = st.u === 'carrera' && st.nom;
+    scene.faces = grUsesFaces(st);
     const ax = (m, vals) => ({ kind: 'num', metric: m, name: m.name, fmt: v => grFmt(m, v), vals, zero: m.kind !== 'pct' && m.kind !== 'age' });
     scene.x = ax(mx, scene.points.map(p => p.x));
     scene.y = ax(my, scene.points.map(p => p.y));
@@ -7193,7 +7201,8 @@ function grLayout(scene, W, H, s) {
   const yStep = yTicks.length > 1 ? yTicks[1] - yTicks[0] : 1;
   const yFmt = grTickFmt(ay, yStep);
   const yLabW = Math.max(...yTicks.map(v => yFmt(v).length)) * cw;
-  const m = { t: 12 * s, r: 18 * s, b: (18 + 22 + 14) * s, l: 22 * s + yLabW + 10 * s };
+  const fp = scene.faces ? 14 * s : 0;   // hueco para que las caras de los bordes no se corten
+  const m = { t: 12 * s + fp, r: 18 * s + fp, b: (18 + 22 + 14) * s, l: 22 * s + yLabW + 10 * s };
   const plot = { x: m.l, y: m.t, w: Math.max(40, W - m.l - m.r), h: Math.max(40, H - m.t - m.b) };
   const yd = [yTicks[0], yTicks[yTicks.length - 1]];
   // Eje X
@@ -7229,9 +7238,10 @@ function grLayout(scene, W, H, s) {
       se, segs: se.segs.map(seg => seg.map(p => ({ px: sx(p.x), py: sy(p.y), p }))),
       pts: se.points.map(p => ({ px: sx(p.x), py: sy(p.y), p })),
     }));
+    if (scene.faces) L.series.forEach(se => { const q = se.pts[se.pts.length - 1]; if (q) { q.face = true; q.r = 14 * s; } });
     L.xs = [...new Set(scene.series.flatMap(se => se.points.map(p => p.x)))].sort((a, b) => a - b);
   } else {
-    L.pts = scene.points.map(p => ({ px: sx(p.x), py: sy(p.y), p }));
+    L.pts = scene.points.map(p => ({ px: sx(p.x), py: sy(p.y), p, face: !!scene.faces, r: scene.faces ? (p.sel ? 15 : 11) * s : null }));
     L.labels = scene.labels ? grPlaceLabels(L.pts, plot, s, cw) : [];
   }
   return L;
@@ -7239,13 +7249,14 @@ function grLayout(scene, W, H, s) {
 
 // Etiquetas de nombre sin solapes (greedy): destacados primero, cuatro posiciones candidatas
 function grPlaceLabels(pts, plot, s, cw) {
-  const boxes = pts.map(q => ({ x: q.px - 5 * s, y: q.py - 5 * s, w: 10 * s, h: 10 * s }));
+  const rad = q => q.r || 5 * s;
+  const boxes = pts.map(q => ({ x: q.px - rad(q), y: q.py - rad(q), w: 2 * rad(q), h: 2 * rad(q) }));
   const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   const out = [];
   const order = pts.slice().sort((a, b) => (b.p.sel ? 1 : 0) - (a.p.sel ? 1 : 0));
   order.forEach(q => {
     const txt = q.p.label || '';
-    const w = txt.length * cw * 0.95, h = 13 * s, gap = 7 * s;
+    const w = txt.length * cw * 0.95, h = 13 * s, gap = q.r ? q.r + 4 * s : 7 * s;
     const cands = [
       { x: q.px + gap, y: q.py - h / 2, anchor: 'start' },
       { x: q.px - gap - w, y: q.py - h / 2, anchor: 'end' },
@@ -7298,11 +7309,22 @@ function grTableData(scene) {
 }
 
 // ── Dibujo en SVG (pantalla) ──
-function grSwatch(slot, shape, lineas, ctx) {
+function grSwatch(slot, shape, lineas, ctx, face) {
   const cls = ctx ? 'gr-ctx' : `gr-s${slot + 1}`;
+  if (face && !lineas) return `<svg class="gr-sw ${cls}" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle class="gr-ring" cx="7" cy="7" r="5"/></svg>`;
   return `<svg class="gr-sw ${cls}" width="${lineas ? 22 : 14}" height="14" viewBox="0 0 ${lineas ? 22 : 14} 14" aria-hidden="true">`
     + (lineas ? '<path class="gr-line" d="M1 7H21"/>' : '')
     + `<path class="gr-mk" d="${grShapePath(shape, lineas ? 11 : 7, 7, 4)}"/></svg>`;
+}
+
+function grFaceSvg(q, k, ringCls) {
+  const c = GR_FACE, r = q.r, sc = 2 * r / c.s, f = n => (+n).toFixed(1), cx = f(q.px), cy = f(q.py);
+  return `<g class="gr-face ${ringCls}"><clipPath id="grf${k}"><circle cx="${cx}" cy="${cy}" r="${f(r)}"/></clipPath>`
+    + `<circle class="gr-face-gap" cx="${cx}" cy="${cy}" r="${f(r + 1.5)}"/>`
+    + `<circle cx="${cx}" cy="${cy}" r="${f(r)}" fill="${avatarColor(q.p.name)}"/>`
+    + `<text class="gr-face-ini" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-size="${f(r * 0.75)}">${escapeHtml(iniciales(q.p.name))}</text>`
+    + `<image href="img/players/${encodeURIComponent(q.p.id)}.jpg" x="${f(q.px - r - c.x * sc)}" y="${f(q.py - r - c.y * sc)}" width="${f(c.w * sc)}" height="${f(c.h * sc)}" clip-path="url(#grf${k})" preserveAspectRatio="xMidYMin slice"/>`
+    + `<circle class="gr-face-ring" cx="${cx}" cy="${cy}" r="${f(r)}"/></g>`;
 }
 
 function grSvg(L, scene) {
@@ -7325,10 +7347,12 @@ function grSvg(L, scene) {
     L.series.forEach(se => {
       const c = `gr-s${se.se.slot + 1}`;
       se.segs.forEach(seg => { if (seg.length > 1) g += `<path class="gr-line ${c}" d="${seg.map((q, i) => (i ? 'L' : 'M') + f(q.px) + ' ' + f(q.py)).join('')}"/>`; });
-      se.pts.forEach(q => { g += `<path class="gr-mk ${c}" d="${grShapePath(se.se.shape, q.px, q.py, 4)}"/>`; });
+      se.pts.forEach(q => { if (!q.face) g += `<path class="gr-mk ${c}" d="${grShapePath(se.se.shape, q.px, q.py, 4)}"/>`; });
     });
+    L.series.forEach((se, k) => se.pts.forEach(q => { if (q.face) g += grFaceSvg(q, k, `gr-s${se.se.slot + 1}`); }));
   } else {
-    L.pts.forEach(q => {
+    L.pts.forEach((q, k) => {
+      if (q.face) { g += grFaceSvg(q, k, q.p.sel ? `gr-s${q.p.slot + 1}` : 'ctx'); return; }
       g += q.p.sel ? `<path class="gr-mk gr-s${q.p.slot + 1}" d="${grShapePath(q.p.shape, q.px, q.py, 5)}"/>`
         : `<circle class="gr-ctx" cx="${f(q.px)}" cy="${f(q.py)}" r="3.5"/>`;
     });
@@ -7363,6 +7387,7 @@ async function grBuildImage(scene, legend) {
   // leyenda
   let ly = 190, lx = PAD;
   const lineas = scene.tipo === 'lineas';
+  const ring = scene.faces && !lineas;
   const items = (legend || []).map(l => ({ name: l.name, color: GR_PNG_COLORS[l.slot % GR_PNG_COLORS.length], shape: l.shape }));
   if (scene.tipo === 'dispersion' && scene.ctx) items.push({ name: 'Resto de españoles', color: CO.ctx, shape: 'circle', ctx: true });
   x.font = '600 21px Inter, sans-serif'; x.textBaseline = 'middle';
@@ -7371,7 +7396,8 @@ async function grBuildImage(scene, legend) {
     if (lx + w > W - PAD) { lx = PAD; ly += 34; }
     x.strokeStyle = it.color; x.fillStyle = it.color; x.lineWidth = 3;
     if (lineas) { x.beginPath(); x.moveTo(lx, ly); x.lineTo(lx + 34, ly); x.stroke(); }
-    x.fill(new Path2D(grShapePath(it.shape, lx + (lineas ? 17 : 8), ly, 7)));
+    if (ring) { x.beginPath(); x.arc(lx + 8, ly, 7, 0, Math.PI * 2); x.stroke(); }
+    else x.fill(new Path2D(grShapePath(it.shape, lx + (lineas ? 17 : 8), ly, 7)));
     x.fillStyle = CO.text; x.fillText(it.name, lx + (lineas ? 34 : 18) + 10, ly + 1);
     lx += w;
   });
@@ -7388,6 +7414,9 @@ async function grBuildImage(scene, legend) {
   // área del gráfico
   const top = ly + 30, bottom = H - 104 - (noteLines.length - 1) * 22;
   const L = grLayout(scene, W - 2 * PAD + 10, bottom - top, 1.65);
+  const faceIds = scene.faces ? [...new Set(scene.tipo === 'lineas' ? scene.series.map(se => se.id) : scene.points.map(q => q.id))] : [];
+  const imgs = {};
+  await Promise.all(faceIds.map(async id => { imgs[id] = await qntLoadImg(`img/players/${id}.jpg`); }));
   x.save(); x.translate(PAD - 10, top);
   const p = L.plot, s = L.s;
   x.lineWidth = 1;
@@ -7409,15 +7438,37 @@ async function grBuildImage(scene, legend) {
     const path = new Path2D(grShapePath(shape, px, py, r));
     x.lineWidth = 2.5; x.strokeStyle = CO.bg; x.stroke(path); x.fillStyle = color; x.fill(path);
   };
+  // Cara recortada en círculo (respaldo: iniciales); el resto de españoles, en gris y atenuado
+  const face = (q, ring, ctx) => {
+    const r = q.r, img = imgs[q.p.id];
+    x.save();
+    x.beginPath(); x.arc(q.px, q.py, r + 2, 0, Math.PI * 2); x.fillStyle = CO.bg; x.fill();
+    x.save(); x.beginPath(); x.arc(q.px, q.py, r, 0, Math.PI * 2); x.clip();
+    x.fillStyle = qntAvatarColor(q.p.name); x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r);
+    if (img) {
+      const sc = 2 * r / GR_FACE.s;
+      x.drawImage(img, q.px - r - GR_FACE.x * sc, q.py - r - GR_FACE.y * sc, GR_FACE.w * sc, img.height * sc * (GR_FACE.w / img.width));
+      if (ctx) {   // desaturar con modo de fusión (ctx.filter no existe en Safari)
+        x.globalAlpha = 1; x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080';
+        x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r); x.globalCompositeOperation = 'source-over';
+      }
+    } else { x.fillStyle = '#fff'; x.font = `700 ${Math.round(r * 0.75)}px Inter, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(qntInitials(q.p.name), q.px, q.py); }
+    if (ctx) { x.fillStyle = 'rgba(14,14,16,.5)'; x.fillRect(q.px - r, q.py - r, 2 * r, 2 * r); }   // atenuar
+    x.restore();
+    x.beginPath(); x.arc(q.px, q.py, r, 0, Math.PI * 2); x.strokeStyle = ring; x.lineWidth = ctx ? 2 : 4; x.stroke();
+    x.restore();
+  };
   if (lineas) {
     L.series.forEach(se => {
       x.strokeStyle = col(se.se.slot); x.lineWidth = 3.2; x.lineJoin = 'round'; x.lineCap = 'round';
       se.segs.forEach(seg => { if (seg.length < 2) return; x.beginPath(); seg.forEach((q, i) => i ? x.lineTo(q.px, q.py) : x.moveTo(q.px, q.py)); x.stroke(); });
-      se.pts.forEach(q => mark(se.se.shape, q.px, q.py, 6, col(se.se.slot)));
+      se.pts.forEach(q => { if (!q.face) mark(se.se.shape, q.px, q.py, 6, col(se.se.slot)); });
     });
+    L.series.forEach(se => se.pts.forEach(q => { if (q.face) face(q, col(se.se.slot)); }));
   } else {
     L.pts.forEach(q => {
-      if (q.p.sel) mark(q.p.shape, q.px, q.py, 8, col(q.p.slot));
+      if (q.face) face(q, q.p.sel ? col(q.p.slot) : 'rgba(233,233,236,.45)', !q.p.sel);
+      else if (q.p.sel) mark(q.p.shape, q.px, q.py, 8, col(q.p.slot));
       else { x.fillStyle = CO.ctx; x.beginPath(); x.arc(q.px, q.py, 5.5, 0, Math.PI * 2); x.fill(); }
     });
     x.textBaseline = 'middle';
@@ -7485,7 +7536,7 @@ function grBindUI() {
   $('gr-x').innerHTML = metricOpts + opt('edad', 'Edad');
   [['gr-tipo', 'tipo'], ['gr-comp', 'comp'], ['gr-m', 'm'], ['gr-ex', 'ex'], ['gr-u', 'u'], ['gr-x', 'x'], ['gr-y', 'y'], ['gr-desde', 'desde'], ['gr-hasta', 'hasta'], ['gr-min', 'ming']]
     .forEach(([id, k]) => { $(id).addEventListener('change', e => grSet({ [k]: e.target.value })); });
-  ['ley', 'ctx', 'nom', 'muestra'].forEach(k => {
+  ['ley', 'ctx', 'nom', 'muestra', 'caras'].forEach(k => {
     $('gr-' + k).addEventListener('click', () => grSet({ [k]: !grState[k] }));
   });
   let tTimer = null;
@@ -7556,10 +7607,10 @@ function grSyncControls() {
   document.querySelectorAll('[data-gr]').forEach(el => {
     const need = el.getAttribute('data-gr');
     const pctUsed = (st.tipo === 'lineas' ? [st.m] : [st.x, st.y]).some(k => (grMetric(k) || {}).kind === 'pct');
-    const show = need === st.tipo || (need === 'carrera' && st.tipo === 'dispersion' && st.u === 'carrera') || (need === 'pct' && pctUsed);
+    const show = need === st.tipo || (need === 'carrera' && st.tipo === 'dispersion' && st.u === 'carrera') || (need === 'pct' && pctUsed) || (need === 'caras' && grUsesFaces(Object.assign({}, st, { caras: true })));
     el.hidden = !show;
   });
-  ['ley', 'ctx', 'nom', 'muestra'].forEach(k => { const b = $('gr-' + k); b.classList.toggle('active', !!st[k]); b.setAttribute('aria-pressed', st[k] ? 'true' : 'false'); });
+  ['ley', 'ctx', 'nom', 'muestra', 'caras'].forEach(k => { const b = $('gr-' + k); b.classList.toggle('active', !!st[k]); b.setAttribute('aria-pressed', st[k] ? 'true' : 'false'); });
   const t = $('gr-t');
   if (document.activeElement !== t) t.value = st.t;
   const q = $('gr-q');
@@ -7573,7 +7624,7 @@ function grRenderChips() {
   const lineas = grState.tipo === 'lineas';
   box.innerHTML = grState.ids.map(id => {
     const j = grPlayers.find(p => p.id === id), slot = grSlots[id];
-    return `<span class="gr-chip">${grSwatch(slot, GR_SHAPES[slot % GR_SHAPES.length], lineas)}<span class="gr-chip-name">${escapeHtml(j.nombre)}</span>`
+    return `<span class="gr-chip">${grSwatch(slot, GR_SHAPES[slot % GR_SHAPES.length], lineas, false, grUsesFaces(grState))}<span class="gr-chip-name">${escapeHtml(j.nombre)}</span>`
       + `<button type="button" class="gr-chip-x" aria-label="Quitar a ${escapeHtml(j.nombre)}" onclick="grRemove('${escapeHtml(id)}')">×</button></span>`;
   }).join('');
 }
@@ -7585,8 +7636,8 @@ function grRenderMeta() {
   $('gr-t').placeholder = grAutoTitle(grState, grState.ids.map(id => grPlayers.find(p => p.id === id)));
   const lineas = sc.tipo === 'lineas';
   const leg = $('gr-legend');
-  const items = sc.legend.map(l => `<span class="gr-leg-item">${grSwatch(l.slot, l.shape, lineas)}${escapeHtml(l.name)}</span>`);
-  if (!lineas && sc.ctx) items.push(`<span class="gr-leg-item">${grSwatch(0, 'circle', false, true)}Resto de españoles</span>`);
+  const items = sc.legend.map(l => `<span class="gr-leg-item">${grSwatch(l.slot, l.shape, lineas, false, sc.faces)}${escapeHtml(l.name)}</span>`);
+  if (!lineas && sc.ctx) items.push(`<span class="gr-leg-item">${grSwatch(0, 'circle', false, true, sc.faces)}Resto de españoles</span>`);
   leg.innerHTML = items.join('');
   leg.hidden = !grState.ley || !items.length;
   const w = $('gr-warn');
@@ -7676,7 +7727,8 @@ function grShowAt(i) {
       row.appendChild(el('span', `gr-tip-k gr-s${se.se.slot + 1}`));
       if (q) {
         ys.push(q.py);
-        hlHtml += `<path class="gr-mk-hl gr-s${se.se.slot + 1}" d="${grShapePath(se.se.shape, q.px, q.py, 6)}"/>`;
+        hlHtml += q.face ? `<circle class="gr-face-hl" cx="${q.px}" cy="${q.py}" r="${q.r + 3}"/>`
+          : `<path class="gr-mk-hl gr-s${se.se.slot + 1}" d="${grShapePath(se.se.shape, q.px, q.py, 6)}"/>`;
         row.appendChild(el('strong', null, sc.y.fmt(q.p.y)));
         row.appendChild(el('span', 'gr-tip-n', se.se.name));
         row.appendChild(el('span', 'gr-tip-m', `${key !== 'temp' ? grSeasonLbl(q.p.year) + ' · ' : ''}${q.p.teams ? q.p.teams + ' · ' : ''}${q.p.g} PJ`));
@@ -7692,7 +7744,7 @@ function grShowAt(i) {
     const q = grL.pts[grOrderedPts()[i]];
     if (!q) return;
     ax = q.px; ay = q.py;
-    hlHtml = `<path class="gr-mk-hl ${q.p.sel ? 'gr-s' + (q.p.slot + 1) : 'gr-ctx-hl'}" d="${grShapePath(q.p.shape, q.px, q.py, q.p.sel ? 7 : 6)}"/>`;
+    hlHtml = q.face ? `<circle class="gr-face-hl" cx="${q.px}" cy="${q.py}" r="${q.r + 3}"/>` : `<path class="gr-mk-hl ${q.p.sel ? 'gr-s' + (q.p.slot + 1) : 'gr-ctx-hl'}" d="${grShapePath(q.p.shape, q.px, q.py, q.p.sel ? 7 : 6)}"/>`;
     tip.appendChild(el('div', 'gr-tip-h', q.p.name));
     tip.appendChild(el('div', 'gr-tip-s', q.p.year ? `${grSeasonLbl(q.p.year)}${q.p.teams ? ' · ' + q.p.teams : ''} · ${q.p.g} PJ`
       : `${q.p.from === q.p.to ? grSeasonLbl(q.p.from) : grSeasonLbl(q.p.from) + ' a ' + grSeasonLbl(q.p.to)} · ${q.p.n} temp. · ${fmtEnt(q.p.g)} PJ`));
