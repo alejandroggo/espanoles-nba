@@ -923,7 +923,7 @@ function renderSalariosFranquicias() {
   const fbody = document.getElementById('se-fbody');
   if (fbody) fbody.innerHTML = fr.map((f, i) => {
     const pls = f.jugadores || [];
-    const names = pls.slice(0, 4).map(n => SE_DISP[n] || n).join(', ') + (pls.length > 4 ? '…' : '');
+    const names = pls.map(n => SE_DISP[n] || n).join(', ');
     return '<tr><td class="se-frk">' + (i + 1) + '</td>'
       + '<td><span class="se-fdot" style="background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></span><span class="se-fcode">' + f.nombre + '</span></td>'
       + '<td class="se-fbar"><div class="se-ftrk"><div class="se-fbarf" style="width:' + (100 * f.pagado / fmx).toFixed(1) + '%;background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></div></div></td>'
@@ -932,8 +932,11 @@ function renderSalariosFranquicias() {
       + '<td class="se-fpls">' + names + '</td></tr>';
   }).join('');
   const nunca = (SAL_PE.nunca_jugaron || []).join(', ');
+  const ricky = (SAL_PE.jugadores || []).find(x => x.nombre === 'Ricky Rubio');
+  const perdon = ricky ? (ricky.total || 0) - (ricky.cobrado || 0) : 0;
   const note = document.getElementById('se-note');
-  if (note) note.innerHTML = '🚫 ' + (SAL_PE.nota_global || '') + (nunca ? ' Las que nunca han tenido un español en cancha: <b>' + nunca + '</b>.' : '');
+  if (note) note.innerHTML = '🚫 ' + (SAL_PE.nota_global || '') + (nunca ? ' Las que nunca han tenido un español en cancha: <b>' + nunca + '</b>.' : '')
+    + (perdon > 0 ? '<br>💸 Los totales no cuadran al céntimo porque <b>Ricky Rubio perdonó ' + seDollar(perdon) + '</b> de su último contrato (buyout de 2023): figuran firmados, pero nunca los cobró.' : '');
 }
 
 function renderSalariosKpis() {
