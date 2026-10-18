@@ -8026,6 +8026,7 @@ async function grCopyLink(btn) {
 // ══════════════════════════════════════════════
 // Mapa compartido nombre→jugador (para fotos en parejas y cara a cara)
 let AG_NAME2PLAYER = null;
+let PJ_DATA = [];
 async function agNamePlayerMap() {
   if (AG_NAME2PLAYER) return AG_NAME2PLAYER;
   const d = await loadData();
@@ -8058,7 +8059,7 @@ function pjPhoto(name, color) {
   return '<div class="pj-disc" style="background:' + color + '">' + pjIni(name) + '</div>';
 }
 
-function pjCard(p) {
+function pjCard(p, idx) {
   const c = pjCol(p.equipo), gold = p.en_activo;
   let badge;
   if (gold) badge = '<span class="pj-badge gold"><span class="pj-liv"></span>EN ACTIVO</span>';
@@ -8106,7 +8107,9 @@ function pjCard(p) {
     + '<table class="pj-table"><thead><tr><th class="l"></th><th>' + ka + '</th><th>' + kb + '</th><th class="jt">Juntos</th></tr></thead><tbody>' + rows + '</tbody></table>'
     + '<div class="pj-sect"><div class="t">' + octitle + '</div>' + ocblock + '</div>' + ocnote
     + '<div class="pj-sect"><div class="t">🔗 Se asistieron entre ellos</div>' + conn + '</div>' + po
-    + '<div class="pj-facts">' + facts + '</div></div>';
+    + '<div class="pj-facts">' + facts + '</div>'
+    + pjShareBar(idx, p)
+    + '</div>';
 }
 
 async function initParejasPage() {
@@ -8122,7 +8125,138 @@ async function initParejasPage() {
   try { await agNamePlayerMap(); } catch (e) { }
   const sub = document.getElementById('pj-hero-sub');
   if (sub) sub.innerHTML = 'Españoles que compartieron vestuario en la NBA · números como dúo, rendimiento con los dos en pista y cómo se conectaban.';
-  root.innerHTML = '<div class="pj-grid">' + P.map(pjCard).join('') + '</div>';
+  PJ_DATA = P;
+  root.innerHTML = '<div class="pj-grid">' + P.map((p, i) => pjCard(p, i)).join('') + '</div>';
+}
+
+// ── Compartir pareja: botón + imagen PNG (canvas, sin librerías) ──
+function pjShareBar(idx, p) {
+  const xIco = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+  return '<button type="button" class="pj-sharebar" onclick="pjShare(' + idx + ')" aria-label="Compartir la pareja ' + p.a + ' y ' + p.b + ' en X">'
+    + '<span class="pj-sb-txt"><span class="pj-sb-kicker">Comparte esta pareja</span><span class="pj-sb-sub">' + p.a + ' &amp; ' + p.b + ' · imagen lista para X</span></span>'
+    + '<span class="pj-sb-go"><span class="pj-sb-lbl">Compartir</span><span class="pj-sb-x">' + xIco + '</span><span class="pj-sb-arrow">→</span></span>'
+    + '</button>';
+}
+function pjFilename(p) { return ('pareja-' + drNorm(p.a) + '-' + drNorm(p.b)).replace(/\s+/g, '-') + '.png'; }
+function pjDescargaImg(bl, p) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = pjFilename(p);
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+async function pjShare(idx) {
+  const p = PJ_DATA[idx]; if (!p) return;
+  try { track('compartir', { metodo: 'twitter', origen: 'parejas', pareja: p.a + ' & ' + p.b }); } catch (e) { }
+  const texto = p.a + ' & ' + p.b + ' — la pareja española en la NBA 🏀 #EspañolesNBA (vía @alejandroggo)';
+  const url = location.href;
+  const xIntent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(texto + '\n\n' + url);
+  const isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  if (!isTouch) {
+    window.open(xIntent, '_blank', 'noopener,noreferrer');
+    try { const c = await pjBuildImage(p); pjDescargaImg(await qntBlob(c), p); } catch (e) { }
+    return;
+  }
+  try {
+    const c = await pjBuildImage(p); const bl = await qntBlob(c);
+    const file = new File([bl], pjFilename(p), { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: texto + '\n\n' + url }); return; }
+    pjDescargaImg(bl, p);
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  window.open(xIntent, '_blank', 'noopener,noreferrer');
+}
+async function pjBuildImage(p) {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
+  const CO = { bg: '#0e0e10', panel: '#17171d', line: 'rgba(255,255,255,.08)', coral: '#f2545b', yellow: '#ffc400', gold: '#f5c518', text: '#e9e9ec', muted: '#9a9aa5', red: '#c60b1e', green: '#2faa66' };
+  const d1 = v => (v === null || v === undefined) ? '—' : (typeof v === 'number' ? v.toFixed(1) : ('' + v)).replace('.', ',');
+  const i0 = v => (v === null || v === undefined) ? '—' : String(Math.round(v));
+  const col = pjCol(p.equipo);
+  const keys = Object.keys(p.pts).filter(k => k !== 'juntos'); const ka = keys[0], kb = keys[1];
+  const mkRow = (lbl, cat) => [lbl, d1(p[cat][ka]), d1(p[cat][kb]), (cat === 'min' ? i0(p[cat].juntos) : d1(p[cat].juntos))];
+  const rows = [mkRow('MINUTOS', 'min'), mkRow('PUNTOS', 'pts'), mkRow('REBOTES', 'reb'), mkRow('ASIST.', 'ast')];
+  const oc = p.oncourt, ae = p.asist_entre || {}, aek = Object.keys(ae);
+  const W = 1080;
+  const HEAD = 490, BIG = 134, THEAD = 54, TROW = 60, TAB = THEAD + 4 * TROW, OC = 142, AS = 126, PO = p.playoffs ? 72 : 0, FOOT = 94, GAP = 18;
+  const H = HEAD + GAP + BIG + GAP + TAB + GAP + OC + GAP + AS + (PO ? GAP + PO : 0) + GAP + FOOT;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const rr = (X, Y, Wd, Hd, R) => { x.beginPath(); x.moveTo(X + R, Y); x.arcTo(X + Wd, Y, X + Wd, Y + Hd, R); x.arcTo(X + Wd, Y + Hd, X, Y + Hd, R); x.arcTo(X, Y + Hd, X, Y, R); x.arcTo(X, Y, X + Wd, Y, R); x.closePath(); };
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 10); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 10); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 10); };
+  flag(0); flag(H - 10);
+  x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 58); x.restore();
+  x.fillStyle = CO.muted; x.font = '600 22px Inter, sans-serif'; x.save(); x.letterSpacing = '3px'; x.fillText('LAS PAREJAS', W / 2, 92); x.restore();
+  x.fillStyle = CO.text; x.font = '800 34px Inter, sans-serif'; x.fillText((p.equipo || '').toUpperCase(), W / 2, 140);
+  const badge = p.en_activo ? 'EN ACTIVO' : (p.campeones ? '★ CAMPEONES 2019' : (p.era ? 'ERA ' + p.era : ''));
+  if (badge) { x.fillStyle = (p.en_activo || p.campeones) ? CO.gold : CO.muted; x.font = '700 20px Inter, sans-serif'; x.save(); x.letterSpacing = '2px'; x.fillText(badge, W / 2, 172); x.restore(); }
+  const cols = [W * 0.28, W * 0.72], cy = 300, r = 90;
+  const pa = (AG_NAME2PLAYER || {})[drNorm(p.a)], pb = (AG_NAME2PLAYER || {})[drNorm(p.b)];
+  const imgs = await Promise.all([pa, pb].map(j => j ? qntLoadImg('img/players/' + j.id + '.jpg') : Promise.resolve(null)));
+  const drawFace = (cx, img, name) => {
+    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.closePath(); x.clip();
+    if (img) { const s = Math.max(2 * r / img.width, 2 * r / img.height); const w = img.width * s, h = img.height * s; x.drawImage(img, cx - w / 2, cy - h / 2 - r * 0.12, w, h); }
+    else { x.fillStyle = qntAvatarColor(name); x.fillRect(cx - r, cy - r, 2 * r, 2 * r); x.fillStyle = '#fff'; x.font = '700 52px Inter, sans-serif'; x.textBaseline = 'middle'; x.fillText(qntInitials(name), cx, cy); x.textBaseline = 'alphabetic'; }
+    x.restore();
+    x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.strokeStyle = col; x.lineWidth = 5; x.stroke();
+  };
+  drawFace(cols[0], imgs[0], p.a); drawFace(cols[1], imgs[1], p.b);
+  x.fillStyle = CO.yellow; x.font = '400 56px "DM Serif Display", Georgia, serif'; x.fillText('&', W / 2, cy + 18);
+  x.fillStyle = CO.text; x.font = '800 30px Inter, sans-serif';
+  x.fillText(cmpShortName(p.a, 2), cols[0], cy + r + 48);
+  x.fillText(cmpShortName(p.b, 2), cols[1], cy + r + 48);
+  // banda de grandes cifras
+  let y = HEAD + GAP;
+  x.fillStyle = CO.panel; rr(40, y, W - 80, BIG - 8, 18); x.fill();
+  x.beginPath(); x.moveTo(W / 2, y + 18); x.lineTo(W / 2, y + BIG - 26); x.strokeStyle = CO.line; x.lineWidth = 2; x.stroke();
+  const bcy = y + (BIG - 8) / 2;
+  x.textAlign = 'center';
+  x.fillStyle = CO.coral; x.font = '800 58px Inter, sans-serif'; x.fillText(i0(p.partidos_juntos), W * 0.28, bcy + 4);
+  x.fillStyle = CO.muted; x.font = '700 18px Inter, sans-serif'; x.save(); x.letterSpacing = '2px'; x.fillText('PARTIDOS JUNTOS', W * 0.28, bcy + 38); x.restore();
+  const vic = p.victorias_pct == null ? '—' : ('' + p.victorias_pct).replace('.', ',') + '%';
+  x.fillStyle = CO.coral; x.font = '800 58px Inter, sans-serif'; x.fillText(vic, W * 0.72, bcy + 4);
+  x.fillStyle = CO.muted; x.font = '700 18px Inter, sans-serif'; x.save(); x.letterSpacing = '1px'; x.fillText('VICTORIAS' + (p.record ? ' · ' + p.record : ''), W * 0.72, bcy + 38); x.restore();
+  // tabla de medias
+  y += BIG + GAP;
+  const cA = W * 0.52, cB = W * 0.70, cJ = W * 0.90, lx = 74;
+  x.textAlign = 'center'; x.fillStyle = CO.muted; x.font = '700 18px Inter, sans-serif';
+  x.fillText(cmpShortName(p.a, 2).toUpperCase(), cA, y + 34);
+  x.fillText(cmpShortName(p.b, 2).toUpperCase(), cB, y + 34);
+  x.fillStyle = CO.coral; x.fillText('JUNTOS', cJ, y + 34);
+  y += THEAD;
+  rows.forEach((rw, k) => {
+    if (k % 2 === 0) { x.fillStyle = CO.panel; rr(40, y, W - 80, TROW, 12); x.fill(); }
+    const ry = y + TROW / 2; x.textBaseline = 'middle';
+    x.textAlign = 'left'; x.fillStyle = CO.muted; x.font = '700 20px Inter, sans-serif'; x.fillText(rw[0], lx, ry);
+    x.textAlign = 'center'; x.fillStyle = CO.text; x.font = '800 26px Inter, sans-serif';
+    x.fillText(rw[1], cA, ry); x.fillText(rw[2], cB, ry);
+    x.fillStyle = CO.coral; x.fillText(rw[3], cJ, ry);
+    x.textBaseline = 'alphabetic'; y += TROW;
+  });
+  // con los dos en pista
+  y += GAP;
+  x.fillStyle = CO.panel; rr(40, y, W - 80, OC - 8, 18); x.fill();
+  x.textAlign = 'center'; x.fillStyle = CO.muted; x.font = '700 18px Inter, sans-serif';
+  x.save(); x.letterSpacing = '2px'; x.fillText('CON LOS DOS EN PISTA' + (oc && oc.min ? ' · ' + oc.min + ' MIN' : ''), W / 2, y + 32); x.restore();
+  const ocCols = [W * 0.25, W * 0.5, W * 0.75], ocy = y + (OC - 8) / 2 + 24;
+  const net = oc ? oc.net : null;
+  const ocVals = [oc ? d1(oc.off) : '—', oc ? d1(oc.def) : '—', oc ? ((net >= 0 ? '+' : '') + d1(net)) : '—'];
+  const ocLbls = ['RTG OF.', 'RTG DEF.', 'NET RTG'];
+  ocVals.forEach((v, i) => { x.fillStyle = oc ? (i === 2 ? (net >= 0 ? CO.green : CO.coral) : CO.text) : CO.muted; x.font = '800 42px Inter, sans-serif'; x.fillText(v, ocCols[i], ocy); x.fillStyle = CO.muted; x.font = '700 16px Inter, sans-serif'; x.save(); x.letterSpacing = '1px'; x.fillText(ocLbls[i], ocCols[i], ocy + 30); x.restore(); });
+  // asistencias entre ellos
+  y += OC + GAP;
+  x.fillStyle = CO.panel; rr(40, y, W - 80, AS - 8, 18); x.fill();
+  x.beginPath(); x.moveTo(W / 2, y + 18); x.lineTo(W / 2, y + AS - 26); x.strokeStyle = CO.line; x.lineWidth = 2; x.stroke();
+  x.textAlign = 'center'; x.fillStyle = CO.muted; x.font = '700 16px Inter, sans-serif'; x.save(); x.letterSpacing = '2px'; x.fillText('SE ASISTIERON ENTRE ELLOS', W / 2, y + 30); x.restore();
+  const asCols = [W * 0.28, W * 0.72], asy = y + (AS - 8) / 2 + 24;
+  [0, 1].forEach(i => { const k = aek[i]; x.fillStyle = CO.text; x.font = '800 44px Inter, sans-serif'; x.fillText(k != null ? i0(ae[k]) : '—', asCols[i], asy); x.fillStyle = CO.muted; x.font = '600 18px Inter, sans-serif'; x.fillText(k || '', asCols[i], asy + 30); });
+  // playoffs
+  if (PO) {
+    y += AS + GAP; x.fillStyle = 'rgba(245,197,24,.14)'; rr(40, y, W - 80, PO - 8, 14); x.fill();
+    x.textAlign = 'left'; x.fillStyle = CO.gold; x.font = '700 22px Inter, sans-serif'; x.textBaseline = 'middle';
+    x.fillText('🏀 PLAYOFFS · ' + p.playoffs, 74, y + (PO - 8) / 2); x.textBaseline = 'alphabetic';
+  }
+  // pie
+  x.textAlign = 'left'; x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.fillText('espanoles-nba.alejandroggo.com', 60, H - 40);
+  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.fillText('@alejandroggo · #EspañolesNBA', W - 60, H - 40);
+  return c;
 }
 
 // ══════════════════════════════════════════════
