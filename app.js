@@ -4388,91 +4388,125 @@ function cmpScoreData() {
   return { players, total, blocks, modoTxt };
 }
 
-// Dibuja la imagen-resumen de la comparación (caras + marcador total + por bloque)
+// Dibuja la imagen-resumen de la comparación con el diseño «cara a cara» de la página:
+// fichas con el color de cada jugador, marcador grande (líder subrayado en dorado) y una
+// barra enfrentada por bloque (2 jugadores) o una barra por jugador (3).
 async function cmpBuildImage(d) {
-  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { }
-  const n = d.players.length;
-  const W = 1080;
-  const headH = 520, rowH = 70, totalH = 96, footH = 96;
-  const H = headH + d.blocks.length * rowH + totalH + footH;
+  try {
+    if (document.fonts) {
+      await Promise.all(['400 64px "Bebas Neue"', '700 20px Inter', '800 20px Inter'].map(f => document.fonts.load(f).catch(() => null)));
+      await document.fonts.ready;
+    }
+  } catch (e) { }
+  const n = d.players.length, three = n === 3;
+  const W = 1080, PAD = 56;
+  const panelH = three ? 400 : 420, scoreH = 250, rowH = three ? 84 : 78, footH = 100, headH = 150;
+  const H = headH + panelH + scoreH + d.blocks.length * rowH + 40 + footH;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const x = c.getContext('2d');
-  const CO = { bg: '#0e0e10', panel: '#17171d', line: 'rgba(255,255,255,.08)', coral: '#f2545b', yellow: '#ffc400', text: '#e9e9ec', muted: '#9a9aa5', red: '#c60b1e' };
-  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
-  // franjas de bandera
-  const flag = y => { x.fillStyle = CO.red; x.fillRect(0, y, W, 10); x.fillStyle = CO.yellow; x.fillRect(W * 0.30, y, W * 0.40, 10); x.fillStyle = CO.red; x.fillRect(W * 0.70, y, W * 0.30, 10); };
-  flag(0); flag(H - 10);
-  // kicker
-  x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-  x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif';
-  x.save(); x.letterSpacing = '6px'; x.fillText('ESPAÑOLES EN LA NBA', W / 2, 60); x.restore();
-  // periodo comparado (toda la carrera / temporada / tramos)
-  const tfTxt = d.modoTxt === 'toda la carrera' ? 'Toda la carrera'
-    : d.modoTxt === 'tramos elegidos' ? 'Tramos elegidos por jugador'
-    : `Temporada ${d.modoTxt}`;
-  x.fillStyle = CO.muted; x.font = '600 22px Inter, sans-serif';
-  x.save(); x.letterSpacing = '1px'; x.fillText(tfTxt, W / 2, 94); x.restore();
-
-  // caras + nombres
-  const cols = n === 2 ? [W * 0.26, W * 0.74] : [W * 0.2, W * 0.5, W * 0.8];
-  const cy = 208, r = 92;
-  const drawFace = (cx, img, name) => {
-    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.closePath(); x.clip();
-    if (img) { const s = Math.max(2 * r / img.width, 2 * r / img.height); const w = img.width * s, h = img.height * s; x.drawImage(img, cx - w / 2, cy - h / 2 - r * 0.12, w, h); }
-    else { x.fillStyle = qntAvatarColor(name); x.fillRect(cx - r, cy - r, 2 * r, 2 * r); x.fillStyle = '#fff'; x.font = '700 56px Inter, sans-serif'; x.textBaseline = 'middle'; x.fillText(qntInitials(name), cx, cy); x.textBaseline = 'alphabetic'; }
-    x.restore();
-    x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.strokeStyle = 'rgba(255,255,255,.18)'; x.lineWidth = 3; x.stroke();
-  };
+  const CO = GR_PNG_CO;
+  const col = i => GR_PNG_COLORS[i % GR_PNG_COLORS.length];
+  const spaced = (px, fn) => { x.save(); try { x.letterSpacing = px + 'px'; } catch (e) { } fn(); x.restore(); };
   const imgs = await Promise.all(d.players.map(p => qntLoadImg(`img/players/${p.id}.jpg`)));
-  const mxTot = Math.max(...d.total);
-  const uniqueTop = d.total.filter(t => t === mxTot).length === 1;
-  d.players.forEach((p, i) => {
-    drawFace(cols[i], imgs[i], p.nombre);
-    x.fillStyle = CO.text; x.font = '800 ' + (n === 2 ? 32 : 26) + 'px Inter, sans-serif';
-    x.fillText(cmpShortName(p.nombre, n), cols[i], cy + r + 44);
-    x.fillStyle = CO.muted; x.font = '500 20px Inter, sans-serif';
-    x.fillText(p.draft ? `Draft ${p.draft_anio || ''} · #${p.draft_pick || '?'}` : 'No drafteado', cols[i], cy + r + 74);
-    // total por jugador bajo el nombre
-    x.fillStyle = (uniqueTop && d.total[i] === mxTot) ? CO.yellow : CO.muted;
-    x.font = '800 60px Inter, sans-serif';
-    x.fillText(String(d.total[i]), cols[i], cy + r + 185);
-  });
-  x.fillStyle = CO.muted; x.font = '600 20px Inter, sans-serif';
-  x.save(); x.letterSpacing = '3px'; x.fillText('CATEGORÍAS GANADAS', W / 2, cy + r + 120); x.restore();
 
-  // bloques
-  let y = headH + 6;
-  x.textBaseline = 'middle';
+  // Fondo, franja de bandera y antetítulo
+  x.fillStyle = CO.bg; x.fillRect(0, 0, W, H);
+  x.fillStyle = CO.red; x.fillRect(0, 0, W, 10);
+  x.fillStyle = CO.yellow; x.fillRect(W * 0.3, 0, W * 0.4, 10);
+  x.textBaseline = 'alphabetic'; x.textAlign = 'center';
+  x.font = '400 30px "Bebas Neue", Inter, sans-serif';
+  spaced(6, () => { x.fillStyle = CO.yellow; x.fillText('ESPAÑOLES EN LA NBA · EL COMPARADOR', W / 2, 78); });
+  const tf = d.modoTxt === 'toda la carrera' ? 'Toda la carrera' : d.modoTxt === 'tramos elegidos' ? 'Tramos elegidos por jugador' : `Temporada ${d.modoTxt}`;
+  x.fillStyle = CO.muted; x.font = '500 24px Inter, sans-serif'; x.fillText(tf, W / 2, 116);
+
+  // Fichas: panel teñido del color del jugador, cara con aro, nombre y draft
+  const top = headH, pw = (W - 2 * PAD) / n;
+  d.players.forEach((p, i) => {
+    const px = PAD + i * pw, cx = px + pw / 2;
+    x.save();
+    x.beginPath(); x.rect(px, top, pw, panelH); x.clip();
+    x.fillStyle = col(i); x.globalAlpha = 0.14; x.fillRect(px, top, pw, panelH); x.globalAlpha = 1;
+    x.fillRect(px, top, pw, 8);
+    x.restore();
+    const r = three ? 92 : 112, cy = top + 40 + r;
+    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip();
+    const img = imgs[i];
+    if (img) {
+      x.fillStyle = CO.face; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+      const sc = 2 * r / GR_FACE.s;
+      x.drawImage(img, cx - r - GR_FACE.x * sc, cy - r - GR_FACE.y * sc, GR_FACE.w * sc, img.height * sc * (GR_FACE.w / img.width));
+    } else {
+      x.fillStyle = qntAvatarColor(p.nombre); x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+      x.fillStyle = '#fff'; x.font = `700 ${Math.round(r * 0.7)}px Inter, sans-serif`; x.textBaseline = 'middle'; x.fillText(qntInitials(p.nombre), cx, cy); x.textBaseline = 'alphabetic';
+    }
+    x.restore();
+    x.beginPath(); x.arc(cx, cy, r - 4, 0, Math.PI * 2); x.strokeStyle = col(i); x.lineWidth = 8; x.stroke();
+    let fs = three ? 54 : 70;
+    x.font = `400 ${fs}px "Bebas Neue", Inter, sans-serif`;
+    const name = cmpShortName(p.nombre, n).toUpperCase();
+    while (x.measureText(name).width > pw - 24 && fs > 34) { fs -= 2; x.font = `400 ${fs}px "Bebas Neue", Inter, sans-serif`; }
+    x.fillStyle = CO.text; x.fillText(name, cx, cy + r + 30 + fs * 0.75);
+    x.fillStyle = CO.muted; x.font = `500 ${three ? 20 : 24}px Inter, sans-serif`;
+    x.fillText(p.draft ? `Draft ${p.draft_anio || ''} · nº ${p.draft_pick || '?'}` : 'No drafteado', cx, cy + r + 30 + fs * 0.75 + 40);
+  });
+
+  // Marcador total
+  const sy = top + panelH + 150;
+  const mx = Math.max(...d.total), uniqueTop = d.total.filter(t => t === mx).length === 1;
+  x.font = '400 150px "Bebas Neue", Inter, sans-serif';
+  const sep = '–', gap = 36;
+  const ws = d.total.map(t => x.measureText(String(t)).width);
+  x.font = '400 90px "Bebas Neue", Inter, sans-serif'; const sw = x.measureText(sep).width;
+  let sx = W / 2 - (ws.reduce((a, b) => a + b, 0) + (n - 1) * (sw + 2 * gap)) / 2;
+  d.total.forEach((t, i) => {
+    const lead = uniqueTop && t === mx;
+    x.textAlign = 'left'; x.font = '400 150px "Bebas Neue", Inter, sans-serif';
+    x.fillStyle = lead ? CO.text : CO.muted; x.fillText(String(t), sx, sy);
+    if (lead) { x.fillStyle = '#f5c518'; x.fillRect(sx + ws[i] / 2 - 40, sy + 18, 80, 9); }
+    sx += ws[i];
+    if (i < n - 1) { x.font = '400 90px "Bebas Neue", Inter, sans-serif'; x.fillStyle = '#4a4a52'; x.fillText(sep, sx + gap, sy - 20); sx += sw + 2 * gap; }
+  });
+  x.textAlign = 'center'; x.fillStyle = CO.muted; x.font = '700 20px Inter, sans-serif';
+  spaced(4, () => x.fillText('CATEGORÍAS GANADAS', W / 2, sy + 66));
+
+  // Bloques: título + barras como en la página
+  let y = top + panelH + scoreH;
   d.blocks.forEach((b, k) => {
-    if (k % 2 === 0) { x.fillStyle = CO.panel; x.fillRect(40, y - rowH / 2 + 4, W - 80, rowH - 8); }
-    x.fillStyle = CO.text; x.font = '700 26px Inter, sans-serif'; x.textAlign = 'left';
-    x.fillText(b.title, 70, y);
-    const mx = Math.max(...b.scores); const uniq = b.scores.filter(s => s === mx).length === 1;
-    x.textAlign = 'center'; x.font = '800 30px Inter, sans-serif';
-    const sx = n === 2 ? [W - 360, W - 130] : [W - 430, W - 280, W - 130];
-    b.scores.forEach((s, i) => {
-      x.fillStyle = (uniq && s === mx) ? CO.yellow : CO.muted;
-      x.fillText(String(s), sx[i], y);
-    });
-    if (n === 2) { x.fillStyle = CO.muted; x.font = '400 26px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, y); }
+    const yc = y + rowH / 2;
+    if (k) { x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(PAD, y, W - 2 * PAD, 1); }
+    const bmx = Math.max(...b.scores), uniq = b.scores.filter(s => s === bmx).length === 1;
+    const win = i => uniq && b.scores[i] === bmx;
+    const tot = b.scores.reduce((a, s) => a + s, 0) || 1;
+    if (!three) {
+      x.textAlign = 'center'; x.fillStyle = CO.dim; x.font = '700 18px Inter, sans-serif';
+      spaced(3, () => x.fillText(b.title.toUpperCase(), W / 2, yc - 12));
+      const bx0 = PAD + 120, bx1 = W - PAD - 120, mid = W / 2, half = (bx1 - bx0) / 2 - 3;
+      x.fillStyle = '#1f1f26'; x.fillRect(bx0, yc + 2, bx1 - bx0, 12);
+      const fill = (i, w) => { x.globalAlpha = win(i) ? 1 : (uniq ? 0.35 : 0.6); x.fillStyle = col(i); if (i === 0) x.fillRect(mid - 3 - w, yc + 2, w, 12); else x.fillRect(mid + 3, yc + 2, w, 12); x.globalAlpha = 1; };
+      fill(0, Math.max(4, half * b.scores[0] / Math.max(1, bmx))); fill(1, Math.max(4, half * b.scores[1] / Math.max(1, bmx)));
+      x.font = '800 40px Inter, sans-serif';
+      x.textAlign = 'right'; x.fillStyle = win(0) ? CO.text : CO.muted; x.fillText(String(b.scores[0]), bx0 - 28, yc + 20);
+      x.textAlign = 'left'; x.fillStyle = win(1) ? CO.text : CO.muted; x.fillText(String(b.scores[1]), bx1 + 28, yc + 20);
+    } else {
+      x.textAlign = 'left'; x.fillStyle = CO.text; x.font = '400 34px "Bebas Neue", Inter, sans-serif';
+      spaced(1, () => x.fillText(b.title.toUpperCase(), PAD, yc + 12));
+      const colW = (W - 2 * PAD - 330) / 3;
+      b.scores.forEach((s, i) => {
+        const cx0 = PAD + 330 + i * colW;
+        x.font = '800 34px Inter, sans-serif'; x.fillStyle = win(i) ? CO.text : CO.muted; x.textAlign = 'right';
+        x.fillText(String(s), cx0 + 44, yc + 12);
+        x.fillStyle = '#1f1f26'; x.fillRect(cx0 + 58, yc - 4, colW - 80, 12);
+        x.globalAlpha = win(i) ? 1 : (uniq ? 0.35 : 0.6); x.fillStyle = col(i); x.fillRect(cx0 + 58, yc - 4, Math.max(4, (colW - 80) * s / Math.max(1, bmx)), 12); x.globalAlpha = 1;
+      });
+    }
     y += rowH;
   });
-  // total (texto centrado verticalmente en la barra)
-  const barTop = y - rowH / 2 + 4, barCy = barTop + (totalH - 8) / 2;
-  x.fillStyle = CO.coral; x.fillRect(40, barTop, W - 80, totalH - 8);
-  x.fillStyle = '#fff'; x.font = '800 32px Inter, sans-serif'; x.textAlign = 'left';
-  x.fillText('TOTAL', 70, barCy);
-  x.textAlign = 'center'; x.font = '800 44px Inter, sans-serif';
-  const sx = n === 2 ? [W - 360, W - 130] : [W - 430, W - 280, W - 130];
-  d.total.forEach((s, i) => { x.fillStyle = '#fff'; x.fillText(String(s), sx[i], barCy); });
-  if (n === 2) { x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '400 34px Inter, sans-serif'; x.fillText('–', (sx[0] + sx[1]) / 2, barCy); }
 
-  // footer
-  x.textBaseline = 'alphabetic';
-  x.fillStyle = CO.text; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'left';
-  x.fillText('espanoles-nba.alejandroggo.com', 60, H - 40);
-  x.fillStyle = CO.yellow; x.font = '700 24px Inter, sans-serif'; x.textAlign = 'right';
-  x.fillText('@alejandroggo · #EspañolesNBA', W - 60, H - 40);
+  // Pie de marca
+  x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(PAD, H - footH + 20, W - 2 * PAD, 1);
+  x.textBaseline = 'middle'; x.font = '700 24px Inter, sans-serif';
+  x.textAlign = 'left'; x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', PAD, H - footH / 2 + 10);
+  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.fillText('@alejandroggo', W - PAD, H - footH / 2 + 10);
   return c;
 }
 function cmpShortName(nombre, n) {
