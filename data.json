@@ -9757,7 +9757,11 @@
         "fg_pct": null,
         "tres_pct": null,
         "ft_pct": null
-      }
+      },
+      "posicion": "Base",
+      "bref_id": "delarse01",
+      "nacimiento": 2005,
+      "nacimiento_fecha": "4 dic 2005"
     },
     {
       "id": "baba-miller",
@@ -9861,7 +9865,11 @@
         "fg_pct": null,
         "tres_pct": null,
         "ft_pct": null
-      }
+      },
+      "posicion": "Ala-Pívot",
+      "bref_id": "milleba01",
+      "nacimiento": 2004,
+      "nacimiento_fecha": "7 feb 2004"
     },
     {
       "id": "aday-mara",
@@ -9965,7 +9973,11 @@
         "fg_pct": null,
         "tres_pct": null,
         "ft_pct": null
-      }
+      },
+      "posicion": "Pívot",
+      "bref_id": "maraad01",
+      "nacimiento": 2005,
+      "nacimiento_fecha": "7 abr 2005"
     },
     {
       "id": "jose-a-montero",
