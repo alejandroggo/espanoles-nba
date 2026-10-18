@@ -8521,6 +8521,8 @@ async function initCaraACaraPage() {
 // ══════════════════════════════════════════════
 const SE_COL = { MEM: '#5D76A9', TOR: '#CE1141', LAL: '#552583', MIN: '#236192', OKC: '#007ac1', SAS: '#8a8d8f', SAC: '#5a2d81', CHI: '#CE1141', UTA: '#5c2f83', CLE: '#860038', NOP: '#0C2340', NYK: '#f58426', LAC: '#1d428a', PHX: '#e56020', DET: '#1d428a', POR: '#E03A3E', MIL: '#00471B', DEN: '#0e2240', ORL: '#0077c0', IND: '#002d62', PHI: '#006bb6', DAL: '#00538c', HOU: '#ce1141', CHA: '#1d1160', BOS: '#007a33', GSW: '#1d428a', ATL: '#e03a3e' };
 const SE_DISP = { 'Pau Gasol': 'Pau', 'Marc Gasol': 'Marc', 'Raül Lopez': 'Raül', 'Raül López': 'Raül', 'Fernando Martín': 'F. Martín', 'José M. Calderón': 'Calderón', 'Sergio Rodríguez': 'Chacho', 'Serge Ibaka': 'Ibaka', 'Ricky Rubio': 'Ricky', 'Nikola Mirotić': 'Mirotić', 'Nikola Mirotic': 'Mirotić', 'Santi Aldama': 'Aldama', 'Usman Garuba': 'Garuba', 'Alex Abrines': 'Abrines', 'Álex Abrines': 'Abrines', 'Willy Hernangómez': 'Willy', 'Juancho Hernangómez': 'Juancho', 'Víctor Claver': 'Claver', 'Jorge Garbajosa': 'Garbajosa', 'Juan Carlos Navarro': 'Navarro', 'Hugo González': 'Hugo', 'Aday Mara': 'Aday', 'Baba Miller': 'Baba', 'Sergio de Larrea': 'De Larrea', 'Eli Ndiaye': 'Ndiaye' };
+// Fotos de jugadores aún no presentes en data.json (override manual)
+const SE_PHOTO = { 'Eli Ndiaye': 'img/players/eli-ndiaye.jpg' };
 function seIni(nm) { const w = (nm || '').trim().split(/\s+/); return (((w[0] || ' ')[0]) + ((w[w.length - 1] || ' ')[0])).toUpperCase(); }
 function seMoney(n) { return n >= 1e6 ? ('$' + (n / 1e6).toFixed(1) + ' M').replace('.', ',') : (n > 0 ? '$' + Math.round(n / 1e3) + ' K' : '$0'); }
 function seDollar(n) { return n ? '$' + Math.round(n).toLocaleString('de-DE') : '—'; }
@@ -8546,7 +8548,8 @@ async function initSalariosEquipoPage() {
     const nEq = splits.length;
     const pct = totalCob ? (100 * (j.cobrado || 0) / totalCob) : 0;
     const col = splits[0] ? (SE_COL[splits[0][0]] || '#b91c1c') : '#b91c1c';
-    const im = agPhotoImg(j.nombre, '');
+    let im = agPhotoImg(j.nombre, '');
+    if (!im && SE_PHOTO[j.nombre]) im = '<img src="' + SE_PHOTO[j.nombre] + '" alt="" loading="lazy" onerror="agImgHide(this)">';
     const ava = im ? '<span class="se-ava">' + im + '</span>' : '<span class="se-ava" style="background:' + col + '">' + seIni(j.nombre) + '</span>';
     html += '<tr class="se-prow">'
       + '<td class="l se-rk">' + rk + '</td>'
