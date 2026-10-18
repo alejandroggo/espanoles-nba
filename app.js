@@ -5524,7 +5524,7 @@ function botAnswer(raw) {
   botPending = { players, stat, year, dim, perGame, count: false };
 
   // 0) COMPAÑEROS: españoles que jugaron juntos (mismo equipo y temporada)
-  if (/juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
+  if (/\bparejas?\b|juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
     const caveat = `<div class="bot-sub">Es el dato de temporadas compartidas en el mismo equipo; no tengo el recuento exacto de partidos juntos en pista.</div>`;
     if (players.length >= 2) {
       const [a, b] = players;
