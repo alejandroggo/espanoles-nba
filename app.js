@@ -5179,6 +5179,36 @@ function botPrepPlayers(list, data) {
   });
 }
 
+// Parejas (compañeros) y duelos (cara a cara) para el buscador PEPU
+let BOT_PAREJAS = [];
+let BOT_DUELOS = [];
+async function botLoadExtras() {
+  try { if (!BOT_PAREJAS.length) BOT_PAREJAS = await fetch('data/parejas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : []); } catch (e) { }
+  try { if (!BOT_DUELOS.length) BOT_DUELOS = await fetch('data/duelos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : []); } catch (e) { }
+}
+function botFindPareja(a, b) {
+  const na = botNorm(a.nombre), nb = botNorm(b.nombre);
+  return BOT_PAREJAS.find(p => { const pa = botNorm(p.a), pb = botNorm(p.b); return (pa === na && pb === nb) || (pa === nb && pb === na); }) || null;
+}
+function botFindDuelo(a, b) {
+  const na = botNorm(a.nombre), nb = botNorm(b.nombre);
+  return BOT_DUELOS.find(d => { const da = botNorm(d.a), db = botNorm(d.b); return (da === na && db === nb) || (da === nb && db === na); }) || null;
+}
+function botDueloMsg(d, a, b) {
+  const igual = /^igualado/i.test(d.rec);
+  const fechas = (d.primer && d.ultimo) ? ` entre <b>${d.primer}</b> y <b>${d.ultimo}</b>` : '';
+  let s = igual
+    ? `El <b>cara a cara</b> entre <b>${d.a}</b> y <b>${d.b}</b> está <b>igualado</b>: ${d.rec}.`
+    : `En el <b>cara a cara</b> entre <b>${d.a}</b> y <b>${d.b}</b>, el récord es <b>${d.rec}</b>.`;
+  s += ` Se enfrentaron <b>${d.g}</b> ${d.g === 1 ? 'vez' : 'veces'}${fechas}.`;
+  if (d.av) s += ` Medias por partido — <b>${d.a}</b>: ${d.av[d.a]}; <b>${d.b}</b>: ${d.av[d.b]}.`;
+  if (d.playoffs && d.playoffs.length) s += ` En playoffs: ${d.playoffs.map(x => `${x.temporada} ${x.serie}`).join('; ')}.`;
+  s += ` ${botPlayerChip(a)}${botPlayerChip(b)}`;
+  if (d.nota) s += `<div class="bot-sub">${d.nota}</div>`;
+  s += `<div class="bot-sub"><a href="cara-a-cara.html">Ver la matriz del cara a cara →</a></div>`;
+  return s;
+}
+
 const BOT_EXAMPLES = [
   '¿Quién ha metido más puntos?',
   '¿Cuántos anillos tiene Pau Gasol?',
@@ -5192,6 +5222,9 @@ const BOT_EXAMPLES = [
   '¿Récord de puntos de Pau en un partido?',
   '¿Quién tiene más All-Star?',
   '¿Qué dorsal lleva Ricky Rubio?',
+  '¿Quién gana el cara a cara entre Pau y Marc?',
+  '¿Cuántos partidos jugaron juntos Marc e Ibaka?',
+  'Ricky Rubio contra José Calderón',
 ];
 
 // Diccionario de estadísticas. El orden importa (triple-doble antes que triples).
@@ -5461,6 +5494,26 @@ function botAnswer(raw) {
     const caveat = `<div class="bot-sub">Es el dato de temporadas compartidas en el mismo equipo; no tengo el recuento exacto de partidos juntos en pista.</div>`;
     if (players.length >= 2) {
       const [a, b] = players;
+      const pj = botFindPareja(a, b);
+      if (pj) {
+        const verFicha = `<div class="bot-sub"><a href="parejas.html">Ver la ficha de la pareja →</a></div>`;
+        if (!pj.partidos_juntos) {
+          let s0 = `<b>${pj.a}</b> y <b>${pj.b}</b> son compañeros`;
+          if (pj.equipo) s0 += ` en <b>${pj.equipo}</b>`;
+          s0 += pj.en_activo ? ' (en activo)' : '';
+          s0 += `, pero <b>aún no han jugado juntos</b>: la pareja está por estrenarse.`;
+          return `${s0} ${botPlayerChip(a)}${botPlayerChip(b)}${verFicha}`;
+        }
+        let s0 = `<b>${pj.a}</b> y <b>${pj.b}</b> fueron compañeros`;
+        if (pj.equipo) s0 += ` en <b>${pj.equipo}</b>`;
+        if (pj.era) s0 += ` (${pj.era})`;
+        s0 += `: jugaron <b>${pj.partidos_juntos}</b> partidos juntos`;
+        if (pj.victorias_pct != null) s0 += ` con un <b>${pj.victorias_pct}%</b> de victorias${pj.record ? ` (${pj.record})` : ''}`;
+        s0 += `.`;
+        if (pj.campeones) s0 += ` Fueron <b>campeones de la NBA en 2019</b>.`;
+        if (pj.playoffs) s0 += ` Playoffs: ${pj.playoffs}.`;
+        return `${s0} ${botPlayerChip(a)}${botPlayerChip(b)}${verFicha}`;
+      }
       const c = botTogether(a, b);
       if (!c.length) return `<b>${a.nombre}</b> y <b>${b.nombre}</b> <b>nunca</b> fueron compañeros en la NBA (no jugaron en el mismo equipo la misma temporada). ${botPlayerChip(a)}${botPlayerChip(b)}`;
       const det = c.map(x => `${drSeason(x.year)} (${teamInfo(x.team).name})`).join(', ');
@@ -5481,6 +5534,34 @@ function botAnswer(raw) {
     }
     if (!seen.length) return null;
     return `Estos españoles han sido <b>compañeros de equipo</b> en la NBA:<div class="bot-sub">${seen.map(s => `• <b>${s.a.nombre}</b> y <b>${s.b.nombre}</b> — ${[...new Set(s.c.map(x => teamInfo(x.team).label + ' ' + drSeason(x.year)))].join(', ')}`).join('<br>')}</div>`;
+  }
+
+  // 0.5) CARA A CARA (duelos directos entre españoles)
+  {
+    const explicitDuel = /cara a cara|se enfrent|enfrentaron|enfrentamiento|\bduelo|duelos|mano a mano|frente a frente/.test(q);
+    const vsWord = /\bcontra\b|frente a|\bante\b|quien gan/.test(q);
+    const duel2 = players.length >= 2 && (explicitDuel || (vsWord && !stat && !team));
+    const duel1 = players.length === 1 && explicitDuel && !stat;
+    if (duel2) {
+      const [a, b] = players;
+      const d = botFindDuelo(a, b);
+      if (d) return botDueloMsg(d, a, b);
+      if (explicitDuel || vsWord) {
+        const tg = botTogether(a, b);
+        const extra = tg.length ? ' Fueron compañeros de equipo, así que apenas coincidieron como rivales.' : '';
+        return `No tengo registrado ningún <b>duelo directo</b> entre <b>${a.nombre}</b> y <b>${b.nombre}</b> en la NBA.${extra} ${botPlayerChip(a)}${botPlayerChip(b)}`;
+      }
+    }
+    if (duel1) {
+      const j = players[0], me = botNorm(j.nombre);
+      const ds = BOT_DUELOS.filter(d => botNorm(d.a) === me || botNorm(d.b) === me);
+      if (!ds.length) return `No tengo <b>duelos directos</b> registrados de <b>${j.nombre}</b> contra otros españoles. ${botPlayerChip(j)}`;
+      ds.sort((x, y) => y.g - x.g);
+      const rival = d => botNorm(d.a) === me ? d.b : d.a;
+      const list = ds.slice(0, 6).map(d => `<b>${rival(d)}</b> (${d.rec} · ${d.g} part.)`).join('; ');
+      const totG = ds.reduce((s, d) => s + d.g, 0);
+      return `<b>${j.nombre}</b> tiene <b>${ds.length}</b> rivales españoles en el cara a cara (<b>${totG}</b> enfrentamientos en total). Los más repetidos: ${list}. ${botPlayerChip(j)}<div class="bot-sub"><a href="cara-a-cara.html">Ver la matriz del cara a cara →</a></div>`;
+    }
   }
 
   // 1) ANILLOS
@@ -6095,6 +6176,7 @@ async function initPreguntasPage() {
   catch (e) { document.getElementById('hero-sub').textContent = 'Error al cargar los datos'; return; }
   buildPlayerIds(data.jugadores);
   botPrepPlayers(data.jugadores, data);
+  await botLoadExtras();
   document.getElementById('hero-sub').textContent = `Escribe una pregunta y te respondo con los datos de los ${botPlayers.length} españoles de la NBA.`;
 
   const sug = document.getElementById('bot-suggest');
@@ -6104,7 +6186,7 @@ async function initPreguntasPage() {
   const form = document.getElementById('bot-form'), input = document.getElementById('bot-input');
   form.addEventListener('submit', e => { e.preventDefault(); botSubmit(input.value); input.value = ''; input.focus(); });
 
-  botAppend('a', `¡Hola! 👋 Soy el buscador de <b>Españoles en la NBA</b>. Pregúntame lo que quieras sobre sus estadísticas, anillos, salarios, draft o trayectoria. Toca un ejemplo para empezar.`);
+  botAppend('a', `¡Hola! 👋 Soy <b>PEPU</b>, el buscador de <b>Españoles en la NBA</b>. Pregúntame lo que quieras: estadísticas, anillos, salarios, draft, trayectoria, <b>parejas</b> y <b>duelos cara a cara</b>. Toca un ejemplo para empezar.`);
 }
 
 // ── WIDGET DE CHAT FLOTANTE (burbuja abajo, en todas las páginas) ──
@@ -6124,7 +6206,7 @@ function buildChatWidget() {
     <div class="cw-panel" id="cw-panel" hidden role="dialog" aria-label="Asistente de Españoles en la NBA">
       <div class="cw-head">
         <span class="cw-dot"></span>
-        <span class="cw-title">Pregúntame</span>
+        <span class="cw-title">PEPU</span>
         <a class="cw-expand" href="preguntas.html" title="Abrir en pantalla completa" aria-label="Abrir en pantalla completa">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
         </a>
@@ -6154,7 +6236,7 @@ function buildChatWidget() {
 
 async function cwEnsureData() {
   if (botPlayers.length) return;
-  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPrepPlayers(d.jugadores, d); } catch (e) { botPlayers = []; }
+  try { const d = await loadData(); buildPlayerIds(d.jugadores); botPrepPlayers(d.jugadores, d); await botLoadExtras(); } catch (e) { botPlayers = []; }
 }
 
 async function cwToggle() {
