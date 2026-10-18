@@ -4287,10 +4287,8 @@ function cmpPlaceSelects() {
     if (el) slot.appendChild(el);
   });
   const c = document.getElementById('cmp-c');
-  if (c && c.options.length) c.options[0].text = c.value ? 'Quitar 3.er jugador' : '+ Añadir 3.er jugador';
+  if (c && c.options.length) c.options[0].text = c.value ? 'Quitar 3er jugador' : '+ Añadir 3er jugador';
 }
-function cmpSlug(t) { return drNorm(t).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-function cmpOpenSec(slug) { const d = document.getElementById('cmp-s-' + slug); if (d) d.open = true; }
 function cmpScoreHtml(sc, sides) {
   return sides.map((s, i) => `<i class="cmp-dot p-${s}" aria-hidden="true"></i><b>${sc[i]}</b>`).join('<span class="cmp-sc-dash">–</span>');
 }
@@ -4304,7 +4302,6 @@ function cmpRender() {
   const scores = sides.map(() => 0);
   const partial = cmpMode !== 'career';
   const noteLbl = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : 'sin datos') : 'rango elegido';
-  const chips = [];
   const sections = CMP_SECTIONS
     .filter(s => !s.when || players.some(p => s.when(p, p)))
     .filter(s => !(partial && s.career))          // en modo parcial se ocultan las secciones de carrera
@@ -4314,10 +4311,8 @@ function cmpRender() {
       if (!rows.length) return '';
       const sec = sides.map(() => 0);
       rows.forEach(r => r.wins.forEach((w, i) => { if (w) { scores[i]++; sec[i]++; } }));
-      const slug = cmpSlug(s.title);
-      chips.push(`<a class="cmp-chip" href="#cmp-s-${slug}" onclick="cmpOpenSec('${slug}')">${s.title.replace(' en un partido', '')} <b>${sec.join('–')}</b></a>`);
       const note = ((s.ranged || s.premios) && partial) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
-      return `<details class="cmp-section" id="cmp-s-${slug}" open><summary class="cmp-sec-title"><span class="cmp-sec-name">${s.title}${note}</span><span class="cmp-sec-score">${cmpScoreHtml(sec, sides)}</span></summary><div class="cmp-sec-body">${rows.map(r => r.html).join('')}</div></details>`;
+      return `<details class="cmp-section" open><summary class="cmp-sec-title"><span class="cmp-sec-name">${s.title}${note}</span><span class="cmp-sec-score">${cmpScoreHtml(sec, sides)}</span></summary><div class="cmp-sec-body">${rows.map(r => r.html).join('')}</div></details>`;
     }).join('');
 
   const mxScore = Math.max(...scores);
@@ -4333,26 +4328,12 @@ function cmpRender() {
   const head = three
     ? `<section class="cmp-head cmp-head--3" aria-label="Cara a cara">${sideHtml.join('')}${center}</section>`
     : `<section class="cmp-head" aria-label="Cara a cara">${sideHtml[0]}${center}${sideHtml[1]}</section>`;
-  const nav = `<div class="cmp-navrow"><nav class="cmp-nav" aria-label="Secciones">${chips.join('')}</nav>${cmpShareBar()}</div>`;
   cmpStashSelects();
-  document.getElementById('cmp-out').innerHTML = head + nav + sections + cmpLegend();
+  document.getElementById('cmp-out').innerHTML = head + sections + cmpLegend();
   cmpPlaceSelects();
 }
 function cmpLegend() {
   return `<p class="cmp-legend"><span class="cmp-noscore">*</span> No puntúa (fila informativa). El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador; los empates no cuentan. Barra llena = gana la fila; atenuada = pierde.</p>`;
-}
-
-function cmpShareBar() {
-  return `<div class="cmp-share-row"><button type="button" class="cmp-btn cmp-btn--primary" onclick="cmpShare()" aria-label="Compartir comparación en X"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Compartir en X</button><button type="button" class="cmp-btn" onclick="cmpCopyLink(this)">Copiar enlace</button></div>`;
-}
-async function cmpCopyLink(btn) {
-  cmpSyncUrl();
-  track('compartir', { metodo: 'enlace', origen: 'comparador' });
-  let ok = false;
-  try { await navigator.clipboard.writeText(location.href); ok = true; } catch (e) { }
-  if (!ok) { window.prompt('Copia el enlace de la comparación:', location.href); return; }
-  const prev = btn.textContent; btn.textContent = '¡Enlace copiado!';
-  setTimeout(() => { btn.textContent = prev; }, 2000);
 }
 
 // Calcula el resultado por bloque y el total (misma lógica que cmpRender, estructurado)
