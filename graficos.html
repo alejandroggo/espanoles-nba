@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(location.hostname==='alejandroggo.github.io'){location.replace('https://espanoles-nba.alejandroggo.com'+location.pathname.replace(/^\/espanoles-nba/,'')+location.search+location.hash);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NCR152YQ9F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied'});
+  try { if (localStorage.getItem('ag-consent') === 'granted') gtag('consent', 'update', {analytics_storage:'granted'}); } catch(e){}
+  gtag('config', 'G-NCR152YQ9F');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gráficos · Españoles en la NBA</title>
+<meta name="description" content="Crea tus propios gráficos con las estadísticas de los españoles de la NBA: evolución temporada a temporada, dispersión entre métricas, temporada regular y playoffs.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Españoles en la NBA">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Gráficos · Españoles en la NBA">
+<meta property="og:description" content="Crea tus propios gráficos con las estadísticas de los españoles de la NBA: evolución temporada a temporada, dispersión entre métricas, temporada regular y playoffs.">
+<meta property="og:url" content="https://espanoles-nba.alejandroggo.com/graficos.html">
+<link rel="canonical" href="https://espanoles-nba.alejandroggo.com/graficos.html">
+<meta property="og:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gráficos · Españoles en la NBA">
+<meta name="twitter:description" content="Crea tus propios gráficos con las estadísticas de los españoles de la NBA: evolución temporada a temporada, dispersión entre métricas, temporada regular y playoffs.">
+<meta name="twitter:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.basketball-reference.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=9">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=9">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0e0e10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Españoles NBA">
+<link rel="stylesheet" href="style.css?v=200">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index.html">ESPAÑOLES <span>EN LA</span> NBA</a>
+    <div class="header-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
+    </div>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+  <section class="hero hero--page">
+    <div class="hero-top">
+      <div>
+        <h1 class="hero-title ag-hero">El <em>Creador de gráficos</em></h1>
+        <p class="hero-sub" id="hero-sub">Cargando datos…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="controles gr-controles" aria-label="Configuración del gráfico">
+    <div class="gr-filtros">
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Tipo de gráfico</span>
+        <select id="gr-tipo" class="sel">
+          <option value="lineas">Líneas (evolución)</option>
+          <option value="dispersion">Dispersión (relación)</option>
+        </select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Competición</span>
+        <select id="gr-comp" class="sel">
+          <option value="reg">Temporada regular</option>
+          <option value="po">Playoffs</option>
+        </select>
+      </label>
+      <label class="tmp-field" data-gr="lineas">
+        <span class="tmp-field-lbl">Métrica (eje Y)</span>
+        <select id="gr-m" class="sel"></select>
+      </label>
+      <label class="tmp-field" data-gr="lineas">
+        <span class="tmp-field-lbl">Eje X</span>
+        <select id="gr-ex" class="sel">
+          <option value="temp">Temporada</option>
+          <option value="n">Nº de temporada en la NBA</option>
+          <option value="edad">Edad</option>
+        </select>
+      </label>
+      <label class="tmp-field" data-gr="dispersion">
+        <span class="tmp-field-lbl">Cada punto es</span>
+        <select id="gr-u" class="sel">
+          <option value="carrera">La carrera de un jugador</option>
+          <option value="temporada">Una temporada de un jugador</option>
+        </select>
+      </label>
+      <label class="tmp-field" data-gr="dispersion">
+        <span class="tmp-field-lbl">Eje Y</span>
+        <select id="gr-y" class="sel"></select>
+      </label>
+      <label class="tmp-field" data-gr="dispersion">
+        <span class="tmp-field-lbl">Eje X</span>
+        <select id="gr-x" class="sel"></select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Desde</span>
+        <select id="gr-desde" class="sel"></select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Hasta</span>
+        <select id="gr-hasta" class="sel"></select>
+      </label>
+      <label class="tmp-field">
+        <span class="tmp-field-lbl">Mín. partidos</span>
+        <select id="gr-min" class="sel"></select>
+      </label>
+    </div>
+
+    <div class="gr-picker" id="gr-picker">
+      <span class="tmp-field-lbl" id="gr-q-lbl">Jugadores <span class="gr-count" id="gr-count"></span></span>
+      <div class="gr-picker-box">
+        <div class="gr-chips" id="gr-chips"></div>
+        <div class="gr-search">
+          <input type="search" id="gr-q" class="gr-q" placeholder="Buscar jugador…" autocomplete="off" role="combobox" aria-labelledby="gr-q-lbl" aria-controls="gr-sugg" aria-expanded="false">
+          <div class="gr-sugg" id="gr-sugg" role="listbox" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gr-opts">
+      <button type="button" id="gr-ley" class="toggle-chip" aria-pressed="true">Leyenda</button>
+      <button type="button" id="gr-ctx" class="toggle-chip" aria-pressed="true" data-gr="dispersion">Resto de españoles</button>
+      <button type="button" id="gr-caras" class="toggle-chip" aria-pressed="true" data-gr="caras">Caras</button>
+      <button type="button" id="gr-nom" class="toggle-chip" aria-pressed="true" data-gr="carrera">Nombres</button>
+      <button type="button" id="gr-muestra" class="toggle-chip" aria-pressed="true" data-gr="pct">Ocultar % con poca muestra</button>
+      <label class="gr-tfield">
+        <span class="sr-only">Título del gráfico</span>
+        <input type="text" id="gr-t" class="gr-tinput" maxlength="90" placeholder="Título automático">
+      </label>
+    </div>
+  </section>
+
+  <section class="gr-wrap" aria-label="Gráfico">
+    <figure class="gr-figure">
+      <figcaption class="gr-cap">
+        <h2 class="gr-title" id="gr-title"></h2>
+        <p class="gr-sub" id="gr-sub"></p>
+      </figcaption>
+      <div class="gr-legend" id="gr-legend"></div>
+      <div class="gr-chart" id="gr-chart"><p class="gr-empty">Cargando…</p></div>
+      <ul class="gr-warn" id="gr-warn" hidden></ul>
+      <p class="gr-note" id="gr-note"></p>
+    </figure>
+    <div class="gr-actions">
+      <label class="gr-fmt"><span class="sr-only">Formato de la imagen</span>
+        <select id="gr-fmt" class="sel">
+          <option value="h">Horizontal · 1600×900</option>
+          <option value="v">Vertical · 1080×1350</option>
+        </select>
+      </label>
+      <button type="button" class="efm-share-btn" onclick="grDownload()">Descargar PNG</button>
+      <button type="button" class="efm-share-btn" onclick="grShare()" aria-label="Compartir el gráfico en X"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir en X</button>
+      <button type="button" class="efm-share-btn" onclick="grCopyLink(this)">Copiar enlace</button>
+    </div>
+    <details class="gr-datos">
+      <summary>Ver los datos del gráfico</summary>
+      <div class="gr-table" id="gr-table"></div>
+    </details>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="ag-footer">
+  <div class="ag-footer-brand">
+    <strong>Alejandro Gaitán</strong>
+    <span>Periodismo NBA en español</span>
+  </div>
+  <nav class="ag-footer-projects" aria-label="Otros proyectos">
+    <a href="https://offseason.alejandroggo.com/" rel="noopener noreferrer">NBA Offseason</a>
+    <a href="https://premios-nba.alejandroggo.com/" rel="noopener noreferrer">NBA Awards</a>
+    <a href="https://mejor-franquicia-nba.alejandroggo.com/" rel="noopener noreferrer">Ranking de franquicias</a>
+    <a href="https://nbaenespanol.alejandroggo.com/" rel="noopener noreferrer">NBA en Español</a>
+    <a href="https://portfolio.alejandroggo.com/" rel="noopener noreferrer">Portafolio</a>
+  </nav>
+  <nav class="ag-footer-pubs" aria-label="Publicaciones">
+    <a href="https://alejandroggo.substack.com" rel="noopener noreferrer">Substack</a>
+    <a href="https://www.gigantes.com/author/alejandrogaitan/" rel="noopener noreferrer">Gigantes</a>
+    <a href="https://alejandrogaitan.com" rel="noopener noreferrer">alejandrogaitan.com</a>
+  </nav>
+  <div class="ag-footer-meta">
+    <span>© Alejandro Gaitán</span>
+    <span>Última actualización: <time id="ag-last-update" datetime=""></time></span>
+  </div>
+</footer>
+
+<script src="app.js?v=200"></script>
+<script>initTheme(); initGraficosPage();</script>
+</body>
+</html>
