@@ -6782,3 +6782,180 @@ async function qntShare() {
   } catch (e) { if (e && e.name === 'AbortError') return; }
   window.open(xIntent, '_blank', 'noopener,noreferrer');
 }
+
+
+// ══════════════════════════════════════════════
+// PAREJAS (compañeros) — página oculta del menú
+// ══════════════════════════════════════════════
+function pjCol(eq) {
+  const m = [['Dallas', '#0053bc'], ['Toronto', '#CE1141'], ['Portland', '#E03A3E'],
+  ['Chicago', '#CE1141'], ['Minnesota', '#236192'], ['Memphis', '#5D76A9']];
+  for (const [k, c] of m) if ((eq || '').includes(k)) return c;
+  return '#b91c1c';
+}
+function pjIni(nm) {
+  const w = (nm || '').trim().split(/\s+/);
+  return ((w[0] || ' ')[0] + (w[w.length - 1] || ' ')[0]).toUpperCase();
+}
+function pjDec1(v) { return (v === null || v === undefined) ? '—' : (typeof v === 'number' ? v.toFixed(1) : ('' + v)).replace('.', ','); }
+function pjNum(v) { return (v === null || v === undefined) ? '—' : ('' + v).replace('.', ','); }
+
+function pjCard(p) {
+  const c = pjCol(p.equipo), gold = p.en_activo;
+  let badge;
+  if (gold) badge = '<span class="pj-badge gold"><span class="pj-liv"></span>EN ACTIVO</span>';
+  else if (p.campeones) badge = '<span class="pj-badge champ">🏆 CAMPEONES 2019</span>';
+  else badge = '<span class="pj-era">' + p.era + '</span>';
+
+  const keys = Object.keys(p.pts).filter(k => k !== 'juntos');
+  const ka = keys[0], kb = keys[1];
+  const row = (lbl, cat) => {
+    const d = p[cat];
+    const jv = d.juntos === null || d.juntos === undefined ? '—'
+      : (cat === 'min' ? String(Math.round(d.juntos)) : pjDec1(d.juntos));
+    return '<tr><th>' + lbl + '</th><td>' + pjDec1(d[ka]) + '</td><td>' + pjDec1(d[kb]) + '</td><td class="jt">' + jv + '</td></tr>';
+  };
+  const rows = row('Minutos', 'min') + row('Puntos', 'pts') + row('Rebotes', 'reb') + row('Asist.', 'ast');
+  const vic = (p.victorias_pct !== null && p.victorias_pct !== undefined) ? pjDec1(p.victorias_pct) + '%' : '—';
+  const rec = p.record || 'por empezar';
+  const pj = pjNum(p.partidos_juntos);
+
+  const oc = p.oncourt;
+  let ocblock, octitle;
+  if (oc) {
+    const net = oc.net, nets = (net >= 0 ? '+' : '') + pjDec1(net);
+    ocblock = '<div class="pj-oc"><div><div class="v">' + pjDec1(oc.off) + '</div><div class="l">Rtg of.</div></div>'
+      + '<div><div class="v">' + pjDec1(oc.def) + '</div><div class="l">Rtg def.</div></div>'
+      + '<div><div class="v net">' + nets + '</div><div class="l">Net Rtg</div></div></div>';
+    octitle = '🏀 Con los dos en pista' + (oc.min ? ' · ' + oc.min + ' min' : '');
+  } else {
+    ocblock = '<div class="pj-oc"><div><div class="v dim">—</div><div class="l">Rtg of.</div></div><div><div class="v dim">—</div><div class="l">Rtg def.</div></div><div><div class="v dim">—</div><div class="l">Net Rtg</div></div></div>';
+    octitle = '🏀 Con los dos en pista';
+  }
+  const ocnote = p.oncourt_nota ? '<div class="pj-note">' + p.oncourt_nota + '</div>' : '';
+  const ae = p.asist_entre, aek = Object.keys(ae || {});
+  const conn = aek.length ? '<div class="pj-conn"><div><div class="v">' + pjNum(ae[aek[0]]) + '</div><div class="l">' + aek[0] + '</div></div>'
+    + '<div><div class="v">' + pjNum(ae[aek[1]]) + '</div><div class="l">' + aek[1] + '</div></div></div>' : '';
+  const po = p.playoffs ? '<div class="pj-po">🏀 Playoffs · ' + p.playoffs + '</div>' : '';
+  const facts = (p.facts || []).map(f => '<div class="pj-fact"><span class="ic">•</span><div>' + f + '</div></div>').join('');
+
+  return '<div class="pj-card' + (gold ? ' gold' : '') + '">'
+    + '<div class="pj-top"><span class="pj-team"><span class="pj-tdot" style="background:' + c + '"></span>' + (p.equipo || '').toUpperCase() + '</span>' + badge + '</div>'
+    + '<div class="pj-duo"><div class="pj-pl"><div class="pj-disc" style="background:' + c + '">' + pjIni(p.a) + '</div><div class="n">' + p.a + '</div></div>'
+    + '<span class="pj-amp">&amp;</span><div class="pj-pl"><div class="pj-disc" style="background:' + c + '">' + pjIni(p.b) + '</div><div class="n">' + p.b + '</div></div></div>'
+    + '<div class="pj-block"><div><div class="big">' + pj + '</div><div class="lbl">partidos juntos</div></div>'
+    + '<div><div class="big">' + vic + '</div><div class="lbl">victorias</div><div class="mini">' + rec + '</div></div></div>'
+    + '<table class="pj-table"><thead><tr><th class="l"></th><th>' + ka + '</th><th>' + kb + '</th><th class="jt">Juntos</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    + '<div class="pj-sect"><div class="t">' + octitle + '</div>' + ocblock + '</div>' + ocnote
+    + '<div class="pj-sect"><div class="t">🔗 Se asistieron entre ellos</div>' + conn + '</div>' + po
+    + '<div class="pj-facts">' + facts + '</div></div>';
+}
+
+async function initParejasPage() {
+  const root = document.getElementById('pj-root');
+  if (!root) return;
+  let P;
+  try {
+    P = await fetch('data/parejas.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(); return r.json(); });
+  } catch (e) {
+    root.innerHTML = '<p class="pj-err">No se pudieron cargar las parejas.</p>';
+    return;
+  }
+  const sub = document.getElementById('pj-hero-sub');
+  if (sub) sub.innerHTML = 'Españoles que compartieron vestuario en la NBA · números como dúo, rendimiento con los dos en pista y cómo se conectaban.';
+  root.innerHTML = P.map(pjCard).join('');
+}
+
+// ══════════════════════════════════════════════
+// CARA A CARA — matriz (página oculta del menú)
+// ══════════════════════════════════════════════
+const CC_SHORT2FULL = {
+  'Pau': 'Pau Gasol', 'Marc': 'Marc Gasol', 'Chacho': 'Sergio Rodríguez', 'Ibaka': 'Serge Ibaka',
+  'Ricky': 'Ricky Rubio', 'Calderón': 'José M. Calderón', 'Mirotić': 'Nikola Mirotic', 'Rudy': 'Rudy Fernández',
+  'Raül': 'Raül Lopez', 'Garuba': 'Usman Garuba', 'Abrines': 'Alex Abrines', 'Willy': 'Willy Hernangómez',
+  'Juancho': 'Juancho Hernangómez', 'Aldama': 'Santi Aldama', 'Hugo': 'Hugo González',
+  'Navarro': 'Juan Carlos Navarro', 'Garbajosa': 'Jorge Garbajosa', 'Claver': 'Víctor Claver'
+};
+function ccNrm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function ccParseRec(rec, a, b) {
+  const m = /(\d+)\s*-\s*(\d+)/.exec(rec);
+  if (!m) return [0, 0];
+  const w = +m[1], l = +m[2];
+  if (ccNrm(rec).startsWith('igualado')) return [w, l];
+  const head = ccNrm(rec.slice(0, m.index)).trim();
+  let winner = null;
+  for (const [sh, full] of Object.entries(CC_SHORT2FULL)) {
+    if (head.startsWith(ccNrm(sh))) { winner = full; break; }
+  }
+  if (winner === a) return [w, l];
+  if (winner === b) return [l, w];
+  return [w, l];
+}
+function ccIni(nm) { const w = nm.split(/\s+/); return (w[0][0] + w[w.length - 1][0]).toUpperCase(); }
+function ccTint(w, l) {
+  if (w === l) return 'background:var(--surface-2)';
+  const tot = w + l, frac = Math.abs(w - l) / tot, a = 0.14 + 0.5 * frac;
+  const c = w > l ? 'var(--win)' : 'var(--loss)';
+  return 'background:color-mix(in srgb,' + c + ' ' + (a * 100).toFixed(0) + '%,transparent);color:' + (frac > 0.55 ? '#fff' : 'var(--text)');
+}
+
+async function initCaraACaraPage() {
+  const host = document.getElementById('cc-root');
+  if (!host) return;
+  let D;
+  try {
+    D = await fetch('data/duelos.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(); return r.json(); });
+  } catch (e) {
+    host.innerHTML = '<p class="cc-err">No se pudieron cargar los duelos.</p>';
+    return;
+  }
+  const FULL2SHORT = {};
+  for (const [sh, full] of Object.entries(CC_SHORT2FULL)) FULL2SHORT[full] = sh;
+
+  const cell = {}, duel = {}, games = {};
+  for (const d of D) {
+    const a = d.a, b = d.b;
+    const [wa, la] = ccParseRec(d.rec, a, b);
+    cell[a + '|' + b] = [wa, la]; cell[b + '|' + a] = [la, wa];
+    duel[[a, b].sort().join('|')] = d;
+    for (const p of [a, b]) games[p] = (games[p] || 0) + d.g;
+  }
+  const players = Object.keys(games).sort((x, y) => games[y] - games[x]);
+  const P = players.map(p => ({ full: p, short: FULL2SHORT[p] || p.split(/\s+/).pop(), ini: ccIni(p) }));
+
+  let html = '<tr><th class="cc-corner">fila&nbsp;vs&nbsp;col</th>';
+  P.forEach(p => { html += '<th class="cc-ch" title="' + p.full + '">' + p.ini + '</th>'; });
+  html += '</tr>';
+  P.forEach((rp, i) => {
+    html += '<tr><th class="cc-rh" title="' + rp.full + '">' + rp.short + '</th>';
+    P.forEach((cp, j) => {
+      if (i === j) { html += '<td class="cc-diag"></td>'; return; }
+      const c = cell[rp.full + '|' + cp.full];
+      if (!c) { html += '<td class="cc-none">·</td>'; return; }
+      html += '<td class="cc-cell" style="' + ccTint(c[0], c[1]) + '" data-i="' + i + '" data-j="' + j + '">' + c[0] + '-' + c[1] + '</td>';
+    });
+    html += '</tr>';
+  });
+  document.getElementById('cc-mx').innerHTML = html;
+
+  const det = document.getElementById('cc-detail');
+  document.getElementById('cc-mx').addEventListener('click', e => {
+    const td = e.target.closest('td.cc-cell'); if (!td) return;
+    const A = P[+td.dataset.i].full, B = P[+td.dataset.j].full;
+    const d = duel[[A, B].sort().join('|')]; if (!d) return;
+    const av = d.av, mn = d.min || {}, ks = [d.a, d.b];
+    const hasMin = mn[d.a] || mn[d.b];
+    const rows = ks.map(k => '<tr><td class="l">' + k + '</td>' + (hasMin ? '<td>' + (mn[k] || '—') + '</td>' : '') + '<td>' + av[k] + '</td></tr>').join('');
+    const dates = (d.primer && d.ultimo) ? '<div class="cc-ddates">Primer duelo <b>' + d.primer + '</b> · último <b>' + d.ultimo + '</b></div>' : '';
+    let po = '';
+    if (d.playoffs && d.playoffs.length) {
+      po = '<div class="cc-dpo"><div class="cc-dpo-h">En playoffs</div>' + d.playoffs.map(s =>
+        '<div class="cc-dpo-row"><span class="yr">' + s.temporada + '</span><span class="sr">' + s.serie + '<br><span class="rd">' + s.ronda + '</span></span></div>').join('') + '</div>';
+    }
+    det.className = 'cc-detail';
+    det.innerHTML = '<div class="cc-dhead">' + d.a + '<span class="vs">vs</span>' + d.b + '</div>'
+      + '<div class="cc-drec">' + d.rec + ' · ' + d.g + ' partidos</div>' + dates
+      + '<table class="cc-dtbl"><thead><tr><th class="l"></th>' + (hasMin ? '<th>min</th>' : '') + '<th>pts/reb/ast</th></tr></thead><tbody>' + rows + '</tbody></table>' + po;
+    det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
