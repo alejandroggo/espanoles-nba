@@ -4142,6 +4142,8 @@ const CMP_SECTIONS = [
 ];
 
 // Compara una fila entre N jugadores (2 o 3). Gana el mejor si es único.
+// Dos jugadores: barras enfrentadas desde el centro; tres: una barra por columna.
+// Cada barra lleva el color del jugador; la del ganador va llena y las demás atenuadas.
 function cmpRow(row, datas) {
   const vals = datas.map(d => row.get(d));
   const nums = vals.map(v => (typeof v === 'number' ? v : null));
@@ -4153,36 +4155,44 @@ function cmpRow(row, datas) {
   }
   const fmts = vals.map(v => (v == null ? '—' : row.fmt(v)));
   const mx = Math.max(...present.map(Math.abs), 0) || 1;
-  const bar = i => (row.bar && nums[i] != null && present.length >= 2)
-    ? `<div class="cmp-bar"><span class="cmp-fill${wins[i] ? ' win' : ''}" style="width:${Math.round(Math.abs(nums[i]) / mx * 100)}%"></span></div>` : '';
-
-  const extraCls = row.cls ? ' ' + row.cls : '';
+  const hasBar = !!row.bar && present.length >= 2;
+  const anyWin = wins.some(Boolean);
+  const pct = i => (nums[i] == null ? 0 : Math.max(2, Math.round(Math.abs(nums[i]) / mx * 100)));
+  const valCls = i => `cmp-val${wins[i] ? ' win' : ''}${anyWin && !wins[i] ? ' lose' : ''}`;
+  const sideOf = i => ['a', 'b', 'c'][i];
+  const fill = i => `<span class="cmp-dfill p-${sideOf(i)}${wins[i] ? ' win' : ''}" style="width:${pct(i)}%"></span>`;
+  const extraCls = (row.cls ? ' ' + row.cls : '') + (row.dir === 'neutral' ? ' cmp-row--info' : '') + (hasBar && !anyWin ? ' cmp-row--tie' : '');
   const metricLabel = row.dir === 'neutral'
     ? `${row.label}<span class="cmp-noscore">*</span>`
     : row.label;
   let html;
   if (datas.length === 2) {
+    const bars = hasBar ? `<div class="cmp-dbar" aria-hidden="true"><span class="cmp-dhalf a">${fill(0)}</span><span class="cmp-dhalf b">${fill(1)}</span></div>` : '';
     html = `<div class="cmp-row${extraCls}">
-      <div class="cmp-cell a"><div class="cmp-val a${wins[0] ? ' win' : ''}">${fmts[0]}</div>${bar(0)}</div>
-      <div class="cmp-metric">${metricLabel}</div>
-      <div class="cmp-cell b"><div class="cmp-val b${wins[1] ? ' win' : ''}">${fmts[1]}</div>${bar(1)}</div>
+      <div class="${valCls(0)} a">${fmts[0]}</div>
+      <div class="cmp-mid"><div class="cmp-metric">${metricLabel}</div>${bars}</div>
+      <div class="${valCls(1)} b">${fmts[1]}</div>
     </div>`;
   } else {
     html = `<div class="cmp-row3${extraCls}">
       <div class="cmp-metric cmp-metric--left">${metricLabel}</div>
-      ${datas.map((_, i) => `<div class="cmp-cell3"><div class="cmp-val${wins[i] ? ' win' : ''}">${fmts[i]}</div>${bar(i)}</div>`).join('')}
+      ${datas.map((_, i) => `<div class="cmp-cell3"><div class="${valCls(i)}">${fmts[i]}</div>${hasBar ? `<span class="cmp-dhalf b" aria-hidden="true">${fill(i)}</span>` : ''}</div>`).join('')}
     </div>`;
   }
   return { wins, empty: vals.every(v => v == null), html };
 }
 
+// Ficha del jugador en el cara a cara: foto con aro de su color, nombre y datos básicos
 function cmpCard(j, side) {
   const foto = (j.id || j.foto_url || j.bref_id) ? `<span class="cmp-photo"><img loading="lazy" ${agFotoSrc(j)} onerror="agImgRemove(this)" alt="${j.nombre}"></span>` : `<span class="cmp-photo">${avatarHtml(j.nombre, 'cmp-avatar')}</span>`;
-  const draft = j.draft ? `Draft ${j.draft_anio || ''} · #${j.draft_pick || '?'}` : 'No drafteado';
+  const draft = j.draft ? `Draft ${j.draft_anio || ''} · nº ${j.draft_pick || '?'}` : 'No drafteado';
+  const meta = [j.posicion, draft].filter(Boolean).join(' · ');
+  const teams = cmpMode === 'career' && j.equipos_nba ? `<span class="cmp-teams">${j.equipos_nba.replace(/\s*,\s*/g, ' · ')}</span>` : '';
   return `<div class="cmp-card cmp-${side}">
     ${foto}
     <a class="cmp-name" href="${jugadorHref(j.id)}">${j.nombre}</a>
-    <span class="cmp-meta">${draft}</span>
+    <span class="cmp-meta">${meta}</span>
+    ${teams}
   </div>`;
 }
 
@@ -4197,7 +4207,7 @@ function cmpAggFor(side, j) {
 // Barra de modos + control asociado (una temporada, o rangos por jugador)
 function cmpModeBar(players) {
   const common = cmpCommon(players);
-  const chip = (m, label, on) => `<button type="button" class="toggle-chip${cmpMode === m ? ' active' : ''}" aria-pressed="${cmpMode === m}"${on === false ? ' disabled' : ''} onclick="cmpSetMode('${m}')">${label}</button>`;
+  const chip = (m, label, on) => `<button type="button" class="cmp-seg-btn${cmpMode === m ? ' active' : ''}" aria-pressed="${cmpMode === m}"${on === false ? ' disabled' : ''} onclick="cmpSetMode('${m}')">${label}</button>`;
   let extra = '';
   if (cmpMode === 'same') {
     if (!common.length) {
@@ -4210,7 +4220,7 @@ function cmpModeBar(players) {
     extra = `<p class="cmp-mode-note">Elige el tramo de cada jugador bajo su foto.</p>`;
   }
   return `<div class="cmp-mode">
-    <div class="mode-switch" role="group" aria-label="Qué comparar">
+    <div class="cmp-seg" role="group" aria-label="Qué comparar">
       ${chip('career', 'Toda la carrera')}
       ${chip('same', 'Misma temporada', common.length > 0)}
       ${chip('diff', 'Diferentes años')}
@@ -4265,6 +4275,26 @@ function cmpRangeUI(side, j, agg) {
   </div>`;
 }
 
+// Los <select> de jugador viven en la ficha de cada uno (y el del 3.º en el centro). Como el
+// cara a cara se repinta entero, se guardan fuera antes de repintar y se recolocan después.
+function cmpStashSelects() {
+  const hold = document.querySelector('.cmp-pick');
+  ['a', 'b', 'c'].forEach(s => { const el = document.getElementById('cmp-' + s); if (el && hold) hold.appendChild(el); });
+}
+function cmpPlaceSelects() {
+  document.querySelectorAll('#cmp-out [data-sel]').forEach(slot => {
+    const el = document.getElementById('cmp-' + slot.getAttribute('data-sel'));
+    if (el) slot.appendChild(el);
+  });
+  const c = document.getElementById('cmp-c');
+  if (c && c.options.length) c.options[0].text = c.value ? 'Quitar 3.er jugador' : '+ Añadir 3.er jugador';
+}
+function cmpSlug(t) { return drNorm(t).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+function cmpOpenSec(slug) { const d = document.getElementById('cmp-s-' + slug); if (d) d.open = true; }
+function cmpScoreHtml(sc, sides) {
+  return sides.map((s, i) => `<i class="cmp-dot p-${s}" aria-hidden="true"></i><b>${sc[i]}</b>`).join('<span class="cmp-sc-dash">–</span>');
+}
+
 function cmpRender() {
   const sides = cmpSides();
   const players = sides.map(s => cmpCur(s));
@@ -4274,6 +4304,7 @@ function cmpRender() {
   const scores = sides.map(() => 0);
   const partial = cmpMode !== 'career';
   const noteLbl = cmpMode === 'same' ? (cmpSame ? drSeason(cmpSame) : 'sin datos') : 'rango elegido';
+  const chips = [];
   const sections = CMP_SECTIONS
     .filter(s => !s.when || players.some(p => s.when(p, p)))
     .filter(s => !(partial && s.career))          // en modo parcial se ocultan las secciones de carrera
@@ -4281,31 +4312,47 @@ function cmpRender() {
       const datas = sides.map((_, i) => (s.premios ? prems[i] : (s.ranged ? aggs[i] : players[i])));
       let rows = s.rows.map(r => cmpRow(r, datas));
       if (!rows.length) return '';
-      rows.forEach(r => r.wins.forEach((w, i) => { if (w) scores[i]++; }));
+      const sec = sides.map(() => 0);
+      rows.forEach(r => r.wins.forEach((w, i) => { if (w) { scores[i]++; sec[i]++; } }));
+      const slug = cmpSlug(s.title);
+      chips.push(`<a class="cmp-chip" href="#cmp-s-${slug}" onclick="cmpOpenSec('${slug}')">${s.title.replace(' en un partido', '')} <b>${sec.join('–')}</b></a>`);
       const note = ((s.ranged || s.premios) && partial) ? `<span class="cmp-sec-note">${noteLbl}</span>` : '';
-      return `<details class="cmp-section" open><summary class="cmp-sec-title">${s.title}${note}</summary>${rows.map(r => r.html).join('')}</details>`;
+      return `<details class="cmp-section" id="cmp-s-${slug}" open><summary class="cmp-sec-title"><span class="cmp-sec-name">${s.title}${note}</span><span class="cmp-sec-score">${cmpScoreHtml(sec, sides)}</span></summary><div class="cmp-sec-body">${rows.map(r => r.html).join('')}</div></details>`;
     }).join('');
 
   const mxScore = Math.max(...scores);
   const uniqueTop = scores.filter(s => s === mxScore).length === 1;
   const scoreHtml = scores.map(s => `<span class="cmp-sc${(uniqueTop && s === mxScore) ? ' win' : ''}">${s}</span>`).join('<span class="cmp-sc-sep">–</span>');
-  const scoreboard = `<div class="cmp-scoreboard${sides.length === 3 ? ' cmp-scoreboard--top' : ''}">
-      <div class="cmp-score">${scoreHtml}</div>
-      <div class="cmp-sc-lbl">categorías ganadas</div>
+  const three = sides.length === 3;
+  const center = `<div class="cmp-center">
+      <div class="cmp-scoreboard"><div class="cmp-score">${scoreHtml}</div><div class="cmp-sc-lbl">categorías ganadas</div></div>
+      ${cmpModeBar(players)}
+      ${three ? '' : '<span class="cmp-sel-slot cmp-sel-slot--add" data-sel="c"></span>'}
     </div>`;
-  const sideHtml = sides.map((s, i) => `<div class="cmp-side">${cmpCard(players[i], s)}${cmpRangeUI(s, players[i], aggs[i])}</div>`);
-
-  const head = sides.length === 3
-    ? `${scoreboard}<div class="cmp-head cmp-head--3">${sideHtml.join('')}</div>`
-    : `<div class="cmp-head">${sideHtml[0]}${scoreboard}${sideHtml[1]}</div>`;
-  document.getElementById('cmp-out').innerHTML = cmpModeBar(players) + head + cmpShareBar() + sections + cmpLegend();
+  const sideHtml = sides.map((s, i) => `<div class="cmp-side p-${s}">${cmpCard(players[i], s)}${cmpRangeUI(s, players[i], aggs[i])}<span class="cmp-sel-slot" data-sel="${s}"></span></div>`);
+  const head = three
+    ? `<section class="cmp-head cmp-head--3" aria-label="Cara a cara">${sideHtml.join('')}${center}</section>`
+    : `<section class="cmp-head" aria-label="Cara a cara">${sideHtml[0]}${center}${sideHtml[1]}</section>`;
+  const nav = `<div class="cmp-navrow"><nav class="cmp-nav" aria-label="Secciones">${chips.join('')}</nav>${cmpShareBar()}</div>`;
+  cmpStashSelects();
+  document.getElementById('cmp-out').innerHTML = head + nav + sections + cmpLegend();
+  cmpPlaceSelects();
 }
 function cmpLegend() {
-  return `<p class="cmp-legend"><span class="cmp-noscore">*</span> No puntúa (fila informativa). El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador; los empates no cuentan.</p>`;
+  return `<p class="cmp-legend"><span class="cmp-noscore">*</span> No puntúa (fila informativa). El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador; los empates no cuentan. Barra llena = gana la fila; atenuada = pierde.</p>`;
 }
 
 function cmpShareBar() {
-  return `<div class="cmp-share-row"><button type="button" class="efm-share-btn" onclick="cmpShare()" aria-label="Compartir comparación"><span class="efm-share-ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span> Compartir comparación</button></div>`;
+  return `<div class="cmp-share-row"><button type="button" class="cmp-btn cmp-btn--primary" onclick="cmpShare()" aria-label="Compartir comparación en X"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Compartir en X</button><button type="button" class="cmp-btn" onclick="cmpCopyLink(this)">Copiar enlace</button></div>`;
+}
+async function cmpCopyLink(btn) {
+  cmpSyncUrl();
+  track('compartir', { metodo: 'enlace', origen: 'comparador' });
+  let ok = false;
+  try { await navigator.clipboard.writeText(location.href); ok = true; } catch (e) { }
+  if (!ok) { window.prompt('Copia el enlace de la comparación:', location.href); return; }
+  const prev = btn.textContent; btn.textContent = '¡Enlace copiado!';
+  setTimeout(() => { btn.textContent = prev; }, 2000);
 }
 
 // Calcula el resultado por bloque y el total (misma lógica que cmpRender, estructurado)
