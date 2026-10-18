@@ -4506,7 +4506,7 @@ async function cmpBuildImage(d) {
   x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(PAD, H - footH + 20, W - 2 * PAD, 1);
   x.textBaseline = 'middle'; x.font = '700 24px Inter, sans-serif';
   x.textAlign = 'left'; x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', PAD, H - footH / 2 + 10);
-  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.fillText('@alejandroggo', W - PAD, H - footH / 2 + 10);
+  x.textAlign = 'right'; x.fillStyle = CO.yellow; x.fillText('@alejandroggo · #EspañolesNBA', W - PAD, H - footH / 2 + 10);
   return c;
 }
 function cmpShortName(nombre, n) {
@@ -7692,20 +7692,20 @@ async function grBuildImage(scene, legend, fmt) {
   const notes = ['Fuente: Basketball Reference.'].concat(scene.notes)
     .concat(median ? [`Líneas discontinuas: mediana de los ${scene.points.length} ${scene.points[0].year ? 'puntos' : 'jugadores'}.`] : []).join(' ');
   const brandF = `700 ${F.foot > 100 ? 22 : 19}px Inter, sans-serif`;
-  x.font = brandF; const siteW = x.measureText('espanoles-nba.alejandroggo.com').width, handW = x.measureText('@alejandroggo').width;
+  x.font = brandF; const siteW = x.measureText('espanoles-nba.alejandroggo.com').width, handW = x.measureText('@alejandroggo · #EspañolesNBA').width;
   x.textBaseline = 'middle';
   if (F.foot > 100) {
     x.font = '400 16px Inter, sans-serif'; x.fillStyle = CO.dim; x.textAlign = 'left';
     grWrap(x, notes, W - 2 * PAD, 2).forEach((ln, i) => x.fillText(ln, PAD, fy + 30 + i * 21));
     x.font = brandF; x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', PAD, H - 34);
-    x.fillStyle = CO.yellow; x.textAlign = 'right'; x.fillText('@alejandroggo', W - PAD, H - 34);
+    x.fillStyle = CO.yellow; x.textAlign = 'right'; x.fillText('@alejandroggo · #EspañolesNBA', W - PAD, H - 34);
   } else {
     const nw = W - 2 * PAD - siteW - handW - 18 - 32;
     x.font = '400 15px Inter, sans-serif'; x.fillStyle = CO.dim; x.textAlign = 'left';
-    const ls = grWrap(x, notes, nw, 2);
+    const ls = grWrap(x, notes, nw, 3);
     ls.forEach((ln, i) => x.fillText(ln, PAD, fy + F.foot / 2 + (i - (ls.length - 1) / 2) * 19));
     x.font = brandF; x.textAlign = 'right';
-    x.fillStyle = CO.yellow; x.fillText('@alejandroggo', W - PAD, fy + F.foot / 2);
+    x.fillStyle = CO.yellow; x.fillText('@alejandroggo · #EspañolesNBA', W - PAD, fy + F.foot / 2);
     x.fillStyle = CO.text; x.fillText('espanoles-nba.alejandroggo.com', W - PAD - handW - 18, fy + F.foot / 2);
   }
   return c;
