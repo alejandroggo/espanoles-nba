@@ -8480,4 +8480,38 @@ async function initCaraACaraPage() {
       + '<table class="cc-dtbl"><thead><tr><th class="l"></th>' + (hasMin ? '<th>min</th>' : '') + '<th>pts/reb/ast</th></tr></thead><tbody>' + rows + '</tbody></table>' + po;
     det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
+
+  // ── Tarjetas premium: las rivalidades con más de 10 enfrentamientos ──
+  const shortOf = full => FULL2SHORT[full] || full.split(/\s+/).pop();
+  const yr = s => { const m = String(s || '').match(/\d{4}/); return m ? m[0] : ''; };
+  const premCard = d => {
+    const m = d.rec.match(/^(.*?)(?:\s*\((.*)\))?$/);
+    const recMain = m[1].trim(), recSub = (m[2] || '').trim();
+    const mn = d.min || {};
+    const plLine = full => {
+      const im = agPhotoImg(full, 'cc-prem-ph');
+      const mnTxt = mn[full] ? '<span class="cc-prem-min">' + mn[full] + ' min</span>' : '';
+      return '<div class="cc-prem-pl">' + (im || '<span class="cc-prem-ph"></span>')
+        + '<div class="cc-prem-pln"><span class="cc-prem-nm">' + shortOf(full) + '</span>' + mnTxt + '</div>'
+        + '<div class="cc-prem-av">' + (d.av ? d.av[full] : '') + '</div></div>';
+    };
+    const po = (d.playoffs && d.playoffs.length)
+      ? '<div class="cc-prem-po">' + d.playoffs.map(s => '<span><b>' + s.temporada + '</b> ' + s.serie + '</span>').join('') + '</div>' : '';
+    const nota = d.nota ? '<div class="cc-prem-note">' + d.nota + '</div>' : '';
+    const span = (yr(d.primer) && yr(d.ultimo)) ? ' · ' + yr(d.primer) + '–' + yr(d.ultimo) : '';
+    return '<div class="cc-prem-card">'
+      + '<div class="cc-prem-head"><span class="cc-prem-rec">' + recMain + '</span>'
+      + (recSub ? '<span class="cc-prem-sub">' + recSub + '</span>' : '')
+      + '<span class="cc-prem-g">' + d.g + ' partidos' + span + '</span></div>'
+      + '<div class="cc-prem-body">' + plLine(d.a) + plLine(d.b) + '</div>'
+      + po + nota + '</div>';
+  };
+  const prem = D.filter(d => d.g > 10).sort((a, b) => b.g - a.g);
+  const wrap = document.createElement('section');
+  wrap.className = 'cc-prem-wrap';
+  wrap.setAttribute('aria-label', 'Los grandes duelos');
+  wrap.innerHTML = '<h2 class="cc-prem-title">Los grandes <em>duelos</em></h2>'
+    + '<p class="cc-prem-lead">Las rivalidades que se vieron más de 10 veces — récord, medias por partido y playoffs.</p>'
+    + '<div class="cc-prem-grid">' + prem.map(premCard).join('') + '</div>';
+  host.parentNode.appendChild(wrap);
 }

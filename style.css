@@ -2245,3 +2245,26 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-dpo-row .sr{color:var(--text);font-weight:600;text-align:right}
 .cc-dpo-row .rd{color:var(--text-dim);font-size:.7rem}
 .cc-err{color:var(--text-muted);text-align:center;padding:30px}
+/* tarjetas premium (grandes duelos) */
+.cc-prem-wrap{max-width:1040px;margin:30px auto 0;padding:0 2px}
+.cc-prem-title{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,5vw,2.2rem);line-height:.95;color:var(--text)}
+.cc-prem-title em{font-family:var(--serif);font-style:italic;color:var(--accent)}
+.cc-prem-lead{color:var(--text-muted);font-size:.86rem;margin:4px 0 16px;font-weight:500}
+.cc-prem-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cc-prem-card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow-sm)}
+.cc-prem-head{text-align:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:11px}
+.cc-prem-rec{display:block;font-family:var(--display);font-size:1.75rem;color:var(--accent);line-height:1}
+.cc-prem-sub{display:block;font-size:.72rem;color:var(--text-muted);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.cc-prem-g{display:block;font-size:.64rem;color:var(--text-dim);margin-top:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.cc-prem-body{display:flex;flex-direction:column;gap:9px}
+.cc-prem-pl{display:flex;align-items:center;gap:10px}
+.cc-prem-ph{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;background:var(--surface-2);flex:none;display:block}
+.cc-prem-pln{display:flex;flex-direction:column;min-width:84px;flex:none}
+.cc-prem-nm{font-weight:800;font-size:.9rem;color:var(--text)}
+.cc-prem-min{font-size:.66rem;color:var(--text-dim);font-weight:600;font-variant-numeric:tabular-nums}
+.cc-prem-av{margin-left:auto;text-align:right;font-weight:700;font-size:.82rem;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.3}
+.cc-prem-po{margin-top:11px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--text-muted)}
+.cc-prem-po b{color:#8a6d00}
+[data-theme="dark"] .cc-prem-po b{color:var(--dorado)}
+.cc-prem-note{margin-top:9px;font-size:.72rem;color:var(--text-dim);font-style:italic;line-height:1.45}
+@media(max-width:620px){.cc-prem-grid{grid-template-columns:1fr}}
