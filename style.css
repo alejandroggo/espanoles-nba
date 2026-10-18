@@ -2108,3 +2108,29 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .gr-sw .gr-ring { fill: none; stroke: var(--c); stroke-width: 2.5; }
 .gr-sw.gr-ctx .gr-ring { stroke: var(--gr-ctx); }
 .gr-fmt .sel { min-height: 36px; min-width: 0; width: auto; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; }
+
+/* Comparador · banda «Comparte el cara a cara» (al pie de las fichas, a todo el ancho) */
+.cmp-sharebar { grid-column: 1 / -1; order: 9; position: relative; display: flex; align-items: center; gap: var(--space-5); width: 100%; padding: 20px 28px 18px; border: 0; background: #0e0e10; color: #f4f4f6; font-family: inherit; text-align: left; cursor: pointer; }
+.cmp-sharebar::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: linear-gradient(90deg, #c60b1e 0 30%, #ffc400 30% 70%, #c60b1e 70%); }
+.cmp-sharebar:focus-visible { outline: 3px solid #ffc400; outline-offset: -3px; border-radius: 0; }
+.cmp-sb-thumb { flex: none; width: 64px; background: #fff; padding: 3px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5); transform: rotate(-5deg); transition: transform 0.25s ease; }
+.cmp-sb-thumb canvas { display: block; width: 100%; height: auto; background: #0e0e10; }
+.cmp-sb-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cmp-sb-kicker { font-family: var(--display); font-size: 2rem; letter-spacing: 0.04em; line-height: 1; color: #fff; }
+.cmp-sb-sub { font-size: var(--font-sm); color: rgba(255, 255, 255, 0.68); }
+.cmp-sb-sub b { color: #ffc400; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cmp-sb-go { margin-left: auto; display: flex; align-items: center; gap: 12px; flex: none; }
+.cmp-sb-lbl { font-family: var(--display); font-size: 1.5rem; letter-spacing: 0.06em; color: #ffc400; }
+.cmp-sb-x { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #fff; color: #0e0e10; }
+.cmp-sb-arrow { font-size: 1.6rem; line-height: 1; color: #fff; transition: transform 0.25s ease; }
+.cmp-sharebar:hover .cmp-sb-thumb, .cmp-sharebar:focus-visible .cmp-sb-thumb { transform: rotate(0deg) scale(1.08); }
+.cmp-sharebar:hover .cmp-sb-arrow, .cmp-sharebar:focus-visible .cmp-sb-arrow { transform: translateX(6px); }
+@media (prefers-reduced-motion: reduce) { .cmp-sb-thumb, .cmp-sb-arrow { transition: none; } }
+@media (max-width: 760px) {
+  .cmp-sharebar { gap: var(--space-3); padding: 16px 14px 14px; }
+  .cmp-sb-thumb { width: 48px; }
+  .cmp-sb-kicker { font-size: 1.2rem; white-space: nowrap; }
+  .cmp-sb-sub { font-size: 0.72rem; }
+  .cmp-sb-lbl { display: none; }
+  .cmp-sb-x { width: 34px; height: 34px; }
+}

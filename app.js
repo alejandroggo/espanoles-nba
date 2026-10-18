@@ -4325,12 +4325,39 @@ function cmpRender() {
       ${three ? '' : '<span class="cmp-sel-slot cmp-sel-slot--add" data-sel="c"></span>'}
     </div>`;
   const sideHtml = sides.map((s, i) => `<div class="cmp-side p-${s}">${cmpCard(players[i], s)}${cmpRangeUI(s, players[i], aggs[i])}<span class="cmp-sel-slot" data-sel="${s}"></span></div>`);
+  const share = cmpShareBand(players, scores);
   const head = three
-    ? `<section class="cmp-head cmp-head--3" aria-label="Cara a cara">${sideHtml.join('')}${center}</section>`
-    : `<section class="cmp-head" aria-label="Cara a cara">${sideHtml[0]}${center}${sideHtml[1]}</section>`;
+    ? `<section class="cmp-head cmp-head--3" aria-label="Cara a cara">${sideHtml.join('')}${center}${share}</section>`
+    : `<section class="cmp-head" aria-label="Cara a cara">${sideHtml[0]}${center}${sideHtml[1]}${share}</section>`;
   cmpStashSelects();
   document.getElementById('cmp-out').innerHTML = head + sections + cmpLegend();
   cmpPlaceSelects();
+  cmpShareThumb();
+}
+
+// Banda «Comparte el cara a cara»: miniatura en vivo de la imagen que se publicará en X
+function cmpShareBand(players, scores) {
+  const names = players.map(p => cmpShortName(p.nombre, players.length)).join(' vs ');
+  const xIco = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+  return `<button type="button" class="cmp-sharebar" onclick="cmpShare()" aria-label="Compartir la comparación en X (${names}, ${scores.join('–')})">
+    <span class="cmp-sb-thumb" aria-hidden="true"><canvas id="cmp-sb-canvas" width="120" height="134"></canvas></span>
+    <span class="cmp-sb-txt"><span class="cmp-sb-kicker">Comparte el cara a cara</span><span class="cmp-sb-sub">${names} · <b>${scores.join('–')}</b> · imagen lista para X</span></span>
+    <span class="cmp-sb-go" aria-hidden="true"><span class="cmp-sb-lbl">Compartir</span><span class="cmp-sb-x">${xIco}</span><span class="cmp-sb-arrow">→</span></span>
+  </button>`;
+}
+let cmpThumbTok = 0;
+async function cmpShareThumb() {
+  const tok = ++cmpThumbTok;
+  const d = cmpScoreData();
+  if (!d) return;
+  try {
+    const big = await cmpBuildImage(d);
+    const cv = document.getElementById('cmp-sb-canvas');
+    if (tok !== cmpThumbTok || !cv) return;   // ya hay un repintado más reciente
+    cv.height = Math.round(cv.width * big.height / big.width);
+    const x = cv.getContext('2d'); x.imageSmoothingQuality = 'high';
+    x.drawImage(big, 0, 0, cv.width, cv.height);
+  } catch (e) { }
 }
 function cmpLegend() {
   return `<p class="cmp-legend"><span class="cmp-noscore">*</span> No puntúa (fila informativa). El marcador suma <b>1 categoría</b> por cada fila numérica que gana un jugador; los empates no cuentan. Barra llena = gana la fila; atenuada = pierde.</p>`;
