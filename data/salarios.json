@@ -74,12 +74,13 @@
   {
    "nombre": "Santi Aldama",
    "total": 62743373,
-   "cobrado": 28729287,
-   "firmado": 34014086,
+   "cobrado": 45736330,
+   "firmado": 17007043,
    "splits": {
-    "MEM": 28729287
+    "MEM": 28729287,
+    "DAL": 17007043
    },
-   "nota": "Lo cobrado es todo con Memphis; tiene $34 M más firmados por cobrar."
+   "nota": "Fichó por Dallas en 2026-27, donde coincide con De Larrea; el resto, firmado por cobrar."
   },
   {
    "nombre": "Nikola Mirotić",
@@ -91,14 +92,6 @@
     "NOP": 12923728,
     "MIL": 4449153
    }
-  },
-  {
-   "nombre": "Aday Mara",
-   "total": 27023779,
-   "cobrado": 0,
-   "firmado": 27023779,
-   "splits": {},
-   "nota": "Rookie: $27 M firmados con Oklahoma City, aún sin cobrar."
   },
   {
    "nombre": "Juancho Hernangómez",
@@ -168,6 +161,25 @@
    }
   },
   {
+   "nombre": "Aday Mara",
+   "total": 27023779,
+   "cobrado": 5791680,
+   "firmado": 21232099,
+   "splits": {
+    "OKC": 5791680
+   },
+   "nota": "Rookie de Oklahoma City; debuta en 2026-27. $27 M firmados en total."
+  },
+  {
+   "nombre": "Hugo González",
+   "total": 14298145,
+   "cobrado": 5707440,
+   "firmado": 8590705,
+   "splits": {
+    "BOS": 5707440
+   }
+  },
+  {
    "nombre": "Rudy Fernández",
    "total": 5676523,
    "cobrado": 5676523,
@@ -196,13 +208,24 @@
    }
   },
   {
-   "nombre": "Hugo González",
-   "total": 2783880,
-   "cobrado": 2783880,
-   "firmado": 0,
+   "nombre": "Sergio de Larrea",
+   "total": 16329526,
+   "cobrado": 3182280,
+   "firmado": 13147246,
    "splits": {
-    "BOS": 2783880
-   }
+    "DAL": 3182280
+   },
+   "nota": "Debuta en 2026-27 con Dallas."
+  },
+  {
+   "nombre": "Baba Miller",
+   "total": 9612515,
+   "cobrado": 1705630,
+   "firmado": 7906885,
+   "splits": {
+    "LAC": 1705630
+   },
+   "nota": "Debuta en 2026-27 con los Clippers."
   },
   {
    "nombre": "Juan Carlos Navarro",
@@ -221,6 +244,16 @@
    "splits": {
     "POR": 145000
    }
+  },
+  {
+   "nombre": "Eli Ndiaye",
+   "total": 85300,
+   "cobrado": 85300,
+   "firmado": 0,
+   "splits": {
+    "ATL": 85300
+   },
+   "nota": "Todo su salario con Atlanta."
   }
  ],
  "nunca_jugaron": [
@@ -236,8 +269,8 @@
    "nombre": "Memphis",
    "pagado": 212245769,
    "jugadores": [
-    "Marc Gasol",
     "Pau Gasol",
+    "Marc Gasol",
     "Santi Aldama",
     "Juan Carlos Navarro"
    ]
@@ -247,11 +280,11 @@
    "nombre": "Toronto",
    "pagado": 154248497,
    "jugadores": [
+    "Marc Gasol",
     "Serge Ibaka",
     "José M. Calderón",
-    "Marc Gasol",
-    "Jorge Garbajosa",
-    "Juancho Hernangómez"
+    "Juancho Hernangómez",
+    "Jorge Garbajosa"
    ]
   },
   {
@@ -260,8 +293,19 @@
    "pagado": 126345162,
    "jugadores": [
     "Pau Gasol",
-    "José M. Calderón",
-    "Marc Gasol"
+    "Marc Gasol",
+    "José M. Calderón"
+   ]
+  },
+  {
+   "equipo": "OKC",
+   "nombre": "Oklahoma City",
+   "pagado": 66239332,
+   "jugadores": [
+    "Serge Ibaka",
+    "Álex Abrines",
+    "Usman Garuba",
+    "Aday Mara"
    ]
   },
   {
@@ -271,16 +315,6 @@
    "jugadores": [
     "Ricky Rubio",
     "Juancho Hernangómez"
-   ]
-  },
-  {
-   "equipo": "OKC",
-   "nombre": "Oklahoma City",
-   "pagado": 60447652,
-   "jugadores": [
-    "Serge Ibaka",
-    "Álex Abrines",
-    "Usman Garuba"
    ]
   },
   {
@@ -297,8 +331,8 @@
    "nombre": "Chicago",
    "pagado": 38835054,
    "jugadores": [
-    "Nikola Mirotić",
-    "Pau Gasol"
+    "Pau Gasol",
+    "Nikola Mirotić"
    ]
   },
   {
@@ -307,8 +341,18 @@
    "pagado": 35948525,
    "jugadores": [
     "Ricky Rubio",
-    "Raül López",
-    "Juancho Hernangómez"
+    "Juancho Hernangómez",
+    "Raül López"
+   ]
+  },
+  {
+   "equipo": "DAL",
+   "nombre": "Dallas",
+   "pagado": 26980893,
+   "jugadores": [
+    "José M. Calderón",
+    "Santi Aldama",
+    "Sergio de Larrea"
    ]
   },
   {
@@ -330,6 +374,15 @@
    ]
   },
   {
+   "equipo": "LAC",
+   "nombre": "L.A. Clippers",
+   "pagado": 17891168,
+   "jugadores": [
+    "Serge Ibaka",
+    "Baba Miller"
+   ]
+  },
+  {
    "equipo": "NYK",
    "nombre": "New York",
    "pagado": 17445784,
@@ -337,14 +390,6 @@
     "José M. Calderón",
     "Willy Hernangómez",
     "Sergio Rodríguez"
-   ]
-  },
-  {
-   "equipo": "LAC",
-   "nombre": "L.A. Clippers",
-   "pagado": 16185538,
-   "jugadores": [
-    "Serge Ibaka"
    ]
   },
   {
@@ -368,10 +413,10 @@
    "nombre": "Portland",
    "pagado": 10882564,
    "jugadores": [
-    "Víctor Claver",
-    "Rudy Fernández",
-    "Sergio Rodríguez",
     "Pau Gasol",
+    "Sergio Rodríguez",
+    "Rudy Fernández",
+    "Víctor Claver",
     "Fernando Martín"
    ]
   },
@@ -380,9 +425,9 @@
    "nombre": "Milwaukee",
    "pagado": 10696126,
    "jugadores": [
+    "Pau Gasol",
     "Serge Ibaka",
-    "Nikola Mirotić",
-    "Pau Gasol"
+    "Nikola Mirotić"
    ]
   },
   {
@@ -392,6 +437,15 @@
    "jugadores": [
     "Juancho Hernangómez",
     "Rudy Fernández"
+   ]
+  },
+  {
+   "equipo": "BOS",
+   "nombre": "Boston",
+   "pagado": 9008106,
+   "jugadores": [
+    "Juancho Hernangómez",
+    "Hugo González"
    ]
   },
   {
@@ -407,8 +461,8 @@
    "nombre": "Indiana",
    "pagado": 7430145,
    "jugadores": [
-    "Ricky Rubio",
-    "Serge Ibaka"
+    "Serge Ibaka",
+    "Ricky Rubio"
    ]
   },
   {
@@ -417,23 +471,6 @@
    "pagado": 6800000,
    "jugadores": [
     "Sergio Rodríguez"
-   ]
-  },
-  {
-   "equipo": "DAL",
-   "nombre": "Dallas",
-   "pagado": 6791570,
-   "jugadores": [
-    "José M. Calderón"
-   ]
-  },
-  {
-   "equipo": "BOS",
-   "nombre": "Boston",
-   "pagado": 6084546,
-   "jugadores": [
-    "Juancho Hernangómez",
-    "Hugo González"
    ]
   },
   {
@@ -461,20 +498,21 @@
    ]
   },
   {
+   "equipo": "ATL",
+   "nombre": "Atlanta",
+   "pagado": 450396,
+   "jugadores": [
+    "José M. Calderón",
+    "Eli Ndiaye"
+   ]
+  },
+  {
    "equipo": "GSW",
    "nombre": "Golden State",
    "pagado": 431468,
    "jugadores": [
     "José M. Calderón",
     "Usman Garuba"
-   ]
-  },
-  {
-   "equipo": "ATL",
-   "nombre": "Atlanta",
-   "pagado": 365096,
-   "jugadores": [
-    "José M. Calderón"
    ]
   }
  ]
