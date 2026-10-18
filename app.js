@@ -6787,6 +6787,22 @@ async function qntShare() {
 // ══════════════════════════════════════════════
 // PAREJAS (compañeros) — página oculta del menú
 // ══════════════════════════════════════════════
+// Mapa compartido nombre→jugador (para fotos en parejas y cara a cara)
+let AG_NAME2PLAYER = null;
+async function agNamePlayerMap() {
+  if (AG_NAME2PLAYER) return AG_NAME2PLAYER;
+  const d = await loadData();
+  const m = {};
+  (d.jugadores || []).forEach(j => { m[drNorm(j.nombre)] = j; });
+  AG_NAME2PLAYER = m;
+  return m;
+}
+function agPhotoImg(name, cls) {
+  const j = (AG_NAME2PLAYER || {})[drNorm(name)];
+  if (!j) return '';
+  return '<img class="' + cls + '" ' + agFotoSrc2(j.id, agFotoFb(j)) + ' alt="' + name + '" loading="lazy" onerror="agImgHide(this)">';
+}
+
 function pjCol(eq) {
   const m = [['Dallas', '#0053bc'], ['Toronto', '#CE1141'], ['Portland', '#E03A3E'],
   ['Chicago', '#CE1141'], ['Minnesota', '#236192'], ['Memphis', '#5D76A9']];
@@ -6799,6 +6815,11 @@ function pjIni(nm) {
 }
 function pjDec1(v) { return (v === null || v === undefined) ? '—' : (typeof v === 'number' ? v.toFixed(1) : ('' + v)).replace('.', ','); }
 function pjNum(v) { return (v === null || v === undefined) ? '—' : ('' + v).replace('.', ','); }
+function pjPhoto(name, color) {
+  const img = agPhotoImg(name, 'pj-img');
+  if (img) return '<div class="pj-photo" style="border-color:' + color + '">' + img + '</div>';
+  return '<div class="pj-disc" style="background:' + color + '">' + pjIni(name) + '</div>';
+}
 
 function pjCard(p) {
   const c = pjCol(p.equipo), gold = p.en_activo;
@@ -6841,8 +6862,8 @@ function pjCard(p) {
 
   return '<div class="pj-card' + (gold ? ' gold' : '') + '">'
     + '<div class="pj-top"><span class="pj-team"><span class="pj-tdot" style="background:' + c + '"></span>' + (p.equipo || '').toUpperCase() + '</span>' + badge + '</div>'
-    + '<div class="pj-duo"><div class="pj-pl"><div class="pj-disc" style="background:' + c + '">' + pjIni(p.a) + '</div><div class="n">' + p.a + '</div></div>'
-    + '<span class="pj-amp">&amp;</span><div class="pj-pl"><div class="pj-disc" style="background:' + c + '">' + pjIni(p.b) + '</div><div class="n">' + p.b + '</div></div></div>'
+    + '<div class="pj-duo"><div class="pj-pl">' + pjPhoto(p.a, c) + '<div class="n">' + p.a + '</div></div>'
+    + '<span class="pj-amp">&amp;</span><div class="pj-pl">' + pjPhoto(p.b, c) + '<div class="n">' + p.b + '</div></div></div>'
     + '<div class="pj-block"><div><div class="big">' + pj + '</div><div class="lbl">partidos juntos</div></div>'
     + '<div><div class="big">' + vic + '</div><div class="lbl">victorias</div><div class="mini">' + rec + '</div></div></div>'
     + '<table class="pj-table"><thead><tr><th class="l"></th><th>' + ka + '</th><th>' + kb + '</th><th class="jt">Juntos</th></tr></thead><tbody>' + rows + '</tbody></table>'
@@ -6861,9 +6882,10 @@ async function initParejasPage() {
     root.innerHTML = '<p class="pj-err">No se pudieron cargar las parejas.</p>';
     return;
   }
+  try { await agNamePlayerMap(); } catch (e) { }
   const sub = document.getElementById('pj-hero-sub');
   if (sub) sub.innerHTML = 'Españoles que compartieron vestuario en la NBA · números como dúo, rendimiento con los dos en pista y cómo se conectaban.';
-  root.innerHTML = P.map(pjCard).join('');
+  root.innerHTML = '<div class="pj-grid">' + P.map(pjCard).join('') + '</div>';
 }
 
 // ══════════════════════════════════════════════
@@ -6909,6 +6931,7 @@ async function initCaraACaraPage() {
     host.innerHTML = '<p class="cc-err">No se pudieron cargar los duelos.</p>';
     return;
   }
+  try { await agNamePlayerMap(); } catch (e) { }
   const FULL2SHORT = {};
   for (const [sh, full] of Object.entries(CC_SHORT2FULL)) FULL2SHORT[full] = sh;
 
@@ -6923,17 +6946,29 @@ async function initCaraACaraPage() {
   const players = Object.keys(games).sort((x, y) => games[y] - games[x]);
   const P = players.map(p => ({ full: p, short: FULL2SHORT[p] || p.split(/\s+/).pop(), ini: ccIni(p) }));
 
+  // récord total de cada jugador (suma de todos sus duelos)
+  const totalRec = {};
+  players.forEach(a => {
+    let w = 0, l = 0;
+    players.forEach(b => { const c = cell[a + '|' + b]; if (c) { w += c[0]; l += c[1]; } });
+    totalRec[a] = [w, l];
+  });
+  const ccHead = p => { const im = agPhotoImg(p.full, 'cc-ph'); return im || p.ini; };
+  const ccRowHead = rp => { const im = agPhotoImg(rp.full, 'cc-ph'); return im ? ('<span class="cc-rh-in">' + im + '<span>' + rp.short + '</span></span>') : rp.short; };
+
   let html = '<tr><th class="cc-corner">fila&nbsp;vs&nbsp;col</th>';
-  P.forEach(p => { html += '<th class="cc-ch" title="' + p.full + '">' + p.ini + '</th>'; });
-  html += '</tr>';
+  P.forEach(p => { html += '<th class="cc-ch" title="' + p.full + '">' + ccHead(p) + '</th>'; });
+  html += '<th class="cc-ch cc-tot-h" title="Récord total">TOT</th></tr>';
   P.forEach((rp, i) => {
-    html += '<tr><th class="cc-rh" title="' + rp.full + '">' + rp.short + '</th>';
+    html += '<tr><th class="cc-rh" title="' + rp.full + '">' + ccRowHead(rp) + '</th>';
     P.forEach((cp, j) => {
       if (i === j) { html += '<td class="cc-diag"></td>'; return; }
       const c = cell[rp.full + '|' + cp.full];
       if (!c) { html += '<td class="cc-none">·</td>'; return; }
       html += '<td class="cc-cell" style="' + ccTint(c[0], c[1]) + '" data-i="' + i + '" data-j="' + j + '">' + c[0] + '-' + c[1] + '</td>';
     });
+    const tr = totalRec[rp.full];
+    html += '<td class="cc-tot" title="Récord total">' + tr[0] + '-' + tr[1] + '</td>';
     html += '</tr>';
   });
   document.getElementById('cc-mx').innerHTML = html;
