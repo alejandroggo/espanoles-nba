@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(location.hostname==='alejandroggo.github.io'){location.replace('https://espanoles-nba.alejandroggo.com'+location.pathname.replace(/^\/espanoles-nba/,'')+location.search+location.hash);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('ag-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NCR152YQ9F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied'});
+  try { if (localStorage.getItem('ag-consent') === 'granted') gtag('consent', 'update', {analytics_storage:'granted'}); } catch(e){}
+  gtag('config', 'G-NCR152YQ9F');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Cara a cara · Españoles en la NBA</title>
+<meta name="description" content="Matriz de los duelos directos entre españoles en la NBA: récord de cada uno frente a cada rival, con medias, minutos y series de playoffs.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Españoles en la NBA">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Cara a cara · Españoles en la NBA">
+<meta property="og:description" content="Matriz de los duelos directos entre españoles en la NBA: récord de cada uno frente a cada rival.">
+<meta property="og:url" content="https://espanoles-nba.alejandroggo.com/cara-a-cara.html">
+<link rel="canonical" href="https://espanoles-nba.alejandroggo.com/cara-a-cara.html">
+<meta property="og:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cara a cara · Españoles en la NBA">
+<meta name="twitter:description" content="Matriz de los duelos directos entre españoles en la NBA: récord de cada uno frente a cada rival.">
+<meta name="twitter:image" content="https://espanoles-nba.alejandroggo.com/og-banner.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=9">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=9">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0e0e10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Españoles NBA">
+<link rel="stylesheet" href="style.css?v=200">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index.html">ESPAÑOLES <span>EN LA</span> NBA</a>
+    <div class="header-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" onclick="cycleTheme()"></button>
+    </div>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+  <section class="hero hero--page">
+    <div class="hero-top">
+      <div>
+        <h1 class="hero-title ag-hero">Cara a <em>cara</em></h1>
+        <p class="hero-sub">Récord de cada español (fila) frente a cada rival (columna). Pulsa una celda para ver el duelo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cc-page" aria-label="Matriz de duelos directos">
+    <div class="cc-wrap">
+      <div class="cc-legend">
+        <span><span class="cc-sw" style="background:var(--win)"></span>Gana la fila</span>
+        <span><span class="cc-sw" style="background:var(--loss)"></span>Pierde la fila</span>
+        <span><span class="cc-sw" style="background:var(--surface-2);border:1px solid var(--border)"></span>Empate</span>
+        <span><span class="cc-sw" style="background:var(--surface);border:1px solid var(--border)"></span>No se vieron</span>
+      </div>
+      <div id="cc-root">
+        <div class="cc-scroll"><table class="cc-table" id="cc-mx"></table></div>
+        <div class="cc-detail empty" id="cc-detail">Pulsa una celda de la matriz para ver el detalle del duelo.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="ag-footer">
+  <div class="ag-footer-brand">
+    <strong>Alejandro Gaitán</strong>
+    <span>Periodismo NBA en español</span>
+  </div>
+  <nav class="ag-footer-projects" aria-label="Otros proyectos">
+    <a href="https://offseason.alejandroggo.com/" rel="noopener noreferrer">NBA Offseason</a>
+    <a href="https://premios-nba.alejandroggo.com/" rel="noopener noreferrer">NBA Awards</a>
+    <a href="https://mejor-franquicia-nba.alejandroggo.com/" rel="noopener noreferrer">Ranking de franquicias</a>
+    <a href="https://nbaenespanol.alejandroggo.com/" rel="noopener noreferrer">NBA en Español</a>
+    <a href="https://portfolio.alejandroggo.com/" rel="noopener noreferrer">Portafolio</a>
+  </nav>
+  <nav class="ag-footer-pubs" aria-label="Publicaciones">
+    <a href="https://alejandroggo.substack.com" rel="noopener noreferrer">Substack</a>
+    <a href="https://www.gigantes.com/author/alejandrogaitan/" rel="noopener noreferrer">Gigantes</a>
+    <a href="https://alejandrogaitan.com" rel="noopener noreferrer">alejandrogaitan.com</a>
+  </nav>
+  <div class="ag-footer-meta">
+    <span>© Alejandro Gaitán</span>
+    <span>Última actualización: <time id="ag-last-update" datetime=""></time></span>
+  </div>
+</footer>
+
+<script src="app.js?v=200"></script>
+<script>initTheme(); initCaraACaraPage();</script>
+</body>
+</html>

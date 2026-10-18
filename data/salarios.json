@@ -1,0 +1,481 @@
+{
+ "criterio": "splits = dinero realmente cobrado (cash) por franquicia; total/cobrado/firmado por jugador",
+ "jugadores": [
+  {
+   "nombre": "Pau Gasol",
+   "total": 220990766,
+   "cobrado": 220990766,
+   "firmado": 0,
+   "splits": {
+    "LAL": 116464459,
+    "SAS": 52500000,
+    "MEM": 36458396,
+    "CHI": 14576760,
+    "MIL": 527467,
+    "POR": 463684
+   },
+   "nota": "Portland y Milwaukee le pagaron en 2019 aunque apenas jugó."
+  },
+  {
+   "nombre": "Marc Gasol",
+   "total": 181665456,
+   "cobrado": 181665456,
+   "firmado": 0,
+   "splits": {
+    "MEM": 146519996,
+    "TOR": 32580707,
+    "LAL": 2564753
+   }
+  },
+  {
+   "nombre": "Serge Ibaka",
+   "total": 141250191,
+   "cobrado": 141250191,
+   "firmado": 0,
+   "splits": {
+    "TOR": 67724937,
+    "OKC": 42564305,
+    "LAC": 16185538,
+    "ORL": 8070588,
+    "MIL": 5719506,
+    "IND": 985317
+   }
+  },
+  {
+   "nombre": "Ricky Rubio",
+   "total": 131001894,
+   "cobrado": 130577222,
+   "firmado": 0,
+   "splits": {
+    "MIN": 57941408,
+    "UTA": 29250000,
+    "CLE": 21753486,
+    "PHX": 15187500,
+    "IND": 6444828
+   },
+   "nota": "Diferencia con el total: $424.672 de buyout que Ricky perdonó en 2023."
+  },
+  {
+   "nombre": "José M. Calderón",
+   "total": 84201469,
+   "cobrado": 84201469,
+   "firmado": 0,
+   "splits": {
+    "TOR": 39524468,
+    "NYK": 14500003,
+    "DET": 12955870,
+    "LAL": 7315950,
+    "DAL": 6791570,
+    "CLE": 2328652,
+    "GSW": 419860,
+    "ATL": 365096
+   }
+  },
+  {
+   "nombre": "Santi Aldama",
+   "total": 62743373,
+   "cobrado": 28729287,
+   "firmado": 34014086,
+   "splits": {
+    "MEM": 28729287
+   },
+   "nota": "Lo cobrado es todo con Memphis; tiene $34 M más firmados por cobrar."
+  },
+  {
+   "nombre": "Nikola Mirotić",
+   "total": 41631175,
+   "cobrado": 41631175,
+   "firmado": 0,
+   "splits": {
+    "CHI": 24258294,
+    "NOP": 12923728,
+    "MIL": 4449153
+   }
+  },
+  {
+   "nombre": "Aday Mara",
+   "total": 27023779,
+   "cobrado": 0,
+   "firmado": 27023779,
+   "splits": {},
+   "nota": "Rookie: $27 M firmados con Oklahoma City, aún sin cobrar."
+  },
+  {
+   "nombre": "Juancho Hernangómez",
+   "total": 24938681,
+   "cobrado": 24938681,
+   "firmado": 0,
+   "splits": {
+    "DEN": 8219505,
+    "MIN": 7617601,
+    "BOS": 3300666,
+    "UTA": 2757212,
+    "TOR": 2298385,
+    "SAS": 745312
+   }
+  },
+  {
+   "nombre": "Álex Abrines",
+   "total": 15294947,
+   "cobrado": 15294947,
+   "firmado": 0,
+   "splits": {
+    "OKC": 15294947
+   }
+  },
+  {
+   "nombre": "Willy Hernangómez",
+   "total": 12435586,
+   "cobrado": 12435586,
+   "firmado": 0,
+   "splits": {
+    "NOP": 6507946,
+    "CHA": 3627920,
+    "NYK": 2299720
+   }
+  },
+  {
+   "nombre": "Jorge Garbajosa",
+   "total": 12120000,
+   "cobrado": 12120000,
+   "firmado": 0,
+   "splits": {
+    "TOR": 12120000
+   }
+  },
+  {
+   "nombre": "Sergio Rodríguez",
+   "total": 11469835,
+   "cobrado": 11469835,
+   "firmado": 0,
+   "splits": {
+    "PHI": 6800000,
+    "POR": 2777800,
+    "SAC": 1245974,
+    "NYK": 646061
+   },
+   "nota": "El salario 2009-10 se reparte por partidos: Sacramento 54/82, New York 28/82."
+  },
+  {
+   "nombre": "Usman Garuba",
+   "total": 7424488,
+   "cobrado": 7424488,
+   "firmado": 0,
+   "splits": {
+    "HOU": 4824480,
+    "OKC": 2588400,
+    "GSW": 11608
+   }
+  },
+  {
+   "nombre": "Rudy Fernández",
+   "total": 5676523,
+   "cobrado": 5676523,
+   "firmado": 0,
+   "splits": {
+    "POR": 3496080,
+    "DEN": 2180443
+   }
+  },
+  {
+   "nombre": "Víctor Claver",
+   "total": 4000000,
+   "cobrado": 4000000,
+   "firmado": 0,
+   "splits": {
+    "POR": 4000000
+   }
+  },
+  {
+   "nombre": "Raül López",
+   "total": 3941313,
+   "cobrado": 3941313,
+   "firmado": 0,
+   "splits": {
+    "UTA": 3941313
+   }
+  },
+  {
+   "nombre": "Hugo González",
+   "total": 2783880,
+   "cobrado": 2783880,
+   "firmado": 0,
+   "splits": {
+    "BOS": 2783880
+   }
+  },
+  {
+   "nombre": "Juan Carlos Navarro",
+   "total": 538090,
+   "cobrado": 538090,
+   "firmado": 0,
+   "splits": {
+    "MEM": 538090
+   }
+  },
+  {
+   "nombre": "Fernando Martín",
+   "total": 145000,
+   "cobrado": 145000,
+   "firmado": 0,
+   "splits": {
+    "POR": 145000
+   }
+  }
+ ],
+ "nunca_jugaron": [
+  "Brooklyn",
+  "Indiana",
+  "Miami",
+  "Washington"
+ ],
+ "nota_global": "Solo 26 de 30 franquicias han tenido un español en cancha. Indiana pagó a Ricky e Ibaka pero ninguno llegó a jugar.",
+ "franquicias": [
+  {
+   "equipo": "MEM",
+   "nombre": "Memphis",
+   "pagado": 212245769,
+   "jugadores": [
+    "Marc Gasol",
+    "Pau Gasol",
+    "Santi Aldama",
+    "Juan Carlos Navarro"
+   ]
+  },
+  {
+   "equipo": "TOR",
+   "nombre": "Toronto",
+   "pagado": 154248497,
+   "jugadores": [
+    "Serge Ibaka",
+    "José M. Calderón",
+    "Marc Gasol",
+    "Jorge Garbajosa",
+    "Juancho Hernangómez"
+   ]
+  },
+  {
+   "equipo": "LAL",
+   "nombre": "L.A. Lakers",
+   "pagado": 126345162,
+   "jugadores": [
+    "Pau Gasol",
+    "José M. Calderón",
+    "Marc Gasol"
+   ]
+  },
+  {
+   "equipo": "MIN",
+   "nombre": "Minnesota",
+   "pagado": 65559009,
+   "jugadores": [
+    "Ricky Rubio",
+    "Juancho Hernangómez"
+   ]
+  },
+  {
+   "equipo": "OKC",
+   "nombre": "Oklahoma City",
+   "pagado": 60447652,
+   "jugadores": [
+    "Serge Ibaka",
+    "Álex Abrines",
+    "Usman Garuba"
+   ]
+  },
+  {
+   "equipo": "SAS",
+   "nombre": "San Antonio",
+   "pagado": 53245312,
+   "jugadores": [
+    "Pau Gasol",
+    "Juancho Hernangómez"
+   ]
+  },
+  {
+   "equipo": "CHI",
+   "nombre": "Chicago",
+   "pagado": 38835054,
+   "jugadores": [
+    "Nikola Mirotić",
+    "Pau Gasol"
+   ]
+  },
+  {
+   "equipo": "UTA",
+   "nombre": "Utah",
+   "pagado": 35948525,
+   "jugadores": [
+    "Ricky Rubio",
+    "Raül López",
+    "Juancho Hernangómez"
+   ]
+  },
+  {
+   "equipo": "CLE",
+   "nombre": "Cleveland",
+   "pagado": 24082138,
+   "jugadores": [
+    "Ricky Rubio",
+    "José M. Calderón"
+   ]
+  },
+  {
+   "equipo": "NOP",
+   "nombre": "New Orleans",
+   "pagado": 19431674,
+   "jugadores": [
+    "Nikola Mirotić",
+    "Willy Hernangómez"
+   ]
+  },
+  {
+   "equipo": "NYK",
+   "nombre": "New York",
+   "pagado": 17445784,
+   "jugadores": [
+    "José M. Calderón",
+    "Willy Hernangómez",
+    "Sergio Rodríguez"
+   ]
+  },
+  {
+   "equipo": "LAC",
+   "nombre": "L.A. Clippers",
+   "pagado": 16185538,
+   "jugadores": [
+    "Serge Ibaka"
+   ]
+  },
+  {
+   "equipo": "PHX",
+   "nombre": "Phoenix",
+   "pagado": 15187500,
+   "jugadores": [
+    "Ricky Rubio"
+   ]
+  },
+  {
+   "equipo": "DET",
+   "nombre": "Detroit",
+   "pagado": 12955870,
+   "jugadores": [
+    "José M. Calderón"
+   ]
+  },
+  {
+   "equipo": "POR",
+   "nombre": "Portland",
+   "pagado": 10882564,
+   "jugadores": [
+    "Víctor Claver",
+    "Rudy Fernández",
+    "Sergio Rodríguez",
+    "Pau Gasol",
+    "Fernando Martín"
+   ]
+  },
+  {
+   "equipo": "MIL",
+   "nombre": "Milwaukee",
+   "pagado": 10696126,
+   "jugadores": [
+    "Serge Ibaka",
+    "Nikola Mirotić",
+    "Pau Gasol"
+   ]
+  },
+  {
+   "equipo": "DEN",
+   "nombre": "Denver",
+   "pagado": 10399948,
+   "jugadores": [
+    "Juancho Hernangómez",
+    "Rudy Fernández"
+   ]
+  },
+  {
+   "equipo": "ORL",
+   "nombre": "Orlando",
+   "pagado": 8070588,
+   "jugadores": [
+    "Serge Ibaka"
+   ]
+  },
+  {
+   "equipo": "IND",
+   "nombre": "Indiana",
+   "pagado": 7430145,
+   "jugadores": [
+    "Ricky Rubio",
+    "Serge Ibaka"
+   ]
+  },
+  {
+   "equipo": "PHI",
+   "nombre": "Philadelphia",
+   "pagado": 6800000,
+   "jugadores": [
+    "Sergio Rodríguez"
+   ]
+  },
+  {
+   "equipo": "DAL",
+   "nombre": "Dallas",
+   "pagado": 6791570,
+   "jugadores": [
+    "José M. Calderón"
+   ]
+  },
+  {
+   "equipo": "BOS",
+   "nombre": "Boston",
+   "pagado": 6084546,
+   "jugadores": [
+    "Juancho Hernangómez",
+    "Hugo González"
+   ]
+  },
+  {
+   "equipo": "HOU",
+   "nombre": "Houston",
+   "pagado": 4824480,
+   "jugadores": [
+    "Usman Garuba"
+   ]
+  },
+  {
+   "equipo": "CHA",
+   "nombre": "Charlotte",
+   "pagado": 3627920,
+   "jugadores": [
+    "Willy Hernangómez"
+   ]
+  },
+  {
+   "equipo": "SAC",
+   "nombre": "Sacramento",
+   "pagado": 1245974,
+   "jugadores": [
+    "Sergio Rodríguez"
+   ]
+  },
+  {
+   "equipo": "GSW",
+   "nombre": "Golden State",
+   "pagado": 431468,
+   "jugadores": [
+    "José M. Calderón",
+    "Usman Garuba"
+   ]
+  },
+  {
+   "equipo": "ATL",
+   "nombre": "Atlanta",
+   "pagado": 365096,
+   "jugadores": [
+    "José M. Calderón"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1220 @@
+[
+ {
+  "a": "Pau Gasol",
+  "b": "Marc Gasol",
+  "g": 35,
+  "rec": "Pau 22-13 (RS 18-11 · PO 4-2)",
+  "av": {
+   "Pau Gasol": "12.4/9.9/3.0 RS · 6.5/5.7/1.2 PO",
+   "Marc Gasol": "13.0/8.8/4.3 RS · 19.3/6.5/4.2 PO"
+  },
+  "nota": "Pau ganaba los partidos; Marc el mano a mano (anotación 15-14 en RS, 6-0 en PO). Solo se vieron en playoffs en 2017. Mejor: Marc 32 (G1 2017), Pau 24 (2009).",
+  "playoffs": [
+   {
+    "temporada": "2017",
+    "ronda": "1ª ronda Oeste",
+    "serie": "San Antonio 4-2 Memphis",
+    "gana": "Pau Gasol"
+   }
+  ],
+  "min": {
+   "Pau Gasol": "32.6 RS · 23.2 PO",
+   "Marc Gasol": "35.5 RS · 40.2 PO"
+  },
+  "primer": "22 dic 2008",
+  "ultimo": "9 ene 2019"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Jorge Garbajosa",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "Jorge Garbajosa": "10.0/6.0/2.0",
+   "Sergio Rodríguez": "0.0/0.5/0.5"
+  },
+  "nota": "Garbajosa titular (41 min); Chacho rookie casi sin minutos (0 y 4 min).",
+  "min": {
+   "Sergio Rodríguez": "2.0",
+   "Jorge Garbajosa": "41.0"
+  },
+  "primer": "10 dic 2006",
+  "ultimo": "22 dic 2006"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Serge Ibaka",
+  "g": 4,
+  "rec": "Ibaka 3-1",
+  "av": {
+   "Serge Ibaka": "14.3/3.5/0.5",
+   "Sergio Rodríguez": "9.3/3.5/7.3"
+  },
+  "nota": "Ibaka anotador y taponador (2 tapones); Chacho pasador (pico 11 ast).",
+  "min": {
+   "Sergio Rodríguez": "25.2",
+   "Serge Ibaka": "26.0"
+  },
+  "primer": "20 feb 2010",
+  "ultimo": "9 feb 2017"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Juancho Hernangómez",
+  "g": 1,
+  "rec": "Juancho 1-0",
+  "av": {
+   "Sergio Rodríguez": "17.0/4.0/7.0",
+   "Juancho Hernangómez": "0.0/1.0/0.0"
+  },
+  "nota": "Chacho titular jugó bien (17+7) pero Denver ganó; Juancho rookie 5 min.",
+  "min": {
+   "Sergio Rodríguez": "33.0",
+   "Juancho Hernangómez": "5.0"
+  },
+  "primer": "5 dic 2016",
+  "ultimo": "5 dic 2016"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Willy Hernangómez",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "Willy Hernangómez": "5.5/4.5/0.5",
+   "Sergio Rodríguez": "2.0/0.5/2.5"
+  },
+  "nota": "Ambos con minutos limitados; Chacho frío de tiro.",
+  "min": {
+   "Sergio Rodríguez": "14.5",
+   "Willy Hernangómez": "13.0"
+  },
+  "primer": "11 ene 2017",
+  "ultimo": "25 feb 2017"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Juan Carlos Navarro",
+  "g": 3,
+  "rec": "Chacho 3-0",
+  "av": {
+   "Juan Carlos Navarro": "7.7/2.7/2.3",
+   "Sergio Rodríguez": "2.0/0.3/2.7"
+  },
+  "nota": "Portland barrió al peor Memphis pese a que Navarro jugó más.",
+  "min": {
+   "Sergio Rodríguez": "6.7",
+   "Juan Carlos Navarro": "20.0"
+  },
+  "primer": "9 nov 2007",
+  "ultimo": "15 abr 2008"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Alex Abrines",
+  "g": 2,
+  "rec": "Abrines 2-0",
+  "av": {
+   "Sergio Rodríguez": "9.0/2.5/6.5",
+   "Alex Abrines": "4.0/2.0/0.0"
+  },
+  "nota": "Chacho jugó mejor (incl. 12+9) pero el OKC de Westbrook barrió.",
+  "min": {
+   "Sergio Rodríguez": "29.0",
+   "Alex Abrines": "18.5"
+  },
+  "primer": "26 oct 2016",
+  "ultimo": "22 mar 2017"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Ricky Rubio",
+  "g": 1,
+  "rec": "Ricky 1-0",
+  "av": {
+   "Ricky Rubio": "4.0/4.0/5.0",
+   "Sergio Rodríguez": "0.0/0.0/2.0"
+  },
+  "nota": "Dos bases pasadores helados (combinado 1/9). Ganó Minnesota.",
+  "min": {
+   "Sergio Rodríguez": "24.0",
+   "Ricky Rubio": "25.0"
+  },
+  "primer": "17 nov 2016",
+  "ultimo": "17 nov 2016"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Nikola Mirotic",
+  "g": 3,
+  "rec": "Mirotić 2-1",
+  "av": {
+   "Nikola Mirotic": "11.3/3.3/2.0",
+   "Sergio Rodríguez": "5.0/2.3/3.7"
+  },
+  "nota": "Mirotić anotó (50% TC), Chacho repartió. Un buen partido de Chacho (12+7).",
+  "min": {
+   "Sergio Rodríguez": "14.0",
+   "Nikola Mirotic": "26.0"
+  },
+  "primer": "25 nov 2016",
+  "ultimo": "24 mar 2017"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Rudy Fernández",
+  "g": 1,
+  "rec": "Rudy 1-0",
+  "av": {
+   "Sergio Rodríguez": "12.0/2.0/2.0",
+   "Rudy Fernández": "3.0/4.0/4.0"
+  },
+  "nota": "Excompañeros en Portland; Chacho jugó mejor pero perdió.",
+  "min": {
+   "Sergio Rodríguez": "26.0",
+   "Rudy Fernández": "23.0"
+  },
+  "primer": "31 mar 2010",
+  "ultimo": "31 mar 2010"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Marc Gasol",
+  "g": 8,
+  "rec": "Marc 5-3",
+  "av": {
+   "Marc Gasol": "16.9/7.8/2.6",
+   "Sergio Rodríguez": "7.9/1.6/3.9"
+  },
+  "nota": "All-Star vs suplente. Marc ganó partidos (5-3) y anotación (7-0).",
+  "min": {
+   "Sergio Rodríguez": "18.8",
+   "Marc Gasol": "35.5"
+  },
+  "primer": "18 feb 2009",
+  "ultimo": "6 dic 2016"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "José M. Calderón",
+  "g": 8,
+  "rec": "Igualado 4-4",
+  "av": {
+   "José M. Calderón": "13.0/1.9/6.1",
+   "Sergio Rodríguez": "3.6/1.0/2.3"
+  },
+  "nota": "Dos bases de la selección; Calderón titular ganó los 8 mano a mano en anotación. Marcador igualado 4-4.",
+  "min": {
+   "Sergio Rodríguez": "11.4",
+   "José M. Calderón": "30.4"
+  },
+  "primer": "10 dic 2006",
+  "ultimo": "14 abr 2010"
+ },
+ {
+  "a": "Sergio Rodríguez",
+  "b": "Pau Gasol",
+  "g": 14,
+  "rec": "Pau 8-6",
+  "av": {
+   "Pau Gasol": "17.7/9.3/2.4",
+   "Sergio Rodríguez": "2.6/0.9/2.9"
+  },
+  "nota": "Pau ganó la anotación los 14 partidos (14-0). Lo único de Chacho: asistencias (7-6).",
+  "min": {
+   "Sergio Rodríguez": "11.3",
+   "Pau Gasol": "38.1"
+  },
+  "primer": "27 ene 2007",
+  "ultimo": "1 ene 2010"
+ },
+ {
+  "a": "Santi Aldama",
+  "b": "Usman Garuba",
+  "g": 4,
+  "rec": "Aldama 4-0",
+  "av": {
+   "Santi Aldama": "6.5/3.5/1.5",
+   "Usman Garuba": "3.8/4.8/0.8"
+  },
+  "nota": "Jóvenes interiores; Aldama anotó más, Garuba ganó el rebote.",
+  "min": {
+   "Santi Aldama": "18.5",
+   "Usman Garuba": "14.0"
+  },
+  "primer": "15 nov 2021",
+  "ultimo": "24 mar 2023"
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Usman Garuba",
+  "g": 1,
+  "rec": "Ibaka 1-0",
+  "av": {
+   "Serge Ibaka": "9.0/5.0/0.0",
+   "Usman Garuba": "6.0/8.0/2.0"
+  },
+  "nota": "Garuba titular (8 reb, 4 robos); Ibaka veterano de banquillo.",
+  "min": {
+   "Serge Ibaka": "15.0",
+   "Usman Garuba": "25.0"
+  },
+  "primer": "22 oct 2022",
+  "ultimo": "22 oct 2022"
+ },
+ {
+  "a": "Willy Hernangómez",
+  "b": "Usman Garuba",
+  "g": 2,
+  "rec": "Willy 2-0",
+  "av": {
+   "Willy Hernangómez": "13.0/6.5/2.5",
+   "Usman Garuba": "2.5/4.0/1.0"
+  },
+  "nota": "Willy consolidado (75% TC) muy por encima.",
+  "min": {
+   "Willy Hernangómez": "16.5",
+   "Usman Garuba": "8.5"
+  },
+  "primer": "13 mar 2022",
+  "ultimo": "4 ene 2023"
+ },
+ {
+  "a": "Ricky Rubio",
+  "b": "Usman Garuba",
+  "g": 2,
+  "rec": "Ricky 2-0",
+  "av": {
+   "Ricky Rubio": "4.5/1.5/7.0",
+   "Usman Garuba": "2.5/4.5/2.0"
+  },
+  "nota": "Ricky dirigió (pico 12 ast, +30); ambos fríos de tiro.",
+  "min": {
+   "Ricky Rubio": "18.5",
+   "Usman Garuba": "16.0"
+  },
+  "primer": "15 dic 2021",
+  "ultimo": "26 mar 2023"
+ },
+ {
+  "a": "Santi Aldama",
+  "b": "Hugo González",
+  "g": 1,
+  "rec": "Hugo 1-0",
+  "av": {
+   "Santi Aldama": "14.0/6.0/4.0",
+   "Hugo González": "0.0/1.0/0.0"
+  },
+  "nota": "Nov 2025. Aldama jugó, Boston ganó.",
+  "min": {
+   "Santi Aldama": "24.0",
+   "Hugo González": "8.0"
+  },
+  "primer": "12 nov 2025",
+  "ultimo": "12 nov 2025"
+ },
+ {
+  "a": "Juan Carlos Navarro",
+  "b": "José M. Calderón",
+  "g": 2,
+  "rec": "Calderón 2-0",
+  "av": {
+   "José M. Calderón": "11.5/4.5/9.0",
+   "Juan Carlos Navarro": "8.5/0.5/0.5"
+  },
+  "nota": "El base (Calderón, 9 ast) por encima del tirador. Toronto ganó los 2.",
+  "min": {
+   "Juan Carlos Navarro": "23.5",
+   "José M. Calderón": "37.5"
+  },
+  "primer": "21 nov 2007",
+  "ultimo": "28 nov 2007"
+ },
+ {
+  "a": "Santi Aldama",
+  "b": "Serge Ibaka",
+  "g": 1,
+  "rec": "Aldama 1-0",
+  "av": {
+   "Santi Aldama": "7.0/1.0/0.0",
+   "Serge Ibaka": "0.0/2.0/0.0"
+  },
+  "nota": "Relevo generacional: Ibaka apagándose en los Clippers.",
+  "min": {
+   "Santi Aldama": "20.0",
+   "Serge Ibaka": "8.0"
+  },
+  "primer": "8 ene 2022",
+  "ultimo": "8 ene 2022"
+ },
+ {
+  "a": "Santi Aldama",
+  "b": "Juancho Hernangómez",
+  "g": 1,
+  "rec": "Aldama 1-0",
+  "av": {
+   "Santi Aldama": "6.0/5.0/1.0",
+   "Juancho Hernangómez": "0.0/2.0/0.0"
+  },
+  "nota": "Minutos cortos; el joven por encima.",
+  "min": {
+   "Santi Aldama": "14.0",
+   "Juancho Hernangómez": "11.0"
+  },
+  "primer": "29 dic 2022",
+  "ultimo": "29 dic 2022"
+ },
+ {
+  "a": "Santi Aldama",
+  "b": "Ricky Rubio",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "Santi Aldama": "18.5/6.0/0.5",
+   "Ricky Rubio": "10.0/3.0/3.5"
+  },
+  "nota": "El mejor Aldama del proyecto (56% TC, 21 y 16 pts); Ricky veterano pasador.",
+  "min": {
+   "Santi Aldama": "27.0",
+   "Ricky Rubio": "16.5"
+  },
+  "primer": "18 ene 2023",
+  "ultimo": "2 feb 2023"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Willy Hernangómez",
+  "g": 3,
+  "rec": "Abrines 3-0",
+  "av": {
+   "Alex Abrines": "11.0/2.0/0.0",
+   "Willy Hernangómez": "4.7/5.0/0.3"
+  },
+  "nota": "Modo festín: pico de 25 (5 triples). Willy el rebote.",
+  "min": {
+   "Alex Abrines": "23.3",
+   "Willy Hernangómez": "16.0"
+  },
+  "primer": "15 feb 2017",
+  "ultimo": "1 nov 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Juancho Hernangómez",
+  "g": 4,
+  "rec": "Juancho 3-1",
+  "av": {
+   "Juancho Hernangómez": "11.0/6.0/1.0",
+   "Alex Abrines": "4.5/2.3/1.3"
+  },
+  "nota": "Modo hambruna: 2 partidos a 0 pts. Juancho más regular.",
+  "min": {
+   "Alex Abrines": "16.2",
+   "Juancho Hernangómez": "29.2"
+  },
+  "primer": "7 ene 2017",
+  "ultimo": "14 dic 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "José M. Calderón",
+  "g": 4,
+  "rec": "Abrines 3-1",
+  "av": {
+   "José M. Calderón": "3.5/1.5/2.0",
+   "Alex Abrines": "1.8/0.3/0.5"
+  },
+  "nota": "No-duelo: ambos minutos de basura. OKC ganó 3.",
+  "min": {
+   "Alex Abrines": "7.2",
+   "José M. Calderón": "10.0"
+  },
+  "primer": "30 oct 2016",
+  "ultimo": "3 dic 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Marc Gasol",
+  "g": 5,
+  "rec": "Abrines 4-1",
+  "av": {
+   "Marc Gasol": "16.8/6.6/5.2",
+   "Alex Abrines": "10.4/3.2/0.0"
+  },
+  "nota": "Marc dominó pero perdió 4-1: OKC (Westbrook) > Memphis en declive. Abrines 20/6 triples una noche.",
+  "min": {
+   "Alex Abrines": "27.2",
+   "Marc Gasol": "34.8"
+  },
+  "primer": "29 dic 2016",
+  "ultimo": "14 feb 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Nikola Mirotic",
+  "g": 3,
+  "rec": "Abrines 3-0",
+  "av": {
+   "Nikola Mirotic": "7.7/7.0/2.3",
+   "Alex Abrines": "5.7/2.3/1.7"
+  },
+  "nota": "Mirotić más (16 reb una noche) pero frío (32%); OKC ganó los 3.",
+  "min": {
+   "Alex Abrines": "24.0",
+   "Nikola Mirotic": "22.3"
+  },
+  "primer": "9 ene 2017",
+  "ultimo": "5 nov 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Ricky Rubio",
+  "g": 15,
+  "rec": "Abrines 9-6 (RS 7-2 · PO 2-4)",
+  "av": {
+   "Ricky Rubio": "9.7/4.0/7.6 RS · 14.0/7.3/7.0 PO",
+   "Alex Abrines": "4.1/1.8/0.2 RS · 4.0/2.7/0.3 PO"
+  },
+  "nota": "OKC dominó a Ricky en RS; Ricky se vengó en PO 2018 (Utah 4-2) con triple-doble 26-11-10.",
+  "playoffs": [
+   {
+    "temporada": "2018",
+    "ronda": "1ª ronda Oeste",
+    "serie": "Utah 4-2 Oklahoma City",
+    "gana": "Ricky Rubio"
+   }
+  ],
+  "min": {
+   "Alex Abrines": "17.9 RS · 18.3 PO",
+   "Ricky Rubio": "31.2 RS · 30.0 PO"
+  },
+  "primer": "25 dic 2016",
+  "ultimo": "22 dic 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Pau Gasol",
+  "g": 6,
+  "rec": "Igualado 3-3",
+  "av": {
+   "Pau Gasol": "11.3/6.8/2.7",
+   "Alex Abrines": "5.7/1.5/0.3"
+  },
+  "nota": "Pau (final en SAS) más productivo, pero equipos repartidos.",
+  "min": {
+   "Alex Abrines": "14.3",
+   "Pau Gasol": "24.7"
+  },
+  "primer": "9 mar 2017",
+  "ultimo": "29 mar 2018"
+ },
+ {
+  "a": "Alex Abrines",
+  "b": "Serge Ibaka",
+  "g": 4,
+  "rec": "Abrines 3-1",
+  "av": {
+   "Serge Ibaka": "13.8/5.0/1.3",
+   "Alex Abrines": "5.8/1.5/0.5"
+  },
+  "nota": "Ibaka más (31 pts/13-19 una noche) pero OKC ganó 3.",
+  "min": {
+   "Alex Abrines": "13.2",
+   "Serge Ibaka": "30.0"
+  },
+  "primer": "13 nov 2016",
+  "ultimo": "18 mar 2018"
+ },
+ {
+  "a": "Willy Hernangómez",
+  "b": "Juancho Hernangómez",
+  "g": 9,
+  "rec": "Juancho 5-4",
+  "av": {
+   "Willy Hernangómez": "9.2/6.2/0.7",
+   "Juancho Hernangómez": "6.1/2.8/1.0"
+  },
+  "nota": "HERMANOS. Espejo de los Gasol: Willy mejor individual (anotación 5-4), Juancho gana los partidos (5-4).",
+  "min": {
+   "Willy Hernangómez": "16.8",
+   "Juancho Hernangómez": "16.8"
+  },
+  "primer": "17 dic 2016",
+  "ultimo": "30 nov 2022"
+ },
+ {
+  "a": "Ricky Rubio",
+  "b": "Juancho Hernangómez",
+  "g": 7,
+  "rec": "Ricky 6-1",
+  "av": {
+   "Ricky Rubio": "10.3/3.6/5.7",
+   "Juancho Hernangómez": "2.9/2.3/0.6"
+  },
+  "nota": "Ricky dirigió; Juancho apenas anotó.",
+  "min": {
+   "Ricky Rubio": "29.3",
+   "Juancho Hernangómez": "15.9"
+  },
+  "primer": "15 feb 2017",
+  "ultimo": "26 feb 2023"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Juancho Hernangómez",
+  "g": 1,
+  "rec": "Pau 1-0",
+  "av": {
+   "Pau Gasol": "9.0/5.0/1.0",
+   "Juancho Hernangómez": "2.0/1.0/0.0"
+  },
+  "nota": "Anecdótico.",
+  "min": {
+   "Pau Gasol": "20.0",
+   "Juancho Hernangómez": "6.0"
+  },
+  "primer": "13 ene 2018",
+  "ultimo": "13 ene 2018"
+ },
+ {
+  "a": "Nikola Mirotic",
+  "b": "Juancho Hernangómez",
+  "g": 4,
+  "rec": "Juancho 3-1",
+  "av": {
+   "Nikola Mirotic": "13.5/6.0/1.8",
+   "Juancho Hernangómez": "6.3/3.3/1.0"
+  },
+  "nota": "Mirotić más productivo pero Juancho ganó 3; igualó su 20/10 con un 20/11.",
+  "min": {
+   "Nikola Mirotic": "28.5",
+   "Juancho Hernangómez": "15.2"
+  },
+  "primer": "22 nov 2016",
+  "ultimo": "17 nov 2018"
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Juancho Hernangómez",
+  "g": 5,
+  "rec": "Juancho 4-1",
+  "av": {
+   "Serge Ibaka": "16.4/5.6/1.2",
+   "Juancho Hernangómez": "7.0/4.0/1.0"
+  },
+  "nota": "Ibaka pulverizó en pista (57% TC) pero Juancho ganó 4 de 5.",
+  "min": {
+   "Serge Ibaka": "30.6",
+   "Juancho Hernangómez": "19.2"
+  },
+  "primer": "10 dic 2016",
+  "ultimo": "29 dic 2020"
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Juancho Hernangómez",
+  "g": 7,
+  "rec": "Marc 4-3",
+  "av": {
+   "Marc Gasol": "17.9/6.1/6.3",
+   "Juancho Hernangómez": "4.4/3.7/0.4"
+  },
+  "nota": "Marc muy superior (28 y 14 ast) pero marcador ajustado 4-3.",
+  "min": {
+   "Marc Gasol": "31.1",
+   "Juancho Hernangómez": "17.4"
+  },
+  "primer": "8 nov 2016",
+  "ultimo": "27 dic 2020"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Juancho Hernangómez",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "José M. Calderón": "0.0/0.5/1.5",
+   "Juancho Hernangómez": "3.0/2.5/0.5"
+  },
+  "nota": "Nada: Calderón 0 pts en los dos (6-7 min).",
+  "min": {
+   "José M. Calderón": "6.5",
+   "Juancho Hernangómez": "14.5"
+  },
+  "primer": "17 ene 2017",
+  "ultimo": "4 feb 2019"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Willy Hernangómez",
+  "g": 4,
+  "rec": "Willy 3-1",
+  "av": {
+   "Willy Hernangómez": "8.3/3.0/0.8",
+   "José M. Calderón": "3.5/1.5/2.5"
+  },
+  "nota": "Joven pívot > base veterano (Calderón en Detroit).",
+  "min": {
+   "José M. Calderón": "15.5",
+   "Willy Hernangómez": "12.5"
+  },
+  "primer": "28 mar 2018",
+  "ultimo": "21 dic 2018"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Willy Hernangómez",
+  "g": 3,
+  "rec": "Pau 2-1",
+  "av": {
+   "Willy Hernangómez": "11.0/5.7/1.0",
+   "Pau Gasol": "10.7/7.0/1.7"
+  },
+  "nota": "Rookie Willy ganó la anotación (24/13 una noche) pero Pau los partidos.",
+  "min": {
+   "Pau Gasol": "21.3",
+   "Willy Hernangómez": "18.0"
+  },
+  "primer": "25 mar 2017",
+  "ultimo": "14 ene 2019"
+ },
+ {
+  "a": "Nikola Mirotic",
+  "b": "Willy Hernangómez",
+  "g": 3,
+  "rec": "Mirotić 2-1",
+  "av": {
+   "Nikola Mirotic": "18.3/8.0/1.3",
+   "Willy Hernangómez": "7.3/5.7/1.0"
+  },
+  "nota": "Mirotić mandó claro (tirador grande).",
+  "min": {
+   "Nikola Mirotic": "30.3",
+   "Willy Hernangómez": "13.0"
+  },
+  "primer": "4 abr 2017",
+  "ultimo": "9 mar 2019"
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Willy Hernangómez",
+  "g": 8,
+  "rec": "Willy 5-3",
+  "av": {
+   "Marc Gasol": "12.1/8.0/5.3",
+   "Willy Hernangómez": "7.8/6.0/1.3"
+  },
+  "nota": "Marc mejor (casi triple-doble 22-17-10) pero Willy ganó 5 de 8.",
+  "min": {
+   "Marc Gasol": "29.6",
+   "Willy Hernangómez": "15.4"
+  },
+  "primer": "29 oct 2016",
+  "ultimo": "16 may 2021"
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Willy Hernangómez",
+  "g": 9,
+  "rec": "Willy 5-4",
+  "av": {
+   "Serge Ibaka": "14.4/5.8/0.6",
+   "Willy Hernangómez": "9.3/5.6/1.6"
+  },
+  "nota": "Ibaka anotó más, Willy eficientísimo ganó el marcador. Willy 24/11 una noche.",
+  "min": {
+   "Serge Ibaka": "24.8",
+   "Willy Hernangómez": "18.1"
+  },
+  "primer": "22 dic 2016",
+  "ultimo": "29 nov 2021"
+ },
+ {
+  "a": "Ricky Rubio",
+  "b": "Willy Hernangómez",
+  "g": 6,
+  "rec": "Willy 4-2",
+  "av": {
+   "Ricky Rubio": "12.5/4.0/8.2",
+   "Willy Hernangómez": "6.8/5.0/0.8"
+  },
+  "nota": "Ricky dominó (27-13-9 una noche) pero Willy ganó 4 de 6.",
+  "min": {
+   "Ricky Rubio": "32.3",
+   "Willy Hernangómez": "14.2"
+  },
+  "primer": "30 nov 2016",
+  "ultimo": "28 dic 2021"
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Víctor Claver",
+  "g": 3,
+  "rec": "Marc 3-0",
+  "av": {
+   "Marc Gasol": "16.0/8.7/5.0",
+   "Víctor Claver": "4.3/1.0/0.0"
+  },
+  "nota": "Marc arrolló; Claver suplente.",
+  "min": {
+   "Marc Gasol": "36.0",
+   "Víctor Claver": "15.0"
+  },
+  "primer": "6 mar 2013",
+  "ultimo": "11 mar 2014"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Víctor Claver",
+  "g": 3,
+  "rec": "Pau 2-1",
+  "av": {
+   "Pau Gasol": "15.7/6.7/7.0",
+   "Víctor Claver": "4.0/1.3/1.3"
+  },
+  "nota": "Pau por encima (23-7-9 una noche).",
+  "min": {
+   "Pau Gasol": "32.3",
+   "Víctor Claver": "12.3"
+  },
+  "primer": "28 dic 2012",
+  "ultimo": "1 abr 2014"
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Víctor Claver",
+  "g": 1,
+  "rec": "Ibaka 1-0",
+  "av": {
+   "Serge Ibaka": "11.0/6.0/1.0",
+   "Víctor Claver": "3.0/2.0/1.0"
+  },
+  "nota": "Ibaka mejor (11/6); OKC ganó.",
+  "min": {
+   "Serge Ibaka": "25.0",
+   "Víctor Claver": "26.0"
+  },
+  "primer": "12 abr 2013",
+  "ultimo": "12 abr 2013"
+ },
+ {
+  "a": "Ricky Rubio",
+  "b": "Víctor Claver",
+  "g": 3,
+  "rec": "Claver 3-0",
+  "av": {
+   "Ricky Rubio": "10.7/4.0/11.3",
+   "Víctor Claver": "5.7/3.7/1.7"
+  },
+  "nota": "DIAMANTE: Ricky promedió 11.3 asistencias (11 y 14 en partidos) y perdió los 3. Claver suplente, Portland barrió.",
+  "min": {
+   "Ricky Rubio": "31.3",
+   "Víctor Claver": "18.3"
+  },
+  "primer": "4 feb 2013",
+  "ultimo": "23 feb 2014"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Víctor Claver",
+  "g": 3,
+  "rec": "Claver 2-1",
+  "av": {
+   "José M. Calderón": "6.0/3.0/6.7",
+   "Víctor Claver": "3.0/4.3/1.0"
+  },
+  "nota": "Ambos muy fríos de tiro; Calderón pasador (¡13 asistencias y 0 puntos en un partido!). Claver ganó 2 de 3.",
+  "min": {
+   "José M. Calderón": "27.7",
+   "Víctor Claver": "19.3"
+  },
+  "primer": "10 dic 2012",
+  "ultimo": "28 dic 2014"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Raül Lopez",
+  "g": 4,
+  "rec": "Igualado 2-2",
+  "av": {
+   "Pau Gasol": "14.0/6.2/0.5",
+   "Raül Lopez": "5.8/1.8/3.0"
+  },
+  "min": {
+   "Pau Gasol": "29.8",
+   "Raül Lopez": "17.0"
+  },
+  "primer": "8 nov 2003",
+  "ultimo": "22 ene 2005"
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Pau Gasol",
+  "g": 13,
+  "rec": "Pau 8-5",
+  "av": {
+   "Rudy Fernández": "8.5/2.8/2.5",
+   "Pau Gasol": "16.2/10.5/3.1"
+  },
+  "min": {
+   "Rudy Fernández": "24.6",
+   "Pau Gasol": "36.1"
+  },
+  "primer": "28 oct 2008",
+  "ultimo": "3 feb 2012"
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Marc Gasol",
+  "g": 12,
+  "rec": "Rudy 8-4",
+  "av": {
+   "Rudy Fernández": "6.6/1.3/1.3",
+   "Marc Gasol": "12.8/9.1/2.4"
+  },
+  "min": {
+   "Rudy Fernández": "21.0",
+   "Marc Gasol": "36.2"
+  },
+  "primer": "18 feb 2009",
+  "ultimo": "17 feb 2012"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Rudy Fernández",
+  "g": 6,
+  "rec": "Rudy 6-0",
+  "av": {
+   "José M. Calderón": "9.5/2.2/7.2",
+   "Rudy Fernández": "15.7/3.7/1.8"
+  },
+  "min": {
+   "José M. Calderón": "32.3",
+   "Rudy Fernández": "27.3"
+  },
+  "primer": "7 dic 2008",
+  "ultimo": "27 ene 2012"
+ },
+ {
+  "a": "Rudy Fernández",
+  "b": "Serge Ibaka",
+  "g": 7,
+  "rec": "Ibaka 4-3",
+  "av": {
+   "Rudy Fernández": "5.7/1.9/2.0",
+   "Serge Ibaka": "9.3/5.7/0.1"
+  },
+  "min": {
+   "Rudy Fernández": "22.3",
+   "Serge Ibaka": "28.0"
+  },
+  "primer": "9 feb 2010",
+  "ultimo": "15 mar 2012"
+ },
+ {
+  "a": "Nikola Mirotic",
+  "b": "Ricky Rubio",
+  "g": 9,
+  "rec": "Ricky 6-3",
+  "av": {
+   "Nikola Mirotic": "10.6/5.6/1.0",
+   "Ricky Rubio": "15.2/5.7/9.3"
+  },
+  "min": {
+   "Nikola Mirotic": "25.0",
+   "Ricky Rubio": "32.1"
+  },
+  "primer": "1 nov 2014",
+  "ultimo": "2 mar 2019"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Ricky Rubio",
+  "g": 12,
+  "rec": "Ricky 7-5",
+  "av": {
+   "José M. Calderón": "8.3/3.1/3.9",
+   "Ricky Rubio": "11.2/5.5/8.9"
+  },
+  "min": {
+   "José M. Calderón": "27.8",
+   "Ricky Rubio": "32.8"
+  },
+  "primer": "9 ene 2012",
+  "ultimo": "5 ene 2019"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Ricky Rubio",
+  "g": 17,
+  "rec": "Pau 12-5",
+  "av": {
+   "Pau Gasol": "14.8/8.4/2.8",
+   "Ricky Rubio": "12.1/5.2/9.3"
+  },
+  "min": {
+   "Pau Gasol": "28.8",
+   "Ricky Rubio": "34.2"
+  },
+  "primer": "29 ene 2012",
+  "ultimo": "9 feb 2019"
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Ricky Rubio",
+  "g": 21,
+  "rec": "Marc 15-6",
+  "av": {
+   "Marc Gasol": "15.4/7.6/4.0",
+   "Ricky Rubio": "11.8/4.7/6.3"
+  },
+  "min": {
+   "Marc Gasol": "33.0",
+   "Ricky Rubio": "30.1"
+  },
+  "primer": "4 ene 2012",
+  "ultimo": "16 feb 2021"
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Ricky Rubio",
+  "g": 21,
+  "rec": "Ibaka 15-6",
+  "av": {
+   "Serge Ibaka": "10.6/6.5/1.0",
+   "Ricky Rubio": "10.6/3.8/7.2"
+  },
+  "min": {
+   "Serge Ibaka": "29.0",
+   "Ricky Rubio": "28.8"
+  },
+  "primer": "26 dic 2011",
+  "ultimo": "10 feb 2021"
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Serge Ibaka",
+  "g": 30,
+  "rec": "Pau 16-14 (RS 11-8 · PO 5-6)",
+  "av": {
+   "Pau Gasol": "15.7/8.4/2.9 RS · 15.3/11.2/3.3 PO",
+   "Serge Ibaka": "12.5/9.5/0.7 RS · 8.3/6.1/0.5 PO"
+  },
+  "min": {
+   "Pau Gasol": "32.8 RS · 36.8 PO",
+   "Serge Ibaka": "32.5 RS · 26.1 PO"
+  },
+  "primer": "22 nov 2009",
+  "ultimo": "19 ene 2018",
+  "playoffs": [
+   {
+    "temporada": "2010",
+    "ronda": "1ª ronda Oeste",
+    "serie": "L.A. Lakers 4-2 Oklahoma City",
+    "gana": "Pau Gasol"
+   },
+   {
+    "temporada": "2012",
+    "ronda": "Semifinales Oeste",
+    "serie": "Oklahoma City 4-1 L.A. Lakers",
+    "gana": "Serge Ibaka"
+   }
+  ]
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Serge Ibaka",
+  "g": 47,
+  "rec": "Ibaka 25-22 (RS 16-12 · PO 9-10)",
+  "av": {
+   "Marc Gasol": "14.4/6.9/2.2 RS · 17.3/8.8/3.1 PO",
+   "Serge Ibaka": "10.8/6.2/0.5 RS · 11.5/7.4/0.4 PO"
+  },
+  "min": {
+   "Marc Gasol": "34.2 RS · 41.3 PO",
+   "Serge Ibaka": "27.2 RS · 33.1 PO"
+  },
+  "primer": "11 dic 2009",
+  "ultimo": "22 dic 2020",
+  "playoffs": [
+   {
+    "temporada": "2011",
+    "ronda": "Semifinales Oeste",
+    "serie": "Oklahoma City 4-3 Memphis",
+    "gana": "Serge Ibaka"
+   },
+   {
+    "temporada": "2013",
+    "ronda": "Semifinales Oeste",
+    "serie": "Memphis 4-1 Oklahoma City",
+    "gana": "Marc Gasol"
+   },
+   {
+    "temporada": "2014",
+    "ronda": "1ª ronda Oeste",
+    "serie": "Oklahoma City 4-3 Memphis",
+    "gana": "Serge Ibaka"
+   }
+  ]
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Serge Ibaka",
+  "g": 18,
+  "rec": "Calderón 10-8 (RS 9-8 · PO 1-0)",
+  "av": {
+   "José M. Calderón": "9.5/2.5/6.1 RS · 2.0/1.0/1.0 PO",
+   "Serge Ibaka": "11.9/7.1/1.2 RS · 12.0/1.0/0.0 PO"
+  },
+  "min": {
+   "José M. Calderón": "27.0 RS · 8.0 PO",
+   "Serge Ibaka": "28.6 RS · 18.0 PO"
+  },
+  "primer": "28 feb 2010",
+  "ultimo": "7 may 2018",
+  "playoffs": [
+   {
+    "temporada": "2018",
+    "ronda": "Semifinales Este",
+    "serie": "Cleveland 4-0 Toronto",
+    "gana": "José M. Calderón"
+   }
+  ]
+ },
+ {
+  "a": "Serge Ibaka",
+  "b": "Nikola Mirotic",
+  "g": 12,
+  "rec": "Mirotić 7-5 (RS 5-2 · PO 2-3)",
+  "av": {
+   "Serge Ibaka": "14.7/7.1/1.3 RS · 8.0/7.8/1.2 PO",
+   "Nikola Mirotic": "10.3/4.7/1.1 RS · 9.8/4.0/0.4 PO"
+  },
+  "min": {
+   "Serge Ibaka": "33.6 RS · 20.2 PO",
+   "Nikola Mirotic": "22.6 RS · 22.2 PO"
+  },
+  "primer": "5 mar 2015",
+  "ultimo": "23 may 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "Finales Este",
+    "serie": "Toronto 4-2 Milwaukee",
+    "gana": "Serge Ibaka"
+   }
+  ]
+ },
+ {
+  "a": "Pau Gasol",
+  "b": "Nikola Mirotic",
+  "g": 5,
+  "rec": "Pau 3-2",
+  "av": {
+   "Pau Gasol": "8.2/6.6/2.2",
+   "Nikola Mirotic": "13.8/10.4/1.2"
+  },
+  "min": {
+   "Pau Gasol": "18.4",
+   "Nikola Mirotic": "30.6"
+  },
+  "primer": "8 dic 2016",
+  "ultimo": "3 nov 2018"
+ },
+ {
+  "a": "Jorge Garbajosa",
+  "b": "Pau Gasol",
+  "g": 2,
+  "rec": "Igualado 1-1",
+  "av": {
+   "Jorge Garbajosa": "7.5/4.0/0.5",
+   "Pau Gasol": "19.0/7.5/4.0"
+  },
+  "min": {
+   "Jorge Garbajosa": "22.0",
+   "Pau Gasol": "32.5"
+  },
+  "primer": "30 dic 2006",
+  "ultimo": "7 mar 2007"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Pau Gasol",
+  "g": 24,
+  "rec": "Pau 16-8",
+  "av": {
+   "José M. Calderón": "10.5/2.7/5.9",
+   "Pau Gasol": "16.6/8.2/3.3"
+  },
+  "min": {
+   "José M. Calderón": "26.1",
+   "Pau Gasol": "31.2"
+  },
+  "primer": "30 nov 2005",
+  "ultimo": "7 ene 2019"
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Marc Gasol",
+  "g": 19,
+  "rec": "Marc 13-6",
+  "av": {
+   "José M. Calderón": "9.2/2.4/4.4",
+   "Marc Gasol": "16.1/6.7/3.7"
+  },
+  "min": {
+   "José M. Calderón": "26.2",
+   "Marc Gasol": "33.5"
+  },
+  "primer": "7 feb 2009",
+  "ultimo": "2 ene 2019"
+ },
+ {
+  "a": "Marc Gasol",
+  "b": "Nikola Mirotic",
+  "g": 12,
+  "rec": "Marc 7-5 (RS 4-3 · PO 3-2)",
+  "av": {
+   "Marc Gasol": "15.4/6.1/4.9 RS · 9.0/8.0/4.0 PO",
+   "Nikola Mirotic": "16.0/6.0/1.1 RS · 9.8/4.0/0.4 PO"
+  },
+  "min": {
+   "Marc Gasol": "32.3 RS · 32.8 PO",
+   "Nikola Mirotic": "25.9 RS · 22.2 PO"
+  },
+  "primer": "19 dic 2014",
+  "ultimo": "23 may 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "Finales Este",
+    "serie": "Toronto 4-2 Milwaukee",
+    "gana": "Marc Gasol"
+   }
+  ]
+ },
+ {
+  "a": "José M. Calderón",
+  "b": "Nikola Mirotic",
+  "g": 14,
+  "rec": "Igualado 7-7 (RS 7-4 Calderón · PO 3-0 Mirotić)",
+  "av": {
+   "José M. Calderón": "7.8/2.6/4.4 RS · 0.0/0.0/1.7 PO",
+   "Nikola Mirotic": "13.4/5.6/2.2 RS · 6.0/2.0/1.0 PO"
+  },
+  "min": {
+   "José M. Calderón": "24.5 RS · 3.3 PO",
+   "Nikola Mirotic": "27.5 RS · 15.7 PO"
+  },
+  "primer": "18 dic 2014",
+  "ultimo": "22 abr 2019",
+  "playoffs": [
+   {
+    "temporada": "2019",
+    "ronda": "1ª ronda Este",
+    "serie": "Milwaukee 4-0 Detroit",
+    "gana": "Nikola Mirotic"
+   }
+  ]
+ }
+]
