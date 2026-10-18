@@ -1,31 +1,6 @@
 {
   "actualizado": "2026-10-18T16:56:09.687Z",
-  "superaciones": [
-    {
-      "fecha": "2026-10-18",
-      "tipo": "supera",
-      "jugador": "Usman Garuba",
-      "rival": "Víctor Claver",
-      "campo": "puntos",
-      "valor": 276
-    },
-    {
-      "fecha": "2026-10-18",
-      "tipo": "hito",
-      "jugador": "Usman Garuba",
-      "campo": "puntos",
-      "hito": 250,
-      "valor": 276
-    },
-    {
-      "fecha": "2026-10-18",
-      "tipo": "hito",
-      "jugador": "Usman Garuba",
-      "campo": "partidos",
-      "hito": 100,
-      "valor": 105
-    }
-  ],
+  "superaciones": [],
   "summer_league": [
     {
       "year": 1985,
