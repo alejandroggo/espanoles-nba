@@ -928,6 +928,7 @@ function renderSalariosFranquicias() {
       + '<td><span class="se-fdot" style="background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></span><span class="se-fcode">' + f.nombre + '</span></td>'
       + '<td class="se-fbar"><div class="se-ftrk"><div class="se-fbarf" style="width:' + (100 * f.pagado / fmx).toFixed(1) + '%;background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></div></div></td>'
       + '<td class="se-famt">' + seMoney(f.pagado) + '</td>'
+      + '<td class="se-fpct">' + (ftot ? (100 * f.pagado / ftot).toFixed(1) : '0') + '%</td>'
       + '<td class="se-fpls">' + names + '</td></tr>';
   }).join('');
   const nunca = (SAL_PE.nunca_jugaron || []).join(', ');
@@ -8579,77 +8580,3 @@ function seIni(nm) { const w = (nm || '').trim().split(/\s+/); return (((w[0] ||
 function seMoney(n) { return n >= 1e6 ? ('$' + (n / 1e6).toFixed(1) + ' M').replace('.', ',') : (n > 0 ? '$' + Math.round(n / 1e3) + ' K' : '$0'); }
 function seDollar(n) { return n ? '$' + Math.round(n).toLocaleString('de-DE') : '—'; }
 
-async function initSalariosEquipoPage() {
-  const host = document.getElementById('se-root');
-  if (!host) return;
-  let S;
-  try { S = await fetch('data/salarios.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(); return r.json(); }); }
-  catch (e) { host.innerHTML = '<p class="se-err">No se pudieron cargar los salarios.</p>'; return; }
-  try { await agNamePlayerMap(); } catch (e) { }
-
-  const players = (S.jugadores || []).slice().sort((a, b) => (b.cobrado || 0) - (a.cobrado || 0));
-  const totalCob = players.reduce((s, j) => s + (j.cobrado || 0), 0);
-  const sub = document.getElementById('se-hero-sub');
-  if (sub) sub.innerHTML = 'Ganancias de carrera de los españoles en la NBA · pulsa en un jugador para ver cuánto le pagó cada franquicia. Ya cuenta la temporada 2026-27.';
-
-  // Tabla principal
-  let html = '';
-  players.forEach((j, idx) => {
-    const rk = idx + 1;
-    const splits = Object.entries(j.splits || {}).sort((a, b) => b[1] - a[1]);
-    const nEq = splits.length;
-    const pct = totalCob ? (100 * (j.cobrado || 0) / totalCob) : 0;
-    const col = splits[0] ? (SE_COL[splits[0][0]] || '#b91c1c') : '#b91c1c';
-    let im = agPhotoImg(j.nombre, '');
-    if (!im && SE_PHOTO[j.nombre]) im = '<img src="' + SE_PHOTO[j.nombre] + '" alt="" loading="lazy" onerror="agImgHide(this)">';
-    const ava = im ? '<span class="se-ava">' + im + '</span>' : '<span class="se-ava" style="background:' + col + '">' + seIni(j.nombre) + '</span>';
-    html += '<tr class="se-prow">'
-      + '<td class="l se-rk">' + rk + '</td>'
-      + '<td class="l">' + ava + '</td>'
-      + '<td class="l se-nm">' + j.nombre + '</td>'
-      + '<td class="se-tot' + (rk === 1 ? ' se-lead' : '') + '">' + seDollar(j.total) + '</td>'
-      + '<td class="se-muted">' + seDollar(j.cobrado) + '</td>'
-      + '<td class="se-muted">' + seDollar(j.firmado) + '</td>'
-      + '<td>' + pct.toFixed(1) + '%</td>'
-      + '<td class="se-eq">' + (nEq ? nEq + (nEq > 1 ? ' equipos' : ' equipo') : '—') + ' <span class="se-chev">▸</span></td></tr>';
-    let inner;
-    if (splits.length) {
-      const mx = splits[0][1], tot = splits.reduce((s, [, v]) => s + v, 0);
-      const rows = splits.map(([tm, v]) => '<div class="se-gpe-top"><div class="se-gpe-code">' + tm + '</div>'
-        + '<div class="se-gpe-track"><div class="se-gpe-bar" style="width:' + (100 * v / mx).toFixed(1) + '%;background:' + (SE_COL[tm] || '#b91c1c') + '"></div></div>'
-        + '<div class="se-gpe-amt">' + seMoney(v) + ' <span class="p">· ' + (tot ? (100 * v / tot).toFixed(1) : 0) + '%</span></div></div>').join('');
-      inner = '<div class="se-exp-title">💰 Lo que le pagó cada franquicia</div><div class="se-gpe">' + rows + (j.nota ? '<p class="se-hint">' + j.nota + '</p>' : '') + '</div>';
-    } else {
-      inner = '<div class="se-exp-title">💰 Reparto por franquicia</div><p class="se-hint" style="margin-top:0">' + (j.nota || 'Sin datos de cobro todavía.') + '</p>';
-    }
-    html += '<tr class="se-exp" hidden><td colspan="8"><div class="se-exp-inner">' + inner + '</div></td></tr>';
-  });
-  const pbody = document.getElementById('se-pbody');
-  pbody.innerHTML = html;
-  pbody.addEventListener('click', e => {
-    const tr = e.target.closest('.se-prow'); if (!tr) return;
-    const exp = tr.nextElementSibling; const open = tr.classList.toggle('open'); if (exp) exp.hidden = !open;
-  });
-  const first = pbody.querySelector('.se-prow');
-  if (first) { first.classList.add('open'); if (first.nextElementSibling) first.nextElementSibling.hidden = false; }
-
-  // Tabla de franquicias
-  const fr = (S.franquicias || []).slice().sort((a, b) => b.pagado - a.pagado);
-  const fmx = fr.length ? fr[0].pagado : 1, ftot = fr.reduce((s, f) => s + f.pagado, 0);
-  const fsub = document.getElementById('se-fsub');
-  if (fsub) fsub.innerHTML = 'Dinero realmente cobrado por españoles en cada franquicia · <b>' + seMoney(ftot) + '</b> en total, en ' + fr.length + ' equipos.';
-  document.getElementById('se-fbody').innerHTML = fr.slice(0, 15).map((f, i) => {
-    const pls = f.jugadores || [];
-    const names = pls.slice(0, 4).map(n => SE_DISP[n] || n).join(', ') + (pls.length > 4 ? '…' : '');
-    return '<tr><td class="se-frk">' + (i + 1) + '</td>'
-      + '<td><span class="se-fdot" style="background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></span><span class="se-fcode">' + f.nombre + '</span></td>'
-      + '<td class="se-fbar"><div class="se-ftrk"><div class="se-fbarf" style="width:' + (100 * f.pagado / fmx).toFixed(1) + '%;background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></div></div></td>'
-      + '<td class="se-famt">' + seMoney(f.pagado) + '</td>'
-      + '<td class="se-fpls">' + names + '</td></tr>';
-  }).join('');
-
-  // Nota
-  const nunca = (S.nunca_jugaron || []).join(', ');
-  const note = document.getElementById('se-note');
-  if (note) note.innerHTML = '🚫 ' + (S.nota_global || '') + (nunca ? ' Las que nunca han tenido un español en cancha: <b>' + nunca + '</b>.' : '');
-}

@@ -2273,7 +2273,9 @@ circle.gr-ctx { fill: var(--gr-ctx); }
    SALARIOS POR EQUIPO — página oculta del menú, live
    ══════════════════════════════════════════════ */
 .se-page{--se-rowopen:color-mix(in srgb,var(--accent) 5%,var(--surface))}
-.se-wrap{max-width:1020px;margin:0 auto;padding:0 2px}
+.se-wrap{max-width:1400px;margin:0 auto;padding:0 var(--space-6)}
+.se-fpct{text-align:right;color:var(--text-muted);font-weight:700;font-size:.78rem;white-space:nowrap;width:52px;font-variant-numeric:tabular-nums}
+.se-ftbl tr:nth-child(-n+3) .se-fpct{color:var(--accent)}
 .se-intro{color:var(--text-muted);font-size:.88rem;margin:2px 0 16px;font-weight:500;max-width:64ch}
 .se-scroll{overflow-x:auto;margin-bottom:34px;border:1px solid var(--border);border-radius:14px}
 .se-tbl{width:100%;border-collapse:collapse;background:var(--surface);min-width:620px}
