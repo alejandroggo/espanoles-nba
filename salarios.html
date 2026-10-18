@@ -76,6 +76,28 @@
       <tfoot id="sal-foot"></tfoot>
     </table>
   </section>
+
+  <section class="se-page" aria-label="Salarios por equipo">
+    <div class="se-wrap" id="se-root">
+      <h2 class="se-h2" style="margin-top:6px">Equipo por equipo</h2>
+      <p class="se-intro">Lo que ha cobrado de verdad cada español, franquicia por franquicia · <b>pulsa en un jugador</b> para ver su reparto.</p>
+      <div class="se-scroll">
+        <table class="se-tbl">
+          <thead><tr>
+            <th class="l">#</th><th class="l"></th><th class="l">Jugador</th>
+            <th>Total</th><th>Cobrado</th><th>Firmado</th><th>%</th><th class="l">Equipos</th>
+          </tr></thead>
+          <tbody id="se-pbody"></tbody>
+        </table>
+      </div>
+      <h2 class="se-h2">¿Qué franquicia ha pagado más a los españoles?</h2>
+      <p class="se-intro" id="se-fsub"></p>
+      <div class="se-scroll">
+        <table class="se-ftbl"><tbody id="se-fbody"></tbody></table>
+      </div>
+      <div class="se-never" id="se-note"></div>
+    </div>
+  </section>
 </main>
 
 <!-- FOOTER -->
@@ -103,6 +125,6 @@
 </footer>
 
 <script src="app.js?v=206"></script>
-<script>initTheme(); initSalariosPage();</script>
+<script>initTheme(); initSalariosPage(); initSalariosEquipoPage();</script>
 </body>
 </html>
