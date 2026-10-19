@@ -2256,3 +2256,91 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 @media (max-width: 560px) {
   .nl-cta { max-width: calc(100% - 2 * var(--space-4)); margin: 0 var(--space-4) var(--space-8); flex-direction: column; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); }
 }
+/* tarjetas premium (grandes duelos) */
+.cc-prem-wrap{max-width:1040px;margin:30px auto 0;padding:0 2px}
+.cc-prem-title{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,5vw,2.2rem);line-height:.95;color:var(--text)}
+.cc-prem-title em{font-family:var(--serif);font-style:italic;color:var(--accent)}
+.cc-prem-lead{color:var(--text-muted);font-size:.86rem;margin:4px 0 16px;font-weight:500}
+.cc-prem-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cc-prem-card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow-sm)}
+.cc-prem-head{text-align:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:11px}
+.cc-prem-rec{display:block;font-family:var(--display);font-size:1.75rem;color:var(--accent);line-height:1}
+.cc-prem-sub{display:block;font-size:.72rem;color:var(--text-muted);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.cc-prem-g{display:block;font-size:.64rem;color:var(--text-dim);margin-top:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.cc-prem-body{display:flex;flex-direction:column;gap:9px}
+.cc-prem-pl{display:flex;align-items:center;gap:10px}
+.cc-prem-ph{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;background:var(--surface-2);flex:none;display:block}
+.cc-prem-pln{display:flex;flex-direction:column;min-width:84px;flex:none}
+.cc-prem-nm{font-weight:800;font-size:.9rem;color:var(--text)}
+.cc-prem-min{font-size:.66rem;color:var(--text-dim);font-weight:600;font-variant-numeric:tabular-nums}
+.cc-prem-av{margin-left:auto;text-align:right;font-weight:700;font-size:.82rem;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.3}
+.cc-prem-po{margin-top:11px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--text-muted)}
+.cc-prem-po b{color:#8a6d00}
+[data-theme="dark"] .cc-prem-po b{color:var(--dorado)}
+.cc-prem-note{margin-top:9px;font-size:.72rem;color:var(--text-dim);font-style:italic;line-height:1.45}
+@media(max-width:620px){.cc-prem-grid{grid-template-columns:1fr}}
+
+/* ══════════════════════════════════════════════
+   SALARIOS POR EQUIPO — página oculta del menú, live
+   ══════════════════════════════════════════════ */
+.se-page{--se-rowopen:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.se-wrap{max-width:1400px;margin:0 auto;padding:0 var(--space-6)}
+.se-fpct{text-align:right;color:var(--text-muted);font-weight:700;font-size:.78rem;white-space:nowrap;width:52px;font-variant-numeric:tabular-nums}
+.se-ftbl tr:nth-child(-n+3) .se-fpct{color:var(--accent)}
+.se-intro{color:var(--text-muted);font-size:.88rem;margin:2px 0 16px;font-weight:500;max-width:64ch}
+.se-scroll{overflow-x:auto;margin-bottom:34px;border:1px solid var(--border);border-radius:14px}
+.se-tbl{width:100%;border-collapse:collapse;background:var(--surface);min-width:620px}
+.se-tbl thead th{font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);font-weight:700;padding:11px 10px;text-align:right;border-bottom:2px solid var(--border);background:var(--surface-2)}
+.se-tbl thead th.l{text-align:left}
+.se-tbl tbody td{padding:10px;text-align:right;font-size:.86rem;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--border);color:var(--text)}
+.se-tbl tbody td.l{text-align:left}
+.se-prow{cursor:pointer}
+.se-prow:hover{background:var(--surface-2)}
+.se-prow.open{background:var(--se-rowopen)}
+.se-prow.open td{border-bottom:none}
+.se-rk{color:var(--text-dim);font-weight:700;width:26px}
+.se-ava{width:32px;height:32px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;font-family:var(--display);font-size:.85rem;color:#fff;vertical-align:middle;overflow:hidden;background:var(--surface-2)}
+.se-ava img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.se-nm{font-weight:700}
+.se-tot{font-weight:800}.se-lead{color:var(--accent)}
+.se-muted{color:var(--text-muted)}
+.se-eq{text-align:left;color:var(--accent);font-weight:700;white-space:nowrap}
+.se-chev{display:inline-block;transition:transform .18s;font-size:.8em}
+.se-prow.open .se-chev{transform:rotate(90deg)}
+.se-exp>td{padding:0;border-bottom:1px solid var(--border);background:var(--se-rowopen)}
+.se-exp-inner{padding:2px 20px 18px 56px}
+.se-exp-title{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin:8px 0 12px}
+.se-gpe{display:grid;grid-template-columns:1fr 1fr;gap:12px 36px}
+.se-gpe-top{display:flex;align-items:center;gap:10px}
+.se-gpe-code{font-family:var(--display);font-size:1.1rem;width:42px;flex:none;color:var(--text)}
+.se-gpe-track{flex:1;min-width:0;height:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.se-gpe-bar{height:100%}
+.se-gpe-amt{flex:none;white-space:nowrap;font-weight:800;font-size:.82rem;color:var(--text)}
+.se-gpe-amt .p{color:var(--text-dim);font-weight:700;font-size:.72rem}
+.se-hint{font-size:.74rem;color:var(--text-dim);font-style:italic;margin-top:12px;grid-column:1/-1}
+.se-h2{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,5vw,1.9rem);margin-bottom:2px;color:var(--text)}
+.se-ftbl{width:100%;border-collapse:collapse;background:var(--surface);min-width:540px}
+.se-ftbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:.85rem;color:var(--text)}
+.se-ftbl tr:last-child td{border-bottom:none}
+.se-frk{color:var(--text-dim);font-weight:800;text-align:center;width:26px}
+.se-fdot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:8px}
+.se-fcode{font-family:var(--display);font-size:1.1rem}
+.se-fbar{width:26%}.se-ftrk{height:9px;background:var(--surface-2);border-radius:5px;overflow:hidden}.se-fbarf{height:100%;border-radius:5px}
+.se-famt{text-align:right;font-weight:800;white-space:nowrap;width:76px;font-variant-numeric:tabular-nums}
+.se-fpls{color:var(--text-muted);font-size:.74rem}
+.se-ftbl tr:nth-child(-n+3) .se-fcode,.se-ftbl tr:nth-child(-n+3) .se-famt{color:var(--accent)}
+.se-never{margin-top:16px;background:color-mix(in srgb,var(--dorado) 12%,transparent);border:1px solid var(--dorado);border-radius:12px;padding:13px 17px;font-size:.84rem;color:#7a5e00;font-weight:600;line-height:1.5}
+[data-theme="dark"] .se-never{color:var(--dorado)}
+.se-never b{color:#5e4800}
+[data-theme="dark"] .se-never b{color:#f5d98a}
+.se-err{color:var(--text-muted);text-align:center;padding:30px}
+@media(max-width:560px){.se-gpe{grid-template-columns:1fr}.se-exp-inner{padding:2px 14px 16px 16px}}
+
+/* Salarios: filas desplegables (reparto por equipo) */
+#sal-table .sal-prow{cursor:pointer}
+#sal-table .sal-prow:hover{background:var(--surface-2)}
+#sal-table .sal-prow.open{background:var(--se-rowopen,color-mix(in srgb,var(--accent) 5%,var(--surface)))}
+#sal-table .sal-prow.open td{border-bottom:none}
+.sal-chev{display:inline-block;color:var(--text-dim);transition:transform .18s;font-size:.8em;margin-left:4px}
+#sal-table .sal-prow.open .sal-chev{transform:rotate(90deg);color:var(--accent)}
+#sal-table .sal-exp>td{padding:0;background:var(--se-rowopen,color-mix(in srgb,var(--accent) 5%,var(--surface)));border-bottom:1px solid var(--border)}

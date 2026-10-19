@@ -886,6 +886,8 @@ function fmtDinero(n) {
   return '$' + Math.round(n).toLocaleString('es-ES');
 }
 
+let SAL_SPLITS = {};
+let SAL_PE = null;
 async function initSalariosPage() {
   let jugadores;
   try {
@@ -894,6 +896,10 @@ async function initSalariosPage() {
     document.getElementById('hero-sub').textContent = 'Error al cargar los datos';
     return;
   }
+  // Desglose por equipo (data/salarios.json) para el dropdown y la tabla de franquicias
+  try { SAL_PE = await fetch('data/salarios.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null); } catch (e) { SAL_PE = null; }
+  SAL_SPLITS = {};
+  if (SAL_PE && SAL_PE.jugadores) SAL_PE.jugadores.forEach(x => { SAL_SPLITS[drNorm(x.nombre)] = { splits: x.splits || {}, nota: x.nota || '' }; });
 
   buildPlayerIds(jugadores);
   // Debutados en la NBA o con contrato firmado (los tres rookies)
@@ -907,10 +913,48 @@ async function initSalariosPage() {
   });
 
   document.getElementById('hero-sub').textContent =
-    `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas de carrera (USD)`;
+    `${salRows.length} jugadores con contrato o carrera NBA · Ganancias brutas (USD) · pulsa un jugador para ver su reparto por equipo`;
 
   renderSalariosKpis();
   renderSalariosTable();
+
+  const sb = document.getElementById('sal-body');
+  if (sb && !sb.dataset.expbound) {
+    sb.dataset.expbound = '1';
+    sb.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      const tr = e.target.closest('.sal-prow'); if (!tr) return;
+      const exp = tr.nextElementSibling;
+      if (!exp || !exp.classList.contains('sal-exp')) return;
+      const open = tr.classList.toggle('open'); exp.hidden = !open;
+    });
+  }
+  renderSalariosFranquicias();
+}
+
+function renderSalariosFranquicias() {
+  if (!SAL_PE) return;
+  const fr = (SAL_PE.franquicias || []).slice().sort((a, b) => b.pagado - a.pagado);
+  const fmx = fr.length ? fr[0].pagado : 1, ftot = fr.reduce((s, f) => s + f.pagado, 0);
+  const fsub = document.getElementById('se-fsub');
+  if (fsub) fsub.innerHTML = 'Dinero realmente cobrado por españoles en cada franquicia · <b>' + seMoney(ftot) + '</b> en total, en ' + fr.length + ' equipos.';
+  const fbody = document.getElementById('se-fbody');
+  if (fbody) fbody.innerHTML = fr.map((f, i) => {
+    const pls = f.jugadores || [];
+    const names = pls.map(n => SE_DISP[n] || n).join(', ');
+    return '<tr><td class="se-frk">' + (i + 1) + '</td>'
+      + '<td><span class="se-fdot" style="background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></span><span class="se-fcode">' + f.nombre + '</span></td>'
+      + '<td class="se-fbar"><div class="se-ftrk"><div class="se-fbarf" style="width:' + (100 * f.pagado / fmx).toFixed(1) + '%;background:' + (SE_COL[f.equipo] || '#b91c1c') + '"></div></div></td>'
+      + '<td class="se-famt">' + seMoney(f.pagado) + '</td>'
+      + '<td class="se-fpct">' + (ftot ? (100 * f.pagado / ftot).toFixed(1) : '0') + '%</td>'
+      + '<td class="se-fpls">' + names + '</td></tr>';
+  }).join('');
+  const nunca = (SAL_PE.nunca_jugaron || []).join(', ');
+  const ricky = (SAL_PE.jugadores || []).find(x => x.nombre === 'Ricky Rubio');
+  const perdon = ricky ? (ricky.total || 0) - (ricky.cobrado || 0) : 0;
+  const note = document.getElementById('se-note');
+  if (note) note.innerHTML = '🚫 ' + (SAL_PE.nota_global || '') + (nunca ? ' Las que nunca han tenido un español en cancha: <b>' + nunca + '</b>.' : '')
+    + (perdon > 0 ? '<br>💸 Los totales no cuadran al céntimo porque <b>Ricky Rubio perdonó ' + seDollar(perdon) + '</b> de su último contrato (buyout de 2023): figuran firmados, pero nunca los cobró.' : '');
 }
 
 function renderSalariosKpis() {
@@ -967,8 +1011,19 @@ function renderSalariosTable() {
   const maxGan = Math.max(...salRows.map(j => j.ganancias || 0), 0);
   const maxSpj = Math.max(...salRows.map(j => j.sueldo_pj || 0), 0);
 
-  document.getElementById('sal-body').innerHTML = rows.map((j, i) => `
-    <tr>
+  document.getElementById('sal-body').innerHTML = rows.map((j, i) => {
+    const spl = SAL_SPLITS[drNorm(j.nombre)];
+    const ents = spl ? Object.entries(spl.splits).sort((a, b) => b[1] - a[1]) : [];
+    let exp;
+    if (ents.length) {
+      const mx = ents[0][1], tot = ents.reduce((s, [, v]) => s + v, 0);
+      const bars = ents.map(([tm, v]) => `<div class="se-gpe-top"><div class="se-gpe-code">${tm}</div><div class="se-gpe-track"><div class="se-gpe-bar" style="width:${(100 * v / mx).toFixed(1)}%;background:${SE_COL[tm] || '#b91c1c'}"></div></div><div class="se-gpe-amt">${seMoney(v)} <span class="p">· ${tot ? (100 * v / tot).toFixed(1) : 0}%</span></div></div>`).join('');
+      exp = `<tr class="sal-exp" hidden><td colspan="9"><div class="se-exp-inner"><div class="se-exp-title">💰 Lo que le pagó cada franquicia</div><div class="se-gpe">${bars}${spl.nota ? `<p class="se-hint">${spl.nota}</p>` : ''}</div></div></td></tr>`;
+    } else {
+      exp = `<tr class="sal-exp" hidden><td colspan="9"><div class="se-exp-inner"><p class="se-hint" style="margin-top:0">Sin desglose por franquicia disponible.</p></div></td></tr>`;
+    }
+    return `
+    <tr class="sal-prow">
       <td class="td-rank td-muted">${i + 1}</td>
       <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
@@ -977,8 +1032,9 @@ function renderSalariosTable() {
       <td class="td-num td-muted">${fmtDinero(j.ganancias_futuro)}</td>
       <td class="td-num${maxSpj && j.sueldo_pj === maxSpj ? ' td-leader' : ''}">${fmtDinero(j.sueldo_pj)}</td>
       <td class="td-num">${renderPct(j.pct, maxPct ? (j.pct || 0) / maxPct * 100 : 0)}</td>
-      <td class="td-muted td-equipos">${j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : '—'}</td>
-    </tr>`).join('');
+      <td class="td-muted td-equipos">${j.equipos_nba ? j.equipos_nba.replace(/\s*,\s*/g, ' · ') : '—'} <span class="sal-chev">▸</span></td>
+    </tr>${exp}`;
+  }).join('');
 
   // Pie: totales
   const tTotal    = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
@@ -5542,7 +5598,7 @@ function botAnswer(raw) {
   botPending = { players, stat, year, dim, perGame, count: false };
 
   // 0) COMPAÑEROS: españoles que jugaron juntos (mismo equipo y temporada)
-  if (/juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
+  if (/\bparejas?\b|juntos|junto a|compañer|companer|coincid|mismo equipo|a la vez|de compañero|con (que|quien|algun|otro|otros?|algun otro) espanol|con espanoles|con algun espanol/.test(q)) {
     const caveat = `<div class="bot-sub">Es el dato de temporadas compartidas en el mismo equipo; no tengo el recuento exacto de partidos juntos en pista.</div>`;
     if (players.length >= 2) {
       const [a, b] = players;
@@ -8498,4 +8554,50 @@ async function initCaraACaraPage() {
       + '<table class="cc-dtbl"><thead><tr><th class="l"></th>' + (hasMin ? '<th>min</th>' : '') + '<th>pts/reb/ast</th></tr></thead><tbody>' + rows + '</tbody></table>' + po;
     det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
+
+  // ── Tarjetas premium: las rivalidades con más de 10 enfrentamientos ──
+  const shortOf = full => FULL2SHORT[full] || full.split(/\s+/).pop();
+  const yr = s => { const m = String(s || '').match(/\d{4}/); return m ? m[0] : ''; };
+  const premCard = d => {
+    const m = d.rec.match(/^(.*?)(?:\s*\((.*)\))?$/);
+    const recMain = m[1].trim(), recSub = (m[2] || '').trim();
+    const mn = d.min || {};
+    const plLine = full => {
+      const im = agPhotoImg(full, 'cc-prem-ph');
+      const mnTxt = mn[full] ? '<span class="cc-prem-min">' + mn[full] + ' min</span>' : '';
+      return '<div class="cc-prem-pl">' + (im || '<span class="cc-prem-ph"></span>')
+        + '<div class="cc-prem-pln"><span class="cc-prem-nm">' + shortOf(full) + '</span>' + mnTxt + '</div>'
+        + '<div class="cc-prem-av">' + (d.av ? d.av[full] : '') + '</div></div>';
+    };
+    const po = (d.playoffs && d.playoffs.length)
+      ? '<div class="cc-prem-po">' + d.playoffs.map(s => '<span><b>' + s.temporada + '</b> ' + s.serie + '</span>').join('') + '</div>' : '';
+    const nota = d.nota ? '<div class="cc-prem-note">' + d.nota + '</div>' : '';
+    const span = (yr(d.primer) && yr(d.ultimo)) ? ' · ' + yr(d.primer) + '–' + yr(d.ultimo) : '';
+    return '<div class="cc-prem-card">'
+      + '<div class="cc-prem-head"><span class="cc-prem-rec">' + recMain + '</span>'
+      + (recSub ? '<span class="cc-prem-sub">' + recSub + '</span>' : '')
+      + '<span class="cc-prem-g">' + d.g + ' partidos' + span + '</span></div>'
+      + '<div class="cc-prem-body">' + plLine(d.a) + plLine(d.b) + '</div>'
+      + po + nota + '</div>';
+  };
+  const prem = D.filter(d => d.g > 10).sort((a, b) => b.g - a.g);
+  const wrap = document.createElement('section');
+  wrap.className = 'cc-prem-wrap';
+  wrap.setAttribute('aria-label', 'Los grandes duelos');
+  wrap.innerHTML = '<h2 class="cc-prem-title">Los grandes <em>duelos</em></h2>'
+    + '<p class="cc-prem-lead">Las rivalidades que se vieron más de 10 veces — récord, medias por partido y playoffs.</p>'
+    + '<div class="cc-prem-grid">' + prem.map(premCard).join('') + '</div>';
+  host.parentNode.appendChild(wrap);
 }
+
+// ══════════════════════════════════════════════
+// SALARIOS POR EQUIPO — página oculta del menú
+// ══════════════════════════════════════════════
+const SE_COL = { MEM: '#5D76A9', TOR: '#CE1141', LAL: '#552583', MIN: '#236192', OKC: '#007ac1', SAS: '#8a8d8f', SAC: '#5a2d81', CHI: '#CE1141', UTA: '#5c2f83', CLE: '#860038', NOP: '#0C2340', NYK: '#f58426', LAC: '#1d428a', PHX: '#e56020', DET: '#1d428a', POR: '#E03A3E', MIL: '#00471B', DEN: '#0e2240', ORL: '#0077c0', IND: '#002d62', PHI: '#006bb6', DAL: '#00538c', HOU: '#ce1141', CHA: '#1d1160', BOS: '#007a33', GSW: '#1d428a', ATL: '#e03a3e' };
+const SE_DISP = { 'Pau Gasol': 'Pau', 'Marc Gasol': 'Marc', 'Raül Lopez': 'Raül', 'Raül López': 'Raül', 'Fernando Martín': 'F. Martín', 'José M. Calderón': 'Calderón', 'Sergio Rodríguez': 'Chacho', 'Serge Ibaka': 'Ibaka', 'Ricky Rubio': 'Ricky', 'Nikola Mirotić': 'Mirotić', 'Nikola Mirotic': 'Mirotić', 'Santi Aldama': 'Aldama', 'Usman Garuba': 'Garuba', 'Alex Abrines': 'Abrines', 'Álex Abrines': 'Abrines', 'Willy Hernangómez': 'Willy', 'Juancho Hernangómez': 'Juancho', 'Víctor Claver': 'Claver', 'Jorge Garbajosa': 'Garbajosa', 'Juan Carlos Navarro': 'Navarro', 'Hugo González': 'Hugo', 'Aday Mara': 'Aday', 'Baba Miller': 'Baba', 'Sergio de Larrea': 'De Larrea', 'Eli Ndiaye': 'Ndiaye' };
+// Fotos de jugadores aún no presentes en data.json (override manual)
+const SE_PHOTO = { 'Eli Ndiaye': 'img/players/eli-ndiaye.jpg' };
+function seIni(nm) { const w = (nm || '').trim().split(/\s+/); return (((w[0] || ' ')[0]) + ((w[w.length - 1] || ' ')[0])).toUpperCase(); }
+function seMoney(n) { return n >= 1e6 ? ('$' + (n / 1e6).toFixed(1) + ' M').replace('.', ',') : (n > 0 ? '$' + Math.round(n / 1e3) + ' K' : '$0'); }
+function seDollar(n) { return n ? '$' + Math.round(n).toLocaleString('de-DE') : '—'; }
+
