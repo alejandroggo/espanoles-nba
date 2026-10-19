@@ -13,6 +13,7 @@ function initTheme() {
   buildNav();
   buildHeaderSearch();
   buildShareButton();
+  buildNewsletterCta();
   // buildChatWidget();   // Pregúntame oculto por ahora
   buildCookieBanner();
   agTableTopScroll();
@@ -71,6 +72,23 @@ function buildShareButton() {
   btn.textContent = 'Compartir';
   btn.onclick = sharePage;
   right.appendChild(btn);
+}
+
+// CTA de la newsletter al final de cada página (versión compacta del de la home).
+// Se inyecta antes del footer; en la home no, porque ya tiene el CTA grande.
+function buildNewsletterCta() {
+  const footer = document.querySelector('footer.ag-footer');
+  if (!footer || document.querySelector('.home-cta') || document.getElementById('nl-cta')) return;
+  const cta = document.createElement('aside');
+  cta.className = 'nl-cta';
+  cta.id = 'nl-cta';
+  cta.setAttribute('aria-label', 'Newsletter');
+  cta.innerHTML = `<div class="nl-cta-text">
+      <strong class="nl-cta-title">La NBA española, en tu correo</strong>
+      <span class="nl-cta-sub">Análisis, datos e historias de los españoles en la NBA, por Alejandro Gaitán.</span>
+    </div>
+    <a class="nl-cta-btn" href="https://alejandroggo.substack.com" target="_blank" rel="noopener noreferrer">Suscríbete en Substack →</a>`;
+  footer.parentNode.insertBefore(cta, footer);
 }
 
 // Barra de desplazamiento horizontal ARRIBA de cada tabla, sincronizada con su scroll.

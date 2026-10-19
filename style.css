@@ -2245,3 +2245,14 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-dpo-row .sr{color:var(--text);font-weight:600;text-align:right}
 .cc-dpo-row .rd{color:var(--text-dim);font-size:.7rem}
 .cc-err{color:var(--text-muted);text-align:center;padding:30px}
+
+/* CTA de newsletter compacto (inyectado antes del footer en todas las páginas menos la home) */
+.nl-cta { max-width: 1400px; margin: 0 auto var(--space-10); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-6); box-shadow: var(--shadow-sm); }
+.nl-cta-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nl-cta-title { font-family: var(--display); font-weight: 400; font-size: 1.15rem; letter-spacing: 0.02em; color: var(--text); }
+.nl-cta-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+.nl-cta-btn { flex: 0 0 auto; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); text-decoration: none; white-space: nowrap; transition: opacity .15s; }
+.nl-cta-btn:hover { opacity: 0.9; }
+@media (max-width: 560px) {
+  .nl-cta { max-width: calc(100% - 2 * var(--space-4)); margin: 0 var(--space-4) var(--space-8); flex-direction: column; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); }
+}
