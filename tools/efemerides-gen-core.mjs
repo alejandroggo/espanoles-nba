@@ -1,25 +1,41 @@
-// Núcleo PURO del futuro generador semanal de borradores de efemérides (FASE 2A).
+// Núcleo PURO del futuro generador semanal de borradores de efemérides.
+// FASE 2B (endurecimiento tras la auditoría 2A).
 //
 // Función determinista: recibe una instantánea de data.json (+ los eventos ya
 // construidos por efmBuild, para no duplicar plantillas), una instantánea de los
 // borradores existentes y la ventana semanal + año de campaña, y devuelve un PLAN
 // de operaciones. NO escribe nada: ni archivos, ni Google Sheets, ni servicios.
+// La APLICACIÓN del plan a un almacén la hace tools/efemerides-apply.mjs según un
+// contrato explícito por operación.
 //
 // No modifica app.js ni data.json. No depende de la zona horaria de la máquina:
-// las sugerencias horarias se calculan con Intl y timeZone 'America/Toronto'.
+// las horas se calculan con Intl y timeZone 'America/Toronto'.
 //
 // Reutiliza:
 //   · eventId/draftId  -> tools/efemerides-id.mjs
 //   · validación fechas -> tools/efemerides-fecha.mjs
 //   · plantillas de texto y compositor de tuit -> NO se duplican; el llamador
-//     adjunta `tweetText` a cada evento usando el efmShare real (ver
-//     tools/efemerides-build.mjs). Si no viene, se cae al texto plano del html.
+//     adjunta `tweetText` a cada evento usando el efmShare real (efemerides-build.mjs).
+//
+// CAMBIOS 2B:
+//   H1  Colisión con borradores existentes: se notifica referenciando los
+//       draftId afectados y NO se marca su borrador como `desaparecido`.
+//   Fingerprint observado vs reconocido: `edicion_preservada` no se silencia sola;
+//       solo un `reviewedFingerprint` (que fija el humano al resolver) la calla.
+//   Ediciones independientes de texto y hora: `editedText` / `editedTime`
+//       (con compatibilidad hacia atrás: `edited` == editedText).
+//   DST: horas de pared inexistentes o ambiguas se rechazan con error claro.
 
 import { eventId as calcEventId, draftId as calcDraftId, buildNameToId, norm } from './efemerides-id.mjs';
 import { parsearFecha, validarYMD } from './efemerides-fecha.mjs';
 
 const SLOTS_DEFAULT = ['10:00', '14:00', '19:00']; // franjas sugeridas (configurable)
 const TZ = 'America/Toronto';
+// Para bloqueo de TEXTO / no-regeneración y "no reabrir": aprobado cuenta.
+const ESTADOS_TERMINALES = new Set(['aprobado', 'descartado', 'publicado']);
+// Para NO marcar como desaparecido: solo los ya resueltos (publicado/descartado).
+// Un 'aprobado' cuyo evento desaparece del origen SÍ se avisa (no reabre su estado).
+const ESTADOS_RESUELTOS = new Set(['descartado', 'publicado']);
 
 // ── utilidades deterministas ────────────────────────────────────────────────
 const pad = n => String(n).padStart(2, '0');
@@ -58,8 +74,20 @@ function playersOf(ev, nameToId) {
   return [{ name, id: nameToId[norm(name)] || null }];
 }
 
+// Instantánea del contenido de origen en el momento de generar (para diff/revisión).
+function snapshotOf(ev, eventDateISO, players) {
+  return { texto: stripText(ev.html), tag: ev.tag || '', video: ev.video || '', eventDateISO, players };
+}
+
+// Edición: `edited` (histórico) == editedText; añadimos editedTime independiente.
+function editFlags(ex) {
+  const editedText = ex.editedText ?? ex.edited ?? false;
+  const editedTime = ex.editedTime ?? false;
+  return { editedText: !!editedText, editedTime: !!editedTime };
+}
+
 // ── zona horaria America/Toronto (DST correcto vía Intl, sin librerías) ───────
-function tzOffsetMs(date, tz) {
+function tzParts(date, tz) {
   const dtf = new Intl.DateTimeFormat('en-US', {
     timeZone: tz, hour12: false,
     year: 'numeric', month: '2-digit', day: '2-digit',
@@ -67,27 +95,45 @@ function tzOffsetMs(date, tz) {
   });
   const p = {};
   for (const { type, value } of dtf.formatToParts(date)) p[type] = value;
-  const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +(p.hour === '24' ? '0' : p.hour), +p.minute, +p.second);
+  return { y: +p.year, mo: +p.month, d: +p.day, h: +(p.hour === '24' ? '0' : p.hour), mi: +p.minute, s: +p.second };
+}
+function tzOffsetMs(date, tz) {
+  const p = tzParts(date, tz);
+  const asUTC = Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s);
   return asUTC - Math.floor(date.getTime() / 1000) * 1000;
 }
-// UTC exacto de una hora de pared (YYYY-MM-DD HH:MM) en Toronto, con DST.
-function wallToUTC(y, mo, d, h, mi, tz) {
-  let ts = Date.UTC(y, mo - 1, d, h, mi);
-  for (let i = 0; i < 2; i++) { const off = tzOffsetMs(new Date(ts), tz); ts = Date.UTC(y, mo - 1, d, h, mi) - off; }
-  return new Date(ts);
+function wallMatches(date, y, mo, d, h, mi, tz) {
+  const p = tzParts(date, tz);
+  return p.y === y && p.mo === mo && p.d === d && p.h === h && p.mi === mi;
+}
+// Resuelve una hora de pared (y,mo,d,h,mi) a un instante UTC en `tz`, detectando
+// explícitamente horas INEXISTENTES (salto de primavera) y AMBIGUAS (otoño).
+function resolveWall(y, mo, d, h, mi, tz) {
+  const naive = Date.UTC(y, mo - 1, d, h, mi);
+  const c1 = naive - tzOffsetMs(new Date(naive - 12 * 3600000), tz); // offset "de antes"
+  const c2 = naive - tzOffsetMs(new Date(naive + 12 * 3600000), tz); // offset "de después"
+  const v1 = wallMatches(new Date(c1), y, mo, d, h, mi, tz);
+  const v2 = wallMatches(new Date(c2), y, mo, d, h, mi, tz);
+  if (c1 === c2) return v1 ? { ok: true, utc: new Date(c1) } : { ok: false, code: 'hora_inexistente' };
+  if (v1 && v2) return { ok: false, code: 'hora_ambigua' }; // ocurre dos veces
+  if (v1) return { ok: true, utc: new Date(c1) };
+  if (v2) return { ok: true, utc: new Date(c2) };
+  return { ok: false, code: 'hora_inexistente' }; // no ocurre ninguna vez (hueco DST)
 }
 function offsetLabel(date, tz) {
-  const off = tzOffsetMs(date, tz);           // ms
-  const min = Math.round(off / 60000);
-  const sign = min <= 0 ? '-' : '+';
+  const min = Math.round(tzOffsetMs(date, tz) / 60000);
+  const sign = min < 0 ? '-' : '+';
   const a = Math.abs(min);
   return `${sign}${pad(Math.floor(a / 60))}:${pad(a % 60)}`;
 }
+// Sugerencia horaria: éxito -> {wall,tz,offset,utc}; fallo -> {wall,tz,error}.
 function sugerenciaHoraria(dateStr, hhmm) {
   const [y, mo, d] = dateStr.split('-').map(Number);
   const [h, mi] = hhmm.split(':').map(Number);
-  const utc = wallToUTC(y, mo, d, h, mi, TZ);
-  return { wall: `${dateStr}T${pad(h)}:${pad(mi)}`, tz: TZ, offset: offsetLabel(utc, TZ), utc: utc.toISOString() };
+  const wall = `${dateStr}T${pad(h)}:${pad(mi)}`;
+  const r = resolveWall(y, mo, d, h, mi, TZ);
+  if (!r.ok) return { wall, tz: TZ, error: r.code };
+  return { wall, tz: TZ, offset: offsetLabel(r.utc, TZ), utc: r.utc.toISOString() };
 }
 
 // Días (m,d) y fechas reales cubiertos por [weekStart, weekEnd] (ISO), en UTC.
@@ -145,33 +191,38 @@ export function planGeneration(input) {
       errors.push({ tipo: 'fecha_invalida', fuente: 'evento', ref: `${ev.kind}:${ev.player || ''}`, fechaBruta: `${ev.year}-${ev.m}-${ev.d}`, code: vr.code, motivo: vr.motivo });
       continue;
     }
-    const eventId = calcEventId(ev, nameToId);
-    const draftId = calcDraftId(eventId, campaignYear);
+    const eid = calcEventId(ev, nameToId);
+    const did = calcDraftId(eid, campaignYear);
+    const players = playersOf(ev, nameToId);
     candidates.push({
-      ev, eventId, draftId,
-      kind: ev.kind,
-      eventDateISO: vr.iso,
-      mmdd: `${ev.m}-${ev.d}`,
-      category: ev.tag || '',
-      players: playersOf(ev, nameToId),
-      textX: textXFor(ev),
-      fingerprint: contentFingerprint(ev),
+      ev, eventId: eid, draftId: did, kind: ev.kind, eventDateISO: vr.iso,
+      mmdd: `${ev.m}-${ev.d}`, category: ev.tag || '', players,
+      textX: textXFor(ev), fingerprint: contentFingerprint(ev),
+      sourceSnapshot: snapshotOf(ev, vr.iso, players),
     });
   }
 
+  const existingByDraft = new Map((existing || []).map(r => [r.draftId, r]));
+
   // 2) colisiones de draftId (dos eventos de origen distintos → misma identidad).
+  //    H1: se notifican referenciando los borradores existentes y NO se tocan.
   const byDraft = new Map();
   for (const c of candidates) (byDraft.get(c.draftId) || byDraft.set(c.draftId, []).get(c.draftId)).push(c);
   const review = [];
   const uniq = [];
-  for (const [draftId, group] of byDraft) {
+  const colisionEventIds = new Set();   // eventIds en colisión (se consideran "vistos")
+  const colisionDraftIds = new Set();   // draftIds en colisión (no se emiten ops)
+  for (const [did, group] of byDraft) {
     if (group.length === 1) { uniq.push(group[0]); continue; }
+    colisionEventIds.add(group[0].eventId);
+    colisionDraftIds.add(did);
+    const ex = existingByDraft.get(did);
     review.push({
-      tipo: 'colision_id', draftId,
-      eventos: group.map(g => ({ eventId: g.eventId, kind: g.kind, eventDateISO: g.eventDateISO, texto: stripText(g.ev.html).slice(0, 120) })),
-      nota: 'Dos eventos de origen distintos comparten identidad. No se fusionan ni se crean borradores en conflicto; requiere revisión humana (p. ej. id de origen para hitos).',
+      tipo: 'colision_id', draftId: did, eventId: group[0].eventId,
+      eventos: group.map(g => ({ eventId: g.eventId, kind: g.kind, eventDateISO: g.eventDateISO, categoria: g.category, texto: stripText(g.ev.html).slice(0, 140) })),
+      borradoresAfectados: ex ? [{ draftId: ex.draftId, status: ex.status, editedText: editFlags(ex).editedText, editedTime: editFlags(ex).editedTime, textXPreview: String(ex.textX || '').slice(0, 80) }] : [],
+      nota: 'Dos o más eventos de origen comparten identidad. No se crea ni modifica ningún borrador y NINGUNO se marca como desaparecido: el/los borradores existentes quedan intactos. Requiere resolución humana (p. ej. id de origen para hitos).',
     });
-    // No emitimos ops para un draftId en conflicto: el almacén nunca recibe duplicados.
   }
 
   // 3) asignación de franjas horarias por día (determinista: orden por draftId).
@@ -179,19 +230,20 @@ export function planGeneration(input) {
   for (const c of uniq) (porDia.get(c.mmdd) || porDia.set(c.mmdd, []).get(c.mmdd)).push(c);
   const suggestedById = new Map();
   for (const [mmdd, group] of porDia) {
-    group.sort((a, b) => a.draftId < b.draftId ? -1 : a.draftId > b.draftId ? 1 : 0);
+    group.sort((a, b) => cmp(a.draftId, b.draftId));
     const fecha = winDate.get(mmdd);
     group.forEach((c, i) => {
       const slot = slots[Math.min(i, slots.length - 1)];
       const s = sugerenciaHoraria(fecha, slot);
       if (i >= slots.length) s.overflow = true; // más eventos que franjas ese día
+      if (s.error) errors.push({ tipo: 'hora_invalida', fuente: 'slot', ref: c.draftId, slot, fecha, code: s.error });
       suggestedById.set(c.draftId, s);
     });
   }
 
-  // 4) diff contra los borradores existentes.
-  const existingByDraft = new Map((existing || []).map(r => [r.draftId, r]));
+  // 4) diff contra los borradores existentes (solo candidatos únicos).
   const seenEventIds = new Set(uniq.map(c => c.eventId));
+  for (const id of colisionEventIds) seenEventIds.add(id); // H1: no desaparecen por colisión
   const ops = [];
 
   for (const c of uniq) {
@@ -199,36 +251,44 @@ export function planGeneration(input) {
     const suggestedAt = suggestedById.get(c.draftId) || null;
     if (!ex) {
       ops.push({
-        op: 'nuevo', draftId: c.draftId, eventId: c.eventId, kind: c.kind,
+        op: 'nuevo', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear,
         eventDateISO: c.eventDateISO, category: c.category, players: c.players,
         textX: c.textX, status: 'pendiente', sourceFingerprint: c.fingerprint,
-        suggestedAt, edited: false, createdAt: now, updatedAt: now, flags: {},
+        sourceSnapshot: c.sourceSnapshot, suggestedAt,
+        editedText: false, editedTime: false, createdAt: now, updatedAt: now, flags: {},
       });
       continue;
     }
+    const { editedText, editedTime } = editFlags(ex);
     const changed = ex.sourceFingerprint !== c.fingerprint;
-    const locked = !!ex.edited || (ex.status && ex.status !== 'pendiente');
-    if (!changed) {
-      ops.push({ op: 'sin_cambios', draftId: c.draftId, eventId: c.eventId, kind: c.kind,
-        status: ex.status, textX: ex.textX, suggestedAt: ex.suggestedAt ?? suggestedAt, flags: {} });
-    } else if (locked) {
+    const acknowledged = ex.reviewedFingerprint != null && ex.reviewedFingerprint === c.fingerprint;
+    const textLocked = editedText || ESTADOS_TERMINALES.has(ex.status);
+    const suggKeep = ex.suggestedAt ?? suggestedAt;
+
+    if (!changed || acknowledged) {
+      ops.push({ op: 'sin_cambios', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear,
+        status: ex.status, textX: ex.textX, suggestedAt: suggKeep,
+        flags: { editedText, editedTime, acknowledged: acknowledged && changed } });
+    } else if (textLocked) {
       ops.push({
-        op: 'edicion_preservada', draftId: c.draftId, eventId: c.eventId, kind: c.kind,
+        op: 'edicion_preservada', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear,
         status: ex.status,                 // nunca se reinicia
-        textX: ex.textX,                   // la edición manual nunca se sobrescribe
-        suggestedAt: ex.suggestedAt ?? suggestedAt,
-        sourceFingerprintNuevo: c.fingerprint,
-        flags: { sourceChanged: true, edited: !!ex.edited, statusBloqueado: !!(ex.status && ex.status !== 'pendiente') },
-        nota: 'El contenido del origen cambió, pero hay edición manual o estado no-pendiente: se conserva. Marcado para revisión.',
+        textX: ex.textX,                   // la edición manual / texto aprobado no se sobrescribe
+        suggestedAt: suggKeep,             // la hora manual/previa no se recalcula
+        sourceFingerprintObservado: c.fingerprint,   // lo que el origen tiene AHORA (no se aplica aún)
+        sourceSnapshotObservado: c.sourceSnapshot,
+        flags: { sourceChanged: true, editedText, editedTime, statusBloqueado: ESTADOS_TERMINALES.has(ex.status) },
+        nota: 'El contenido del origen cambió, pero hay edición manual de texto o estado terminal: se conserva. Marcado para revisión. El fingerprint NO se actualiza hasta que un humano lo resuelva (resolverRevision).',
       });
     } else {
+      // pendiente y sin edición de texto → se regenera el texto; la hora se preserva
+      // (incluida una hora editada manualmente, que nunca se recalcula).
       ops.push({
-        op: 'cambio_contenido', draftId: c.draftId, eventId: c.eventId, kind: c.kind,
+        op: 'cambio_contenido', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear,
         eventDateISO: c.eventDateISO, category: c.category, players: c.players,
-        textX: c.textX,                    // regenerado (pendiente y no editado)
-        status: 'pendiente', sourceFingerprint: c.fingerprint,
-        suggestedAt: ex.suggestedAt ?? suggestedAt, updatedAt: now,
-        flags: { sourceChanged: true },
+        textX: c.textX, status: ex.status, sourceFingerprint: c.fingerprint,
+        sourceSnapshot: c.sourceSnapshot, suggestedAt: suggKeep, updatedAt: now,
+        flags: { sourceChanged: true, editedTime },
       });
     }
   }
@@ -237,12 +297,13 @@ export function planGeneration(input) {
   const orphans = [];
   for (const r of (existing || [])) {
     if (r.campaignYear !== campaignYear) continue;
+    if (colisionDraftIds.has(r.draftId)) continue;           // H1: colisión no es desaparición
     const mmdd = isoToMMDD(r.eventDateISO);
-    if (!mmdd || !winSet.has(mmdd)) continue;              // solo los de esta ventana
-    if (seenEventIds.has(r.eventId)) continue;             // sigue en el origen
-    if (r.status === 'descartado' || r.status === 'publicado') continue; // ya resuelto: historial intacto
+    if (!mmdd || !winSet.has(mmdd)) continue;                // solo los de esta ventana
+    if (seenEventIds.has(r.eventId)) continue;               // sigue en el origen
+    if (ESTADOS_RESUELTOS.has(r.status)) continue;           // publicado/descartado: historial intacto
     const o = {
-      op: 'desaparecido', draftId: r.draftId, eventId: r.eventId, kind: r.kind,
+      op: 'desaparecido', draftId: r.draftId, eventId: r.eventId, kind: r.kind, campaignYear,
       eventDateISO: r.eventDateISO, status: r.status, players: r.players || [],
       flags: { orphan: true },
       nota: 'Este borrador ya no corresponde a ningún evento del origen esta semana. No se elimina automáticamente; requiere revisión.',
@@ -271,7 +332,7 @@ export function planGeneration(input) {
   // orden determinista
   ops.sort((a, b) => cmp(a.op, b.op) || cmp(a.draftId, b.draftId));
   review.sort((a, b) => cmp(a.tipo, b.tipo) || cmp(JSON.stringify(a), JSON.stringify(b)));
-  errors.sort((a, b) => cmp(a.fuente + a.ref, b.fuente + b.ref));
+  errors.sort((a, b) => cmp((a.fuente || '') + (a.ref || ''), (b.fuente || '') + (b.ref || '')));
 
   const stats = {
     nuevo: ops.filter(o => o.op === 'nuevo').length,
@@ -281,7 +342,8 @@ export function planGeneration(input) {
     desaparecido: ops.filter(o => o.op === 'desaparecido').length,
     colisiones: review.filter(r => r.tipo === 'colision_id').length,
     posibles_correcciones: review.filter(r => r.tipo === 'posible_correccion_identidad').length,
-    fechas_invalidas: errors.length,
+    fechas_invalidas: errors.filter(e => e.tipo === 'fecha_invalida').length,
+    horas_invalidas: errors.filter(e => e.tipo === 'hora_invalida').length,
   };
 
   return { campaignYear, weekStart, weekEnd, tz: TZ, slots, ventana: win.map(x => `${pad(x.m)}-${pad(x.d)}`), ops, review, errors, stats };
@@ -291,7 +353,6 @@ export function planGeneration(input) {
 function cmp(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
 function isoToMMDD(iso) { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${+m[2]}-${+m[3]}` : null; }
 function sharePlayer(players, orphan) {
-  // El huérfano no guarda players normalizados garantizados; comparamos por id si existe.
   if (!Array.isArray(players) || !orphan.players) return false;
   const ids = new Set(players.map(p => p.id).filter(Boolean));
   return (orphan.players || []).some(p => p.id && ids.has(p.id));
@@ -301,3 +362,6 @@ function dayDiff(isoA, isoB) {
   if (Number.isNaN(a) || Number.isNaN(b)) return null;
   return Math.abs(Math.round((a - b) / 86400000));
 }
+
+// Export para pruebas de zona horaria.
+export const _tz = { sugerenciaHoraria, resolveWall };
