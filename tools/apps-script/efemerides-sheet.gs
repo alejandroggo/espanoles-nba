@@ -55,15 +55,32 @@ function efsRecordToRow(rec) {
   return row;
 }
 function efsHeaderIdx(headers) { var m = {}; headers.forEach(function (h, i) { m[String(h).trim()] = i; }); return m; }
+// Convierte una celda a texto. Google Sheets puede haber convertido una cadena
+// ISO ("2002-10-29" o un timestamp) en un valor Date; la reconstruimos a texto
+// (comprobación de Date segura entre realms con Object.prototype.toString).
+function efsCeldaATexto(v) {
+  if (Object.prototype.toString.call(v) === '[object Date]') {
+    // Sheets guarda una fecha pura ("2002-10-29") como medianoche en la zona del
+    // proyecto (America/Toronto), que en UTC son las 04:00/05:00 — NO 00:00. Por
+    // eso miramos la hora EN Toronto: si es medianoche, es una fecha pura.
+    var p = {};
+    new Intl.DateTimeFormat('en-US', { timeZone: EFS_TZ, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      .formatToParts(v).forEach(function (x) { p[x.type] = x.value; });
+    var h = (p.hour === '24' ? '00' : p.hour);
+    if (h === '00' && p.minute === '00' && p.second === '00') return p.year + '-' + p.month + '-' + p.day;
+    return v.toISOString();
+  }
+  return String(v);
+}
 function efsRowToRecord(idx, row) {
   var rec = {};
   EFS_CAMPOS.forEach(function (c) {
     var i = idx[c.k];
     var v = (i == null ? '' : row[i]);
-    if (c.t === 'j') rec[c.k] = (v === '' || v == null) ? null : JSON.parse(v);
+    if (c.t === 'j') rec[c.k] = (v === '' || v == null) ? null : (typeof v === 'string' ? JSON.parse(v) : v);
     else if (c.t === 'b') rec[c.k] = (v === true || String(v).toUpperCase() === 'TRUE');
     else if (c.t === 'n') rec[c.k] = (v === '' || v == null) ? null : Number(v);
-    else rec[c.k] = (v === '' || v == null) ? null : String(v);
+    else rec[c.k] = (v === '' || v == null) ? null : efsCeldaATexto(v);
   });
   return rec;
 }
@@ -153,7 +170,13 @@ function efsFetchDataReal_() {
 function efsHoja_(nombre) {
   var ss = SpreadsheetApp.openById(EFS_SHEET_ID);
   var sh = ss.getSheetByName(nombre);
-  if (!sh) { sh = ss.insertSheet(nombre); if (nombre === EFS_TAB_BORRADORES) sh.getRange(1, 1, 1, EFS_HEADERS.length).setValues([EFS_HEADERS]); }
+  if (!sh) sh = ss.insertSheet(nombre);
+  if (nombre === EFS_TAB_BORRADORES) {
+    if (sh.getLastRow() < 1) sh.getRange(1, 1, 1, EFS_HEADERS.length).setValues([EFS_HEADERS]);
+    // Formato de TEXTO en todas las columnas: evita que Sheets convierta las
+    // fechas/ISO en valores Date al escribir (que rompía la lectura).
+    sh.getRange(1, 1, Math.max(sh.getMaxRows(), 1), EFS_HEADERS.length).setNumberFormat('@');
+  }
   return sh;
 }
 function efsLeerBorradoresReal_() {

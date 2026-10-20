@@ -62,6 +62,17 @@ test('round-trip record ↔ row ↔ record (serialización fiel)', () => {
   assert.equal(JSON.stringify(row2), JSON.stringify(row1), 'round-trip estable');
 });
 
+test('lee bien una celda event_date que Google Sheets convirtió a Date', () => {
+  const idx = P.efsHeaderIdx(H);
+  const row = P.efsRecordToRow({ draftId: 'cumple:x#2026', eventDateISO: '2026-01-15', campaignYear: 2026, kind: 'cumple', players: [], status: 'pendiente' });
+  // Sheets devolvería la fecha pura como medianoche en Toronto (EST -05:00 → 05:00Z):
+  row[col('eventDateISO')] = new Date('2026-01-15T05:00:00Z');
+  assert.equal(P.efsRowToRecord(idx, row).eventDateISO, '2026-01-15', 'fecha pura reconstruida');
+  // Un timestamp (no medianoche) se conserva como ISO completo:
+  row[col('createdAt')] = new Date('2026-01-15T14:30:00Z');
+  assert.equal(P.efsRowToRecord(idx, row).createdAt, '2026-01-15T14:30:00.000Z', 'timestamp conservado');
+});
+
 test('primera generación: crea una fila por efeméride de la semana', () => {
   const rows = [Array.from(H)], logs = [];
   const r = P.efsGenerarSemana(makeDeps(baseData(), rows, logs));
