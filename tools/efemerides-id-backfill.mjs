@@ -9,11 +9,14 @@
 //     duplicados; si hay duplicados/faltantes, se DETIENE (no se autocorrige).
 //   · No depende del número de fila ni del orden: el UUID viaja en la celda.
 //
-// Una fila es VÁLIDA si tiene contenido en los campos requeridos (fecha, jugador,
-// hito). Las filas totalmente vacías se ignoran; las que tienen algo pero les
-// falta un requerido se marcan como "incompletas" (no se les asigna id).
+// Una fila es VÁLIDA si tiene contenido en los campos requeridos. El criterio
+// DEBE coincidir con el de getEfemerides() del exportador real, que incluye una
+// fila si tiene `fecha` y `hito` (no exige `jugador`). Así, toda fila que llega a
+// data.json recibe id y pasa la validación. Las filas totalmente vacías se
+// ignoran; las que tienen algo pero les falta un requerido se marcan como
+// "incompletas" (no se les asigna id).
 
-export const CAMPOS_REQUERIDOS = ['fecha', 'jugador', 'hito'];
+export const CAMPOS_REQUERIDOS = ['fecha', 'hito'];
 
 // Índice (0-based) de una cabecera por nombre, sin distinguir mayúsculas/espacios.
 export function indiceCabecera(headers, nombre) {

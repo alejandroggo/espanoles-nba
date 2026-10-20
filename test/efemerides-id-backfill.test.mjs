@@ -19,10 +19,12 @@ test('cabeceras: detecta `id` sin distinguir mayúsculas; -1 si falta', () => {
   assert.equal(indiceCabecera(['fecha', 'jugador'], 'id'), -1);
 });
 
-test('fila válida requiere fecha + jugador + hito', () => {
-  assert.equal(filaValida({ fecha: '1 jan 2015', jugador: 'Pau Gasol', hito: 'x' }), true);
-  assert.equal(filaValida({ fecha: '1 jan 2015', jugador: '', hito: 'x' }), false);
-  assert.deepEqual(CAMPOS_REQUERIDOS, ['fecha', 'jugador', 'hito']);
+test('fila válida requiere fecha + hito (igual que getEfemerides, jugador NO es obligatorio)', () => {
+  assert.equal(filaValida({ fecha: '1 jan 2015', hito: 'x' }), true);
+  assert.equal(filaValida({ fecha: '1 jan 2015', hito: '' }), false);
+  assert.equal(filaValida({ fecha: '', hito: 'x' }), false);
+  assert.equal(filaValida({ fecha: '1 jan 2015', hito: 'x', jugador: '' }), true, 'sin jugador sigue siendo válida');
+  assert.deepEqual(CAMPOS_REQUERIDOS, ['fecha', 'hito']);
 });
 
 test('IDs vacíos: asigna UUID a cada fila válida sin id; no toca nada más', () => {

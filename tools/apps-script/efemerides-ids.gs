@@ -16,7 +16,9 @@
  */
 
 var EFEMERIDES_HOJA = 'EFEMERIDES';
-var EFEMERIDES_REQUERIDOS = ['fecha', 'jugador', 'hito']; // una fila es válida si tiene estos 3
+// Una fila es VÁLIDA si tiene estos campos. DEBE coincidir con getEfemerides(),
+// que exporta una fila si tiene `fecha` y `hito` (no exige `jugador`).
+var EFEMERIDES_REQUERIDOS = ['fecha', 'hito'];
 
 /** Punto de entrada único para el flujo de exportación. Lanza si hay que revisar. */
 function prepararEfemeridesIds_() {

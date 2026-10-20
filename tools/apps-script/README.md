@@ -12,9 +12,9 @@ añadir la columna no cambia el comportamiento del sitio.
 ## Qué hace
 1. **Columna `id`**: la añade *al final* de `EFEMERIDES` si no existe. No renombra
    ni reordena columnas.
-2. **Asignación**: a cada fila **válida** (con `fecha`, `jugador` y `hito`) que
-   tenga el `id` vacío le escribe un `Utilities.getUuid()` en la propia hoja.
-   **Nunca** toca un `id` que ya exista.
+2. **Asignación**: a cada fila **válida** (con `fecha` y `hito`, el mismo criterio
+   que usa `getEfemerides()` para exportar) que tenga el `id` vacío le escribe un
+   `Utilities.getUuid()` en la propia hoja. **Nunca** toca un `id` que ya exista.
 3. **Validación (gate)**: antes de exportar comprueba que toda fila válida tenga
    `id` y que no haya `id` duplicados. Si los hay (p. ej. una fila copiada),
    **detiene la exportación** y lista las filas a revisar. No corrige nada solo.
@@ -46,7 +46,7 @@ Si `prepararEfemeridesIds_()` lanza, la exportación se corta antes de tocar
 3. **Ensayo en una COPIA** (recomendado): sobre la hoja duplicada, ejecuta
    manualmente `prepararEfemeridesIds_()` desde el editor. Revisa que:
    - aparece una columna `id` al final con un UUID por fila válida,
-   - las filas incompletas (sin fecha/jugador/hito) quedan sin `id`,
+   - las filas incompletas (sin `fecha` o sin `hito`) quedan sin `id`,
    - no se ha modificado ninguna otra columna.
 4. **Backfill real** (con tu visto bueno): ejecuta `prepararEfemeridesIds_()` una
    vez sobre la hoja real. Las 86 filas existentes reciben su UUID. Si salta el
