@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base target="_top">
+<style>
+  :root { --accent:#b91c1c; --bg:#0e0e10; --card:#17171b; --line:#2a2a30; --txt:#f2f2f4; --muted:#9a9aa2; --dorado:#f5c518; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:15px; }
+  header { position:sticky; top:0; background:#0e0e10ee; backdrop-filter:blur(6px); border-bottom:1px solid var(--line); padding:12px 16px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; z-index:5; }
+  header h1 { font-size:16px; margin:0; letter-spacing:.3px; }
+  header .sp { flex:1; }
+  .btn { background:#1f1f25; color:var(--txt); border:1px solid var(--line); border-radius:8px; padding:7px 11px; font-size:13px; cursor:pointer; }
+  .btn:hover { border-color:#3a3a42; }
+  .btn.primary { background:var(--accent); border-color:var(--accent); }
+  .btn.ghost { background:transparent; }
+  .wrap { padding:16px; max-width:1200px; margin:0 auto; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:14px; }
+  .chip { font-size:12px; padding:4px 9px; border-radius:999px; border:1px solid var(--line); background:#1a1a1f; color:var(--muted); cursor:pointer; }
+  .chip.on { color:var(--txt); border-color:var(--accent); }
+  .count { font-size:12px; color:var(--muted); }
+  .dow { font-size:12px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin:18px 0 8px; border-bottom:1px solid var(--line); padding-bottom:6px; display:flex; justify-content:space-between; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .card.inc { border-color:var(--dorado); }
+  .card .top { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .tag { font-size:11px; padding:2px 7px; border-radius:6px; background:#26262c; color:var(--muted); }
+  .st { font-size:11px; padding:2px 7px; border-radius:6px; font-weight:600; }
+  .st.pendiente { background:#2a2a30; color:#cfcfd6; }
+  .st.aprobado { background:#14432a; color:#7ee2a8; }
+  .st.descartado { background:#3a2230; color:#e59ab8; }
+  .st.publicado { background:#1e2d4d; color:#8fb6ff; }
+  .warn { font-size:11px; color:var(--dorado); }
+  textarea { width:100%; min-height:92px; resize:vertical; background:#111116; color:var(--txt); border:1px solid var(--line); border-radius:8px; padding:8px; font:inherit; font-size:13px; }
+  .meta { font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .meta a { color:#8fb6ff; }
+  .acts { display:flex; flex-wrap:wrap; gap:6px; }
+  .acts .btn { padding:6px 9px; font-size:12px; }
+  #toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:#26262c; border:1px solid var(--line); padding:9px 14px; border-radius:8px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  #toast.on { opacity:1; }
+  .empty { color:var(--muted); font-size:13px; padding:8px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📅 Borradores · Efemérides NBA</h1>
+  <span class="count" id="rango"></span>
+  <span class="sp"></span>
+  <button class="btn ghost" id="regen" title="Regenerar la semana sin perder tus cambios">↻ Regenerar</button>
+  <button class="btn ghost" id="reload">Recargar</button>
+</header>
+<div class="wrap">
+  <div class="bar" id="filtros">
+    <span class="count" id="resumen"></span>
+    <span class="sp"></span>
+    <span class="chip on" data-f="todos">Todos</span>
+    <span class="chip" data-f="pendiente">Pendientes</span>
+    <span class="chip" data-f="aprobado">Aprobados</span>
+    <span class="chip" data-f="descartado">Descartados</span>
+    <span class="chip" data-f="publicado">Publicados</span>
+    <span class="chip" data-f="incidencias">Incidencias</span>
+  </div>
+  <div id="contenido"><p class="empty">Cargando…</p></div>
+</div>
+<div id="toast"></div>
+
+<script>
+  var SEMANA = null, FILTRO = 'todos';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 1800); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function cargar() {
+    $('#contenido').innerHTML = '<p class="empty">Cargando…</p>';
+    google.script.run.withSuccessHandler(render).withFailureHandler(function (e) { $('#contenido').innerHTML = '<p class="empty">Error: ' + esc(e.message) + '</p>'; }).getSemanaActual();
+  }
+  function render(sem) {
+    SEMANA = sem;
+    $('#rango').textContent = sem.weekStart + ' → ' + sem.weekEnd;
+    var c = sem.contadores;
+    $('#resumen').textContent = c.total + ' borradores · ' + c.pendiente + ' pend · ' + c.aprobado + ' aprob · ' + c.publicado + ' public' + (c.incidencias ? ' · ⚠ ' + c.incidencias : '');
+    var html = '';
+    var DOW = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    sem.dias.forEach(function (dia, i) {
+      var items = dia.items.filter(pasaFiltro);
+      html += '<div class="dow"><span>' + DOW[i] + ' · ' + dia.fecha + '</span><span>' + dia.items.length + '</span></div>';
+      if (!items.length) { html += '<p class="empty">— sin borradores' + (dia.items.length ? ' (filtrados)' : '') + ' —</p>'; return; }
+      html += '<div class="grid">' + items.map(tarjeta).join('') + '</div>';
+    });
+    $('#contenido').innerHTML = html;
+    [].forEach.call(document.querySelectorAll('[data-act]'), function (b) {
+      b.addEventListener('click', function () { onAccion(b.getAttribute('data-id'), b.getAttribute('data-act')); });
+    });
+  }
+  function pasaFiltro(it) {
+    if (FILTRO === 'todos') return true;
+    if (FILTRO === 'incidencias') return it.orphan || it.pendingSourceChange;
+    return it.status === FILTRO;
+  }
+  function tarjeta(it) {
+    var hora = it.suggestedAt && it.suggestedAt.wall ? it.suggestedAt.wall.replace('T', ' ') : '';
+    var warn = it.orphan ? '<span class="warn">⚠ desaparecido del origen</span>' : (it.pendingSourceChange ? '<span class="warn">⚠ el origen cambió — revisar</span>' : '');
+    return '<div class="card' + (it.orphan || it.pendingSourceChange ? ' inc' : '') + '" data-card="' + esc(it.draftId) + '">'
+      + '<div class="top"><span class="tag">' + esc(it.category || it.kind) + '</span><span class="st ' + esc(it.status) + '">' + esc(it.status) + '</span>' + warn + '</div>'
+      + '<textarea data-txt="' + esc(it.draftId) + '">' + esc(it.textX) + '</textarea>'
+      + '<div class="meta"><span>' + esc(hora) + (it.editedTime ? ' ✎' : '') + '</span><a href="' + esc(it.url) + '" target="_blank" rel="noopener">ver efeméride ↗</a></div>'
+      + '<div class="acts">'
+      + '<button class="btn" data-act="copiar" data-id="' + esc(it.draftId) + '">Copiar tuit</button>'
+      + '<button class="btn" data-act="guardar" data-id="' + esc(it.draftId) + '">Guardar</button>'
+      + '<button class="btn primary" data-act="aprobar" data-id="' + esc(it.draftId) + '">Aprobar</button>'
+      + '<button class="btn" data-act="descartar" data-id="' + esc(it.draftId) + '">Descartar</button>'
+      + '<button class="btn" data-act="publicar" data-id="' + esc(it.draftId) + '">Marcar publicado</button>'
+      + (it.pendingSourceChange ? '<button class="btn ghost" data-act="resolver" data-id="' + esc(it.draftId) + '">Mantener mi edición</button>' : '')
+      + '</div></div>';
+  }
+  function textoDe(draftId) { var t = document.querySelector('[data-txt="' + draftId + '"]'); return t ? t.value : ''; }
+  function onAccion(draftId, act) {
+    if (act === 'copiar') { copiar(textoDe(draftId)); return; }
+    if (act === 'guardar') { llamar('accionBorrador', [draftId, 'editarTexto', { texto: textoDe(draftId) }], 'Guardado'); return; }
+    if (act === 'aprobar') { llamar('accionBorrador', [draftId, 'aprobar', {}], 'Aprobado'); return; }
+    if (act === 'descartar') { if (confirm('¿Descartar este borrador?')) llamar('accionBorrador', [draftId, 'descartar', {}], 'Descartado'); return; }
+    if (act === 'publicar') { if (confirm('¿Marcar como PUBLICADO? Hazlo solo tras publicarlo en X.')) llamar('accionBorrador', [draftId, 'publicar', {}], 'Marcado como publicado'); return; }
+    if (act === 'resolver') { llamar('resolverRevisionBorrador', [draftId, 'mantener'], 'Edición conservada'); return; }
+  }
+  function llamar(fn, args, ok) {
+    var r = google.script.run.withSuccessHandler(function () { toast(ok); cargar(); }).withFailureHandler(function (e) { toast('Error: ' + e.message); });
+    r[fn].apply(r, args);
+  }
+  function copiar(txt) {
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function () { toast('Tuit copiado'); }, function () { copiarFallback(txt); }); }
+    else copiarFallback(txt);
+  }
+  function copiarFallback(txt) { var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Tuit copiado'); } catch (e) { toast('No se pudo copiar'); } ta.remove(); }
+
+  [].forEach.call(document.querySelectorAll('#filtros .chip'), function (ch) {
+    ch.addEventListener('click', function () {
+      FILTRO = ch.getAttribute('data-f');
+      [].forEach.call(document.querySelectorAll('#filtros .chip'), function (c) { c.classList.toggle('on', c === ch); });
+      if (SEMANA) render(SEMANA);
+    });
+  });
+  $('#reload').addEventListener('click', cargar);
+  $('#regen').addEventListener('click', function () {
+    if (!confirm('¿Regenerar la semana? No se pierden tus ediciones ni aprobaciones.')) return;
+    $('#contenido').innerHTML = '<p class="empty">Regenerando…</p>';
+    google.script.run.withSuccessHandler(render).withFailureHandler(function (e) { toast('Error: ' + e.message); }).regenerarSemanaManual();
+  });
+  cargar();
+</script>
+</body>
+</html>
