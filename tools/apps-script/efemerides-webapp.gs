@@ -78,14 +78,41 @@ function doGet(e) {
     .setTitle('Borradores · Efemérides NBA')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
+// Lunes–domingo de la semana que CONTIENE a `base` (la semana en curso).
+function efsSemanaActualLunDom(base, tz) {
+  var dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
+  var p = {}; dtf.formatToParts(base).forEach(function (x) { p[x.type] = x.value; });
+  var hoy = new Date(Date.UTC(+p.year, +p.month - 1, +p.day, 12, 0, 0));
+  var dow = hoy.getUTCDay();                 // 0=domingo..6=sábado
+  var aLunes = (dow === 0 ? 6 : dow - 1);    // días desde el lunes de ESTA semana
+  var lun = new Date(hoy.getTime() - aLunes * 86400000);
+  var dom = new Date(lun.getTime() + 6 * 86400000);
+  var fmt = function (d) { return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2); };
+  return { weekStart: fmt(lun), weekEnd: fmt(dom), campaignYear: dom.getUTCFullYear() };
+}
+// La página muestra la SEMANA ACTUAL (lo que publicas hoy..domingo).
 function getSemanaActual() {
-  var wk = efsProximaSemanaLunDom(new Date(), EFS_TZ);
+  var wk = efsSemanaActualLunDom(new Date(), EFS_TZ);
   return getSemana(wk.weekStart, wk.weekEnd);
 }
 function getSemana(weekStart, weekEnd) {
   var cy = +String(weekEnd).slice(0, 4);
   var parsed = efsRowsToStore(efsLeerBorradoresReal_());
   return efwAgruparSemana(parsed.store, weekStart, weekEnd, cy);
+}
+// Genera (o regenera) la semana actual, sin perder ediciones.
+function generarSemanaActual() {
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) throw new Error('Otra generación está en curso.');
+  try {
+    var wk = efsSemanaActualLunDom(new Date(), EFS_TZ);
+    efsGenerarSemana({
+      fetchData: efsFetchDataReal_, leerBorradores: efsLeerBorradoresReal_,
+      escribir: efsEscribirReal_, log: efsLogReal_,
+      weekStart: wk.weekStart, weekEnd: wk.weekEnd, campaignYear: wk.campaignYear,
+      now: new Date().toISOString(), slots: EFS_SLOTS_DEFAULT
+    });
+  } finally { lock.releaseLock(); }
 }
 function accionBorrador(draftId, accion, payload) {
   var r = efwProcesarAccion(efsLeerBorradoresReal_(), draftId, accion, payload, new Date().toISOString());

@@ -176,18 +176,22 @@ function efgHandle(name) {
   return h ? ('@' + String(h).replace(/^@/, '')) : '';
 }
 
-// Reproduce efmShare(): devuelve el texto EXACTO que se compartiría en X.
-function efgTweet(ev) {
+// Compone el tuit del borrador. Formato (decisión de Alejandro):
+//   «#EspañolesNBA Hoy hace X años <texto>» + enlace
+// Sin la fecha al inicio y sin «(vía @alejandroggo)» (todos son tuits suyos).
+// `pubYear` = año de publicación (campaña); X = pubYear - año del acontecimiento.
+function efgTweet(ev, pubYear) {
   var texto = efgStripHtml(ev.html).replace(/\s+/g, ' ').trim();
   var handle = efgHandle(ev.player);
   if (handle && ev.player) texto = texto.split(ev.player).join(handle);
-  var fechaTxt = ev.d + ' de ' + EFG_MESES_LARGOS[ev.m - 1] + ' de ' + ev.year;
+  // Cumpleaños: "Nace X" -> "nace X" para que fluya tras el prefijo.
+  if (/^Nace /.test(texto)) texto = texto.charAt(0).toLowerCase() + texto.slice(1);
+  var anios = (pubYear || new Date().getUTCFullYear()) - ev.year;
+  var prefijoAnios = anios >= 2 ? ('Hoy hace ' + anios + ' años ') : (anios === 1 ? 'Hoy hace 1 año ' : 'Hoy ');
+  var inicio = '#EspañolesNBA ' + prefijoAnios;
   var url = EFG_SITE_URL + '?m=' + ev.m + '&d=' + ev.d;
-  var prefijo = '📅 ' + fechaTxt + ' — ';
-  var sufijo = ' #NBA #EspañolesNBA (vía @alejandroggo)';
-  var presupuesto = 280 - 24 - prefijo.length - sufijo.length;
-  var cuerpoTexto = texto;
-  if (cuerpoTexto.length > presupuesto) cuerpoTexto = cuerpoTexto.slice(0, presupuesto - 1).replace(/\s+$/, '') + '…';
-  var cuerpo = prefijo + cuerpoTexto + sufijo;
-  return cuerpo + '\n\n' + url;
+  // Límite de X (280): enlace pesa 23 + 2 saltos de línea.
+  var presupuesto = 280 - 25 - inicio.length;
+  if (texto.length > presupuesto) texto = texto.slice(0, presupuesto - 1).replace(/\s+$/, '') + '…';
+  return inicio + texto + '\n\n' + url;
 }

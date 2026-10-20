@@ -35,6 +35,7 @@ const mine = gs.efgBuild(data);
 // Proyección a objeto plano del host (evita falsos negativos por realm del vm).
 const proj = e => ({ kind: e.kind, player: e.player || '', m: e.m, d: e.d, year: e.year, tag: String(e.tag || ''), html: e.html || '' });
 const keyOf = e => `${e.kind}|${(e.player || '').toLowerCase()}|${e.year}-${e.m}-${e.d}|${e.html}`;
+const EFG_URL = e => 'https://espanoles-nba.alejandroggo.com/efemerides.html?m=' + e.m + '&d=' + e.d;
 // Array.from (host) evita falsos negativos por el realm del vm.
 const sortByKey = arr => Array.from(arr, proj).sort((a, b) => keyOf(a) < keyOf(b) ? -1 : keyOf(a) > keyOf(b) ? 1 : 0);
 
@@ -48,15 +49,27 @@ test('paridad efgBuild ↔ efmBuild: mismos eventos (kind, jugador, fecha, tag, 
   assert.deepEqual(b, a);
 });
 
-test('paridad efgTweet ↔ efmShare: mismo texto de tuit para cada evento real', () => {
-  // Usamos los eventos "verdad" en ambos para aislar la composición del tuit.
-  const fallos = [];
+test('formato nuevo del tuit: #EspañolesNBA + "Hoy hace X años", sin fecha ni "(vía …)"', () => {
+  // efgTweet YA NO replica efmShare (la web): los tuits son propios de Alejandro.
+  // Contrato nuevo: empiezan con "#EspañolesNBA " + prefijo temporal, sin la vía
+  // ni el prefijo de fecha "📅 …", y terminan con el enlace de la efeméride.
   for (const ev of truth) {
-    const esperado = sb.tweetTextFor(ev);   // efmShare real
-    const obtenido = gs.efgTweet({ html: ev.html, player: ev.player, m: ev.m, d: ev.d, year: ev.year });
-    if (esperado !== obtenido) fallos.push({ ev: keyOf(proj(ev)), esperado, obtenido });
+    const pub = ev.year + 7;                 // año de publicación hipotético (X = 7 años)
+    const t = gs.efgTweet({ html: ev.html, player: ev.player, m: ev.m, d: ev.d, year: ev.year }, pub);
+    assert.ok(t.startsWith('#EspañolesNBA Hoy hace 7 años '), `prefijo mal: ${t.slice(0, 40)}`);
+    assert.ok(!/vía @alejandroggo/i.test(t), `sigue la vía: ${keyOf(proj(ev))}`);
+    assert.ok(!/📅/.test(t), `sigue el prefijo de fecha: ${keyOf(proj(ev))}`);
+    assert.ok(t.endsWith(EFG_URL(ev)), `no termina en el enlace: ${keyOf(proj(ev))}`);
   }
-  assert.deepEqual(fallos, [], `tuits divergentes:\n${fallos.slice(0, 3).map(f => f.ev + '\n  esperado: ' + f.esperado + '\n  obtenido: ' + f.obtenido).join('\n')}`);
+});
+
+test('prefijo temporal según los años: 0 → "Hoy", 1 → "Hoy hace 1 año", N → "Hoy hace N años"', () => {
+  const ev = truth[0];
+  const base = { html: ev.html, player: ev.player, m: ev.m, d: ev.d, year: ev.year };
+  assert.ok(gs.efgTweet(base, ev.year).startsWith('#EspañolesNBA Hoy '), 'mismo año → "Hoy "');
+  assert.ok(!gs.efgTweet(base, ev.year).startsWith('#EspañolesNBA Hoy hace'), 'mismo año no lleva "hace"');
+  assert.ok(gs.efgTweet(base, ev.year + 1).startsWith('#EspañolesNBA Hoy hace 1 año '), '1 año (singular)');
+  assert.ok(gs.efgTweet(base, ev.year + 5).startsWith('#EspañolesNBA Hoy hace 5 años '), 'N años (plural)');
 });
 
 test('ningún tuit lleva HTML y todos respetan el límite real de X (peso t.co=23)', () => {
