@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-20T01:44:22.955Z",
+  "actualizado": "2026-10-21T04:36:19.726Z",
   "superaciones": [],
   "summer_league": [
     {
@@ -9238,7 +9238,7 @@
         "edad": 24.062,
         "equipo": "POR",
         "rival": "HOU",
-        "resultado": "false",
+        "resultado": "true",
         "min": "3:33",
         "pts": 0,
         "rbd": 1,
@@ -9990,6 +9990,29 @@
       "draft_equipo": "OKC",
       "draft_fecha": "23 jun 2026",
       "draft_notas": null,
+      "primer_partido": {
+        "fecha": "20 oct 2026",
+        "edad": 21.196,
+        "equipo": "OKC",
+        "rival": "SAS",
+        "resultado": "true",
+        "min": "Sat Dec 30 1899 11:43:00 GMT-0500 (hora estándar oriental)",
+        "pts": 7,
+        "rbd": 2,
+        "ast": 1,
+        "stl": 0,
+        "blk": 1,
+        "fgm": 3,
+        "fga": 4,
+        "tres_m": 0,
+        "tres_a": 0,
+        "ftm": 1,
+        "fta": 2,
+        "tov": 1,
+        "pf": 1,
+        "dd": "false",
+        "video": ""
+      },
       "game_highs": {
         "min": 0,
         "pts": 0,
