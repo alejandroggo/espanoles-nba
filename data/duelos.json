@@ -1216,5 +1216,21 @@
     "gana": "Nikola Mirotic"
    }
   ]
+ },
+ {
+  "a": "Aday Mara",
+  "b": "Baba Miller",
+  "g": 1,
+  "rec": "Aday 1-0",
+  "av": {
+   "Aday Mara": "2.0/3.0/1.0",
+   "Baba Miller": "0.0/1.0/0.0"
+  },
+  "min": {
+   "Aday Mara": "14.0",
+   "Baba Miller": "2.0"
+  },
+  "primer": "25 oct 2026",
+  "ultimo": "25 oct 2026"
  }
 ]

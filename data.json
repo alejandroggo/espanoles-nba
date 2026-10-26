@@ -1,6 +1,143 @@
 {
-  "actualizado": "2026-10-18T17:18:49.415Z",
-  "superaciones": [],
+  "actualizado": "2026-10-26T13:28:25.053Z",
+  "superaciones": [
+    {
+      "fecha": "2026-10-21",
+      "tipo": "supera",
+      "jugador": "Aday Mara",
+      "rival": "Juan Carlos Navarro",
+      "campo": "tapones",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-21",
+      "tipo": "supera",
+      "jugador": "Aday Mara",
+      "rival": "Fernando Martín",
+      "campo": "tapones",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-21",
+      "tipo": "supera",
+      "jugador": "Hugo González",
+      "rival": "Alex Abrines",
+      "campo": "rebotes",
+      "valor": 249
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Baba Miller",
+      "rival": "Aday Mara",
+      "campo": "rebotes",
+      "valor": 3
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Baba Miller",
+      "rival": "Aday Mara",
+      "campo": "asistencias",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Baba Miller",
+      "rival": "Aday Mara",
+      "campo": "partidos",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "rebotes",
+      "valor": 2
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "asistencias",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-22",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "partidos",
+      "valor": 1
+    },
+    {
+      "fecha": "2026-10-23",
+      "tipo": "supera",
+      "jugador": "Aday Mara",
+      "rival": "Baba Miller",
+      "campo": "rebotes",
+      "valor": 5
+    },
+    {
+      "fecha": "2026-10-24",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "partidos",
+      "valor": 2
+    },
+    {
+      "fecha": "2026-10-25",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "puntos",
+      "valor": 21
+    },
+    {
+      "fecha": "2026-10-25",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Baba Miller",
+      "campo": "puntos",
+      "valor": 21
+    },
+    {
+      "fecha": "2026-10-25",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Aday Mara",
+      "campo": "rebotes",
+      "valor": 7
+    },
+    {
+      "fecha": "2026-10-25",
+      "tipo": "supera",
+      "jugador": "Sergio De Larrea",
+      "rival": "Baba Miller",
+      "campo": "rebotes",
+      "valor": 7
+    },
+    {
+      "fecha": "2026-10-26",
+      "tipo": "supera",
+      "jugador": "Aday Mara",
+      "rival": "Sergio De Larrea",
+      "campo": "rebotes",
+      "valor": 8
+    },
+    {
+      "fecha": "2026-10-26",
+      "tipo": "supera",
+      "jugador": "Aday Mara",
+      "rival": "Sergio De Larrea",
+      "campo": "partidos",
+      "valor": 3
+    }
+  ],
   "summer_league": [
     {
       "year": 1985,
@@ -2147,6 +2284,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "101",
+      "id": "bd3a87f6-06d6-4e3e-af1d-42dadf28cdc6",
       "etiquetas": "CAREER-HIGH"
     },
     {
@@ -2156,6 +2294,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "104",
+      "id": "8a67b22f-058c-4ab2-a369-85b00504b952",
       "etiquetas": "LESIÓN"
     },
     {
@@ -2165,6 +2304,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "107",
+      "id": "9b721bcd-f4db-43ff-8f51-aac6637a3bae",
       "etiquetas": "ANILLO"
     },
     {
@@ -2174,6 +2314,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=rN-vdKOp7gE",
       "data": "110",
+      "id": "b3b6940d-139f-4f34-ac21-902c9a1ddfd6",
       "etiquetas": "GAME WINNER"
     },
     {
@@ -2183,6 +2324,7 @@
       "etiqueta": "PARTIDO DESTACADO",
       "video": "",
       "data": "111",
+      "id": "72c50968-039b-4279-841e-611b18f6ae73",
       "etiquetas": "SERIE GANADA"
     },
     {
@@ -2192,6 +2334,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "117",
+      "id": "ac2bd598-dfab-4cce-a4a1-a5a5a3f10173",
       "etiquetas": "TRIPLE-DOBLE"
     },
     {
@@ -2201,6 +2344,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "123",
+      "id": "45a50c73-2cd7-44ba-b0cb-15d0669cbb71",
       "etiquetas": "ALL-STAR"
     },
     {
@@ -2210,6 +2354,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=9DlR4wYznQE",
       "data": "125",
+      "id": "93285931-1c20-43a1-858a-24647565c7d6",
       "etiquetas": "DEBUT PLAYOFFS"
     },
     {
@@ -2219,6 +2364,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=p878PhGNvoc",
       "data": "125",
+      "id": "04cbeccd-e4d5-469c-806b-39862c2471f9",
       "etiquetas": "PREMIO"
     },
     {
@@ -2228,6 +2374,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "126",
+      "id": "b16b09eb-8a41-49f3-b63a-61b106d7cea9",
       "etiquetas": "FINALES"
     },
     {
@@ -2237,6 +2384,7 @@
       "etiqueta": "GAME WINNER",
       "video": "https://www.youtube.com/watch?v=d4wmkY0Z9iU",
       "data": "208",
+      "id": "c3a48132-2788-40e1-8c85-3b1287cd8e93",
       "etiquetas": "RÉCORD FRANQUICIA"
     },
     {
@@ -2246,6 +2394,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "210",
+      "id": "b4c27232-5f54-43df-a93b-06f6af48d55a",
       "etiquetas": "PRIMERA VEZ"
     },
     {
@@ -2255,6 +2404,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "212",
+      "id": "0b1bdcfd-304a-416b-be34-f6fa8afd52c7",
       "etiquetas": "MILESTONE"
     },
     {
@@ -2264,6 +2414,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=R7yJ1_3T_cA",
       "data": "213",
+      "id": "32e09d05-8145-492e-b425-56c9c355152c",
       "etiquetas": "JUGADA HISTÓRICA"
     },
     {
@@ -2273,6 +2424,7 @@
       "etiqueta": "GAME WINNER",
       "video": "https://www.youtube.com/watch?v=IKAac4Q0LGw",
       "data": "213",
+      "id": "2382ece0-4e5b-4ce2-8414-0927616f2258",
       "etiquetas": "PARTIDO DESTACADO"
     },
     {
@@ -2282,6 +2434,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "217",
+      "id": "776e9a65-ea0e-4bb0-8a84-6e5d643592d1",
       "etiquetas": "PLAYOFFS-HIGH"
     },
     {
@@ -2291,6 +2444,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "218",
+      "id": "63020642-191e-4c78-8e5d-2a2afbcdeaa8",
       "etiquetas": ""
     },
     {
@@ -2300,6 +2454,7 @@
       "etiqueta": "ALL-STAR",
       "video": "",
       "data": "219",
+      "id": "a83cca00-7c56-4a7d-a0fa-560acdb789c5",
       "etiquetas": ""
     },
     {
@@ -2309,6 +2464,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "219",
+      "id": "91d1e6fd-a94c-4d96-9009-3fb03d88981f",
       "etiquetas": ""
     },
     {
@@ -2318,6 +2474,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "219",
+      "id": "d813f55e-c4db-4fd2-9a1b-b6758889da80",
       "etiquetas": ""
     },
     {
@@ -2327,6 +2484,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "222",
+      "id": "53cee3e5-14e3-4d45-a8e8-edd1bbbe53cb",
       "etiquetas": ""
     },
     {
@@ -2336,6 +2494,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "226",
+      "id": "34577c21-2c2b-4562-91a0-650374b4a2fe",
       "etiquetas": ""
     },
     {
@@ -2345,6 +2504,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "227",
+      "id": "7c6560ca-6f9d-4f44-8999-7361ca2155ee",
       "etiquetas": ""
     },
     {
@@ -2354,6 +2514,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "301",
+      "id": "259ec187-10ed-470b-bdc1-7ea2b22e6dc7",
       "etiquetas": ""
     },
     {
@@ -2363,6 +2524,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=AXlM4QQTnHk",
       "data": "302",
+      "id": "6026f521-d316-41ce-a817-94fa783d7372",
       "etiquetas": ""
     },
     {
@@ -2372,6 +2534,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "308",
+      "id": "34f75fe2-2e11-49dc-a619-77595564f092",
       "etiquetas": ""
     },
     {
@@ -2381,6 +2544,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "312",
+      "id": "701c3935-84d2-48bf-b194-91333e33a760",
       "etiquetas": ""
     },
     {
@@ -2390,6 +2554,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "313",
+      "id": "42b3220c-131a-4e95-9b17-621352996cc4",
       "etiquetas": ""
     },
     {
@@ -2399,6 +2564,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "313",
+      "id": "b1c1f7b4-ba2e-4128-bca3-6e833a81b420",
       "etiquetas": ""
     },
     {
@@ -2408,6 +2574,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=TucdNjUvxxQ",
       "data": "323",
+      "id": "8ce84a5c-f339-4826-811d-54a46f482c23",
       "etiquetas": ""
     },
     {
@@ -2417,6 +2584,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=6AVlQ2mBOy0",
       "data": "323",
+      "id": "f27ad156-b9d6-4cfc-acfb-cc42f70448fc",
       "etiquetas": ""
     },
     {
@@ -2426,6 +2594,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "325",
+      "id": "9230b6f0-af9f-4518-9322-4353e702d3f7",
       "etiquetas": ""
     },
     {
@@ -2435,6 +2604,7 @@
       "etiqueta": "PARTIDO DESTACADO",
       "video": "https://youtu.be/SoS29exGECw?si=eJggKnWWhlGe3VgQ",
       "data": "328",
+      "id": "5a036cbc-89ca-47b7-a68f-cdb024369762",
       "etiquetas": ""
     },
     {
@@ -2444,6 +2614,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=Bwr_gC7ykWg",
       "data": "329",
+      "id": "13b3854e-c9d9-4644-9403-7060a8b529fb",
       "etiquetas": ""
     },
     {
@@ -2453,6 +2624,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "401",
+      "id": "676eebe7-6dbd-4dbe-948a-0808f2966915",
       "etiquetas": ""
     },
     {
@@ -2462,6 +2634,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "403",
+      "id": "672f7fcf-e917-4769-ae45-834c7f1b21d6",
       "etiquetas": ""
     },
     {
@@ -2471,6 +2644,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "413",
+      "id": "98494ac1-f799-439a-bc41-6fcd35df15ea",
       "etiquetas": ""
     },
     {
@@ -2480,6 +2654,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "414",
+      "id": "8761a783-d882-428d-8ab7-dfda8e176c9e",
       "etiquetas": ""
     },
     {
@@ -2489,6 +2664,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "415",
+      "id": "42b9b77c-5a8a-44ae-b70a-a37564439c5f",
       "etiquetas": ""
     },
     {
@@ -2498,6 +2674,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "415",
+      "id": "5a8ddcfb-5585-47fb-bc43-57f86fdbcc33",
       "etiquetas": ""
     },
     {
@@ -2507,6 +2684,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "416",
+      "id": "a0e5eac0-b1cc-4fc3-9a20-05ff5ea823e3",
       "etiquetas": ""
     },
     {
@@ -2516,6 +2694,7 @@
       "etiqueta": "DEBUT PLAYOFFS",
       "video": "",
       "data": "417",
+      "id": "ca634913-a46a-4604-9524-53e9f922ccdf",
       "etiquetas": ""
     },
     {
@@ -2525,6 +2704,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "418",
+      "id": "1a794f76-e28d-48a8-a851-b2f716537530",
       "etiquetas": ""
     },
     {
@@ -2534,6 +2714,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "419",
+      "id": "a7a62b74-c75f-4a14-a8a1-768974597b8c",
       "etiquetas": ""
     },
     {
@@ -2543,6 +2724,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "420",
+      "id": "0bdafc1a-599e-4292-a412-29e7b06c7633",
       "etiquetas": ""
     },
     {
@@ -2552,6 +2734,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "421",
+      "id": "3c07effa-a3c4-449c-9f20-52a50e6a1532",
       "etiquetas": ""
     },
     {
@@ -2561,6 +2744,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "421",
+      "id": "07f9c89e-65ec-476f-89e5-72465d57b46c",
       "etiquetas": ""
     },
     {
@@ -2570,6 +2754,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "422",
+      "id": "a6d01f4d-5d07-4096-864a-f51bafd2254c",
       "etiquetas": ""
     },
     {
@@ -2579,6 +2764,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "423",
+      "id": "bd404273-e611-41c8-978c-ece7b4b80118",
       "etiquetas": ""
     },
     {
@@ -2588,6 +2774,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "423",
+      "id": "562b10b5-aa34-44d5-893e-bd9ce60a199f",
       "etiquetas": ""
     },
     {
@@ -2597,6 +2784,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "424",
+      "id": "61fa88f7-760a-4e76-9b2d-72920019a4a9",
       "etiquetas": ""
     },
     {
@@ -2606,6 +2794,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "424",
+      "id": "981ee8ed-a6ce-4553-9615-d0282929aaf9",
       "etiquetas": ""
     },
     {
@@ -2615,6 +2804,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "424",
+      "id": "0cab8b5d-3a50-4f64-b42e-0f76e3d1feb7",
       "etiquetas": ""
     },
     {
@@ -2624,6 +2814,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "425",
+      "id": "f3c96382-dc4f-4a99-bdb1-153ee65ff793",
       "etiquetas": ""
     },
     {
@@ -2633,6 +2824,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "426",
+      "id": "d02d6d2b-17f3-464c-b88e-6f3d1859ddf0",
       "etiquetas": ""
     },
     {
@@ -2642,6 +2834,7 @@
       "etiqueta": "DEBUT PLAYOFFS, PRIMERA VEZ",
       "video": "",
       "data": "430",
+      "id": "2c52501e-692b-4721-a11e-7b1e5cabd497",
       "etiquetas": ""
     },
     {
@@ -2651,6 +2844,7 @@
       "etiqueta": "GAME WINNER, SERIE GANADA",
       "video": "https://www.youtube.com/watch?v=GklQlH1z_KE",
       "data": "430",
+      "id": "6ee4918d-4c51-417f-a681-f18b91fbd998",
       "etiquetas": ""
     },
     {
@@ -2660,6 +2854,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "501",
+      "id": "5e2ee94e-b239-433f-82ef-cee3b8d8ce94",
       "etiquetas": ""
     },
     {
@@ -2669,6 +2864,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "504",
+      "id": "33cac962-aa88-4be0-8ff7-f3acb83737f1",
       "etiquetas": ""
     },
     {
@@ -2678,6 +2874,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "509",
+      "id": "bc95c59f-86f5-4621-9a0c-1484a448621f",
       "etiquetas": ""
     },
     {
@@ -2687,6 +2884,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "529",
+      "id": "8d83e0b7-a66c-47e3-9e16-8eb6bc678e11",
       "etiquetas": ""
     },
     {
@@ -2696,6 +2894,7 @@
       "etiqueta": "PLAYOFFS-HIGH",
       "video": "",
       "data": "823",
+      "id": "69113577-7912-4fb1-95cf-acd4bf14dffe",
       "etiquetas": ""
     },
     {
@@ -2705,6 +2904,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=8wgD1KEKIYE",
       "data": "1019",
+      "id": "c597e0a5-8956-4624-92ba-6f7396d185ec",
       "etiquetas": ""
     },
     {
@@ -2714,6 +2914,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=kzBuwfyyXB4",
       "data": "1022",
+      "id": "fe0f6b83-3193-41d8-be36-d219949b49a7",
       "etiquetas": ""
     },
     {
@@ -2723,6 +2924,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1030",
+      "id": "5112c5f1-30ef-44bd-9cf5-f43ffd4c8b3f",
       "etiquetas": ""
     },
     {
@@ -2732,6 +2934,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=VMmG3L8XxrE",
       "data": "1101",
+      "id": "09dc6a4f-b084-42d8-97da-a281bf558462",
       "etiquetas": ""
     },
     {
@@ -2741,6 +2944,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=cquAHccg_L0",
       "data": "1104",
+      "id": "a9d32070-7829-467e-8c50-d773ed221a59",
       "etiquetas": ""
     },
     {
@@ -2750,6 +2954,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=uuFFFoRFgQE",
       "data": "1107",
+      "id": "b584f44f-51d8-4e2c-a832-d49656550495",
       "etiquetas": ""
     },
     {
@@ -2759,6 +2964,7 @@
       "etiqueta": "GAME WINNER",
       "video": "https://www.youtube.com/watch?v=FJEgcbdeLPU",
       "data": "1108",
+      "id": "b4a60288-acfe-4ee4-bd86-dfd0926978de",
       "etiquetas": ""
     },
     {
@@ -2768,6 +2974,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=VUMwc-7tG2c",
       "data": "1116",
+      "id": "adebba52-79e7-4a36-be3c-f39dd59dae45",
       "etiquetas": ""
     },
     {
@@ -2777,6 +2984,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=aCy3WhlgMQQ",
       "data": "1116",
+      "id": "96c337f7-aaba-4701-80a5-372b50f38b91",
       "etiquetas": ""
     },
     {
@@ -2786,6 +2994,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1117",
+      "id": "7f188538-c048-4826-8d25-64a0ffedcccd",
       "etiquetas": ""
     },
     {
@@ -2795,6 +3004,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1124",
+      "id": "460a6e7d-5cf6-46ca-a993-47dec6829fbc",
       "etiquetas": ""
     },
     {
@@ -2804,6 +3014,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1125",
+      "id": "20417226-a8bb-4ac0-bccb-1347ba42dc2e",
       "etiquetas": ""
     },
     {
@@ -2813,6 +3024,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=FJEgcbdeLPU",
       "data": "1125",
+      "id": "1860b1d6-08e2-46e9-98ec-4218e81ac5af",
       "etiquetas": ""
     },
     {
@@ -2822,6 +3034,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1127",
+      "id": "a59d73ae-458d-4437-b518-bbb260470fe6",
       "etiquetas": ""
     },
     {
@@ -2831,6 +3044,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1128",
+      "id": "6acfe7a0-4b6b-4b47-8187-beaddf7a261b",
       "etiquetas": ""
     },
     {
@@ -2840,6 +3054,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=ZfgfyMHHlVQ",
       "data": "1129",
+      "id": "680b0b6a-0418-41d2-adfb-700a91bbf717",
       "etiquetas": ""
     },
     {
@@ -2849,6 +3064,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1202",
+      "id": "b7b37e3f-56c4-42ee-8a7d-78a2e28b71de",
       "etiquetas": ""
     },
     {
@@ -2858,6 +3074,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1216",
+      "id": "c850d68f-ac7f-4d1a-aee8-284ae1bd2b07",
       "etiquetas": ""
     },
     {
@@ -2867,6 +3084,7 @@
       "etiqueta": "PARTIDO DESTACADO",
       "video": "",
       "data": "1216",
+      "id": "a522b89b-36c0-43fb-9ffb-39885a9d9baf",
       "etiquetas": ""
     },
     {
@@ -2876,6 +3094,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=G_s-dC_ZWzo",
       "data": "1217",
+      "id": "add0e356-5fb1-4961-be1f-1277ee1d4d41",
       "etiquetas": ""
     },
     {
@@ -2885,6 +3104,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "https://www.youtube.com/watch?v=EqDoEdP1oko",
       "data": "1220",
+      "id": "6206204c-8ddd-40eb-83da-272cc403ebc1",
       "etiquetas": ""
     },
     {
@@ -2894,6 +3114,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1226",
+      "id": "49f50008-50cd-4f28-96f0-909995fbdb12",
       "etiquetas": ""
     },
     {
@@ -2903,6 +3124,7 @@
       "etiqueta": "CAREER-HIGH",
       "video": "",
       "data": "1228",
+      "id": "15a40e85-c7ed-4e63-bef2-974de7fc12ac",
       "etiquetas": ""
     },
     {
@@ -2912,6 +3134,277 @@
       "etiqueta": "PARTIDO DESTACADO",
       "video": "https://www.youtube.com/watch?v=3Z7F42VKaK4",
       "data": "1231",
+      "id": "6b87f8fd-a9f5-4db5-ad04-649bceaf1d8e",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2006-03-08",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Seattle SuperSonics con 21 puntos, 12 rebotes y 12 asistencias. El primero de Pau Gasol.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "aa65c15c-0dfa-47c6-ac12-0ed85beaa5a0",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2007-01-24",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Utah Jazz con 17 puntos, 13 rebotes y 12 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "21448d20-edb0-4a7f-ad8c-8e8ec624ec45",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2009-02-17",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Atlanta Hawks con 12 puntos, 13 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "352026d1-fe9a-4bcf-a8b3-de3b84f700fa",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2010-11-07",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Portland Trail Blazers con 20 puntos, 14 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "9e251bbb-0122-43f4-8668-d32a940345d0",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2012-04-18",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Golden State Warriors con 22 puntos, 11 rebotes y 11 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "0c183216-4a0c-4abc-88a3-d04a111d7cf4",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-04-12",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Golden State Warriors con 26 puntos, 11 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "1f6cf1ff-6862-4fe9-b053-94314595ae94",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-04-17",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Houston Rockets con 17 puntos, 20 rebotes y 11 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "eee1fec2-9980-4d5b-8d51-3845d75bd642",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2016-02-27",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Portland Trail Blazers con 22 puntos, 16 rebotes y 14 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "2824db80-ea27-4ee4-ab6b-3439337c0b49",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2016-03-07",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Milwaukee Bucks con 12 puntos, 17 rebotes y 13 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "28742827-9a29-4e42-b705-31e044ed9a87",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2017-12-23",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble ante Sacramento Kings con 14 puntos, 11 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "1804526b-d253-4389-b816-28ff77c58278",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-04-26",
+      "jugador": "Pau Gasol",
+      "hito": "Triple-doble en playoffs ante San Antonio Spurs con 11 puntos, 13 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "c8277cbb-904d-4e0f-ae8c-8c43d3bb475b",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-03-12",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante San Antonio Spurs con 21 puntos, 13 rebotes y 12 asistencias. El primero de Ricky Rubio.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "ab013166-3dc0-466c-b389-1d91babeefdd",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2013-11-10",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante Los Angeles Lakers con 12 puntos, 10 rebotes y 14 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "46053514-a873-4e34-9127-f6d130ca2f1a",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2014-03-19",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante Dallas Mavericks con 22 puntos, 10 rebotes y 15 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "b0bd222c-f6dd-4e29-aa83-4564d03140a6",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2015-03-02",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante Los Angeles Clippers con 18 puntos, 11 rebotes y 12 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "ece44d2e-0102-4393-bddb-2c67f3504f2b",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2017-03-04",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante San Antonio Spurs con 11 puntos, 13 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "c88d527d-8dac-46d3-9e8f-23450ae63936",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2019-12-16",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante Portland Trail Blazers con 10 puntos, 11 rebotes y 14 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "4ec683ae-8948-4f9f-ba8a-3a183ec24be9",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2020-03-08",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble ante Milwaukee Bucks con 25 puntos, 13 rebotes y 13 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "9329e795-b788-4b7a-9c2a-2e4603a457bf",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2018-04-21",
+      "jugador": "Ricky Rubio",
+      "hito": "Triple-doble en playoffs ante Oklahoma City Thunder con 26 puntos, 11 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "0bede808-92a6-44d9-8fd1-f6297a88a1f6",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2015-11-20",
+      "jugador": "Marc Gasol",
+      "hito": "Triple-doble ante Houston Rockets con 16 puntos, 11 rebotes y 11 asistencias. El primero de Marc Gasol",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "229af772-3179-4e26-be59-f8ed1bdd5806",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2016-12-05",
+      "jugador": "Marc Gasol",
+      "hito": "Triple-doble ante New Orleans Pelicans con 28 puntos, 11 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "e7653769-2a2c-4a71-9589-56d34005f10a",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2017-03-16",
+      "jugador": "Marc Gasol",
+      "hito": "Triple-doble ante Atlanta Hawks con 18 puntos, 10 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "d53fe451-4f3c-407f-a164-32d91a3da9e3",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2018-01-26",
+      "jugador": "Marc Gasol",
+      "hito": "Triple-doble ante Los Angeles Clippers con 13 puntos, 12 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "404f03c9-5da8-49a4-9d89-97c468be3294",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2019-01-23",
+      "jugador": "Marc Gasol",
+      "hito": "Triple-doble ante Charlotte Hornets con 22 puntos, 17 rebotes y 10 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "2efec072-d92a-400b-9ee9-4def3f4027d6",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2012-11-13",
+      "jugador": "José Manuel Calderón",
+      "hito": "Triple-doble ante Indiana Pacers con 13 puntos, 10 rebotes y 10 asistencias. El primero de Calderón.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "9d35c4f8-13f4-4510-8d02-547fe179fb07",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2012-12-16",
+      "jugador": "José Manuel Calderón",
+      "hito": "Triple-doble ante Houston Rockets con 18 puntos, 10 rebotes y 14 asistencias.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "d6616198-00b8-411e-9b52-53874533fa7c",
+      "etiquetas": ""
+    },
+    {
+      "fecha": "2012-02-19",
+      "jugador": "Serge Ibaka",
+      "hito": "Triple-doble ante Denver Nuggets con 14 puntos, 15 rebotes y 11 tapones. El primero y único de Ibaka.",
+      "etiqueta": "TRIPLE-DOBLE",
+      "video": "",
+      "data": "",
+      "id": "5c976e04-a695-45ce-911d-71ec45e0c41f",
       "etiquetas": ""
     }
   ],
@@ -7878,6 +8371,137 @@
       "summer_league": []
     },
     {
+      "id": "sergio-de-larrea",
+      "nombre": "Sergio De Larrea",
+      "temporadas": null,
+      "partidos": 3,
+      "partidos_titular": 0,
+      "min_total": 41,
+      "min_g": 13.666666666666666,
+      "pts_total": 21,
+      "pts_g": 7,
+      "rbd_total": 7,
+      "rbd_g": 2.3333333333333335,
+      "ast_total": 5,
+      "ast_g": 1.6666666666666667,
+      "stl_total": 0,
+      "stl_g": 0,
+      "blk_total": 0,
+      "blk_g": 0,
+      "tres_total": 3,
+      "tres_g": 1,
+      "tov_total": 4,
+      "pf_total": 3,
+      "td_total": 0,
+      "fg_pct": 0.5294117647058824,
+      "tres_pct": 0.6,
+      "ft_pct": null,
+      "rank": 12,
+      "draft": true,
+      "draft_anio": 2026,
+      "draft_pick": 25,
+      "draft_equipo": "LAL",
+      "draft_fecha": "23 jun 2026",
+      "draft_notas": "Traspasado a Dallas la noche del draft",
+      "primer_partido": {
+        "fecha": "21 oct 2026",
+        "edad": 20.321,
+        "equipo": "DAL",
+        "rival": "HOU",
+        "resultado": "false",
+        "min": "6:51",
+        "pts": 0,
+        "rbd": 2,
+        "ast": 1,
+        "stl": 0,
+        "blk": 0,
+        "fgm": 0,
+        "fga": 1,
+        "tres_m": 0,
+        "tres_a": 1,
+        "ftm": 0,
+        "fta": 0,
+        "tov": 0,
+        "pf": 0,
+        "dd": "false",
+        "video": ""
+      },
+      "game_highs": {
+        "min": 33,
+        "pts": 21,
+        "rbd": 5,
+        "ast": 4,
+        "stl": 0,
+        "blk": 0,
+        "fgm": 9,
+        "fga": 15,
+        "tres_m": 3,
+        "tres_a": 4,
+        "ftm": 0,
+        "fta": 0,
+        "tov": 4,
+        "pf": 3
+      },
+      "ganancias": 16329526,
+      "ganancias_ganado": 3182280,
+      "ganancias_futuro": 13147246,
+      "equipos_nba": "DAL",
+      "temporadas_data": [
+        {
+          "year": 2027,
+          "team": "DAL",
+          "g": 3,
+          "min_g": 13.666666666666666,
+          "pts_g": 7,
+          "rbd_g": 2.3333333333333335,
+          "ast_g": 1.6666666666666667,
+          "stl_g": 0,
+          "blk_g": 0,
+          "fg_pct": 0.5294117647058824,
+          "tres_pct": 0.6,
+          "ft_pct": null,
+          "fgm_g": 3,
+          "tres_g": 1,
+          "ftm_g": 0,
+          "pf_g": 1,
+          "tov_g": 1.3,
+          "td": 0
+        }
+      ],
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": [],
+      "playoffs_totales": {
+        "temporadas": null,
+        "partidos": 0,
+        "partidos_titular": 0,
+        "min_total": 0,
+        "min_g": 0,
+        "pts_total": 0,
+        "pts_g": 0,
+        "rbd_total": 0,
+        "rbd_g": 0,
+        "ast_total": 0,
+        "ast_g": 0,
+        "stl_total": 0,
+        "stl_g": 0,
+        "blk_total": 0,
+        "blk_g": 0,
+        "tres_total": 0,
+        "tres_g": 0,
+        "tov_total": 0,
+        "pf_total": 0,
+        "td_total": 0,
+        "fg_pct": null,
+        "tres_pct": null,
+        "ft_pct": null
+      },
+      "posicion": "Base",
+      "bref_id": "delarse01",
+      "nacimiento": 2005,
+      "nacimiento_fecha": "4 dic 2005"
+    },
+    {
       "id": "raul-lopez",
       "nombre": "Raül Lopez",
       "temporadas": null,
@@ -7903,7 +8527,7 @@
       "fg_pct": 0.4294478527607362,
       "tres_pct": 0.34615384615384615,
       "ft_pct": 0.8533333333333334,
-      "rank": 12,
+      "rank": 13,
       "draft": true,
       "draft_anio": 2001,
       "draft_pick": 24,
@@ -8057,7 +8681,7 @@
       "fg_pct": 0.3865652724968314,
       "tres_pct": 0.3680672268907563,
       "ft_pct": 0.8796296296296297,
-      "rank": 13,
+      "rank": 14,
       "draft": true,
       "draft_anio": 2013,
       "draft_pick": 32,
@@ -8278,7 +8902,7 @@
       "fg_pct": 0.4278462654097172,
       "tres_pct": 0.34234234234234234,
       "ft_pct": 0.6760204081632653,
-      "rank": 14,
+      "rank": 15,
       "draft": true,
       "draft_anio": 2016,
       "draft_pick": 15,
@@ -8692,7 +9316,7 @@
       "fg_pct": 0.4094488188976378,
       "tres_pct": 0.33666666666666667,
       "ft_pct": 0.7394636015325671,
-      "rank": 15,
+      "rank": 16,
       "draft": true,
       "draft_anio": 2006,
       "draft_pick": 27,
@@ -8944,29 +9568,29 @@
       "id": "hugo-gonzalez",
       "nombre": "Hugo González",
       "temporadas": null,
-      "partidos": 74,
+      "partidos": 76,
       "partidos_titular": 3,
-      "min_total": 1084,
-      "min_g": 14.64864864864865,
+      "min_total": 1098,
+      "min_g": 14.447368421052632,
       "pts_total": 289,
-      "pts_g": 3.9054054054054053,
-      "rbd_total": 246,
-      "rbd_g": 3.324324324324324,
-      "ast_total": 40,
-      "ast_g": 0.5405405405405406,
+      "pts_g": 3.8026315789473686,
+      "rbd_total": 249,
+      "rbd_g": 3.276315789473684,
+      "ast_total": 41,
+      "ast_g": 0.5394736842105263,
       "stl_total": 42,
-      "stl_g": 0.5675675675675675,
+      "stl_g": 0.5526315789473685,
       "blk_total": 21,
-      "blk_g": 0.28378378378378377,
+      "blk_g": 0.27631578947368424,
       "tres_total": 42,
       "tres_g": 0.6,
       "tov_total": 38,
       "pf_total": 124,
       "td_total": 0,
-      "fg_pct": 0.47560975609756095,
-      "tres_pct": 0.3620689655172414,
+      "fg_pct": 0.4717741935483871,
+      "tres_pct": 0.3559322033898305,
       "ft_pct": 0.5,
-      "rank": 16,
+      "rank": 17,
       "draft": true,
       "draft_anio": 2025,
       "draft_pick": 28,
@@ -9020,21 +9644,21 @@
         {
           "year": 2027,
           "team": "BOS",
-          "g": 0,
-          "min_g": 0,
+          "g": 2,
+          "min_g": 7,
           "pts_g": 0,
-          "rbd_g": 0,
-          "ast_g": 0,
+          "rbd_g": 1.5,
+          "ast_g": 0.5,
           "stl_g": 0,
           "blk_g": 0,
-          "fg_pct": null,
-          "tres_pct": null,
+          "fg_pct": 0,
+          "tres_pct": 0,
           "ft_pct": null,
-          "fgm_g": null,
-          "tres_g": null,
-          "ftm_g": null,
-          "pf_g": null,
-          "tov_g": null,
+          "fgm_g": 0,
+          "tres_g": 0,
+          "ftm_g": 0,
+          "pf_g": 0,
+          "tov_g": 0,
           "td": 0
         },
         {
@@ -9115,6 +9739,137 @@
       "summer_league": []
     },
     {
+      "id": "aday-mara",
+      "nombre": "Aday Mara",
+      "temporadas": null,
+      "partidos": 3,
+      "partidos_titular": 0,
+      "min_total": 39,
+      "min_g": 13,
+      "pts_total": 11,
+      "pts_g": 3.6666666666666665,
+      "rbd_total": 8,
+      "rbd_g": 2.6666666666666665,
+      "ast_total": 2,
+      "ast_g": 0.6666666666666666,
+      "stl_total": 1,
+      "stl_g": 0.3333333333333333,
+      "blk_total": 3,
+      "blk_g": 1,
+      "tres_total": 0,
+      "tres_g": 0,
+      "tov_total": 4,
+      "pf_total": 4,
+      "td_total": 0,
+      "fg_pct": 0.5,
+      "tres_pct": null,
+      "ft_pct": 0.5,
+      "rank": 18,
+      "draft": true,
+      "draft_anio": 2026,
+      "draft_pick": 12,
+      "draft_equipo": "OKC",
+      "draft_fecha": "23 jun 2026",
+      "draft_notas": null,
+      "primer_partido": {
+        "fecha": "20 oct 2026",
+        "edad": 21.196,
+        "equipo": "OKC",
+        "rival": "SAS",
+        "resultado": "true",
+        "min": "11:43",
+        "pts": 7,
+        "rbd": 2,
+        "ast": 1,
+        "stl": 0,
+        "blk": 1,
+        "fgm": 3,
+        "fga": 4,
+        "tres_m": 0,
+        "tres_a": 0,
+        "ftm": 1,
+        "fta": 2,
+        "tov": 1,
+        "pf": 1,
+        "dd": "false",
+        "video": ""
+      },
+      "game_highs": {
+        "min": 14,
+        "pts": 7,
+        "rbd": 3,
+        "ast": 1,
+        "stl": 1,
+        "blk": 1,
+        "fgm": 3,
+        "fga": 4,
+        "tres_m": 0,
+        "tres_a": 0,
+        "ftm": 1,
+        "fta": 2,
+        "tov": 2,
+        "pf": 2
+      },
+      "ganancias": 27023779,
+      "ganancias_ganado": 5791680,
+      "ganancias_futuro": 21232099,
+      "equipos_nba": "OKC",
+      "temporadas_data": [
+        {
+          "year": 2027,
+          "team": "OKC",
+          "g": 3,
+          "min_g": 13,
+          "pts_g": 3.6666666666666665,
+          "rbd_g": 2.6666666666666665,
+          "ast_g": 0.6666666666666666,
+          "stl_g": 0.3333333333333333,
+          "blk_g": 1,
+          "fg_pct": 0.5,
+          "tres_pct": null,
+          "ft_pct": 0.5,
+          "fgm_g": 1.7,
+          "tres_g": 0,
+          "ftm_g": 0.3,
+          "pf_g": 1.3,
+          "tov_g": 1.3,
+          "td": 0
+        }
+      ],
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": [],
+      "playoffs_totales": {
+        "temporadas": null,
+        "partidos": 0,
+        "partidos_titular": 0,
+        "min_total": 0,
+        "min_g": 0,
+        "pts_total": 0,
+        "pts_g": 0,
+        "rbd_total": 0,
+        "rbd_g": 0,
+        "ast_total": 0,
+        "ast_g": 0,
+        "stl_total": 0,
+        "stl_g": 0,
+        "blk_total": 0,
+        "blk_g": 0,
+        "tres_total": 0,
+        "tres_g": 0,
+        "tov_total": 0,
+        "pf_total": 0,
+        "td_total": 0,
+        "fg_pct": null,
+        "tres_pct": null,
+        "ft_pct": null
+      },
+      "posicion": "Pívot",
+      "bref_id": "maraad01",
+      "nacimiento": 2005,
+      "nacimiento_fecha": "7 abr 2005"
+    },
+    {
       "id": "victor-claver",
       "nombre": "Víctor Claver",
       "temporadas": null,
@@ -9140,7 +9895,7 @@
       "fg_pct": 0.398406374501992,
       "tres_pct": 0.29310344827586204,
       "ft_pct": 0.5853658536585366,
-      "rank": 17,
+      "rank": 19,
       "draft": true,
       "draft_anio": 2009,
       "draft_pick": 22,
@@ -9152,7 +9907,7 @@
         "edad": 24.062,
         "equipo": "POR",
         "rival": "HOU",
-        "resultado": "false",
+        "resultado": "true",
         "min": "3:33",
         "pts": 0,
         "rbd": 1,
@@ -9334,7 +10089,7 @@
       "fg_pct": 0.4669603524229075,
       "tres_pct": 0.3625,
       "ft_pct": 0.625,
-      "rank": 18,
+      "rank": 20,
       "draft": true,
       "draft_anio": 2021,
       "draft_pick": 23,
@@ -9502,6 +10257,137 @@
       "summer_league": []
     },
     {
+      "id": "baba-miller",
+      "nombre": "Baba Miller",
+      "temporadas": null,
+      "partidos": 2,
+      "partidos_titular": 0,
+      "min_total": 11,
+      "min_g": 5.5,
+      "pts_total": 4,
+      "pts_g": 2,
+      "rbd_total": 4,
+      "rbd_g": 2,
+      "ast_total": 1,
+      "ast_g": 0.5,
+      "stl_total": 0,
+      "stl_g": 0,
+      "blk_total": 0,
+      "blk_g": 0,
+      "tres_total": 0,
+      "tres_g": 0,
+      "tov_total": 3,
+      "pf_total": 1,
+      "td_total": 0,
+      "fg_pct": 1,
+      "tres_pct": null,
+      "ft_pct": null,
+      "rank": 21,
+      "draft": true,
+      "draft_anio": 2026,
+      "draft_pick": 36,
+      "draft_equipo": "LAC",
+      "draft_fecha": "24 jun 2026",
+      "draft_notas": null,
+      "primer_partido": {
+        "fecha": "21 oct 2026",
+        "edad": 22.256,
+        "equipo": "LAC",
+        "rival": "SAC",
+        "resultado": "true",
+        "min": "9:23",
+        "pts": 4,
+        "rbd": 3,
+        "ast": 1,
+        "stl": 0,
+        "blk": 0,
+        "fgm": 2,
+        "fga": 2,
+        "tres_m": 0,
+        "tres_a": 0,
+        "ftm": 0,
+        "fta": 0,
+        "tov": 1,
+        "pf": 0,
+        "dd": "false",
+        "video": ""
+      },
+      "game_highs": {
+        "min": 9,
+        "pts": 4,
+        "rbd": 3,
+        "ast": 1,
+        "stl": 0,
+        "blk": 0,
+        "fgm": 2,
+        "fga": 2,
+        "tres_m": 0,
+        "tres_a": 0,
+        "ftm": 0,
+        "fta": 0,
+        "tov": 2,
+        "pf": 1
+      },
+      "ganancias": 9612515,
+      "ganancias_ganado": 1705630,
+      "ganancias_futuro": 7906885,
+      "equipos_nba": "LAC",
+      "temporadas_data": [
+        {
+          "year": 2027,
+          "team": "LAC",
+          "g": 2,
+          "min_g": 5.5,
+          "pts_g": 2,
+          "rbd_g": 2,
+          "ast_g": 0.5,
+          "stl_g": 0,
+          "blk_g": 0,
+          "fg_pct": 1,
+          "tres_pct": null,
+          "ft_pct": null,
+          "fgm_g": 1,
+          "tres_g": 0,
+          "ftm_g": 0,
+          "pf_g": 0.5,
+          "tov_g": 1.5,
+          "td": 0
+        }
+      ],
+      "premios": [],
+      "records": [],
+      "playoffs_temporadas": [],
+      "playoffs_totales": {
+        "temporadas": null,
+        "partidos": 0,
+        "partidos_titular": 0,
+        "min_total": 0,
+        "min_g": 0,
+        "pts_total": 0,
+        "pts_g": 0,
+        "rbd_total": 0,
+        "rbd_g": 0,
+        "ast_total": 0,
+        "ast_g": 0,
+        "stl_total": 0,
+        "stl_g": 0,
+        "blk_total": 0,
+        "blk_g": 0,
+        "tres_total": 0,
+        "tres_g": 0,
+        "tov_total": 0,
+        "pf_total": 0,
+        "td_total": 0,
+        "fg_pct": null,
+        "tres_pct": null,
+        "ft_pct": null
+      },
+      "posicion": "Ala-Pívot",
+      "bref_id": "milleba01",
+      "nacimiento": 2004,
+      "nacimiento_fecha": "7 feb 2004"
+    },
+    {
       "id": "fernando-martin",
       "nombre": "Fernando Martín",
       "temporadas": null,
@@ -9527,7 +10413,7 @@
       "fg_pct": 0.2903225806451613,
       "tres_pct": 0,
       "ft_pct": 0.36363636363636365,
-      "rank": 19,
+      "rank": 22,
       "draft": true,
       "draft_anio": 1985,
       "draft_pick": 38,
@@ -9654,330 +10540,6 @@
       "nacimiento_fecha": "25 ene 1962",
       "post_nba": [],
       "summer_league": []
-    },
-    {
-      "id": "sergio-de-larrea",
-      "nombre": "Sergio De Larrea",
-      "temporadas": null,
-      "partidos": 0,
-      "partidos_titular": 0,
-      "min_total": 0,
-      "min_g": 0,
-      "pts_total": 0,
-      "pts_g": 0,
-      "rbd_total": 0,
-      "rbd_g": 0,
-      "ast_total": 0,
-      "ast_g": 0,
-      "stl_total": 0,
-      "stl_g": 0,
-      "blk_total": 0,
-      "blk_g": 0,
-      "tres_total": 0,
-      "tres_g": 0,
-      "tov_total": 0,
-      "pf_total": 0,
-      "td_total": 0,
-      "fg_pct": null,
-      "tres_pct": null,
-      "ft_pct": null,
-      "rank": 20,
-      "draft": true,
-      "draft_anio": 2026,
-      "draft_pick": 25,
-      "draft_equipo": "LAL",
-      "draft_fecha": "23 jun 2026",
-      "draft_notas": "Traspasado a Dallas la noche del draft",
-      "game_highs": {
-        "min": 0,
-        "pts": 0,
-        "rbd": 0,
-        "ast": 0,
-        "stl": 0,
-        "blk": 0,
-        "fgm": 0,
-        "fga": 0,
-        "tres_m": 0,
-        "tres_a": 0,
-        "ftm": 0,
-        "fta": 0,
-        "tov": 0,
-        "pf": 0
-      },
-      "ganancias": 16329526,
-      "ganancias_ganado": 3182280,
-      "ganancias_futuro": 13147246,
-      "equipos_nba": "DAL",
-      "temporadas_data": [
-        {
-          "year": 2027,
-          "team": "DAL",
-          "g": 0,
-          "min_g": 0,
-          "pts_g": 0,
-          "rbd_g": 0,
-          "ast_g": 0,
-          "stl_g": 0,
-          "blk_g": 0,
-          "fg_pct": null,
-          "tres_pct": null,
-          "ft_pct": null,
-          "fgm_g": null,
-          "tres_g": null,
-          "ftm_g": null,
-          "pf_g": null,
-          "tov_g": null,
-          "td": 0
-        }
-      ],
-      "premios": [],
-      "records": [],
-      "playoffs_temporadas": [],
-      "playoffs_totales": {
-        "temporadas": null,
-        "partidos": 0,
-        "partidos_titular": 0,
-        "min_total": 0,
-        "min_g": 0,
-        "pts_total": 0,
-        "pts_g": 0,
-        "rbd_total": 0,
-        "rbd_g": 0,
-        "ast_total": 0,
-        "ast_g": 0,
-        "stl_total": 0,
-        "stl_g": 0,
-        "blk_total": 0,
-        "blk_g": 0,
-        "tres_total": 0,
-        "tres_g": 0,
-        "tov_total": 0,
-        "pf_total": 0,
-        "td_total": 0,
-        "fg_pct": null,
-        "tres_pct": null,
-        "ft_pct": null
-      },
-      "posicion": "Base",
-      "bref_id": "delarse01",
-      "nacimiento": 2005,
-      "nacimiento_fecha": "4 dic 2005"
-    },
-    {
-      "id": "baba-miller",
-      "nombre": "Baba Miller",
-      "temporadas": null,
-      "partidos": 0,
-      "partidos_titular": 0,
-      "min_total": 0,
-      "min_g": 0,
-      "pts_total": 0,
-      "pts_g": 0,
-      "rbd_total": 0,
-      "rbd_g": 0,
-      "ast_total": 0,
-      "ast_g": 0,
-      "stl_total": 0,
-      "stl_g": 0,
-      "blk_total": 0,
-      "blk_g": 0,
-      "tres_total": 0,
-      "tres_g": 0,
-      "tov_total": 0,
-      "pf_total": 0,
-      "td_total": 0,
-      "fg_pct": null,
-      "tres_pct": null,
-      "ft_pct": null,
-      "rank": 21,
-      "draft": true,
-      "draft_anio": 2026,
-      "draft_pick": 36,
-      "draft_equipo": "LAC",
-      "draft_fecha": "24 jun 2026",
-      "draft_notas": null,
-      "game_highs": {
-        "min": 0,
-        "pts": 0,
-        "rbd": 0,
-        "ast": 0,
-        "stl": 0,
-        "blk": 0,
-        "fgm": 0,
-        "fga": 0,
-        "tres_m": 0,
-        "tres_a": 0,
-        "ftm": 0,
-        "fta": 0,
-        "tov": 0,
-        "pf": 0
-      },
-      "ganancias": 9612515,
-      "ganancias_ganado": 1705630,
-      "ganancias_futuro": 7906885,
-      "equipos_nba": "LAC",
-      "temporadas_data": [
-        {
-          "year": 2027,
-          "team": "LAC",
-          "g": 0,
-          "min_g": 0,
-          "pts_g": 0,
-          "rbd_g": 0,
-          "ast_g": 0,
-          "stl_g": 0,
-          "blk_g": 0,
-          "fg_pct": null,
-          "tres_pct": null,
-          "ft_pct": null,
-          "fgm_g": null,
-          "tres_g": null,
-          "ftm_g": null,
-          "pf_g": null,
-          "tov_g": null,
-          "td": 0
-        }
-      ],
-      "premios": [],
-      "records": [],
-      "playoffs_temporadas": [],
-      "playoffs_totales": {
-        "temporadas": null,
-        "partidos": 0,
-        "partidos_titular": 0,
-        "min_total": 0,
-        "min_g": 0,
-        "pts_total": 0,
-        "pts_g": 0,
-        "rbd_total": 0,
-        "rbd_g": 0,
-        "ast_total": 0,
-        "ast_g": 0,
-        "stl_total": 0,
-        "stl_g": 0,
-        "blk_total": 0,
-        "blk_g": 0,
-        "tres_total": 0,
-        "tres_g": 0,
-        "tov_total": 0,
-        "pf_total": 0,
-        "td_total": 0,
-        "fg_pct": null,
-        "tres_pct": null,
-        "ft_pct": null
-      },
-      "posicion": "Ala-Pívot",
-      "bref_id": "milleba01",
-      "nacimiento": 2004,
-      "nacimiento_fecha": "7 feb 2004"
-    },
-    {
-      "id": "aday-mara",
-      "nombre": "Aday Mara",
-      "temporadas": null,
-      "partidos": 0,
-      "partidos_titular": 0,
-      "min_total": 0,
-      "min_g": 0,
-      "pts_total": 0,
-      "pts_g": 0,
-      "rbd_total": 0,
-      "rbd_g": 0,
-      "ast_total": 0,
-      "ast_g": 0,
-      "stl_total": 0,
-      "stl_g": 0,
-      "blk_total": 0,
-      "blk_g": 0,
-      "tres_total": 0,
-      "tres_g": 0,
-      "tov_total": 0,
-      "pf_total": 0,
-      "td_total": 0,
-      "fg_pct": null,
-      "tres_pct": null,
-      "ft_pct": null,
-      "rank": 22,
-      "draft": true,
-      "draft_anio": 2026,
-      "draft_pick": 12,
-      "draft_equipo": "OKC",
-      "draft_fecha": "23 jun 2026",
-      "draft_notas": null,
-      "game_highs": {
-        "min": 0,
-        "pts": 0,
-        "rbd": 0,
-        "ast": 0,
-        "stl": 0,
-        "blk": 0,
-        "fgm": 0,
-        "fga": 0,
-        "tres_m": 0,
-        "tres_a": 0,
-        "ftm": 0,
-        "fta": 0,
-        "tov": 0,
-        "pf": 0
-      },
-      "ganancias": 27023779,
-      "ganancias_ganado": 5791680,
-      "ganancias_futuro": 21232099,
-      "equipos_nba": "OKC",
-      "temporadas_data": [
-        {
-          "year": 2027,
-          "team": "OKC",
-          "g": 0,
-          "min_g": 0,
-          "pts_g": 0,
-          "rbd_g": 0,
-          "ast_g": 0,
-          "stl_g": 0,
-          "blk_g": 0,
-          "fg_pct": null,
-          "tres_pct": null,
-          "ft_pct": null,
-          "fgm_g": null,
-          "tres_g": null,
-          "ftm_g": null,
-          "pf_g": null,
-          "tov_g": null,
-          "td": 0
-        }
-      ],
-      "premios": [],
-      "records": [],
-      "playoffs_temporadas": [],
-      "playoffs_totales": {
-        "temporadas": null,
-        "partidos": 0,
-        "partidos_titular": 0,
-        "min_total": 0,
-        "min_g": 0,
-        "pts_total": 0,
-        "pts_g": 0,
-        "rbd_total": 0,
-        "rbd_g": 0,
-        "ast_total": 0,
-        "ast_g": 0,
-        "stl_total": 0,
-        "stl_g": 0,
-        "blk_total": 0,
-        "blk_g": 0,
-        "tres_total": 0,
-        "tres_g": 0,
-        "tov_total": 0,
-        "pf_total": 0,
-        "td_total": 0,
-        "fg_pct": null,
-        "tres_pct": null,
-        "ft_pct": null
-      },
-      "posicion": "Pívot",
-      "bref_id": "maraad01",
-      "nacimiento": 2005,
-      "nacimiento_fecha": "7 abr 2005"
     },
     {
       "id": "jose-a-montero",
