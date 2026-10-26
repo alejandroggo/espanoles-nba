@@ -240,7 +240,7 @@ function planGeneration(input) {
     const textLocked = editedText || ESTADOS_TERMINALES.has(ex.status);
     const suggKeep = ex.suggestedAt ?? suggestedAt;
     if (!changed || acknowledged) {
-      ops.push({ op: 'sin_cambios', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear, status: ex.status, textX: ex.textX, suggestedAt: suggKeep, flags: { editedText, editedTime, acknowledged: acknowledged && changed } });
+      ops.push({ op: 'sin_cambios', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear, status: ex.status, textX: ex.textX, textXCanonico: c.textX, suggestedAt: suggKeep, flags: { editedText, editedTime, acknowledged: acknowledged && changed } });
     } else if (textLocked) {
       ops.push({ op: 'edicion_preservada', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear, status: ex.status, textX: ex.textX, suggestedAt: suggKeep, sourceFingerprintObservado: c.fingerprint, sourceSnapshotObservado: c.sourceSnapshot, flags: { sourceChanged: true, editedText, editedTime, statusBloqueado: ESTADOS_TERMINALES.has(ex.status) }, nota: 'El contenido del origen cambió, pero hay edición manual de texto o estado terminal: se conserva. Marcado para revisión. El fingerprint NO se actualiza hasta que un humano lo resuelva (resolverRevision).' });
     } else {
@@ -326,6 +326,7 @@ function applyPlan(store, plan, opts = {}) {
       }
       case 'sin_cambios': {
         if (!prev) { log.push({ draftId: op.draftId, resultado: 'omitido', motivo: 'sin_cambios sobre inexistente' }); break; }
+        if (op.textXCanonico != null && !prev.editedText && !TERMINALES.has(prev.status) && op.textXCanonico !== prev.textX) { prev.textX = op.textXCanonico; prev.updatedAt = now; }
         prev.sourceSeenAt = now; prev.orphan = false; prev.pendingSourceChange = false; prev.observedFingerprint = null; prev.observedSnapshot = null;
         log.push({ draftId: op.draftId, resultado: 'sin_cambios' });
         break;

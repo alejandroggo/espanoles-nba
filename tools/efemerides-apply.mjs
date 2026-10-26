@@ -15,7 +15,8 @@
 //  kind             set        -            -                     -                   -
 //  createdAt        =now       PRESERVA     PRESERVA              PRESERVA            PRESERVA
 //  status           'pendiente' PRESERVA    PRESERVA              PRESERVA            PRESERVA
-//  textX            set        PRESERVA     set (si !editedText)  PRESERVA            PRESERVA
+//  textX            set        refresca*    set (si !editedText)  PRESERVA            PRESERVA
+//    * sin_cambios refresca textX con la plantilla actual solo si !editedText y no terminal
 //  suggestedAt      set        PRESERVA     set (si !editedTime)  PRESERVA            PRESERVA
 //  editedText       false      PRESERVA     PRESERVA              PRESERVA            PRESERVA
 //  editedTime       false      PRESERVA     PRESERVA              PRESERVA            PRESERVA
@@ -71,6 +72,14 @@ export function applyPlan(store, plan, opts = {}) {
       }
       case 'sin_cambios': {
         if (!prev) { log.push({ draftId: op.draftId, resultado: 'omitido', motivo: 'sin_cambios sobre inexistente' }); break; }
+        // El origen no cambió, pero el texto canónico sí puede haberlo hecho si se
+        // cambió la PLANTILLA del tuit. Si no hay edición manual ni estado terminal,
+        // el borrador sigue la plantilla actual: refrescamos textX. Idempotente
+        // (si la plantilla no cambió, el texto coincide y no hay reescritura).
+        if (op.textXCanonico != null && !prev.editedText && !TERMINALES.has(prev.status) && op.textXCanonico !== prev.textX) {
+          prev.textX = op.textXCanonico;
+          prev.updatedAt = now;
+        }
         prev.sourceSeenAt = now;
         prev.orphan = false;                         // reapareció/está presente
         prev.pendingSourceChange = false;            // contenido acorde con lo aplicado/reconocido

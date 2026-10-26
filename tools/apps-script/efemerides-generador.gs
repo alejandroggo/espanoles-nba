@@ -176,9 +176,10 @@ function efgHandle(name) {
   return h ? ('@' + String(h).replace(/^@/, '')) : '';
 }
 
-// Compone el tuit del borrador. Formato (decisión de Alejandro):
-//   «#EspañolesNBA Hoy hace X años <texto>» + enlace
-// Sin la fecha al inicio y sin «(vía @alejandroggo)» (todos son tuits suyos).
+// Compone el tuit PRINCIPAL del borrador. Formato (decisión de Alejandro):
+//   «#EspañolesNBA Hoy hace X años <texto>»  (sin enlace)
+// El post se sube en X con imagen y SIN link; el enlace va en un 2º tuit aparte
+// (ver efgTweetReply). Sin la fecha al inicio y sin «(vía @alejandroggo)».
 // `pubYear` = año de publicación (campaña); X = pubYear - año del acontecimiento.
 function efgTweet(ev, pubYear) {
   var texto = efgStripHtml(ev.html).replace(/\s+/g, ' ').trim();
@@ -189,9 +190,14 @@ function efgTweet(ev, pubYear) {
   var anios = (pubYear || new Date().getUTCFullYear()) - ev.year;
   var prefijoAnios = anios >= 2 ? ('Hoy hace ' + anios + ' años ') : (anios === 1 ? 'Hoy hace 1 año ' : 'Hoy ');
   var inicio = '#EspañolesNBA ' + prefijoAnios;
-  var url = EFG_SITE_URL + '?m=' + ev.m + '&d=' + ev.d;
-  // Límite de X (280): enlace pesa 23 + 2 saltos de línea.
-  var presupuesto = 280 - 25 - inicio.length;
+  // Límite de X (280). Sin enlace en el tuit principal.
+  var presupuesto = 280 - inicio.length;
   if (texto.length > presupuesto) texto = texto.slice(0, presupuesto - 1).replace(/\s+$/, '') + '…';
-  return inicio + texto + '\n\n' + url;
+  return inicio + texto;
+}
+
+// 2º tuit (respuesta) con el enlace directo a la efeméride.
+var EFG_REPLY_PREFIX = 'Más efemérides de españoles en la NBA aquí: ';
+function efgTweetReply(ev) {
+  return EFG_REPLY_PREFIX + EFG_SITE_URL + '?m=' + ev.m + '&d=' + ev.d;
 }

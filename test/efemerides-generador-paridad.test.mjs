@@ -22,6 +22,7 @@ function loadGs() {
   return {
     efgBuild: vm.runInContext('efgBuild', ctx),
     efgTweet: vm.runInContext('efgTweet', ctx),
+    efgTweetReply: vm.runInContext('efgTweetReply', ctx),
   };
 }
 
@@ -49,17 +50,24 @@ test('paridad efgBuild ↔ efmBuild: mismos eventos (kind, jugador, fecha, tag, 
   assert.deepEqual(b, a);
 });
 
-test('formato nuevo del tuit: #EspañolesNBA + "Hoy hace X años", sin fecha ni "(vía …)"', () => {
+test('formato nuevo del tuit principal: #EspañolesNBA + "Hoy hace X años", sin fecha, sin vía y SIN enlace', () => {
   // efgTweet YA NO replica efmShare (la web): los tuits son propios de Alejandro.
-  // Contrato nuevo: empiezan con "#EspañolesNBA " + prefijo temporal, sin la vía
-  // ni el prefijo de fecha "📅 …", y terminan con el enlace de la efeméride.
+  // Contrato nuevo: empiezan con "#EspañolesNBA " + prefijo temporal, sin la vía,
+  // sin el prefijo de fecha "📅 …" y SIN enlace (el enlace va en el 2º tuit).
   for (const ev of truth) {
     const pub = ev.year + 7;                 // año de publicación hipotético (X = 7 años)
     const t = gs.efgTweet({ html: ev.html, player: ev.player, m: ev.m, d: ev.d, year: ev.year }, pub);
     assert.ok(t.startsWith('#EspañolesNBA Hoy hace 7 años '), `prefijo mal: ${t.slice(0, 40)}`);
     assert.ok(!/vía @alejandroggo/i.test(t), `sigue la vía: ${keyOf(proj(ev))}`);
     assert.ok(!/📅/.test(t), `sigue el prefijo de fecha: ${keyOf(proj(ev))}`);
-    assert.ok(t.endsWith(EFG_URL(ev)), `no termina en el enlace: ${keyOf(proj(ev))}`);
+    assert.ok(!/https?:\/\//.test(t), `el tuit principal no debe llevar enlace: ${keyOf(proj(ev))}`);
+  }
+});
+
+test('2º tuit (efgTweetReply): "Más efemérides … aquí: <enlace directo>"', () => {
+  for (const ev of truth) {
+    const r = gs.efgTweetReply({ m: ev.m, d: ev.d });
+    assert.equal(r, 'Más efemérides de españoles en la NBA aquí: ' + EFG_URL(ev), `respuesta mal: ${keyOf(proj(ev))}`);
   }
 });
 

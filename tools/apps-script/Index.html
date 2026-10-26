@@ -89,7 +89,7 @@
     });
     $('#contenido').innerHTML = html;
     [].forEach.call(document.querySelectorAll('[data-act]'), function (b) {
-      b.addEventListener('click', function () { onAccion(b.getAttribute('data-id'), b.getAttribute('data-act')); });
+      b.addEventListener('click', function () { onAccion(b.getAttribute('data-id'), b.getAttribute('data-act'), b); });
     });
   }
   function pasaFiltro(it) {
@@ -106,6 +106,7 @@
       + '<div class="meta"><span>' + esc(hora) + (it.editedTime ? ' ✎' : '') + '</span><a href="' + esc(it.url) + '" target="_blank" rel="noopener">ver efeméride ↗</a></div>'
       + '<div class="acts">'
       + '<button class="btn" data-act="copiar" data-id="' + esc(it.draftId) + '">Copiar tuit</button>'
+      + '<button class="btn" data-act="copiar2" data-id="' + esc(it.draftId) + '" data-url="' + esc(it.url) + '" title="2º tuit (respuesta) con el enlace">Copiar 2º tuit</button>'
       + '<button class="btn" data-act="guardar" data-id="' + esc(it.draftId) + '">Guardar</button>'
       + '<button class="btn primary" data-act="aprobar" data-id="' + esc(it.draftId) + '">Aprobar</button>'
       + '<button class="btn" data-act="descartar" data-id="' + esc(it.draftId) + '">Descartar</button>'
@@ -114,8 +115,10 @@
       + '</div></div>';
   }
   function textoDe(draftId) { var t = document.querySelector('[data-txt="' + draftId + '"]'); return t ? t.value : ''; }
-  function onAccion(draftId, act) {
+  var REPLY_PREFIX = 'Más efemérides de españoles en la NBA aquí: ';
+  function onAccion(draftId, act, el) {
     if (act === 'copiar') { copiar(textoDe(draftId)); return; }
+    if (act === 'copiar2') { var u = el ? el.getAttribute('data-url') : ''; copiar(REPLY_PREFIX + u, '2º tuit copiado'); return; }
     if (act === 'guardar') { llamar('accionBorrador', [draftId, 'editarTexto', { texto: textoDe(draftId) }], 'Guardado'); return; }
     if (act === 'aprobar') { llamar('accionBorrador', [draftId, 'aprobar', {}], 'Aprobado'); return; }
     if (act === 'descartar') { if (confirm('¿Descartar este borrador?')) llamar('accionBorrador', [draftId, 'descartar', {}], 'Descartado'); return; }
@@ -126,11 +129,12 @@
     var r = google.script.run.withSuccessHandler(function () { toast(ok); cargar(); }).withFailureHandler(function (e) { toast('Error: ' + e.message); });
     r[fn].apply(r, args);
   }
-  function copiar(txt) {
-    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function () { toast('Tuit copiado'); }, function () { copiarFallback(txt); }); }
-    else copiarFallback(txt);
+  function copiar(txt, msg) {
+    msg = msg || 'Tuit copiado';
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function () { toast(msg); }, function () { copiarFallback(txt, msg); }); }
+    else copiarFallback(txt, msg);
   }
-  function copiarFallback(txt) { var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Tuit copiado'); } catch (e) { toast('No se pudo copiar'); } ta.remove(); }
+  function copiarFallback(txt, msg) { var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(msg || 'Tuit copiado'); } catch (e) { toast('No se pudo copiar'); } ta.remove(); }
 
   [].forEach.call(document.querySelectorAll('#filtros .chip'), function (ch) {
     ch.addEventListener('click', function () {

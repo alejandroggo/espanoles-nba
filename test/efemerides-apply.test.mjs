@@ -19,6 +19,24 @@ function record(over = {}) {
 }
 const planWith = (...ops) => ({ ops, review: [] });
 
+test('sin_cambios: refresca textX con la plantilla actual solo si no está editado ni terminal', () => {
+  const sc = (over = {}) => ({ op: 'sin_cambios', draftId: DID, eventId: 'hito:pau-gasol:2015-01-10', kind: 'hito', campaignYear: 2026, status: over.status || 'pendiente', textX: 'tuit original', textXCanonico: 'TUIT NUEVA PLANTILLA', suggestedAt: null, flags: {} });
+  // pendiente, sin edición: se refresca al texto canónico nuevo.
+  let r = applyPlan(createStore([record({ status: 'pendiente', editedText: false })]), planWith(sc()), { now: 'C1' });
+  assert.equal(r.store[DID].textX, 'TUIT NUEVA PLANTILLA', 'refresca el no editado');
+  // editado a mano: se preserva.
+  r = applyPlan(createStore([record({ textX: 'MI EDICIÓN', editedText: true })]), planWith(sc()), { now: 'C1' });
+  assert.equal(r.store[DID].textX, 'MI EDICIÓN', 'no toca la edición manual');
+  // estado terminal: se preserva aunque no esté editado.
+  for (const estado of ['aprobado', 'descartado', 'publicado']) {
+    r = applyPlan(createStore([record({ status: estado, textX: 'tuit original', editedText: false })]), planWith(sc({ status: estado })), { now: 'C1' });
+    assert.equal(r.store[DID].textX, 'tuit original', `terminal (${estado}) preservado`);
+  }
+  // idempotente: si el texto canónico coincide, no cambia updatedAt.
+  r = applyPlan(createStore([record({ status: 'pendiente', editedText: false, textX: 'IGUAL', updatedAt: 'C0' })]), planWith({ ...sc(), textXCanonico: 'IGUAL' }), { now: 'C1' });
+  assert.equal(r.store[DID].updatedAt, 'C0', 'sin reescritura si el texto no cambia');
+});
+
 test('nuevo: crea; no sobrescribe si ya existe', () => {
   const r = applyPlan(createStore([]), planWith({
     op: 'nuevo', draftId: DID, eventId: 'e', campaignYear: 2026, kind: 'hito',

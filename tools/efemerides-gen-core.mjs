@@ -267,7 +267,7 @@ export function planGeneration(input) {
 
     if (!changed || acknowledged) {
       ops.push({ op: 'sin_cambios', draftId: c.draftId, eventId: c.eventId, kind: c.kind, campaignYear,
-        status: ex.status, textX: ex.textX, suggestedAt: suggKeep,
+        status: ex.status, textX: ex.textX, textXCanonico: c.textX, suggestedAt: suggKeep,
         flags: { editedText, editedTime, acknowledged: acknowledged && changed } });
     } else if (textLocked) {
       ops.push({
