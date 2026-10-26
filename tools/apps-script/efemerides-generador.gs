@@ -3,10 +3,11 @@
  * compositor de tuit de la web (FASE 4, Bloque A).
  *
  * Apps Script no puede cargar app.js (no hay DOM ni módulos), así que esta es la
- * ÚNICA parte que hay que re-expresar: `efgBuild()` reproduce `efmBuild()` y
- * `efgTweet()` reproduce `efmShare()`, byte a byte. Un test de paridad en Node
- * (test/efemerides-generador-paridad.test.mjs) compara esta salida contra el
- * app.js real sobre data.json, para garantizar que no diverge.
+ * ÚNICA parte que hay que re-expresar: `efgBuild()` reproduce `efmBuild()` byte a
+ * byte (lo verifica un test de paridad en Node contra el app.js real sobre
+ * data.json). `efgTweet()` compone el tuit PROPIO de Alejandro y diverge a
+ * propósito de `efmShare()` (la web): otro formato, sin enlace en el principal.
+ * El enlace va en un 2º tuit (efgTweetReply).
  *
  * Entrada: `data` = el objeto data.json (jugadores, transacciones, efemerides…),
  * que Apps Script obtiene del repo publicado. Las efemérides manuales ya traen

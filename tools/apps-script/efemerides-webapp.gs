@@ -126,7 +126,7 @@ function resolverRevisionBorrador(draftId, modo) {
   efsEscribirReal_([r.upsert]);
   return r.record;
 }
-function regenerarSemanaManual() { generarSemana(); return getSemanaActual(); }
+function regenerarSemanaManual() { generarSemanaActual(); return getSemanaActual(); }
 
 // ── trigger del sábado (Bloque D) ────────────────────────────────────────────
 function crearTriggerSabado() {
