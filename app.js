@@ -201,7 +201,8 @@ const NAV_LINKS = [
   ['Debut', 'debut.html'], ['Carrera', 'ranking.html'], ['Temporadas', 'temporadas.html'],
   ['Career Highs', 'career-highs.html'], ['Marcas al alcance', 'marcas.html'], ['Transacciones', 'transacciones.html'], ['Premios', 'premios.html'],
   ['Salarios', 'salarios.html'], ['Dorsales', 'dorsales.html'], ['Summer League', 'summer-league.html'],
-  ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'], ['Gráficos', 'graficos.html'],
+  ['Línea temporal', 'linea-temporal.html'], ['Por equipo', 'por-equipo.html'], ['Comparador', 'comparador.html'],
+  ['Cara a cara', 'cara-a-cara.html'], ['Parejas', 'parejas.html'], ['Gráficos', 'graficos.html'],
   ['Efemérides', 'efemerides.html'], ['Quinteto ideal', 'quinteto.html'], ['Test', 'test.html'],
   // ['Pregúntame', 'preguntas.html'],   // oculto por ahora
 ];
@@ -501,6 +502,19 @@ function applyHomeBoxState(id) {
 // Para los españoles en activo, calcula qué marcas tienen cerca: superar al
 // siguiente español en una estadística acumulada o llegar a un número redondo.
 // "Activo" = juega la temporada actual (año de fin de temporada más reciente).
+// Novato "en formación": juega esta temporada y aún no llega a 25 partidos NBA.
+// A estos NO se les compara entre ellos (ni superaciones ni marcas a tiro), solo
+// con jugadores ya asentados, hasta que acumulen 25 partidos. [decisión Alejandro]
+const RW_ROOKIE_MIN_GAMES = 25;
+function rwEndYear() {
+  const now = new Date();
+  return now.getMonth() >= 7 ? now.getFullYear() + 1 : now.getFullYear();
+}
+function rwIsFormingRookie(j, endYear) {
+  if (!j) return false;
+  const maxYear = (j.temporadas_data || []).reduce((m, r) => Math.max(m, r.year || 0), 0);
+  return (j.partidos || 0) < RW_ROOKIE_MIN_GAMES && maxYear >= endYear;
+}
 function rwBuild(data) {
   const J = data.jugadores || [];
   const now = new Date();
@@ -521,6 +535,7 @@ function rwBuild(data) {
   const ROOKIE_ABS = { puntos: 50, rebotes: 25, asistencias: 25, triples: 10, robos: 10, tapones: 10, partidos: 30 };
   const out = [];
   active.forEach(j => {
+    const jRookie = rwIsFormingRookie(j, endYear);
     STATS.forEach(s => {
       const mine = j[s.tot] || 0;
       const perg = s.pg ? (j[s.pg] || 0) : 1;         // 'partidos' => 1 partido por partido
@@ -532,7 +547,11 @@ function rwBuild(data) {
       const show = (gap, g) => hasRate ? (g <= MAXGAMES) : (abs != null && gap <= abs);
       // superar al siguiente español por encima
       let rival = null, rval = Infinity;
-      J.forEach(x => { if (x !== j) { const v = x[s.tot] || 0; if (v > mine && v < rval) { rval = v; rival = x; } } });
+      J.forEach(x => {
+        if (x === j) return;
+        if (jRookie && rwIsFormingRookie(x, endYear)) return;   // no competir entre novatos aún
+        const v = x[s.tot] || 0; if (v > mine && v < rval) { rval = v; rival = x; }
+      });
       if (rival) {
         const gap = rval - mine, g = games(gap);
         if (show(gap, g)) {
@@ -608,8 +627,16 @@ function rsBuild(data) {
   if (!sup.length) return [];
   const byName = {};
   (data.jugadores || []).forEach(j => { byName[drNorm(j.nombre)] = j; });
+  const endYear = rwEndYear();
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  return sup.map(s => {
+  return sup.filter(s => {
+    // Oculta superaciones directas entre dos novatos en formación (<25 PJ). [decisión Alejandro]
+    if (s.tipo === 'supera' && s.rival) {
+      const a = byName[drNorm(s.jugador)], b = byName[drNorm(s.rival)];
+      if (rwIsFormingRookie(a, endYear) && rwIsFormingRookie(b, endYear)) return false;
+    }
+    return true;
+  }).map(s => {
     const j = byName[drNorm(s.jugador)] || { nombre: s.jugador };
     const dt = new Date(String(s.fecha) + 'T00:00:00');
     const days = Math.round((today - dt) / 86400000);
