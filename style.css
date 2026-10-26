@@ -2267,10 +2267,12 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-prem-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .cc-prem-card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow-sm)}
 .cc-prem-head{text-align:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:11px}
-.cc-prem-rec{display:block;font-family:var(--display);font-size:1.75rem;color:var(--accent);line-height:1}
+.cc-prem-rec{display:inline;font-family:var(--display);font-size:1.75rem;color:var(--accent);line-height:1}
+.cc-prem-loser{display:inline;font-family:var(--display);font-size:1.3rem;color:var(--text-dim);margin-left:8px;vertical-align:baseline}
 .cc-prem-sub{display:block;font-size:.72rem;color:var(--text-muted);font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
 .cc-prem-g{display:block;font-size:.64rem;color:var(--text-dim);margin-top:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
 .cc-prem-body{display:flex;flex-direction:column;gap:9px}
+.cc-prem-statlbl{text-align:right;font-size:.6rem;font-weight:800;letter-spacing:.06em;color:var(--text-dim);text-transform:uppercase;margin-bottom:-3px}
 .cc-prem-pl{display:flex;align-items:center;gap:10px}
 .cc-prem-ph{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;background:var(--surface-2);flex:none;display:block}
 .cc-prem-pln{display:flex;flex-direction:column;min-width:84px;flex:none}
@@ -2280,6 +2282,8 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-prem-po{margin-top:11px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--text-muted)}
 .cc-prem-po b{color:#8a6d00}
 [data-theme="dark"] .cc-prem-po b{color:var(--dorado)}
+.cc-prem-win{font-style:normal;font-weight:800;color:var(--accent)}
+.cc-dpo-win{color:var(--accent);font-weight:800;margin-left:6px;white-space:nowrap}
 .cc-prem-note{margin-top:9px;font-size:.72rem;color:var(--text-dim);font-style:italic;line-height:1.45}
 @media(max-width:620px){.cc-prem-grid{grid-template-columns:1fr}}
 

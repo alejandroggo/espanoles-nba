@@ -41,7 +41,7 @@ Sitio **100% estático, vanilla JS** (sin framework ni build). Toda la lógica v
 - **Export a imagen (canvas, sin librerías):** `qntBlob()` (canvas→PNG) + builders `cmpBuildImage`, `grBuildImage`, `qntBuildImage`, `retoBuildImage`, `pjBuildImage`. Plantilla PNG oscura con franjas de bandera. Reutilizar este motor para cualquier imagen nueva.
 - Analítica: `track(evento, params)` (falla en silencio si no hay gtag).
 
-**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=209**) con `sed -i 's/?v=209/?v=210/g' *.html`. [verificado]
+**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=212**) con `sed -i 's/?v=212/?v=213/g' *.html`. [verificado]
 
 **Despliegue** [verificado/decisión]: sin `vercel.json` ni workflows → sitio estático. **Push a `main` → Vercel despliega automáticamente** en el dominio. El bot de Apps Script también commitea a `main`. No publicar sin autorización (ver §4).
 
@@ -56,7 +56,7 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 - **Test / Quinteto ideal** (`test.html`, `quinteto.html`): cuestionario ("reto del día") y "arma tu quinteto", ambos con imagen compartible.
 - **Creador de gráficos** (`graficos.html`): ver §5 (implementado).
 - **Buscador PEPU** (`preguntas.html`, `initPreguntasPage`): Q&A **determinista** (no IA) sobre `data.json` + `data/parejas.json` + `data/duelos.json`. Oculto del menú por ahora (ver §7).
-- **Parejas** (`parejas.html`) y **Cara a cara / matriz de duelos** (`cara-a-cara.html`): live pero **ocultas** (sin enlace en menú, `noindex`). Leen `data/parejas.json` y `data/duelos.json`. Parejas tiene botón "Compartir pareja" (PNG).
+- **Parejas** (`parejas.html`) y **Cara a cara / matriz de duelos** (`cara-a-cara.html`): **públicas** (en menú + portada). Leen `data/parejas.json` y `data/duelos.json`. Parejas tiene botón "Compartir pareja" (PNG). La tarjeta premium y el detalle de celda de Cara a cara muestran: nombre del perdedor en el encabezado, etiqueta `PTS / REB / AST` y el ganador de cada serie de playoffs (`d.playoffs[].gana`).
 - Portada (`index.html`) con "recién superadas", buscador de jugador en cabecera, menú global (`buildNav`), tema claro/oscuro, banner de cookies.
 
 ## 4. Decisiones y preferencias de desarrollo
@@ -72,9 +72,11 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 
 **Decisiones de contenido de este ciclo** [decisión]:
 - El buscador se llama **PEPU**.
-- Parejas y Cara a cara: **públicas pero ocultas** (sin menú) hasta que Alejandro las encienda.
+- Parejas y Cara a cara: **ENCENDIDAS** (enlace en menú junto a Comparador + tarjetas 20/21 en portada + sin `noindex`). [hecho]
 - Salarios por equipo: **integrado dentro de `salarios.html`** (una sola tabla con dropdown), no como página aparte.
 - `Ricky Rubio` perdonó **$424.672** (buyout 2023) → sus splits no cuadran con su total; Indiana pagó a Ricky e Ibaka sin que jugaran (caso especial en la tabla de franquicias).
+- **Eli Ndiaye** (**$85.300**, Atlanta): no debutará en la NBA, así que NO es `jugador` en `data.json`. Se muestra en el **ranking de salarios** como fila sintetizada desde `data/salarios.json` en `initSalariosPage` (bloque que recorre `SAL_PE.jugadores` no presentes en `data.json`; foto vía `SE_PHOTO`). Patrón reutilizable para futuros fichados sin ficha. [hecho]
+- **Marcas al alcance**: los novatos "en formación" (<25 PJ en la temporada actual) NO compiten entre ellos (ni en "a punto" ni en "recién superadas"), solo contra jugadores asentados. Helper `rwIsFormingRookie` + `RW_ROOKIE_MIN_GAMES=25`; filtra en `rwBuild` (rival) y `rsBuild` (superaciones). Se auto-desactiva al llegar a 25 PJ. [hecho] — Pendiente opcional: aplicar la misma regla al correo del bot (`calcularCercanias_`/`actualizarTotales_`/`computeSuperaciones`).
 
 **Propuesto, NO aprobado** [propuesto]:
 - Página/sección de **"españoles no jugadores"** (entrenadores/staff) para Jordi Fernández y futuros. Hay un **preview** de la ficha de Jordi (artifact), sin desplegar.
@@ -101,8 +103,8 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 
 ## 7. Estado actual y próximos pasos
 **Hechos verificados (repo):**
-- Menú (`NAV_LINKS`) enlaza todas las secciones **excepto** PEPU/`preguntas.html` (comentado), `parejas.html` y `cara-a-cara.html` (ocultas, `noindex`).
-- `data.json` actualizado 2026-10-18; 29 jugadores. Caché en **v=209**.
+- Menú (`NAV_LINKS`) enlaza todas las secciones **excepto** PEPU/`preguntas.html` (comentado, sigue oculto). `parejas.html` y `cara-a-cara.html` YA están en el menú y en la portada.
+- `data.json` actualizado 2026-10-18; 29 jugadores. Caché en **v=212**.
 - Creador de gráficos, comparador, salarios (con "por equipo"), parejas, cara a cara y PEPU: funcionando.
 
 **Decisiones en conversación (este ciclo):**

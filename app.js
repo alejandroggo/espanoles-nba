@@ -932,6 +932,20 @@ async function initSalariosPage() {
   // Debutados en la NBA o con contrato firmado (los tres rookies)
   salRows = jugadores.filter(j => (j.partidos || 0) > 0 || ROOKIES_CONTRATO.includes(j.nombre));
 
+  // Españoles con contrato NBA pero sin ficha en data.json (no debutan, p. ej. Eli Ndiaye):
+  // fila de salario sintetizada desde data/salarios.json, que el bot no toca. [decisión Alejandro]
+  if (SAL_PE && SAL_PE.jugadores) {
+    const have = new Set(jugadores.map(j => drNorm(j.nombre)));
+    SAL_PE.jugadores.forEach(x => {
+      if (have.has(drNorm(x.nombre))) return;
+      salRows.push({
+        nombre: x.nombre, id: '', foto_url: SE_PHOTO[x.nombre] || '',
+        ganancias: x.total || 0, ganancias_ganado: x.cobrado || 0, ganancias_futuro: x.firmado || 0,
+        partidos: 0, equipos_nba: Object.keys(x.splits || {}).join(', '), _soloSalario: true,
+      });
+    });
+  }
+
   // % = cuota de cada jugador sobre el total ganado por todos los españoles
   const granTotal = salRows.reduce((s, j) => s + (j.ganancias || 0), 0);
   salRows.forEach(j => {
@@ -1052,7 +1066,7 @@ function renderSalariosTable() {
     return `
     <tr class="sal-prow">
       <td class="td-rank td-muted">${i + 1}</td>
-      <td class="td-foto"><a class="pl-link" href="${jugadorHref(j.id)}">${(j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb')}</a></td>
+      <td class="td-foto">${(() => { const im = (j.id || j.foto_url || j.bref_id) ? `<img loading="lazy" class="player-thumb" ${agFotoSrc(j)} onerror="agImgHide(this)" alt="">` : avatarHtml(j.nombre, 'player-thumb'); return j.id ? `<a class="pl-link" href="${jugadorHref(j.id)}">${im}</a>` : im; })()}</td>
       <td class="td-nombre">${plLink(j.nombre, j.nombre)}</td>
       <td class="td-num td-dinero${maxGan && j.ganancias === maxGan ? ' td-leader' : ''}">${fmtDinero(j.ganancias)}</td>
       <td class="td-num td-muted">${fmtDinero(j.ganancias_ganado)}</td>
@@ -8568,12 +8582,12 @@ async function initCaraACaraPage() {
     const d = duel[[A, B].sort().join('|')]; if (!d) return;
     const av = d.av, mn = d.min || {}, ks = [d.a, d.b];
     const hasMin = mn[d.a] || mn[d.b];
-    const rows = ks.map(k => '<tr><td class="l">' + k + '</td>' + (hasMin ? '<td>' + (mn[k] || '—') + '</td>' : '') + '<td>' + av[k] + '</td></tr>').join('');
+    const rows = ks.map(k => '<tr><td class="l">' + k + '</td>' + (hasMin ? '<td>' + (mn[k] || '—') + '</td>' : '') + '<td>' + ((av[k] || '').replace(/\//g, ' / ')) + '</td></tr>').join('');
     const dates = (d.primer && d.ultimo) ? '<div class="cc-ddates">Primer duelo <b>' + d.primer + '</b> · último <b>' + d.ultimo + '</b></div>' : '';
     let po = '';
     if (d.playoffs && d.playoffs.length) {
       po = '<div class="cc-dpo"><div class="cc-dpo-h">En playoffs</div>' + d.playoffs.map(s =>
-        '<div class="cc-dpo-row"><span class="yr">' + s.temporada + '</span><span class="sr">' + s.serie + '<br><span class="rd">' + s.ronda + '</span></span></div>').join('') + '</div>';
+        '<div class="cc-dpo-row"><span class="yr">' + s.temporada + '</span><span class="sr">' + s.serie + (s.gana ? ' <b class="cc-dpo-win">gana ' + shortOf(s.gana) + '</b>' : '') + '<br><span class="rd">' + s.ronda + '</span></span></div>').join('') + '</div>';
     }
     det.className = 'cc-detail';
     det.innerHTML = '<div class="cc-dhead">' + d.a + '<span class="vs">vs</span>' + d.b + '</div>'
@@ -8589,22 +8603,31 @@ async function initCaraACaraPage() {
     const m = d.rec.match(/^(.*?)(?:\s*\((.*)\))?$/);
     const recMain = m[1].trim(), recSub = (m[2] || '').trim();
     const mn = d.min || {};
+    // Encabezado: ganador (destacado) · marcador · perdedor (atenuado)
+    const sA = shortOf(d.a), sB = shortOf(d.b);
+    const score = (recMain.match(/\d+\s*-\s*\d+/) || [recMain])[0];
+    const recNrm = ccNrm(recMain);
+    let headRec;
+    if (recNrm.startsWith(ccNrm(sA)))      headRec = '<span class="cc-prem-rec">' + sA + ' ' + score + '</span><span class="cc-prem-loser">' + sB + '</span>';
+    else if (recNrm.startsWith(ccNrm(sB))) headRec = '<span class="cc-prem-rec">' + sB + ' ' + score + '</span><span class="cc-prem-loser">' + sA + '</span>';
+    else                                   headRec = '<span class="cc-prem-rec">' + sA + ' ' + score + ' ' + sB + '</span>';   // igualado
     const plLine = full => {
       const im = agPhotoImg(full, 'cc-prem-ph');
       const mnTxt = mn[full] ? '<span class="cc-prem-min">' + mn[full] + ' min</span>' : '';
+      const avTxt = d.av ? (d.av[full] || '').replace(/\//g, ' / ') : '';
       return '<div class="cc-prem-pl">' + (im || '<span class="cc-prem-ph"></span>')
         + '<div class="cc-prem-pln"><span class="cc-prem-nm">' + shortOf(full) + '</span>' + mnTxt + '</div>'
-        + '<div class="cc-prem-av">' + (d.av ? d.av[full] : '') + '</div></div>';
+        + '<div class="cc-prem-av">' + avTxt + '</div></div>';
     };
     const po = (d.playoffs && d.playoffs.length)
-      ? '<div class="cc-prem-po">' + d.playoffs.map(s => '<span><b>' + s.temporada + '</b> ' + s.serie + '</span>').join('') + '</div>' : '';
+      ? '<div class="cc-prem-po">' + d.playoffs.map(s => '<span><b>' + s.temporada + '</b> ' + s.serie + (s.gana ? ' <i class="cc-prem-win">(gana ' + shortOf(s.gana) + ')</i>' : '') + '</span>').join('') + '</div>' : '';
     const nota = d.nota ? '<div class="cc-prem-note">' + d.nota + '</div>' : '';
     const span = (yr(d.primer) && yr(d.ultimo)) ? ' · ' + yr(d.primer) + '–' + yr(d.ultimo) : '';
     return '<div class="cc-prem-card">'
-      + '<div class="cc-prem-head"><span class="cc-prem-rec">' + recMain + '</span>'
+      + '<div class="cc-prem-head">' + headRec
       + (recSub ? '<span class="cc-prem-sub">' + recSub + '</span>' : '')
       + '<span class="cc-prem-g">' + d.g + ' partidos' + span + '</span></div>'
-      + '<div class="cc-prem-body">' + plLine(d.a) + plLine(d.b) + '</div>'
+      + '<div class="cc-prem-body"><div class="cc-prem-statlbl">PTS / REB / AST</div>' + plLine(d.a) + plLine(d.b) + '</div>'
       + po + nota + '</div>';
   };
   const prem = D.filter(d => d.g > 10).sort((a, b) => b.g - a.g);
