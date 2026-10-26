@@ -41,7 +41,7 @@ Sitio **100% estático, vanilla JS** (sin framework ni build). Toda la lógica v
 - **Export a imagen (canvas, sin librerías):** `qntBlob()` (canvas→PNG) + builders `cmpBuildImage`, `grBuildImage`, `qntBuildImage`, `retoBuildImage`, `pjBuildImage`. Plantilla PNG oscura con franjas de bandera. Reutilizar este motor para cualquier imagen nueva.
 - Analítica: `track(evento, params)` (falla en silencio si no hay gtag).
 
-**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=212**) con `sed -i 's/?v=212/?v=213/g' *.html`. [verificado]
+**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=213**) con `sed -i 's/?v=213/?v=214/g' *.html`. [verificado]
 
 **Despliegue** [verificado/decisión]: sin `vercel.json` ni workflows → sitio estático. **Push a `main` → Vercel despliega automáticamente** en el dominio. El bot de Apps Script también commitea a `main`. No publicar sin autorización (ver §4).
 
@@ -56,7 +56,7 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 - **Test / Quinteto ideal** (`test.html`, `quinteto.html`): cuestionario ("reto del día") y "arma tu quinteto", ambos con imagen compartible.
 - **Creador de gráficos** (`graficos.html`): ver §5 (implementado).
 - **Buscador PEPU** (`preguntas.html`, `initPreguntasPage`): Q&A **determinista** (no IA) sobre `data.json` + `data/parejas.json` + `data/duelos.json`. Oculto del menú por ahora (ver §7).
-- **Parejas** (`parejas.html`) y **Cara a cara / matriz de duelos** (`cara-a-cara.html`): **públicas** (en menú + portada). Leen `data/parejas.json` y `data/duelos.json`. Parejas tiene botón "Compartir pareja" (PNG). La tarjeta premium y el detalle de celda de Cara a cara muestran: nombre del perdedor en el encabezado, etiqueta `PTS / REB / AST` y el ganador de cada serie de playoffs (`d.playoffs[].gana`).
+- **Parejas** (`parejas.html`) y **Cara a cara / matriz de duelos** (`cara-a-cara.html`): **públicas** (en menú + portada). Leen `data/parejas.json` y `data/duelos.json`. Parejas tiene botón "Compartir pareja" (PNG). La tarjeta premium y el detalle de celda de Cara a cara muestran: nombre del perdedor en el encabezado, etiqueta `PTS / REB / AST` y el ganador de cada serie de playoffs (`d.playoffs[].gana`). La matriz: columna final **% V** (% de victorias por fila, coloreada con `ccTint`) y sin scroll vertical interno (`.cc-scroll` sin `max-height`; solo scroll horizontal por ancho).
 - Portada (`index.html`) con "recién superadas", buscador de jugador en cabecera, menú global (`buildNav`), tema claro/oscuro, banner de cookies.
 
 ## 4. Decisiones y preferencias de desarrollo
@@ -104,7 +104,7 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 ## 7. Estado actual y próximos pasos
 **Hechos verificados (repo):**
 - Menú (`NAV_LINKS`) enlaza todas las secciones **excepto** PEPU/`preguntas.html` (comentado, sigue oculto). `parejas.html` y `cara-a-cara.html` YA están en el menú y en la portada.
-- `data.json` actualizado 2026-10-18; 29 jugadores. Caché en **v=212**.
+- `data.json` actualizado 2026-10-18; 29 jugadores. Caché en **v=213**.
 - Creador de gráficos, comparador, salarios (con "por equipo"), parejas, cara a cara y PEPU: funcionando.
 
 **Decisiones en conversación (este ciclo):**

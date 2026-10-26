@@ -2215,7 +2215,7 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-wrap{max-width:1040px;margin:0 auto;padding:0 2px}
 .cc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;color:var(--text-muted);margin:6px 0 12px;align-items:center}
 .cc-sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}
-.cc-scroll{overflow:auto;border:1px solid var(--border);border-radius:12px;max-height:78vh;-webkit-overflow-scrolling:touch}
+.cc-scroll{overflow-x:auto;overflow-y:visible;border:1px solid var(--border);border-radius:12px;-webkit-overflow-scrolling:touch}
 .cc-table{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
 .cc-table th,.cc-table td{padding:0;text-align:center;white-space:nowrap}
 .cc-ch{position:sticky;top:0;z-index:3;background:var(--surface-2);font-family:var(--display);font-size:.78rem;letter-spacing:.02em;color:var(--text-muted);height:40px;min-width:42px;padding:4px 3px;border-bottom:2px solid var(--border);border-left:1px solid var(--border)}
@@ -2225,6 +2225,8 @@ circle.gr-ctx { fill: var(--gr-ctx); }
 .cc-rh-in .cc-ph{margin:0}
 .cc-tot-h{border-left:2px solid var(--border-strong);color:var(--text)}
 .cc-tot{min-width:52px;height:34px;font-weight:800;font-size:.75rem;color:var(--text);background:var(--surface-2);border-left:2px solid var(--border-strong);border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+.cc-pct-h{color:var(--text)}
+.cc-pct{min-width:46px;height:34px;font-weight:800;font-size:.73rem;color:var(--text);background:var(--surface-2);border-left:1px solid var(--border);border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
 .cc-corner{position:sticky;left:0;top:0;z-index:4;background:var(--surface-2);border-right:2px solid var(--border);border-bottom:2px solid var(--border);font-family:var(--serif);font-style:italic;font-size:.66rem;color:var(--text-dim)}
 .cc-cell{min-width:42px;height:34px;font-size:.72rem;font-weight:700;border-left:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer}
 .cc-cell:hover{outline:2px solid var(--accent);outline-offset:-2px}

@@ -8560,7 +8560,8 @@ async function initCaraACaraPage() {
 
   let html = '<tr><th class="cc-corner">fila&nbsp;vs&nbsp;col</th>';
   P.forEach(p => { html += '<th class="cc-ch" title="' + p.full + '">' + ccHead(p) + '</th>'; });
-  html += '<th class="cc-ch cc-tot-h" title="Récord total">TOT</th></tr>';
+  html += '<th class="cc-ch cc-tot-h" title="Récord total">TOT</th>';
+  html += '<th class="cc-ch cc-pct-h" title="% de victorias">% V</th></tr>';
   P.forEach((rp, i) => {
     html += '<tr><th class="cc-rh" title="' + rp.full + '">' + ccRowHead(rp) + '</th>';
     P.forEach((cp, j) => {
@@ -8571,6 +8572,9 @@ async function initCaraACaraPage() {
     });
     const tr = totalRec[rp.full];
     html += '<td class="cc-tot" title="Récord total">' + tr[0] + '-' + tr[1] + '</td>';
+    const tg = tr[0] + tr[1];
+    const pct = tg ? Math.round(tr[0] / tg * 100) : null;
+    html += '<td class="cc-pct" style="' + (pct == null ? '' : ccTint(tr[0], tr[1])) + '" title="% de victorias">' + (pct == null ? '—' : pct + '%') + '</td>';
     html += '</tr>';
   });
   document.getElementById('cc-mx').innerHTML = html;
