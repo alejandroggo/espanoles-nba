@@ -5350,8 +5350,19 @@ function botDueloMsg(d, a, b) {
     ? `El <b>cara a cara</b> entre <b>${d.a}</b> y <b>${d.b}</b> está <b>igualado</b>: ${d.rec}.`
     : `En el <b>cara a cara</b> entre <b>${d.a}</b> y <b>${d.b}</b>, el récord es <b>${d.rec}</b>.`;
   s += ` Se enfrentaron <b>${d.g}</b> ${d.g === 1 ? 'vez' : 'veces'}${fechas}.`;
+  // % de victorias del líder (a partir del récord, p. ej. "Ibaka 25-22")
+  const nums = d.rec.match(/(\d+)\s*-\s*(\d+)/);
+  if (nums && !igual) {
+    const n1 = +nums[1], n2 = +nums[2], tot = n1 + n2;
+    if (tot) {
+      const pre = botNorm(d.rec.slice(0, d.rec.search(/\d/))).trim();
+      const last = pre.split(/\s+/).pop();
+      const winner = last && botNorm(d.a).includes(last) ? d.a : d.b;
+      s += ` <b>${winner}</b> domina con un <b>${Math.round(Math.max(n1, n2) / tot * 100)}%</b> de victorias.`;
+    }
+  }
   if (d.av) s += ` Medias por partido — <b>${d.a}</b>: ${d.av[d.a]}; <b>${d.b}</b>: ${d.av[d.b]}.`;
-  if (d.playoffs && d.playoffs.length) s += ` En playoffs: ${d.playoffs.map(x => `${x.temporada} ${x.serie}`).join('; ')}.`;
+  if (d.playoffs && d.playoffs.length) s += ` En playoffs: ${d.playoffs.map(x => `${x.temporada} ${x.serie}${x.gana ? ` (gana ${x.gana})` : ''}`).join('; ')}.`;
   s += ` ${botPlayerChip(a)}${botPlayerChip(b)}`;
   if (d.nota) s += `<div class="bot-sub">${d.nota}</div>`;
   s += `<div class="bot-sub"><a href="cara-a-cara.html">Ver la matriz del cara a cara →</a></div>`;
@@ -7225,10 +7236,11 @@ function grYears(players, comp) {
 }
 
 // ── Estado (configuración del gráfico) y URL ──
-const GR_TIPOS = ['lineas', 'dispersion'];
+const GR_TIPOS = ['lineas', 'dispersion', 'barras'];
 // Caras de los jugadores como marcas: en líneas, al final de cada línea; en dispersión,
-// solo cuando cada punto es una carrera (por temporadas se repetiría la misma cara decenas de veces)
-function grUsesFaces(st) { return !!st.caras && (st.tipo === 'lineas' || st.u === 'carrera'); }
+// solo cuando cada punto es una carrera (por temporadas se repetiría la misma cara decenas de veces);
+// en barras, como avatar a la izquierda de cada barra.
+function grUsesFaces(st) { return !!st.caras && (st.tipo === 'lineas' || st.tipo === 'barras' || st.u === 'carrera'); }
 // Recorte de las fotos locales (img/players/<id>.jpg, 420×560): cuadrado centrado en la cara
 const GR_FACE = { x: 45, y: 55, s: 330, w: 420, h: 560 };
 const GR_EJES_X = ['temp', 'n', 'edad'];
@@ -7243,7 +7255,7 @@ function grDefaults() {
 }
 // Opciones de mínimo de partidos según unidad (temporada/carrera) y competición
 function grMinOptions(st) {
-  const carrera = st.tipo === 'dispersion' && st.u === 'carrera';
+  const carrera = (st.tipo === 'dispersion' && st.u === 'carrera') || st.tipo === 'barras';
   if (carrera) return st.comp === 'po' ? [0, 10, 25, 50, 100] : [0, 50, 100, 250, 500];
   return st.comp === 'po' ? [0, 3, 5, 10, 15] : [0, 10, 20, 41, 58];
 }
@@ -7299,6 +7311,8 @@ function grStateToParams(s) {
   if (s.tipo === 'lineas') {
     if (s.m !== d.m) p.set('m', s.m);
     if (s.ex !== d.ex) p.set('ex', s.ex);
+  } else if (s.tipo === 'barras') {
+    if (s.m !== d.m) p.set('m', s.m);
   } else {
     p.set('u', s.u); p.set('x', s.x); p.set('y', s.y);
     if (!s.ctx) p.set('ctx', '0');
@@ -7325,7 +7339,7 @@ function grRangeTxt(st, players) {
 function grAutoTitle(st, sel) {
   const names = sel.map(j => j.nombre);
   const vs = names.length <= 3 ? names.join(' vs ') : `${names.length} jugadores`;
-  if (st.tipo === 'lineas') return `${grMetric(st.m).name}${vs ? ' · ' + vs : ''}`;
+  if (st.tipo === 'lineas' || st.tipo === 'barras') return `${grMetric(st.m).name}${vs ? ' · ' + vs : ''}`;
   const x = grMetric(st.x), y = grMetric(st.y);
   return `${y.name} frente a ${x.name.charAt(0).toLowerCase() + x.name.slice(1)}`;
 }
@@ -7381,6 +7395,29 @@ function grBuildScene(st, players, slots) {
     if (st.ex === 'edad') notes.push('Edad a 1 de febrero de cada temporada (criterio de Basketball Reference).');
     if (!sel.length) scene.empty = 'Añade al menos un jugador para dibujar el gráfico.';
     else if (!all.length) scene.empty = 'No hay datos para esta combinación.';
+  } else if (st.tipo === 'barras') {
+    const m = grMetric(st.m);
+    scene.faces = grUsesFaces(st);
+    const bars = [];
+    sel.forEach((j, i) => {
+      const slot = slotOf(j, i), shape = GR_SHAPES[slot % GR_SHAPES.length];
+      scene.legend.push({ id: j.id, name: j.nombre, slot, shape });
+      const c = grCareerAgg(j, st.comp, st.desde, st.hasta);
+      if (!c || c.g < ming) { warnings.push(c ? `${j.nombre}: no llega al mínimo de ${ming} partidos` : (grSeasonRows(j, st.comp).length ? `${j.nombre}: sin temporadas en el periodo elegido` : noData(j))); return; }
+      const v = grCareerValue(c, m, opts);
+      if (v.hidden) hidden++;
+      if (v.value == null) { if (!v.hidden) warnings.push(`${j.nombre}: sin dato de ${m.short} en este filtro`); return; }
+      bars.push({ id: j.id, name: j.nombre, slot, shape, value: v.value, g: c.g, n: c.n, from: c.from, to: c.to });
+    });
+    bars.sort((a, b) => b.value - a.value);
+    scene.bars = bars;
+    scene.x = { kind: 'num', metric: m, name: m.name, fmt: v => grFmt(m, v), vals: bars.map(b => b.value), zero: m.kind !== 'pct' };
+    const unit = 'Cada barra = ' + (st.desde || st.hasta ? 'lo jugado en el periodo' : 'la carrera') + (ming ? ` (mín. ${ming} PJ)` : '');
+    scene.subtitle = [compTxt, rangeTxt, unit].filter(Boolean).join(' · ');
+    if (st.comp === 'reg' && !st.desde && !st.hasta) notes.push('Carrera: los promedios salen de los totales ÷ partidos.');
+    else if (st.desde || st.hasta) notes.push('Periodo: promedios ponderados por partidos; los % se calculan con intentos estimados.');
+    if (!sel.length) scene.empty = 'Añade al menos un jugador para dibujar el gráfico.';
+    else if (!bars.length) scene.empty = 'No hay datos para esta combinación.';
   } else {
     const mx = grMetric(st.x), my = grMetric(st.y);
     const selIds = new Map(sel.map((j, i) => [j.id, j]));
@@ -7436,8 +7473,8 @@ function grBuildScene(st, players, slots) {
 
   function gaps(series) { return series.some(s => s.segs.length > 1); }
   function pctThresholds(s) {
-    const keys = s.tipo === 'lineas' ? [s.m] : [s.x, s.y];
-    const car = s.tipo === 'dispersion' && s.u === 'carrera';
+    const keys = (s.tipo === 'lineas' || s.tipo === 'barras') ? [s.m] : [s.x, s.y];
+    const car = (s.tipo === 'dispersion' && s.u === 'carrera') || s.tipo === 'barras';
     return keys.map(grMetric).filter(m => m && m.kind === 'pct').map(m => `${car ? m.minAttCar : m.minAtt} en ${m.short}`).join(' / ');
   }
 }
@@ -7471,7 +7508,43 @@ function grTickFmt(axis, step) {
 
 // ── Maquetación en píxeles (compartida por SVG y PNG) ──
 // s = escala de fuente (1 en pantalla). Devuelve ejes, marcas y posiciones de cada punto.
+// Barras horizontales: una fila por jugador, nombre a la izquierda, valor al final.
+function grBarLayout(scene, W, H, s) {
+  s = s || 1;
+  const fs = 12 * s, cw = 6.7 * s;
+  const bars = scene.bars || [];
+  const ax = scene.x, fmt = ax.fmt;
+  const disp = b => abrevNombre(b.name);
+  const maxVal = bars.length ? Math.max(...bars.map(b => b.value), 0) : 1;
+  const ticks = grNiceTicks(0, maxVal, 5).filter(v => v >= 0);
+  const vmax = ticks[ticks.length - 1] || 1;
+  const faceW = scene.faces ? 30 * s : 0;
+  const faceR = scene.faces ? 13 * s : 0;
+  const nameChars = bars.length ? Math.max(...bars.map(b => disp(b).length), 5) : 6;
+  const nameW = Math.min(nameChars * cw * 0.92 + 8 * s, Math.max(70 * s, W * 0.34));
+  const valW = (Math.max(...ticks.map(v => String(fmt(v)).length), 4)) * cw + 10 * s;
+  const m = { t: 10 * s, r: 10 * s + valW, b: 32 * s, l: 4 * s + faceW + nameW + 12 * s };
+  const plot = { x: m.l, y: m.t, w: Math.max(40, W - m.l - m.r), h: Math.max(40, H - m.t - m.b) };
+  const n = Math.max(1, bars.length);
+  const rowH = plot.h / n;
+  const barH = Math.max(7, Math.min(rowH * 0.6, 48 * s));
+  const sx = v => plot.x + (v / (vmax || 1)) * plot.w;
+  return {
+    W, H, s, fs, plot, sx, vmax, fmt, faceR,
+    faceCx: scene.faces ? 4 * s + faceW / 2 : null,
+    nameRight: plot.x - 12 * s,
+    xName: ax.name,
+    xTicks: ticks.map(v => ({ v, p: sx(v), label: String(fmt(v)) })),
+    bars: bars.map((b, i) => {
+      const cy = plot.y + rowH * i + rowH / 2;
+      return { b, id: b.id, name: b.name, disp: disp(b), slot: b.slot, value: b.value,
+        x: plot.x, y: cy - barH / 2, w: Math.max(0, sx(b.value) - plot.x), h: barH, cy };
+    }),
+  };
+}
+
 function grLayout(scene, W, H, s) {
+  if (scene.tipo === 'barras') return grBarLayout(scene, W, H, s);
   s = s || 1;
   const fs = 12 * s, cw = 6.7 * s;   // ancho aprox. de un carácter
   const ax = scene.x, ay = scene.y;
@@ -7575,8 +7648,27 @@ function grShapePath(shape, cx, cy, r) {
   }
 }
 
+// Rectángulo redondeado para canvas (barras del PNG)
+function grRoundRect(x, px, py, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2));
+  x.beginPath();
+  x.moveTo(px + r, py);
+  x.arcTo(px + w, py, px + w, py + h, r);
+  x.arcTo(px + w, py + h, px, py + h, r);
+  x.arcTo(px, py + h, px, py, r);
+  x.arcTo(px, py, px + w, py, r);
+  x.closePath();
+}
+
 // Filas de la tabla de datos (accesible y verificable sin pasar el ratón)
 function grTableData(scene) {
+  if (scene.tipo === 'barras') {
+    const head = ['Jugador', 'Periodo', 'PJ', scene.x.metric.name];
+    const rows = (scene.bars || []).map(b => [b.name,
+      b.from === b.to ? grSeasonLbl(b.from) : `${grSeasonLbl(b.from)} a ${grSeasonLbl(b.to)}`,
+      fmtEnt(b.g), scene.x.fmt(b.value)]);
+    return { head, rows };
+  }
   if (scene.tipo === 'lineas') {
     const xs = [...new Set(scene.series.flatMap(s => s.points.map(p => p.x)))].sort((a, b) => a - b);
     const head = [scene.x.name.replace(/ \(.*\)$/, ''), ...scene.series.map(s => s.name)];
@@ -7613,7 +7705,30 @@ function grFaceSvg(q, k, ringCls) {
     + `<circle class="gr-face-ring" cx="${cx}" cy="${cy}" r="${f(r)}"/></g>`;
 }
 
+// SVG de barras horizontales (pantalla)
+function grBarsSvg(L, scene) {
+  const p = L.plot, f = n => (+n).toFixed(1), s = L.s;
+  let g = '';
+  L.xTicks.forEach(t => {
+    if (t.v > 0) g += `<line class="gr-grid" x1="${f(t.p)}" x2="${f(t.p)}" y1="${f(p.y)}" y2="${f(p.y + p.h)}"/>`;
+    g += `<text class="gr-tick" x="${f(t.p)}" y="${f(p.y + p.h + 16)}" text-anchor="middle">${escapeHtml(t.label)}</text>`;
+  });
+  g += `<line class="gr-axis" x1="${f(p.x)}" x2="${f(p.x)}" y1="${f(p.y)}" y2="${f(p.y + p.h)}"/>`;
+  g += `<text class="gr-axname" x="${f(p.x + p.w)}" y="${f(L.H - 5)}" text-anchor="end">${escapeHtml(L.xName)}</text>`;
+  L.bars.forEach((bar, k) => {
+    const c = `gr-s${bar.slot + 1}`;
+    if (scene.faces) g += grFaceSvg({ px: L.faceCx, py: bar.cy, r: L.faceR, p: { id: bar.id, name: bar.name } }, 'b' + k, c);
+    g += `<text class="gr-bar-name" x="${f(L.nameRight)}" y="${f(bar.cy)}" text-anchor="end" dominant-baseline="central">${escapeHtml(bar.disp)}</text>`;
+    g += `<rect class="gr-bar ${c}" x="${f(bar.x)}" y="${f(bar.y)}" width="${f(bar.w)}" height="${f(bar.h)}" rx="${f(Math.min(4 * s, bar.h / 2))}" data-bi="${k}"/>`;
+    g += `<text class="gr-bar-val" x="${f(bar.x + bar.w + 7 * s)}" y="${f(bar.cy)}" text-anchor="start" dominant-baseline="central">${escapeHtml(scene.x.fmt(bar.value))}</text>`;
+  });
+  g += '<g id="gr-hl"></g>';
+  const aria = `${scene.title}. ${scene.subtitle}`;
+  return `<svg id="gr-svg" class="gr-svg" width="${L.W}" height="${L.H}" viewBox="0 0 ${L.W} ${L.H}" role="img" tabindex="0" aria-label="${escapeHtml(aria)}">${g}</svg>`;
+}
+
 function grSvg(L, scene) {
+  if (scene.tipo === 'barras') return grBarsSvg(L, scene);
   const p = L.plot, f = n => (+n).toFixed(1);
   let g = '';
   // rejilla y ejes (recesivos)
@@ -7678,6 +7793,11 @@ function grTitleParts(scene) {
 function grLegendStat(scene, l) {
   const unit = m => m.short.replace('%', '');
   const val = (a, v) => `${a.fmt(v)}${a.metric.kind === 'pct' ? '' : ' ' + unit(a.metric)}`;
+  if (scene.tipo === 'barras') {
+    const b = (scene.bars || []).find(x => x.id === l.id);
+    if (!b) return 'Sin datos en este filtro';
+    return `${val(scene.x, b.value)} · ${fmtEnt(b.g)} PJ`;
+  }
   if (scene.tipo === 'lineas') {
     const se = scene.series.find(s => s.id === l.id);
     if (!se || !se.points.length) return 'Sin datos en este filtro';
@@ -7806,6 +7926,29 @@ async function grBuildImage(scene, legend, fmt) {
   const top = y + 58, bottom = H - F.foot - 8;
   const L = grLayout(scene, W - 2 * PAD + 20, bottom - top, F.s);
   const p = L.plot, s = L.s, fs = L.fs;
+  let median = null;
+  if (scene.tipo === 'barras') {
+    x.save(); x.translate(PAD - 20, top);
+    x.lineWidth = 1;
+    L.xTicks.forEach(t => {
+      if (t.v > 0) { x.strokeStyle = CO.grid; x.beginPath(); x.moveTo(t.p, p.y); x.lineTo(t.p, p.y + p.h); x.stroke(); }
+      x.fillStyle = CO.dim; x.font = `400 ${fs}px Inter, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+      x.fillText(t.label, t.p, p.y + p.h + fs * 1.7);
+    });
+    x.strokeStyle = CO.axis; x.lineWidth = 1.5; x.beginPath(); x.moveTo(p.x, p.y); x.lineTo(p.x, p.y + p.h); x.stroke();
+    x.font = `600 ${Math.round(fs * 0.82)}px Inter, sans-serif`; x.fillStyle = CO.dim; x.textAlign = 'right'; x.textBaseline = 'alphabetic';
+    spaced(2, () => x.fillText(L.xName.replace(/ \(.*\)$/, '').toUpperCase(), p.x + p.w, L.H - 4));
+    L.bars.forEach(bar => {
+      const w = Math.max(0, bar.w), r = Math.min(6 * s, bar.h / 2);
+      x.fillStyle = col(bar.slot); grRoundRect(x, bar.x, bar.y, w, bar.h, r); x.fill();
+      x.fillStyle = CO.text; x.font = `700 ${Math.round(fs * 1.02)}px Inter, sans-serif`; x.textAlign = 'left'; x.textBaseline = 'middle';
+      x.fillText(scene.x.fmt(bar.value), bar.x + w + 8 * s, bar.cy);
+      x.fillStyle = CO.muted; x.font = `600 ${Math.round(fs * 0.98)}px Inter, sans-serif`; x.textAlign = 'right'; x.textBaseline = 'middle';
+      x.fillText(bar.disp, L.nameRight, bar.cy);
+      if (scene.faces) face(bar.id, bar.name, L.faceCx, bar.cy, L.faceR, col(bar.slot), 3, false);
+    });
+    x.restore();
+  } else {
   if (L.series) L.series.forEach(se => se.pts.forEach(q => { if (q.face) q.r = F.faceL; }));
   if (L.pts && scene.faces) {
     L.pts.forEach(q => { q.r = q.p.sel ? F.faceS : F.faceC; });
@@ -7833,7 +7976,6 @@ async function grBuildImage(scene, legend, fmt) {
     spaced(2, () => x.fillText(L.xName.replace(/ \(.*\)$/, '').toUpperCase(), p.x + p.w, L.H - 2));
   }
 
-  let median = null;
   if (lineas) {
     L.series.forEach(se => {
       x.strokeStyle = col(se.se.slot); x.lineWidth = 2.9 * s; x.lineJoin = 'round'; x.lineCap = 'round';
@@ -7882,6 +8024,7 @@ async function grBuildImage(scene, legend, fmt) {
     });
   }
   x.restore();
+  }
 
   // Pie: fuente y notas a la izquierda (o arriba en vertical), marca a la derecha
   const fy = H - F.foot;
@@ -7928,7 +8071,7 @@ async function initGraficosPage() {
   catch (e) { sub.textContent = 'Error al cargar los datos'; grShowEmpty('No se pudieron cargar los datos. Recarga la página para intentarlo de nuevo.'); return; }
   buildPlayerIds(data.jugadores);
   grPlayers = grEligible(data.jugadores);
-  sub.textContent = `Construye gráficos de líneas y de dispersión con las estadísticas de los ${grPlayers.length} españoles que han jugado en la NBA`;
+  sub.textContent = `Construye gráficos de líneas, dispersión y barras con las estadísticas de los ${grPlayers.length} españoles que han jugado en la NBA`;
   grState = grParseState(new URLSearchParams(location.search), grPlayers);
   grAssignSlots();
   grBindUI();
@@ -8023,9 +8166,12 @@ function grSyncControls() {
   [...$('gr-x').options].forEach(o => { o.disabled = o.value === st.y || (o.value === 'edad' && st.u !== 'temporada'); o.hidden = o.value === 'edad' && st.u !== 'temporada'; });
   [...$('gr-y').options].forEach(o => { o.disabled = o.value === st.x; });
   document.querySelectorAll('[data-gr]').forEach(el => {
-    const need = el.getAttribute('data-gr');
-    const pctUsed = (st.tipo === 'lineas' ? [st.m] : [st.x, st.y]).some(k => (grMetric(k) || {}).kind === 'pct');
-    const show = need === st.tipo || (need === 'carrera' && st.tipo === 'dispersion' && st.u === 'carrera') || (need === 'pct' && pctUsed) || (need === 'caras' && grUsesFaces(Object.assign({}, st, { caras: true })));
+    const needs = el.getAttribute('data-gr').split(/\s+/);
+    const pctUsed = (st.tipo === 'lineas' || st.tipo === 'barras' ? [st.m] : [st.x, st.y]).some(k => (grMetric(k) || {}).kind === 'pct');
+    const show = needs.some(need => need === st.tipo
+      || (need === 'carrera' && st.tipo === 'dispersion' && st.u === 'carrera')
+      || (need === 'pct' && pctUsed)
+      || (need === 'caras' && grUsesFaces(Object.assign({}, st, { caras: true }))));
     el.hidden = !show;
   });
   ['ley', 'ctx', 'nom', 'muestra', 'caras'].forEach(k => { const b = $('gr-' + k); b.classList.toggle('active', !!st[k]); b.setAttribute('aria-pressed', st[k] ? 'true' : 'false'); });
@@ -8084,7 +8230,7 @@ function grDraw() {
   svg.addEventListener('pointerdown', grPointer);
   svg.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') grHideTip(); });
   svg.addEventListener('keydown', grKey);
-  svg.addEventListener('focus', () => { if (grHover == null) grShowAt(grScene.tipo === 'lineas' ? grL.xs.length - 1 : grOrderedPts().length - 1); });
+  svg.addEventListener('focus', () => { if (grHover == null) grShowAt(grScene.tipo === 'lineas' ? grL.xs.length - 1 : grScene.tipo === 'barras' ? 0 : grOrderedPts().length - 1); });
   svg.addEventListener('blur', grHideTip);
 }
 
@@ -8095,6 +8241,13 @@ function grPointer(e) {
   if (!grL) return;
   const r = e.currentTarget.getBoundingClientRect();
   const mx = e.clientX - r.left, my = e.clientY - r.top, p = grL.plot;
+  if (grScene.tipo === 'barras') {
+    if (my < p.y - 10 || my > p.y + p.h + 10 || mx < 0 || mx > grL.W) { grHideTip(); return; }
+    let best = -1, bd = Infinity;
+    grL.bars.forEach((bar, i) => { const d = Math.abs(bar.cy - my); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) grShowAt(best); else grHideTip();
+    return;
+  }
   if (mx < p.x - 24 || mx > p.x + p.w + 24 || my < p.y - 24 || my > p.y + p.h + 24) { grHideTip(); return; }
   if (grScene.tipo === 'lineas') {
     let best = -1, bd = Infinity;
@@ -8109,7 +8262,7 @@ function grPointer(e) {
 
 function grKey(e) {
   if (!grL) return;
-  const n = grScene.tipo === 'lineas' ? grL.xs.length : grL.pts.length;
+  const n = grScene.tipo === 'lineas' ? grL.xs.length : grScene.tipo === 'barras' ? grL.bars.length : grL.pts.length;
   if (e.key === 'Escape') { grHideTip(); return; }
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
   e.preventDefault();
@@ -8132,7 +8285,18 @@ function grShowAt(i) {
   tip.innerHTML = '';
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
   let ax, ay, hlHtml = '';
-  if (sc.tipo === 'lineas') {
+  if (sc.tipo === 'barras') {
+    const bar = grL.bars[i]; if (!bar) return;
+    ax = bar.x + bar.w; ay = bar.cy;
+    hlHtml = `<rect x="${(bar.x - 1.5).toFixed(1)}" y="${(bar.y - 1.5).toFixed(1)}" width="${(Math.max(0, bar.w) + 3).toFixed(1)}" height="${(bar.h + 3).toFixed(1)}" rx="3" fill="none" stroke="var(--text)" stroke-width="2" pointer-events="none"/>`;
+    const b = bar.b;
+    tip.appendChild(el('div', 'gr-tip-h', bar.name));
+    tip.appendChild(el('div', 'gr-tip-s', `${b.from === b.to ? grSeasonLbl(b.from) : grSeasonLbl(b.from) + ' a ' + grSeasonLbl(b.to)} · ${b.n} temp. · ${fmtEnt(b.g)} PJ`));
+    const row = el('div', 'gr-tip-r');
+    row.appendChild(el('strong', null, sc.x.fmt(bar.value)));
+    row.appendChild(el('span', 'gr-tip-n', sc.x.name.replace(/ \(.*\)$/, '')));
+    tip.appendChild(row);
+  } else if (sc.tipo === 'lineas') {
     const xv = grL.xs[i];
     ax = grL.sx(xv);
     cross.setAttribute('x1', ax); cross.setAttribute('x2', ax); cross.setAttribute('visibility', 'visible');
@@ -8208,7 +8372,7 @@ function grUpdate() {
 }
 
 // ── Exportar / compartir ──
-function grTrackInfo() { return { tipo: grState.tipo, unidad: grState.tipo === 'lineas' ? 'temporada' : grState.u, metrica: grState.tipo === 'lineas' ? grState.m : `${grState.y}~${grState.x}`, n: grState.ids.length }; }
+function grTrackInfo() { return { tipo: grState.tipo, unidad: grState.tipo === 'dispersion' ? grState.u : 'carrera', metrica: grState.tipo === 'dispersion' ? `${grState.y}~${grState.x}` : grState.m, n: grState.ids.length }; }
 function grPngFmt() { const el = document.getElementById('gr-fmt'); return el && el.value === 'v' ? 'v' : 'h'; }
 function grDescargaImagen(bl) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'grafico-espanoles-nba.png';

@@ -43,7 +43,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Españoles NBA">
-<link rel="stylesheet" href="style.css?v=213">
+<link rel="stylesheet" href="style.css?v=214">
 </head>
 <body>
 
@@ -75,6 +75,7 @@
         <select id="gr-tipo" class="sel">
           <option value="lineas">Líneas (evolución)</option>
           <option value="dispersion">Dispersión (relación)</option>
+          <option value="barras">Barras (ranking)</option>
         </select>
       </label>
       <label class="tmp-field">
@@ -84,8 +85,8 @@
           <option value="po">Playoffs</option>
         </select>
       </label>
-      <label class="tmp-field" data-gr="lineas">
-        <span class="tmp-field-lbl">Métrica (eje Y)</span>
+      <label class="tmp-field" data-gr="lineas barras">
+        <span class="tmp-field-lbl">Métrica</span>
         <select id="gr-m" class="sel"></select>
       </label>
       <label class="tmp-field" data-gr="lineas">
@@ -202,7 +203,7 @@
   </div>
 </footer>
 
-<script src="app.js?v=213"></script>
+<script src="app.js?v=214"></script>
 <script>initTheme(); initGraficosPage();</script>
 </body>
 </html>

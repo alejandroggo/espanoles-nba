@@ -2062,6 +2062,9 @@ span.efm-photo-img { display: flex; align-items: center; justify-content: center
 .gr-line { fill: none; stroke: var(--c, var(--text-muted)); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .gr-mk { fill: var(--c, var(--text-muted)); stroke: var(--surface); stroke-width: 2; paint-order: stroke; }
 .gr-mk-hl { fill: var(--c); stroke: var(--text); stroke-width: 2; pointer-events: none; }
+.gr-bar { fill: var(--c, var(--text-muted)); }
+.gr-bar-val { fill: var(--text); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; }
+.gr-bar-name { fill: var(--text-muted); font-weight: 600; font-size: 13px; }
 .gr-ctx-hl { --c: var(--text-muted); }
 .gr-sw.gr-ctx .gr-mk { fill: var(--gr-ctx); stroke: none; }
 circle.gr-ctx { fill: var(--gr-ctx); }

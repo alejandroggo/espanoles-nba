@@ -179,6 +179,23 @@ test('color/forma fijos por jugador (slots) aunque cambie el orden', () => {
 test('sin jugadores: estado vacío explícito', () => {
   assert.ok(grBuildScene(grNormalize({ ids: [] }, players), players).empty);
 });
+test('barras: una barra por jugador, ordenadas desc, con escala y tabla', () => {
+  const st = grNormalize({ tipo: 'barras', ids: ['marc-gasol', 'pau-gasol', 'sergio-llull'], m: 'pts_tot' }, players);
+  const sc = grBuildScene(st, players);
+  assert.equal(sc.tipo, 'barras');
+  assert.equal(sc.bars.length, 2, 'Llull no tiene carrera NBA → se descarta');
+  assert.ok(sc.bars[0].value >= sc.bars[1].value, 'ordenadas de mayor a menor');
+  assert.equal(sc.bars[0].value, grCareerValue(grCareerAgg(P(sc.bars[0].id), 'reg'), grMetric('pts_tot')).value);
+  const L = grLayout(sc, 1000, 500, 1);
+  assert.equal(L.bars.length, 2);
+  assert.ok(L.bars.every(b => b.w >= 0 && b.h > 0));
+  const d = grTableData(sc);
+  assert.equal(JSON.stringify(d.head), JSON.stringify(['Jugador', 'Periodo', 'PJ', 'Puntos totales']));
+  assert.equal(d.rows.length, 2);
+  // ida y vuelta por URL
+  const back = grParseState(grStateToParams(st), players);
+  assert.equal(back.tipo, 'barras'); assert.equal(back.m, 'pts_tot');
+});
 
 console.log('Gráficos · URL y validación');
 test('URL de ida y vuelta conserva la configuración', () => {
