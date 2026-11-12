@@ -59,8 +59,8 @@ test('descarta filas sin año (year 0) y sin partidos (temporada 2026-27 sin emp
 });
 test('selector: solo jugadores con partidos NBA (excluye no debutados y novatos sin partidos)', () => {
   const ids = players.map(j => j.id);
-  ['sergio-llull', 'fran-vazquez', 'aday-mara', 'baba-miller', 'sergio-de-larrea'].forEach(id => assert.ok(!ids.includes(id), id));
-  ['pau-gasol', 'fernando-martin', 'hugo-gonzalez'].forEach(id => assert.ok(ids.includes(id), id));
+  ['sergio-llull', 'fran-vazquez', 'juan-nunez'].forEach(id => assert.ok(!ids.includes(id), id));
+  ['pau-gasol', 'fernando-martin', 'hugo-gonzalez', 'aday-mara', 'baba-miller', 'sergio-de-larrea'].forEach(id => assert.ok(ids.includes(id), id));
 });
 test('edad a 1 de febrero (criterio Basketball Reference)', () => {
   assert.equal(grAge(P('pau-gasol'), 2009), 28);     // 6 jul 1980
