@@ -1,54 +1,6 @@
 {
-  "actualizado": "2026-11-12T13:58:27.762Z",
+  "actualizado": "2026-11-14T04:17:20.283Z",
   "superaciones": [
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Baba Miller",
-      "rival": "Aday Mara",
-      "campo": "rebotes",
-      "valor": 3
-    },
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Baba Miller",
-      "rival": "Aday Mara",
-      "campo": "asistencias",
-      "valor": 1
-    },
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Baba Miller",
-      "rival": "Aday Mara",
-      "campo": "partidos",
-      "valor": 1
-    },
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Sergio De Larrea",
-      "rival": "Aday Mara",
-      "campo": "rebotes",
-      "valor": 2
-    },
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Sergio De Larrea",
-      "rival": "Aday Mara",
-      "campo": "asistencias",
-      "valor": 1
-    },
-    {
-      "fecha": "2026-10-22",
-      "tipo": "supera",
-      "jugador": "Sergio De Larrea",
-      "rival": "Aday Mara",
-      "campo": "partidos",
-      "valor": 1
-    },
     {
       "fecha": "2026-10-23",
       "tipo": "supera",
