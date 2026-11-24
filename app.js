@@ -906,7 +906,7 @@ const SAL_COLS = [
   { key: 'equipos',          label: 'Equipos',   sortable: false },
 ];
 
-const ROOKIES_CONTRATO = ['Sergio de Larrea', 'Baba Miller', 'Aday Mara'];
+const ROOKIES_CONTRATO = ['Sergio de Larrea', 'Baba Miller', 'Aday Mara', 'Eli Ndiaye'];
 
 function fmtDinero(n) {
   if (!n) return '—';
@@ -2394,6 +2394,7 @@ const BIO = {
   'sergio llull':         { altura: '1,90 m', peso: '86 kg',  origen: 'Mahón (Menorca)' },
   'dani diez':            { altura: '2,02 m', peso: '96 kg',  origen: 'Madrid' },
   'juan nunez':           { altura: '1,93 m', peso: '91 kg',  origen: 'Madrid' },
+  'eli ndiaye':           { altura: '2,03 m', peso: '94 kg',  origen: 'Guediawaye (Senegal)' },
 };
 
 function jugHeader(j) {
