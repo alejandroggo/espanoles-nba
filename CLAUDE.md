@@ -29,6 +29,14 @@ Sitio **100% estático, vanilla JS** (sin framework ni build). Toda la lógica v
 - `temporadas_data[]`: una fila por paso por equipo y temporada (`year`, `team`, `g`, `*_g`, `*_pct`). **En temporadas con traspaso hay una fila `TOT` + una por equipo.** Para una fila por año usar **`cmpYearRows()`** (prefiere `TOT`, nunca suma parciales). Los totales de carrera oficiales viven en los campos `*_total`; las vistas por temporada salen de `temporadas_data`.
 - Campos manuales (`posicion`, `bref_id`, `nacimiento`, `foto_url`, etc.) los **preserva el Apps Script** (mecanismo `CAMPOS_MANUALES`, fuera del repo) al regenerar: editarlos en `data.json` persiste. [decisión, confirmado por Alejandro]
 
+**Bot de stats (Apps Script, fuera del repo, 2 archivos)** [verificado al leer el código]:
+- *Exportador* (`buildJSON`/`exportarEspanoles`, `codigo.gs`): lee las pestañas del Sheet "BD Españoles" → construye `data.json` → PUT a GitHub; preserva `CAMPOS_MANUALES`. La **lista maestra de jugadores** sale de la pestaña **DRAFT-DEBUT** (incluye a los que no debutaron; `draft:false` = columnas de draft en blanco).
+- *Actualizador diario* (`actualizarStatsDiarios`, `EspanolesNBA.gs`): RapidAPI "nba-ncaab-api". Identifica a los 5 activos (`JUGADORES`) **por NOMBRE** (`norm_` + `ALIAS_BUSQUEDA`, lista de grafías) — **NO** por la pestaña `BDL_IDS`, que es **vestigial/no se usa**. Suma a TOTALES / TOTAL x SEASON / GAME HIGHS / G-TEAM y manda email diario (box score + "ha superado a un español" + "a poco de algo").
+- **Novatos en el correo**: `esNovatoEnFormacion_` (en `JUGADORES` y <25 PJ) — no se comparan entre ellos en `actualizarTotales_`/`calcularCercanias_` (misma regla que la web). [hecho]
+- **GS/titulares**: la API no los da → se ponen **a mano** (recordatorio semanal programado, miércoles 8:30 ET).
+- **TD = triples-dobles** (`esTripleDoble_`, ≥3 categorías ≥10). (Antes contaba dobles-dobles por error.)
+- El Sheet se puede editar por connector de **Google Sheets** si está activo en la sesión (se usó para añadir a Eli / depurar Aldama).
+
 **Carga de datos** [verificado]: `loadData()` hace un único `fetch('data.json', {cache:'no-cache'})` deduplicado (`AG_DATA_PROMISE`); normaliza `BRK→BKN`. Las páginas que usan `data/` hacen su propio `fetch('data/<x>.json')`.
 
 **Patrón de página** [verificado]: `<head>` con GA4 (Consent Mode v2, cookies denegadas por defecto + banner) + fuentes + `style.css?v=N`; header + hero + contenido + footer; al final `<script src="app.js?v=N"></script>` y `<script>initTheme(); init<Nombre>Page();</script>`. `initTheme()` llama a `buildNav()`, `buildHeaderSearch()`, `buildShareButton()`, banner de cookies, etc.
@@ -41,7 +49,7 @@ Sitio **100% estático, vanilla JS** (sin framework ni build). Toda la lógica v
 - **Export a imagen (canvas, sin librerías):** `qntBlob()` (canvas→PNG) + builders `cmpBuildImage`, `grBuildImage`, `qntBuildImage`, `retoBuildImage`, `pjBuildImage`. Plantilla PNG oscura con franjas de bandera. Reutilizar este motor para cualquier imagen nueva.
 - Analítica: `track(evento, params)` (falla en silencio si no hay gtag).
 
-**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=213**) con `sed -i 's/?v=213/?v=214/g' *.html`. [verificado]
+**Caché:** cache-busting `?v=N` en `app.js` y `style.css` en TODAS las páginas. **Al cambiar `app.js`/`style.css` hay que subir N** (hoy **v=215**) con `sed -i 's/?v=215/?v=216/g' *.html`. [verificado]
 
 **Despliegue** [verificado/decisión]: sin `vercel.json` ni workflows → sitio estático. **Push a `main` → Vercel despliega automáticamente** en el dominio. El bot de Apps Script también commitea a `main`. No publicar sin autorización (ver §4).
 
@@ -75,24 +83,22 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 - Parejas y Cara a cara: **ENCENDIDAS** (enlace en menú junto a Comparador + tarjetas 20/21 en portada + sin `noindex`). [hecho]
 - Salarios por equipo: **integrado dentro de `salarios.html`** (una sola tabla con dropdown), no como página aparte.
 - `Ricky Rubio` perdonó **$424.672** (buyout 2023) → sus splits no cuadran con su total; Indiana pagó a Ricky e Ibaka sin que jugaran (caso especial en la tabla de franquicias).
-- **Eli Ndiaye** (**$85.300**, Atlanta): no debutará en la NBA, así que NO es `jugador` en `data.json`. Se muestra en el **ranking de salarios** como fila sintetizada desde `data/salarios.json` en `initSalariosPage` (bloque que recorre `SAL_PE.jugadores` no presentes en `data.json`; foto vía `SE_PHOTO`). Patrón reutilizable para futuros fichados sin ficha. [hecho]
-- **Marcas al alcance**: los novatos "en formación" (<25 PJ en la temporada actual) NO compiten entre ellos (ni en "a punto" ni en "recién superadas"), solo contra jugadores asentados. Helper `rwIsFormingRookie` + `RW_ROOKIE_MIN_GAMES=25`; filtra en `rwBuild` (rival) y `rsBuild` (superaciones). Se auto-desactiva al llegar a 25 PJ. [hecho] — Pendiente opcional: aplicar la misma regla al correo del bot (`calcularCercanias_`/`actualizarTotales_`/`computeSuperaciones`).
+- **Eli Ndiaye** (**$85.300**, Atlanta; undrafted 2025, cortado sin debutar): **YA es `jugador` en `data.json`** (0 PJ). Se añadió como fila en la pestaña **DRAFT-DEBUT** del Sheet (el bot lo exporta); sus campos manuales `posicion`/`nacimiento` en `data.json` (preservados por `CAMPOS_MANUALES`) + entrada en el mapa `BIO` (físico 2,03 m · 94 kg, origen Guediawaye); ficha `jugador-eli-ndiaye.html` + action card `img/og/eli-ndiaye.jpg`; está en `ROOKIES_CONTRATO` (para salir en el ranking de salarios pese a 0 PJ). Aparece en Jugadores/Draft(undrafted)/ficha/PEPU/Salarios. [hecho] — El bloque "fila sintetizada" de `initSalariosPage` que recorre `SAL_PE.jugadores` sigue ahí como red de seguridad, pero ya no aplica a Eli.
+- **Marcas al alcance**: los novatos "en formación" (<25 PJ en la temporada actual) NO compiten entre ellos (ni en "a punto" ni en "recién superadas"), solo contra jugadores asentados. Helper `rwIsFormingRookie` + `RW_ROOKIE_MIN_GAMES=25`; filtra en `rwBuild` (rival) y `rsBuild` (superaciones). Se auto-desactiva al llegar a 25 PJ. [hecho] La **misma regla ya está aplicada al correo del bot** (`esNovatoEnFormacion_` en `actualizarTotales_`/`calcularCercanias_`). [hecho]
 
 **Propuesto, NO aprobado** [propuesto]:
 - Página/sección de **"españoles no jugadores"** (entrenadores/staff) para Jordi Fernández y futuros. Hay un **preview** de la ficha de Jordi (artifact), sin desplegar.
 
 ## 5. Proyecto: creador de gráficos (`graficos.html`)
 **Estado: IMPLEMENTADO** [verificado] (módulo en `app.js`, sección "GRÁFICOS", ~líneas 7014-8585; funciones puras testeadas en `tools/test-graficos.mjs`). Resumen de lo que YA existe:
-- Tipos: **líneas** (evolución de carrera) y **dispersión/scatter** (dos métricas). `GR_TIPOS = ['lineas','dispersion']`. [verificado]
+- Tipos: **líneas** (evolución de carrera), **dispersión/scatter** (dos métricas) y **barras** (ranking horizontal, una barra por jugador para una métrica de carrera/periodo). `GR_TIPOS = ['lineas','dispersion','barras']`. [verificado]
 - Selección de **jugadores** (picker/chips) y **métricas** (catálogo `GR_CATS`: pts/reb/ast/rob/tap/triples/min/tov/pf por partido, totales y %; eje X `temp`/`n`/`edad`). [verificado]
 - Periodos/filtros compatibles con los datos: **carrera vs temporada**, **reg vs playoffs**, rango `desde`/`hasta`, mínimo de partidos. Manejo correcto de **`TOT`** (una fila/año vía dedup), promedios por partido (nunca suma de promedios) y valores ausentes. [verificado]
 - **Export a imagen PNG** (`grDownload`, horizontal 1600×900 o vertical 1080×1350) y **compartir en X** (`grShare`, `navigator.share`), reutilizando `qntBlob`/`grBuildImage`. [verificado]
 - **Compartir configuración por URL**: estado serializado en query params (`grParseState` + `history.replaceState`) + "Copiar enlace" (`grCopyLink`). [verificado]
 - **Tooltips** (`gr-tip`, pointermove), **leyenda** (`gr-legend`), **ejes etiquetados**, **responsive** (`ResizeObserver`→`grDraw`), caras de jugadores como marcas. [verificado]
 
-**Pendiente/propuesto:**
-- **Gráficos de barras**: NO implementados aún (solo líneas y dispersión). [propuesto]
-- Ejemplo inicial "puntos por partido de Pau y Marc Gasol en líneas": soportado por la herramienta; **el estado por defecto exacto está sin confirmar** (el default actual incluye un scatter). [pendiente de confirmar]
+**Barras** (`tipo='barras'`) [hecho]: barras horizontales, una por jugador, métrica única (agregado de carrera o periodo), reg/po, mínimo de partidos. Funciones propias `grBarLayout`/`grBarsSvg` + ramas en `grBuildScene`/`grLayout`/`grSvg`/`grBuildImage`/`grDraw`/`grPointer`/`grShowAt`/`grKey`/`grTableData`/`grSyncControls`. Reutiliza selección de jugadores, métrica (`gr-m` con `data-gr="lineas barras"`), periodo y caras. Export PNG (h/v), tooltip, teclado, URL. Test en `tools/test-graficos.mjs`.
 
 ## 6. Preferencias de trabajo con Alejandro
 - Respuestas **directas y prácticas**; cambios concretos, no reescrituras innecesarias.
@@ -103,20 +109,21 @@ Todas verificadas por sus `init…Page()` en `app.js` y su `.html`:
 
 ## 7. Estado actual y próximos pasos
 **Hechos verificados (repo):**
-- Menú (`NAV_LINKS`) enlaza todas las secciones **excepto** PEPU/`preguntas.html` (comentado, sigue oculto). `parejas.html` y `cara-a-cara.html` YA están en el menú y en la portada.
-- `data.json` actualizado 2026-10-18; 29 jugadores. Caché en **v=213**.
-- Creador de gráficos, comparador, salarios (con "por equipo"), parejas, cara a cara y PEPU: funcionando.
+- Menú (`NAV_LINKS`) enlaza todas las secciones **excepto** PEPU/`preguntas.html` (comentado, sigue oculto). `parejas.html` y `cara-a-cara.html` están en el menú y en la portada.
+- `data.json`: **30 jugadores** (Eli Ndiaye incluido). Caché en **v=215**.
+- Gráficos (líneas/dispersión/barras), comparador, salarios (con "por equipo"), parejas, cara a cara y PEPU: funcionando.
 
-**Decisiones en conversación (este ciclo):**
-- `data/duelos.json` completo (récord, medias, minutos, primer/último duelo, series de playoffs) y `data/salarios.json` actualizado a 2026-27 (Aldama→Dallas, rookies que debutan, Eli Ndiaye→Atlanta).
-- Preview de Jordi Fernández listo (perfil de entrenador, orden cronológico inverso, NBA destacado, Nets 46-118 en 2 temporadas).
+**Hecho este ciclo (desplegado):**
+- Gráficos de **barras** (ver §5).
+- PEPU en duelos: **% de victorias** del líder + **ganador de cada serie de playoffs** (`botDueloMsg`).
+- **Eli Ndiaye** completo en toda la web + action card (ver §4).
+- Cara a cara / Parejas públicas; matriz con columna **% V**.
+- **GA4**: creadas 6 dimensiones personalizadas (evento `bot_pregunta` → `resultado`, `pregunta`, `origen`; y `metodo`, `jugadores`, `tipo` de `compartir`/`comparar_jugadores`/`graficos`). Las de PEPU solo se poblarán al encender el buscador.
+- **Bot** (ver §2): arreglado Aldama (match por nombre, no `BDL_IDS`), bug del TD (triples-dobles), regla de novatos en el correo, recordatorio semanal de titularidades.
 
 **Pendiente / requiere confirmación:**
-- **Encender PEPU** del todo (enlace en menú + widget flotante `buildChatWidget`): decisión de Alejandro.
-- **GA4**: crear las 3 dimensiones personalizadas del buscador (`resultado`, `pregunta`, `origen`) — tarea manual en la consola; hay recordatorio programado.
-- **Gráficos de barras** (pendiente de implementar).
-- **Página "españoles no jugadores"** (Jordi): propuesta, no construida.
-- Salario de **Eli Ndiaye ($85.300)**: tomado tal cual, a confirmar.
+- **Encender PEPU** del todo (enlace en menú + widget flotante `buildChatWidget`): decisión de Alejandro. (Al encenderlo empiezan a llegar datos a GA4.)
+- **Página "españoles no jugadores"** (Jordi Fernández): preview listo, sin construir ni desplegar.
 - Backlog de ideas: ver el artifact "Pendientes · Web NBA" (lista viva mantenida por Claude).
 - **Siguiente paso recomendado:** confirmar con Alejandro si se enciende PEPU y si se construye la sección de no-jugadores; mientras, no desplegar sin su visto bueno.
 
