@@ -61,6 +61,22 @@ function track(evento, params) {
   try { if (typeof gtag === 'function') gtag('event', evento, params || {}); } catch (e) { }
 }
 
+// Monitoreo de errores JS en producción → GA4 (para enterarse si una página se rompe).
+// Cap de 5 por carga para no inundar. Evento `js_error` con {mensaje, fuente, pagina}.
+var AG_ERR_COUNT = 0;
+function agReportError(msg, fuente) {
+  if (AG_ERR_COUNT >= 5) return;
+  AG_ERR_COUNT++;
+  track('js_error', { mensaje: String(msg == null ? 'error' : msg).slice(0, 150), fuente: String(fuente || '').slice(0, 100), pagina: location.pathname });
+}
+window.addEventListener('error', function (e) {
+  agReportError(e && e.message, e && e.filename ? (String(e.filename).split('/').pop() + ':' + (e.lineno || 0)) : '');
+});
+window.addEventListener('unhandledrejection', function (e) {
+  var r = e && e.reason;
+  agReportError('promesa: ' + ((r && r.message) || r), '');
+});
+
 // ── BOTÓN COMPARTIR (cabecera, todas las páginas) ──
 function buildShareButton() {
   const right = document.querySelector('.header-right');
