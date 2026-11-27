@@ -1,46 +1,6 @@
 {
-  "actualizado": "2026-11-26T12:05:23.148Z",
+  "actualizado": "2026-11-27T12:04:44.079Z",
   "superaciones": [
-    {
-      "fecha": "2026-11-05",
-      "tipo": "supera",
-      "jugador": "Aday Mara",
-      "rival": "Fernando Martín",
-      "campo": "asistencias",
-      "valor": 10
-    },
-    {
-      "fecha": "2026-11-05",
-      "tipo": "supera",
-      "jugador": "Aday Mara",
-      "rival": "Jorge Garbajosa",
-      "campo": "tapones",
-      "valor": 15
-    },
-    {
-      "fecha": "2026-11-05",
-      "tipo": "supera",
-      "jugador": "Aday Mara",
-      "rival": "Sergio Rodríguez",
-      "campo": "tapones",
-      "valor": 15
-    },
-    {
-      "fecha": "2026-11-05",
-      "tipo": "supera",
-      "jugador": "Hugo González",
-      "rival": "Juan Carlos Navarro",
-      "campo": "partidos",
-      "valor": 82
-    },
-    {
-      "fecha": "2026-11-05",
-      "tipo": "supera",
-      "jugador": "Baba Miller",
-      "rival": "Sergio De Larrea",
-      "campo": "asistencias",
-      "valor": 5
-    },
     {
       "fecha": "2026-11-11",
       "tipo": "supera",
